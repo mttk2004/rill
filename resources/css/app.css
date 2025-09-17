@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @plugin 'tailwindcss-animate';
 
@@ -9,7 +10,7 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -60,74 +61,105 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    /* Rill Color Scheme - Modern Retro for Vinyl Store */
+    --background: #ffffff;
+    --foreground: #0a0a0a;
+    --card: #ffffff;
+    --card-foreground: #0a0a0a;
+    --popover: #ffffff;
+    --popover-foreground: #0a0a0a;
+    
+    /* Primary - Black dominant */
+    --primary: #1a1a1a;
+    --primary-foreground: #fafafa;
+    
+    /* Secondary - Warm gray */
+    --secondary: #f5f5f4;
+    --secondary-foreground: #0c0a09;
+    
+    /* Accent - Vintage copper */
+    --accent: #d97706;
+    --accent-foreground: #fefbf3;
+    
+    /* System colors */
+    --muted: #f5f5f5;
+    --muted-foreground: #737373;
+    --border: #e5e5e5;
+    --input: #e5e5e5;
+    --ring: #d97706;
+    
+    /* Destructive */
+    --destructive: #dc2626;
+    --destructive-foreground: #fefefe;
+    
+    /* Chart colors */
+    --chart-1: #d97706;
+    --chart-2: #b45309;
+    --chart-3: #92400e;
+    --chart-4: #78350f;
+    --chart-5: #451a03;
+    
+    --radius: 0.5rem;
+    
+    /* Sidebar colors */
+    --sidebar: #fafafa;
+    --sidebar-foreground: #1a1a1a;
+    --sidebar-primary: #1a1a1a;
+    --sidebar-primary-foreground: #fafafa;
+    --sidebar-accent: #f5f5f4;
+    --sidebar-accent-foreground: #0c0a09;
+    --sidebar-border: #e5e5e5;
+    --sidebar-ring: #d97706;
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    /* Dark mode for Rill */
+    --background: #0a0a0a;
+    --foreground: #fafafa;
+    --card: #1a1a1a;
+    --card-foreground: #fafafa;
+    --popover: #1a1a1a;
+    --popover-foreground: #fafafa;
+    
+    /* Primary inverted for dark mode */
+    --primary: #fafafa;
+    --primary-foreground: #0a0a0a;
+    
+    /* Secondary dark */
+    --secondary: #262626;
+    --secondary-foreground: #fafafa;
+    
+    /* Accent remains copper but adjusted */
+    --accent: #d97706;
+    --accent-foreground: #fefbf3;
+    
+    /* System colors for dark */
+    --muted: #262626;
+    --muted-foreground: #a3a3a3;
+    --border: #262626;
+    --input: #262626;
+    --ring: #d97706;
+    
+    /* Destructive */
+    --destructive: #dc2626;
+    --destructive-foreground: #fefefe;
+    
+    /* Chart colors adjusted for dark */
+    --chart-1: #f59e0b;
+    --chart-2: #d97706;
+    --chart-3: #b45309;
+    --chart-4: #92400e;
+    --chart-5: #78350f;
+    
+    /* Sidebar dark */
+    --sidebar: #1a1a1a;
+    --sidebar-foreground: #fafafa;
+    --sidebar-primary: #fafafa;
+    --sidebar-primary-foreground: #1a1a1a;
+    --sidebar-accent: #262626;
+    --sidebar-accent-foreground: #fafafa;
+    --sidebar-border: #262626;
+    --sidebar-ring: #d97706;
 }
 
 @layer base {
@@ -137,5 +169,33 @@
 
     body {
         @apply bg-background text-foreground;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    }
+}
+
+@layer components {
+    /* Rill Custom Components */
+    .btn-primary {
+        @apply bg-accent text-accent-foreground hover:bg-accent/90 transition-colors duration-150 font-medium;
+    }
+    
+    .btn-secondary {
+        @apply bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 transition-colors duration-150 font-medium;
+    }
+    
+    .card-rill {
+        @apply bg-card text-card-foreground border border-border rounded-md shadow-sm;
+    }
+    
+    .input-rill {
+        @apply bg-background border border-input rounded-md px-4 py-3 text-base focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors duration-150;
+    }
+    
+    /* Vietnamese text optimization */
+    .text-vietnamese {
+        text-rendering: optimizeLegibility;
+        -webkit-font-feature-settings: "kern" 1;
+        font-feature-settings: "kern" 1;
     }
 }
