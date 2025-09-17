@@ -14,20 +14,20 @@ export default function Welcome() {
                 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
                 <meta name="description" content="Cửa hàng đĩa than online hàng đầu Việt Nam. Khám phá bộ sưu tập vinyl chất lượng cao từ các nghệ sĩ nổi tiếng. Giao hàng COD toàn quốc." />
             </Head>
-            <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 dark:from-[#0a0a0a] dark:to-[#111111]">
+            <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 dark:from-background-dark dark:to-background-darker">
                 {/* Header */}
-                <header className="relative z-10 border-b border-gray-200/50 bg-white/80 backdrop-blur-sm dark:border-gray-800/50 dark:bg-[#0a0a0a]/80">
+                <header className="relative z-10 border-b border-gray-200/50 bg-white/80 backdrop-blur-sm dark:border-gray-800/50 dark:bg-background-dark/80">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-16 items-center justify-between">
                             <div className="flex items-center space-x-2">
-                                <Music className="h-8 w-8 text-[#d97706]" />
-                                <span className="text-2xl font-bold text-[#1a1a1a] dark:text-white">Rill</span>
+                                <Music className="h-8 w-8 text-accent" />
+                                <span className="text-2xl font-bold text-primary dark:text-primary-foreground">Rill</span>
                             </div>
                             <nav className="flex items-center space-x-4">
                                 {auth.user ? (
                                     <Link
                                         href={dashboard()}
-                                        className="rounded-lg bg-[#d97706] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#b45309]"
+                                        className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90"
                                     >
                                         Dashboard
                                     </Link>
@@ -41,7 +41,7 @@ export default function Welcome() {
                                         </Link>
                                         <Link
                                             href={register()}
-                                            className="rounded-lg bg-[#d97706] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#b45309]"
+                                            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/90"
                                         >
                                             Đăng ký
                                         </Link>
@@ -55,9 +55,9 @@ export default function Welcome() {
                 <main className="relative overflow-hidden">
                     <div className="mx-auto max-w-7xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24 lg:px-8 lg:pt-32">
                         <div className="mx-auto max-w-2xl text-center">
-                            <h1 className="text-4xl font-bold tracking-tight text-[#1a1a1a] sm:text-6xl dark:text-white">
+                            <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-6xl dark:text-primary-foreground">
                                 Khám phá thế giới
-                                <span className="text-[#d97706]"> vinyl </span>
+                                <span className="text-accent"> vinyl </span>
                                 chính hãng
                             </h1>
                             <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300">
@@ -67,7 +67,7 @@ export default function Welcome() {
                                 <div className="mt-10 flex items-center justify-center gap-x-4">
                                     <Link
                                         href={register()}
-                                        className="rounded-lg bg-[#d97706] px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#b45309] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d97706]"
+                                        className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground shadow-sm hover:bg-accent/90 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                                     >
                                         Bắt đầu mua sắm
                                     </Link>
@@ -85,7 +85,7 @@ export default function Welcome() {
                     {/* Features Section */}
                     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl text-center">
-                            <h2 className="text-3xl font-bold tracking-tight text-[#1a1a1a] sm:text-4xl dark:text-white">
+                            <h2 className="text-3xl font-bold tracking-tight text-primary sm:text-4xl dark:text-primary-foreground">
                                 Tại sao chọn Rill?
                             </h2>
                             <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
@@ -94,66 +94,66 @@ export default function Welcome() {
                         </div>
                         <div className="mx-auto mt-16 max-w-5xl">
                             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-[#1a1a1a] dark:border-gray-800">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#d97706]/10">
-                                        <Music className="h-6 w-6 text-[#d97706]" />
+                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-card-dark dark:border-gray-800">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
+                                        <Music className="h-6 w-6 text-accent" />
                                     </div>
-                                    <h3 className="mt-4 text-lg font-semibold text-[#1a1a1a] dark:text-white">
+                                    <h3 className="mt-4 text-lg font-semibold text-primary dark:text-primary-foreground">
                                         Bộ sưu tập đồ sộ
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                                         Hàng ngàn đĩa than từ các nghệ sĩ hàng đầu, bao gồm cả các album hiếm và phiên bản giới hạn.
                                     </p>
                                 </div>
-                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-[#1a1a1a] dark:border-gray-800">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#d97706]/10">
-                                        <Truck className="h-6 w-6 text-[#d97706]" />
+                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-card-dark dark:border-gray-800">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
+                                        <Truck className="h-6 w-6 text-accent" />
                                     </div>
-                                    <h3 className="mt-4 text-lg font-semibold text-[#1a1a1a] dark:text-white">
+                                    <h3 className="mt-4 text-lg font-semibold text-primary dark:text-primary-foreground">
                                         Giao hàng COD
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                                         Thanh toán khi nhận hàng, giao hàng tận nơi toàn quốc. An toàn, tin cậy và tiện lợi.
                                     </p>
                                 </div>
-                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-[#1a1a1a] dark:border-gray-800">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#d97706]/10">
-                                        <Shield className="h-6 w-6 text-[#d97706]" />
+                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-card-dark dark:border-gray-800">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
+                                        <Shield className="h-6 w-6 text-accent" />
                                     </div>
-                                    <h3 className="mt-4 text-lg font-semibold text-[#1a1a1a] dark:text-white">
+                                    <h3 className="mt-4 text-lg font-semibold text-primary dark:text-primary-foreground">
                                         Chất lượng đảm bảo
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                                         Tất cả đĩa than được kiểm tra kỹ lưỡng trước khi gửi đến khách hàng.
                                     </p>
                                 </div>
-                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-[#1a1a1a] dark:border-gray-800">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#d97706]/10">
-                                        <Star className="h-6 w-6 text-[#d97706]" />
+                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-card-dark dark:border-gray-800">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
+                                        <Star className="h-6 w-6 text-accent" />
                                     </div>
-                                    <h3 className="mt-4 text-lg font-semibold text-[#1a1a1a] dark:text-white">
+                                    <h3 className="mt-4 text-lg font-semibold text-primary dark:text-primary-foreground">
                                         Đánh giá cộng đồng
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                                         Hệ thống review và đánh giá từ cộng đồng người yêu nhạc giúp bạn chọn được album phù hợp.
                                     </p>
                                 </div>
-                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-[#1a1a1a] dark:border-gray-800">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#d97706]/10">
-                                        <Clock className="h-6 w-6 text-[#d97706]" />
+                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-card-dark dark:border-gray-800">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
+                                        <Clock className="h-6 w-6 text-accent" />
                                     </div>
-                                    <h3 className="mt-4 text-lg font-semibold text-[#1a1a1a] dark:text-white">
+                                    <h3 className="mt-4 text-lg font-semibold text-primary dark:text-primary-foreground">
                                         Hỗ trợ 24/7
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
                                         Đội ngũ hỗ trợ khách hàng chuyên nghiệp, sẵn sàng giải đáp mọi thắc mắc của bạn.
                                     </p>
                                 </div>
-                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-[#1a1a1a] dark:border-gray-800">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#d97706]/10">
-                                        <Award className="h-6 w-6 text-[#d97706]" />
+                                <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200 dark:bg-card-dark dark:border-gray-800">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
+                                        <Award className="h-6 w-6 text-accent" />
                                     </div>
-                                    <h3 className="mt-4 text-lg font-semibold text-[#1a1a1a] dark:text-white">
+                                    <h3 className="mt-4 text-lg font-semibold text-primary dark:text-primary-foreground">
                                         Uy tín hàng đầu
                                     </h3>
                                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
@@ -167,7 +167,7 @@ export default function Welcome() {
                     {/* CTA Section */}
                     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl text-center">
-                            <h2 className="text-3xl font-bold tracking-tight text-[#1a1a1a] sm:text-4xl dark:text-white">
+                            <h2 className="text-3xl font-bold tracking-tight text-primary sm:text-4xl dark:text-primary-foreground">
                                 Sẵn sàng bắt đầu hành trình vinyl?
                             </h2>
                             <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
@@ -177,7 +177,7 @@ export default function Welcome() {
                                 <div className="mt-8">
                                     <Link
                                         href={register()}
-                                        className="rounded-lg bg-[#d97706] px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-[#b45309] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d97706]"
+                                        className="rounded-lg bg-accent px-8 py-4 text-lg font-semibold text-accent-foreground shadow-sm hover:bg-accent/90 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                                     >
                                         Tạo tài khoản miễn phí
                                     </Link>
@@ -188,12 +188,12 @@ export default function Welcome() {
                 </main>
 
                 {/* Footer */}
-                <footer className="border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-[#0a0a0a]">
+                <footer className="border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-background-dark">
                     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                                <Music className="h-6 w-6 text-[#d97706]" />
-                                <span className="text-xl font-bold text-[#1a1a1a] dark:text-white">Rill</span>
+                                <Music className="h-6 w-6 text-accent" />
+                                <span className="text-xl font-bold text-primary dark:text-primary-foreground">Rill</span>
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">
                                 &copy; 2024 Rill. Tất cả các quyền được bảo lưu.

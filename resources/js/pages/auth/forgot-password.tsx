@@ -24,23 +24,23 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         <>
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Địa chỉ email</Label>
-                                <Input 
-                                    id="email" 
-                                    type="email" 
-                                    name="email" 
-                                    autoComplete="off" 
-                                    autoFocus 
-                                    placeholder="example@email.com" 
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    autoComplete="off"
+                                    autoFocus
+                                    placeholder="example@email.com"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
 
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="my-6 flex items-center justify-start">
-                                <Button 
-                                    className="w-full bg-[#d97706] hover:bg-[#b45309] text-white transition-colors" 
-                                    disabled={processing} 
+                                <Button
+                                    className="w-full bg-accent hover:bg-accent/90 text-accent-foreground transition-colors"
+                                    disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >
                                     {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
@@ -53,7 +53,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                 <div className="space-x-1 text-center text-sm text-muted-foreground">
                     <span>Hoặc, quay lại</span>
-                    <TextLink href={login()} className="text-[#d97706] hover:text-[#b45309]">đăng nhập</TextLink>
+                    <TextLink href={login()} className="text-accent hover:text-accent/80">đăng nhập</TextLink>
                 </div>
             </div>
         </AuthLayout>

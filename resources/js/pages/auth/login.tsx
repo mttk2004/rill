@@ -36,7 +36,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="example@email.com"
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -45,7 +45,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Mật khẩu</Label>
                                     {canResetPassword && (
-                                        <TextLink href={request()} className="ml-auto text-sm text-[#d97706] hover:text-[#b45309]" tabIndex={5}>
+                                        <TextLink href={request()} className="ml-auto text-sm text-accent hover:text-accent/80" tabIndex={5}>
                                             Quên mật khẩu?
                                         </TextLink>
                                     )}
@@ -58,17 +58,17 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Nhập mật khẩu"
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="flex items-center space-x-3">
-                                <Checkbox id="remember" name="remember" tabIndex={3} className="data-[state=checked]:bg-[#d97706] data-[state=checked]:border-[#d97706]" />
+                                <Checkbox id="remember" name="remember" tabIndex={3} className="data-[state=checked]:bg-accent data-[state=checked]:border-accent" />
                                 <Label htmlFor="remember">Ghi nhớ tôi</Label>
                             </div>
 
-                            <Button type="submit" className="mt-4 w-full bg-[#d97706] hover:bg-[#b45309] text-white transition-colors" tabIndex={4} disabled={processing} data-test="login-button">
+                            <Button type="submit" className="mt-4 w-full bg-accent hover:bg-accent/90 text-accent-foreground transition-colors" tabIndex={4} disabled={processing} data-test="login-button">
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 Đăng nhập
                             </Button>
@@ -76,7 +76,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                         <div className="text-center text-sm text-muted-foreground">
                             Chưa có tài khoản?{' '}
-                            <TextLink href={register()} tabIndex={5} className="text-[#d97706] hover:text-[#b45309]">
+                            <TextLink href={register()} tabIndex={5} className="text-accent hover:text-accent/80">
                                 Đăng ký ngay
                             </TextLink>
                         </div>

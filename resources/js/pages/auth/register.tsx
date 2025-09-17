@@ -34,7 +34,7 @@ export default function Register() {
                                     autoComplete="name"
                                     name="name"
                                     placeholder="Nguyễn Văn A"
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
@@ -49,7 +49,7 @@ export default function Register() {
                                     autoComplete="email"
                                     name="email"
                                     placeholder="example@email.com"
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -64,7 +64,7 @@ export default function Register() {
                                     name="phone"
                                     placeholder="0901234567"
                                     maxLength={10}
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
                                 <InputError message={errors.phone} />
                             </div>
@@ -79,7 +79,7 @@ export default function Register() {
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Tối thiểu 8 ký tự"
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -94,12 +94,12 @@ export default function Register() {
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Nhập lại mật khẩu"
-                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                    className="border-input focus:border-ring focus:ring-2 focus:ring-ring/20"
                                 />
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
-                            <Button type="submit" className="mt-2 w-full bg-[#d97706] hover:bg-[#b45309] text-white transition-colors" tabIndex={6} data-test="register-user-button">
+                            <Button type="submit" className="mt-2 w-full bg-accent hover:bg-accent/90 text-accent-foreground transition-colors" tabIndex={6} data-test="register-user-button">
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 Tạo tài khoản
                             </Button>
@@ -107,7 +107,7 @@ export default function Register() {
 
                         <div className="text-center text-sm text-muted-foreground">
                             Đã có tài khoản?{' '}
-                            <TextLink href={login()} tabIndex={7} className="text-[#d97706] hover:text-[#b45309]">
+                            <TextLink href={login()} tabIndex={7} className="text-accent hover:text-accent/80">
                                 Đăng nhập
                             </TextLink>
                         </div>
