@@ -63,6 +63,18 @@
     --color-background-dark: var(--background-dark);
     --color-background-darker: var(--background-darker);
     --color-card-dark: var(--card-dark);
+
+    /* Vintage vinyl store colors */
+    --color-vintage-primary: var(--vintage-primary);
+    --color-vintage-secondary: var(--vintage-secondary);
+    --color-vintage-tertiary: var(--vintage-tertiary);
+    --color-vintage-accent-warm: var(--vintage-accent-warm);
+    --color-vintage-accent-hot: var(--vintage-accent-hot);
+    --color-vintage-accent-red: var(--vintage-accent-red);
+    --color-vintage-amber-50: var(--vintage-amber-50);
+    --color-vintage-amber-100: var(--vintage-amber-100);
+    --color-vintage-amber-200: var(--vintage-amber-200);
+    --color-vintage-orange-50: var(--vintage-orange-50);
 }
 
 :root {
@@ -108,6 +120,18 @@
     --chart-3: #92400e;
     --chart-4: #78350f;
     --chart-5: #451a03;
+
+    /* Vintage vinyl store colors */
+    --vintage-primary: #1a1a1a;
+    --vintage-secondary: #8B4513;
+    --vintage-tertiary: #5D4037;
+    --vintage-accent-warm: #e68900;
+    --vintage-accent-hot: #ea580c;
+    --vintage-accent-red: #dc2626;
+    --vintage-amber-50: #fffbeb;
+    --vintage-amber-100: #fef3c7;
+    --vintage-amber-200: #fde68a;
+    --vintage-orange-50: #fff7ed;
 
     --radius: 0.5rem;
 
@@ -170,6 +194,15 @@
     --sidebar-accent-foreground: #fafafa;
     --sidebar-border: #262626;
     --sidebar-ring: #d97706;
+
+    /* Vintage colors for dark mode */
+    --vintage-primary: #fafafa;
+    --vintage-secondary: #d97706;
+    --vintage-tertiary: #fbbf24;
+    --vintage-amber-50: #422006;
+    --vintage-amber-100: #451a03;
+    --vintage-amber-200: #78350f;
+    --vintage-orange-50: #431407;
 }
 
 @layer base {
