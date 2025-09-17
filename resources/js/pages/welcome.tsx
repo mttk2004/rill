@@ -7,9 +7,10 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="Welcome">
-                <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+            <Head title="Welcome to Rill - Vinyl Record Store">
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
             </Head>
             <div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#0a0a0a]">
                 <header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
@@ -42,87 +43,54 @@ export default function Welcome() {
                 <div className="flex w-full items-center justify-center opacity-100 transition-opacity duration-750 lg:grow starting:opacity-0">
                     <main className="flex w-full max-w-[335px] flex-col-reverse lg:max-w-4xl lg:flex-row">
                         <div className="flex-1 rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
-                            <h1 className="mb-1 font-medium">Let's get started</h1>
-                            <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                                Laravel has an incredibly rich ecosystem.
+                            <h1 className="mb-1 text-2xl font-bold lg:text-3xl">Welcome to Rill</h1>
+                            <p className="mb-4 text-base text-[#706f6c] dark:text-[#A1A09A]">
+                                Cửa hàng đĩa than online dành cho những người yêu nhạc và sưu tầm vinyl.
                                 <br />
-                                We suggest starting with the following.
+                                Khám phá bộ sưu tập đĩa than chất lượng cao từ các nghệ sĩ hàng đầu.
                             </p>
-                            <ul className="mb-4 flex flex-col lg:mb-6">
-                                <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
-                                    <span className="relative bg-white py-1 dark:bg-[#161615]">
-                                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
-                                        </span>
+                            <ul className="mb-6 flex flex-col space-y-2 lg:mb-8">
+                                <li className="flex items-center gap-3">
+                                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f53003] text-white">
+                                        <span className="text-xs">♪</span>
                                     </span>
-                                    <span>
-                                        Read the
-                                        <a
-                                            href="https://laravel.com/docs"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
-                                        >
-                                            <span>Documentation</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
-                                        </a>
+                                    <span className="text-sm">
+                                        Bộ sưu tập vinyl chất lượng cao từ các nghệ sĩ nổi tiếng
                                     </span>
                                 </li>
-                                <li className="relative flex items-center gap-4 py-2 before:absolute before:top-0 before:bottom-1/2 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
-                                    <span className="relative bg-white py-1 dark:bg-[#161615]">
-                                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
-                                            <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
-                                        </span>
+                                <li className="flex items-center gap-3">
+                                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f53003] text-white">
+                                        <span className="text-xs">🎵</span>
                                     </span>
-                                    <span>
-                                        Watch video tutorials at
-                                        <a
-                                            href="https://laracasts.com"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
-                                        >
-                                            <span>Laracasts</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
-                                        </a>
+                                    <span className="text-sm">
+                                        Giao hàng tận nơi với dịch vụ COD (thanh toán khi nhận hàng)
+                                    </span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f53003] text-white">
+                                        <span className="text-xs">⭐</span>
+                                    </span>
+                                    <span className="text-sm">
+                                        Hệ thống đánh giá và review từ cộng đồng người yêu nhạc
                                     </span>
                                 </li>
                             </ul>
-                            <ul className="flex gap-3 text-sm leading-normal">
-                                <li>
-                                    <a
-                                        href="https://cloud.laravel.com"
-                                        target="_blank"
-                                        className="inline-block rounded-sm border border-black bg-[#1b1b18] px-5 py-1.5 text-sm leading-normal text-white hover:border-black hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:border-white dark:hover:bg-white"
+                            {!auth.user && (
+                                <div className="flex gap-3 text-sm">
+                                    <Link
+                                        href={register()}
+                                        className="inline-block rounded-lg border border-[#f53003] bg-[#f53003] px-6 py-2 text-white hover:bg-[#d42a02] dark:border-[#FF4433] dark:bg-[#FF4433] dark:hover:bg-[#e63728]"
                                     >
-                                        Deploy now
-                                    </a>
-                                </li>
-                            </ul>
+                                        Đăng ký ngay
+                                    </Link>
+                                    <Link
+                                        href={login()}
+                                        className="inline-block rounded-lg border border-[#19140035] px-6 py-2 text-[#1b1b18] hover:border-[#1915014a] hover:bg-gray-50 dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:bg-[#2a2a28]"
+                                    >
+                                        Đăng nhập
+                                    </Link>
+                                </div>
+                            )}
                         </div>
                         <div className="relative -mb-px aspect-[335/376] w-full shrink-0 overflow-hidden rounded-t-lg bg-[#fff2f2] lg:mb-0 lg:-ml-px lg:aspect-auto lg:w-[438px] lg:rounded-t-none lg:rounded-r-lg dark:bg-[#1D0002]">
                             <svg

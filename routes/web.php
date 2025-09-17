@@ -7,10 +7,25 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+// Customer routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+    
+    // Customer profile and orders
+    Route::prefix('customer')->name('customer.')->group(function () {
+        // Will be implemented later
+    });
+});
+
+// Admin routes
+Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('dashboard');
+    })->name('dashboard');
+    
+    // Admin management routes will be implemented later
 });
 
 require __DIR__.'/settings.php';
