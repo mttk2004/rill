@@ -12,8 +12,8 @@ import AuthLayout from '@/layouts/auth-layout';
 
 export default function Register() {
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
-            <Head title="Register" />
+        <AuthLayout title="Tạo tài khoản" description="Nhập thông tin của bạn để tạo tài khoản mới">
+            <Head title="Đăng ký" />
             <Form
                 {...RegisteredUserController.store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -24,7 +24,7 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
+                                <Label htmlFor="name">Họ và tên</Label>
                                 <Input
                                     id="name"
                                     type="text"
@@ -33,13 +33,14 @@ export default function Register() {
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
-                                    placeholder="Full name"
+                                    placeholder="Nguyễn Văn A"
+                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
                                 />
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">Địa chỉ email</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -47,49 +48,67 @@ export default function Register() {
                                     tabIndex={2}
                                     autoComplete="email"
                                     name="email"
-                                    placeholder="email@example.com"
+                                    placeholder="example@email.com"
+                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="phone">Số điện thoại</Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    tabIndex={3}
+                                    autoComplete="tel"
+                                    name="phone"
+                                    placeholder="0901234567"
+                                    maxLength={10}
+                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
+                                />
+                                <InputError message={errors.phone} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="password">Mật khẩu</Label>
                                 <Input
                                     id="password"
                                     type="password"
                                     required
-                                    tabIndex={3}
+                                    tabIndex={4}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder="Password"
+                                    placeholder="Tối thiểu 8 ký tự"
+                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">Confirm password</Label>
+                                <Label htmlFor="password_confirmation">Xác nhận mật khẩu</Label>
                                 <Input
                                     id="password_confirmation"
                                     type="password"
                                     required
-                                    tabIndex={4}
+                                    tabIndex={5}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="Confirm password"
+                                    placeholder="Nhập lại mật khẩu"
+                                    className="border-input focus:border-[#d97706] focus:ring-2 focus:ring-[#d97706]/20"
                                 />
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
-                            <Button type="submit" className="mt-2 w-full" tabIndex={5} data-test="register-user-button">
+                            <Button type="submit" className="mt-2 w-full bg-[#d97706] hover:bg-[#b45309] text-white transition-colors" tabIndex={6} data-test="register-user-button">
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Create account
+                                Tạo tài khoản
                             </Button>
                         </div>
 
                         <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
+                            Đã có tài khoản?{' '}
+                            <TextLink href={login()} tabIndex={7} className="text-[#d97706] hover:text-[#b45309]">
+                                Đăng nhập
                             </TextLink>
                         </div>
                     </>
