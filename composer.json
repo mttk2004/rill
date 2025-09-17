@@ -1,15 +1,21 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/react-starter-kit",
+    "name": "rill/vinyl-store",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Rill - Cửa hàng Đĩa Than Online. E-commerce platform for vinyl record enthusiasts.",
     "keywords": [
         "laravel",
-        "framework"
+        "vinyl",
+        "records",
+        "e-commerce",
+        "music",
+        "react",
+        "inertiajs"
     ],
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "godruoyi/php-snowflake": "^3.2",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
