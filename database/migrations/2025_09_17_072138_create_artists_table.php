@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('artists', function (Blueprint $table) {
-            $table->id();
+            $table->string('id', 19)->primary()->comment('Snowflake ID');
             $table->string('name')->comment('Tên nghệ sĩ');
             $table->string('slug')->unique()->comment('URL friendly name');
             $table->text('description')->nullable()->comment('Tiểu sử nghệ sĩ');
@@ -21,11 +21,11 @@ return new class extends Migration
             $table->boolean('is_active')->default(true)->comment('Trạng thái');
             $table->timestamps();
             $table->softDeletes();
-
+            
             // Indexes
             $table->index('slug');
             $table->index('is_active');
-            $table->fullText(['name', 'description'], 'ft_artists_search');
+            // $table->fullText(['name', 'description'], 'ft_artists_search'); // Disabled for SQLite compatibility
         });
     }
 

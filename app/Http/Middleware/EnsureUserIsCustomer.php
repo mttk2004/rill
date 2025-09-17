@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureUserIsAdmin
+class EnsureUserIsCustomer
 {
     /**
      * Handle an incoming request.
@@ -15,8 +15,8 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user() || !$request->user()->isAdmin()) {
-            return redirect()->route('products')->with('error', 'Bạn không có quyền truy cập trang này.');
+        if (!$request->user() || $request->user()->role !== 'customer') {
+            return redirect()->route('dashboard')->with('error', 'Bạn không có quyền truy cập trang này.');
         }
 
         return $next($request);

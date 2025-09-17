@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
+            $table->string('id', 19)->primary()->comment('Snowflake ID');
             $table->string('name')->comment('Tên sản phẩm');
             $table->string('slug')->unique()->comment('URL friendly name');
             $table->text('description')->comment('Mô tả ngắn');
@@ -32,13 +32,13 @@ return new class extends Migration
             $table->text('meta_description')->nullable()->comment('SEO description');
             $table->timestamps();
             $table->softDeletes();
-
+            
             // Indexes
             $table->index('genre');
             $table->index('label');
             $table->index('status');
             $table->index('is_featured');
-            $table->fullText(['name', 'description', 'genre', 'label'], 'ft_products_search');
+            // $table->fullText(['name', 'description', 'genre', 'label'], 'ft_products_search'); // Disabled for SQLite compatibility
         });
     }
 

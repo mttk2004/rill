@@ -7,15 +7,11 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::get('/products', function () {
-    return Inertia::render('products');
-})->name('products');
-
-// Customer routes
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+// Customer routes (including products)
+Route::middleware(['auth', 'verified', 'customer'])->group(function () {
+    Route::get('/products', function () {
+        return Inertia::render('products');
+    })->name('products');
     
     // Customer profile and orders
     Route::prefix('customer')->name('customer.')->group(function () {
@@ -24,8 +20,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Admin routes
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', function () {
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
     
