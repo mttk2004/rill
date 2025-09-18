@@ -17,7 +17,9 @@ import {
     ShoppingCart,
     User,
     History,
-    Disc
+    Disc,
+    HelpCircle,
+    Info
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -82,23 +84,18 @@ const getCustomerNavItems = (): NavItem[] => [
         href: '/customer/orders',
         icon: History,
     },
-    {
-        title: 'Tài khoản',
-        href: '/customer/profile',
-        icon: User,
-    },
 ];
 
 const footerNavItems: NavItem[] = [
     {
         title: 'Hỗ trợ',
         href: '/support',
-        icon: null,
+        icon: HelpCircle,
     },
     {
         title: 'Về Rill',
         href: '/about',
-        icon: null,
+        icon: Info,
     },
 ];
 

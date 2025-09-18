@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
+        'address',
         'gender',
         'date_of_birth',
         'avatar',
@@ -70,5 +71,13 @@ class User extends Authenticatable
     public function isCustomer(): bool
     {
         return $this->role === 'customer';
+    }
+    
+    /**
+     * Get the avatar URL attribute.
+     */
+    public function getAvatarUrlAttribute(): ?string
+    {
+        return $this->avatar ? asset('storage/' . $this->avatar) : null;
     }
 }

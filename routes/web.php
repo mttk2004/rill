@@ -7,6 +7,7 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+
 // Customer routes (including products)
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/products', function () {
