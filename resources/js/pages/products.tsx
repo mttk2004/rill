@@ -1,24 +1,27 @@
-import AppLayout from '@/layouts/app-layout';
-import { products } from '@/routes';
-import { type BreadcrumbItem, ProductsPageData, Product } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { Music, Search, Filter, Grid, List } from 'lucide-react';
-import ProductCard from '@/components/products/product-card';
-import ProductFilters from '@/components/products/product-filters';
-import ProductPagination from '@/components/products/product-pagination';
+import { Navigation } from "@/components/navigation";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Star, Grid, List, Disc3 } from "lucide-react";
+import { type ProductsPageData, Product } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useState, FormEvent } from 'react';
+import { type SharedData } from '@/types';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Sản phẩm',
-        href: products().url,
-    },
-];
+interface ProductsProps extends ProductsPageData {
+    search?: string;
+    genre?: string;
+    label?: string;
+    artist?: string;
+    sort?: string;
+}
 
-export default function Products({ products: productsData, filters, pagination, ...props }: ProductsPageData & { [key: string]: any }) {
+export default function Products({ products: productsData, pagination, ...props }: ProductsProps) {
+    const { auth } = usePage<SharedData>().props;
     const [searchTerm, setSearchTerm] = useState(props.search || '');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-    const [showFilters, setShowFilters] = useState(false);
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
@@ -50,136 +53,243 @@ export default function Products({ products: productsData, filters, pagination, 
         artist: props.artist,
         sort: props.sort,
     };
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sản phẩm - Rill">
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
-                <meta name="description" content="Khám phá bộ sưu tập đĩa than chất lượng cao tại Rill. Tìm kiếm các album yêu thích từ các nghệ sĩ nổi tiếng thế giới." />
-            </Head>
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-6">
-                {/* Page Header */}
-                <div className="text-center">
-                    <h1 
-                        className="text-4xl sm:text-5xl font-black text-vintage-primary dark:text-white mb-4"
-                        style={{ fontFamily: "'Playfair Display', serif" }}
-                    >
-                        Bộ Sưu Tập Vinyl
-                    </h1>
-                    <p 
-                        className="text-xl text-vintage-tertiary dark:text-vintage-tertiary max-w-2xl mx-auto"
-                        style={{ fontFamily: "'Crimson Text', serif" }}
-                    >
-                        Khám phá hàng ngàn đĩa than chất lượng cao từ các nghệ sĩ nổi tiếng thế giới
-                    </p>
-                </div>
 
-                {/* Search and View Controls */}
-                <div className="flex flex-col lg:flex-row gap-4">
-                    <form onSubmit={handleSearch} className="flex-1 relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Tìm kiếm album, nghệ sĩ..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                        />
-                    </form>
-                    <div className="flex items-center space-x-2">
-                        <button 
-                            onClick={() => setShowFilters(!showFilters)}
-                            className={`flex items-center space-x-2 px-4 py-3 border rounded-lg transition-colors lg:hidden ${
-                                showFilters 
-                                    ? 'bg-accent text-white border-accent' 
-                                    : 'border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800'
-                            }`}
-                        >
-                            <Filter className="h-5 w-5" />
-                            <span>Bộ lọc</span>
-                        </button>
-                        <div className="flex border border-gray-300 dark:border-gray-600 rounded-lg">
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                className={`p-2 ${viewMode === 'grid' ? 'bg-accent text-white' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-                            >
-                                <Grid className="h-5 w-5" />
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                className={`p-2 border-l border-gray-300 dark:border-gray-600 ${viewMode === 'list' ? 'bg-accent text-white' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-                            >
-                                <List className="h-5 w-5" />
-                            </button>
+    // Mock data for genres and labels - in real app, this would come from backend
+    const genres = ["Tất cả", "Rock", "Pop", "Jazz", "Classical", "Progressive Rock"];
+    const labels = ["Tất cả", "Apple Records", "Harvest Records", "Epic Records", "Warner Bros", "Asylum Records"];
+    return (
+        <>
+            <Head title="Sản phẩm - Rill" />
+            <div className="min-h-screen bg-background">
+                <Navigation user={auth.user} />
+
+                {/* Header */}
+                <section className="bg-gradient-to-r from-primary to-primary/90 text-white py-12">
+                    <div className="container mx-auto px-4">
+                        <h1 className="text-3xl lg:text-4xl font-bold mb-4">Bộ sưu tập đĩa than</h1>
+                        <p className="text-white/90 text-lg">
+                            Khám phá hơn {pagination.total ? pagination.total.toLocaleString('vi-VN') : '1,000'}+ đĩa than chính hãng từ những nghệ sĩ huyền thoại
+                        </p>
+                    </div>
+                </section>
+
+                <div className="container mx-auto px-4 py-8">
+                    {/* Filters */}
+                    <div className="flex flex-col lg:flex-row gap-6 mb-8">
+                        {/* Search & Filters */}
+                        <div className="flex-1 space-y-4 lg:space-y-0 lg:flex lg:items-center lg:gap-4">
+                            <form onSubmit={handleSearch} className="relative flex-1 max-w-md">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Tìm kiếm album, nghệ sĩ..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10"
+                                />
+                            </form>
+
+                            <Select defaultValue={props.genre || "all-genres"}>
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="Thể loại" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {genres.map((genre) => (
+                                        <SelectItem key={genre} value={genre.toLowerCase().replace(/\s+/g, '-')}>
+                                            {genre}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            <Select defaultValue={props.label || "all-labels"}>
+                                <SelectTrigger className="w-48">
+                                    <SelectValue placeholder="Hãng đĩa" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {labels.map((label) => (
+                                        <SelectItem key={label} value={label.toLowerCase().replace(/\s+/g, '-')}>
+                                            {label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* View Mode & Sort */}
+                        <div className="flex items-center gap-2">
+                            <div className="flex border rounded-md">
+                                <Button
+                                    variant={viewMode === "grid" ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setViewMode("grid")}
+                                    className="rounded-r-none"
+                                >
+                                    <Grid className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant={viewMode === "list" ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setViewMode("list")}
+                                    className="rounded-l-none"
+                                >
+                                    <List className="h-4 w-4" />
+                                </Button>
+                            </div>
+
+                            <Select defaultValue={props.sort || "popular"}>
+                                <SelectTrigger className="w-48">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="popular">Phổ biến</SelectItem>
+                                    <SelectItem value="price-low">Giá thấp đến cao</SelectItem>
+                                    <SelectItem value="price-high">Giá cao đến thấp</SelectItem>
+                                    <SelectItem value="newest">Mới nhất</SelectItem>
+                                    <SelectItem value="rating">Đánh giá cao</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
-                </div>
 
-                {/* Main Content */}
-                <div className="flex gap-6">
-                    {/* Sidebar Filters - Desktop */}
-                    <aside className={`w-80 flex-shrink-0 ${
-                        showFilters ? 'block' : 'hidden lg:block'
-                    }`}>
-                        <ProductFilters 
-                            filters={filters} 
-                            currentFilters={currentFilters}
-                        />
-                    </aside>
+                    {/* Results Info */}
+                    <div className="flex items-center justify-between mb-6">
+                        <p className="text-muted-foreground">
+                            {pagination.total > 0 ? (
+                                <>Hiển thị <span className="font-medium">{pagination.from}-{pagination.to}</span> trong <span className="font-medium">{pagination.total}</span> sản phẩm</>
+                            ) : (
+                                'Không tìm thấy sản phẩm nào'
+                            )}
+                            {currentFilters.search && (
+                                <> cho "{currentFilters.search}"</>
+                            )}
+                        </p>
+                    </div>
 
-                    {/* Products Content */}
-                    <main className="flex-1 min-w-0">
-                        {/* Results Summary */}
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {pagination.total > 0 ? (
-                                    <>Tìm thấy {pagination.total.toLocaleString('vi-VN')} sản phẩm</>
-                                ) : (
-                                    'Không tìm thấy sản phẩm nào'
+                    {/* Products Grid */}
+                    {productsData.data.length > 0 ? (
+                        <div className={`grid gap-6 ${
+                            viewMode === "grid"
+                                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                                : "grid-cols-1"
+                        }`}>
+                            {productsData.data.map((product: Product, index: number) => (
+                                <Card
+                                    key={product.id}
+                                    className={`product-hover cursor-pointer animate-fade-in border-0 shadow-vinyl ${
+                                        viewMode === "list" ? "flex-row" : ""
+                                    }`}
+                                    style={{ animationDelay: `${index * 0.1}s` }}
+                                >
+                                    <CardContent className={`p-0 ${viewMode === "list" ? "flex" : ""}`}>
+                                        <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
+                                            <div className={`w-full bg-muted flex items-center justify-center ${
+                                                viewMode === "list" ? "h-32" : "h-64"
+                                            } ${
+                                                viewMode === "list" ? "rounded-l-lg" : "rounded-t-lg"
+                                            }`}>
+                                                <Disc3 className="h-16 w-16 text-muted-foreground/30" />
+                                            </div>
+                                            {product.is_featured && (
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="absolute top-3 left-3 bg-accent text-accent-foreground"
+                                                >
+                                                    Nổi bật
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <div className={`p-6 ${viewMode === "list" ? "flex-1" : ""}`}>
+                                            <div className={viewMode === "list" ? "flex justify-between items-start" : ""}>
+                                                <div className={viewMode === "list" ? "flex-1" : ""}>
+                                                    <h3 className="font-semibold text-lg mb-1 line-clamp-1">{product.name}</h3>
+                                                    <p className="text-muted-foreground mb-2">
+                                                        {product.artists?.map(artist => artist.name).join(', ') || 'Unknown Artist'}
+                                                    </p>
+
+                                                    {viewMode === "list" && (
+                                                        <div className="text-sm text-muted-foreground mb-3">
+                                                            <p>Thể loại: {product.genre}</p>
+                                                            <p>Hãng đĩa: {product.label}</p>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <Star className="h-4 w-4 fill-accent text-accent" />
+                                                        <span className="text-sm font-medium">4.8</span>
+                                                        <span className="text-xs text-muted-foreground">(125 đánh giá)</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className={`flex ${viewMode === "list" ? "flex-col items-end" : "items-center justify-between"}`}>
+                                                    <div className={`flex items-center gap-2 ${viewMode === "list" ? "mb-3" : ""}`}>
+                                                        <span className="text-xl font-bold text-accent">{product.price?.toLocaleString('vi-VN')}đ</span>
+                                                    </div>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="hover:bg-accent hover:text-accent-foreground"
+                                                    >
+                                                        Thêm vào giỏ
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <Disc3 className="h-24 w-24 text-muted-foreground/30 mx-auto mb-6" />
+                            <h3 className="text-2xl font-bold mb-4">Không tìm thấy sản phẩm</h3>
+                            <p className="text-muted-foreground max-w-md mx-auto">
+                                Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem thêm sản phẩm.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Pagination */}
+                    {pagination.last_page > 1 && (
+                        <div className="flex justify-center mt-12">
+                            <div className="flex items-center space-x-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={pagination.current_page <= 1}
+                                >
+                                    Trước
+                                </Button>
+                                {Array.from({ length: Math.min(5, pagination.last_page) }, (_, i) => {
+                                    const page = i + 1;
+                                    return (
+                                        <Button
+                                            key={page}
+                                            variant={pagination.current_page === page ? "default" : "outline"}
+                                            size="sm"
+                                        >
+                                            {page}
+                                        </Button>
+                                    );
+                                })}
+                                {pagination.last_page > 5 && (
+                                    <>
+                                        <span className="px-2 text-muted-foreground">...</span>
+                                        <Button variant="outline" size="sm">{pagination.last_page}</Button>
+                                    </>
                                 )}
-                                {currentFilters.search && (
-                                    <> cho "{currentFilters.search}"</>
-                                )}
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={pagination.current_page >= pagination.last_page}
+                                >
+                                    Sau
+                                </Button>
                             </div>
                         </div>
-
-                        {/* Products Grid/List */}
-                        {productsData.data.length > 0 ? (
-                            <div className={viewMode === 'grid' 
-                                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-                                : 'space-y-4'
-                            }>
-                                {productsData.data.map((product: Product) => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="rounded-lg bg-white dark:bg-gray-800 p-12 shadow-sm text-center">
-                                <Music className="h-24 w-24 text-gray-300 dark:text-gray-600 mx-auto mb-6" />
-                                <h3 
-                                    className="text-2xl font-bold text-vintage-primary dark:text-white mb-4"
-                                    style={{ fontFamily: "'Playfair Display', serif" }}
-                                >
-                                    Không tìm thấy sản phẩm
-                                </h3>
-                                <p 
-                                    className="text-vintage-tertiary dark:text-vintage-tertiary max-w-md mx-auto mb-8"
-                                    style={{ fontFamily: "'Crimson Text', serif" }}
-                                >
-                                    Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem thêm sản phẩm.
-                                </p>
-                            </div>
-                        )}
-
-                        {/* Pagination */}
-                        <ProductPagination 
-                            pagination={pagination} 
-                            currentFilters={currentFilters}
-                        />
-                    </main>
+                    )}
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
