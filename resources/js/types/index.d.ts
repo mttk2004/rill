@@ -41,3 +41,59 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Artist {
+    id: string;
+    name: string;
+    slug: string;
+    role?: string;
+    sort_order?: number;
+}
+
+export interface Product {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    detailed_description?: string;
+    price: number;
+    compare_price?: number;
+    stock_quantity: number;
+    genre: string;
+    label: string;
+    image?: string;
+    is_featured: boolean;
+    status: 'active' | 'inactive' | 'out_of_stock';
+    artists: Artist[];
+    main_artists: string[];
+    featured_artists: string[];
+    in_stock: boolean;
+    low_stock: boolean;
+    discount_percentage?: number;
+}
+
+export interface ProductFilters {
+    genres: string[];
+    labels: string[];
+    artists: { name: string; slug: string }[];
+    sort_options: { value: string; label: string }[];
+}
+
+export interface Pagination {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+}
+
+export interface ProductsPageData {
+    products: {
+        data: Product[];
+        links: any[];
+        meta: any;
+    };
+    filters: ProductFilters;
+    pagination: Pagination;
+}

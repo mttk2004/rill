@@ -135,7 +135,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                                                     </div>
                                                 </div>
                                             )}
-                                            
+
                                             <div className="flex gap-4">
                                                 {/* Genres Column */}
                                                 {categoryData.genres.length > 0 && (
@@ -176,7 +176,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                                                         </div>
                                                     </div>
                                                 )}
-                                                
+
                                                 {/* Labels Column */}
                                                 {categoryData.labels.length > 0 && (
                                                     <div className="flex-1">
@@ -265,7 +265,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <Heart className="h-4 w-4 text-accent" />
-                                    <h3 
+                                    <h3
                                         className="font-bold text-vintage-primary dark:text-white"
                                         style={{ fontFamily: "'Playfair Display', serif" }}
                                     >
@@ -351,7 +351,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <ShoppingCart className="h-4 w-4 text-accent" />
-                                    <h3 
+                                    <h3
                                         className="font-bold text-vintage-primary dark:text-white"
                                         style={{ fontFamily: "'Playfair Display', serif" }}
                                     >
@@ -387,13 +387,13 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
 
                                 <div className="p-4 border-t bg-gradient-to-r from-accent/5 to-accent/10">
                                     <div className="flex items-center justify-between mb-3">
-                                        <span 
+                                        <span
                                             className="font-bold text-vintage-primary dark:text-white"
                                             style={{ fontFamily: "'Playfair Display', serif" }}
                                         >
                                             Tổng cộng:
                                         </span>
-                                        <span 
+                                        <span
                                             className="font-black text-xl text-accent"
                                             style={{ fontFamily: "'Playfair Display', serif" }}
                                         >
@@ -410,7 +410,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                                 <div className="h-16 w-16 bg-gradient-to-br from-accent/10 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <ShoppingCart className="h-8 w-8 text-accent" />
                                 </div>
-                                <p 
+                                <p
                                     className="text-vintage-tertiary dark:text-vintage-tertiary mb-2"
                                     style={{ fontFamily: "'Crimson Text', serif" }}
                                 >

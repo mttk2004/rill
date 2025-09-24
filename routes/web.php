@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -7,11 +8,12 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-// Customer routes (including products)
+// Public routes (accessible to guests and authenticated users)
+Route::get('/products', [ProductController::class, 'index'])->name('products');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+// Customer routes (authenticated only)
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
-    Route::get('/products', function () {
-        return Inertia::render('products');
-    })->name('products');
     Route::get('/cart', function () {
         return Inertia::render('cart');
     })->name('cart');
