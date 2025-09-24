@@ -1,4 +1,6 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+/* Rill Design System - Modern Retro Vinyl Aesthetic */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @plugin 'tailwindcss-animate';
@@ -9,195 +11,208 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-sans:
-        'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  /* Container */
+  --container-center: true;
+  --container-padding: 2rem;
+  --container-screens-2xl: 1400px;
 
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
+  /* Border Radius */
+  --radius: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
+  /* Colors */
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
 
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
 
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
 
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
 
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
 
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
 
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
 
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
 
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
 
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
+  /* Font Family */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
-
-    /* Additional background colors */
-    --color-background-dark: var(--background-dark);
-    --color-background-darker: var(--background-darker);
-    --color-card-dark: var(--card-dark);
-
-    /* Vintage vinyl store colors */
-    --color-vintage-primary: var(--vintage-primary);
-    --color-vintage-secondary: var(--vintage-secondary);
-    --color-vintage-tertiary: var(--vintage-tertiary);
-    --color-vintage-accent-warm: var(--vintage-accent-warm);
-    --color-vintage-accent-hot: var(--vintage-accent-hot);
-    --color-vintage-accent-red: var(--vintage-accent-red);
-    --color-vintage-amber-50: var(--vintage-amber-50);
-    --color-vintage-amber-100: var(--vintage-amber-100);
-    --color-vintage-amber-200: var(--vintage-amber-200);
-    --color-vintage-orange-50: var(--vintage-orange-50);
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-vinyl-spin: vinyl-spin 3s linear infinite;
+  --animate-hero-fade-in: hero-fade-in 1s ease-out forwards;
+  --animate-fade-in: fade-in 0.3s ease-out;
 }
 
-:root {
-    /* Rill Color Scheme - Modern Retro for Vinyl Store */
-    --background: #ffffff;
-    --foreground: #0a0a0a;
-    --card: #ffffff;
-    --card-foreground: #0a0a0a;
-    --popover: #ffffff;
-    --popover-foreground: #0a0a0a;
+@layer base {
+  :root {
+    /* Rill Color System - Modern Retro */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 4%;
 
-    /* Primary - Black dominant */
-    --primary: #1a1a1a;
-    --primary-foreground: #fafafa;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
 
-    /* Secondary - Warm gray */
-    --secondary: #f5f5f4;
-    --secondary-foreground: #0c0a09;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
 
-    /* Accent - Vintage copper */
-    --accent: #d97706;
-    --accent-foreground: #fefbf3;
+    /* Primary - Rich Black */
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 98%;
 
-    /* System colors */
-    --muted: #f5f5f5;
-    --muted-foreground: #737373;
-    --border: #e5e5e5;
-    --input: #e5e5e5;
-    --ring: #d97706;
+    /* Secondary - Warm Gray */
+    --secondary: 40 2% 96%;
+    --secondary-foreground: 30 6% 3%;
 
-    /* Additional background colors */
-    --background-dark: #0a0a0a;
-    --background-darker: #111111;
-    --card-dark: #1a1a1a;
+    /* Accent - Classic Copper */
+    --accent: 25 95% 53%;
+    --accent-foreground: 35 50% 97%;
+
+    /* Muted tones */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
     /* Destructive */
-    --destructive: #dc2626;
-    --destructive-foreground: #fefefe;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* Chart colors */
-    --chart-1: #d97706;
-    --chart-2: #b45309;
-    --chart-3: #92400e;
-    --chart-4: #78350f;
-    --chart-5: #451a03;
+    /* Borders and inputs */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 25 95% 53%;
 
-    /* Vintage vinyl store colors */
-    --vintage-primary: #1a1a1a;
-    --vintage-secondary: #8B4513;
-    --vintage-tertiary: #5D4037;
-    --vintage-accent-warm: #e68900;
-    --vintage-accent-hot: #ea580c;
-    --vintage-accent-red: #dc2626;
-    --vintage-amber-50: #fffbeb;
-    --vintage-amber-100: #fef3c7;
-    --vintage-amber-200: #fde68a;
-    --vintage-orange-50: #fff7ed;
-
+    /* Design system tokens */
     --radius: 0.5rem;
 
-    /* Sidebar colors */
-    --sidebar: #fafafa;
-    --sidebar-foreground: #1a1a1a;
-    --sidebar-primary: #1a1a1a;
-    --sidebar-primary-foreground: #fafafa;
-    --sidebar-accent: #f5f5f4;
-    --sidebar-accent-foreground: #0c0a09;
-    --sidebar-border: #e5e5e5;
-    --sidebar-ring: #d97706;
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(0 0% 20%));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(25 95% 63%));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--muted)), hsl(var(--background)));
+
+    /* Shadows */
+    --shadow-vinyl: 0 4px 20px -4px hsl(var(--primary) / 0.15);
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--accent) / 0.3);
+    --shadow-glow: 0 0 40px hsl(var(--accent) / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-vinyl: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark mode for retro vinyl aesthetic */
+    --background: 0 0% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 8%;
+
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 95%;
+
+    --accent: 25 95% 53%;
+    --accent-foreground: 35 50% 97%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 25 95% 53%;
+
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 0% 95%;
+    --sidebar-primary-foreground: 0 0% 8%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 25 95% 53%;
+  }
 }
 
-.dark {
-    /* Dark mode for Rill */
-    --background: var(--background-dark);
-    --foreground: #fafafa;
-    --card: var(--card-dark);
-    --card-foreground: #fafafa;
-    --popover: var(--card-dark);
-    --popover-foreground: #fafafa;
+@layer base {
+  * {
+    @apply border-border;
+  }
 
-    /* Primary inverted for dark mode */
-    --primary: #fafafa;
-    --primary-foreground: #0a0a0a;
+  body {
+    @apply bg-background text-foreground font-['Inter',system-ui,sans-serif];
+  }
 
-    /* Secondary dark */
-    --secondary: #262626;
-    --secondary-foreground: #fafafa;
+  /* Custom design system classes */
+  .vinyl-gradient {
+    background: var(--gradient-primary);
+  }
 
-    /* Accent remains copper but adjusted */
-    --accent: #d97706;
-    --accent-foreground: #fefbf3;
+  .accent-gradient {
+    background: var(--gradient-accent);
+  }
 
-    /* System colors for dark */
-    --muted: #262626;
-    --muted-foreground: #a3a3a3;
-    --border: #262626;
-    --input: #262626;
-    --ring: #d97706;
+  .subtle-gradient {
+    background: var(--gradient-subtle);
+  }
 
-    /* Destructive */
-    --destructive: #dc2626;
-    --destructive-foreground: #fefefe;
+  .shadow-vinyl {
+    box-shadow: var(--shadow-vinyl);
+  }
 
-    /* Chart colors adjusted for dark */
-    --chart-1: #f59e0b;
-    --chart-2: #d97706;
-    --chart-3: #b45309;
-    --chart-4: #92400e;
-    --chart-5: #78350f;
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
 
-    /* Sidebar dark */
-    --sidebar: #1a1a1a;
-    --sidebar-foreground: #fafafa;
-    --sidebar-primary: #fafafa;
-    --sidebar-primary-foreground: #1a1a1a;
-    --sidebar-accent: #262626;
-    --sidebar-accent-foreground: #fafafa;
-    --sidebar-border: #262626;
-    --sidebar-ring: #d97706;
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
 
-    /* Vintage colors for dark mode */
-    --vintage-primary: #fafafa;
-    --vintage-secondary: #d97706;
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-vinyl {
+    transition: var(--transition-vinyl);
+  }
 }
 
 /* Custom scrollbar styles for category menu */
@@ -248,27 +263,101 @@
 }
 
 @layer components {
-    /* Rill Custom Components */
-    .btn-primary {
-        @apply bg-accent text-accent-foreground hover:bg-accent/90 transition-colors duration-150 font-medium;
-    }
+  /* Vinyl Record Animation */
+  .vinyl-spin {
+    animation: vinyl-spin 3s linear infinite;
+  }
 
-    .btn-secondary {
-        @apply bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 transition-colors duration-150 font-medium;
-    }
+  .vinyl-spin:hover {
+    animation-duration: 1s;
+  }
 
-    .card-rill {
-        @apply bg-card text-card-foreground border border-border rounded-md shadow-sm;
-    }
+  /* Hero section animations */
+  .hero-fade-in {
+    animation: hero-fade-in 1s ease-out forwards;
+  }
 
-    .input-rill {
-        @apply bg-background border border-input rounded-md px-4 py-3 text-base focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors duration-150;
-    }
+  /* Product card hover effects */
+  .product-hover {
+    transition: var(--transition-vinyl);
+  }
 
-    /* Vietnamese text optimization */
-    .text-vietnamese {
-        text-rendering: optimizeLegibility;
-        -webkit-font-feature-settings: "kern" 1;
-        font-feature-settings: "kern" 1;
-    }
+  .product-hover:hover {
+    box-shadow: var(--shadow-vinyl);
+    transform: translateY(-0.25rem);
+  }
+
+  /* Rill Custom Components */
+  .btn-primary {
+    @apply bg-accent text-accent-foreground hover:bg-accent/90 transition-colors duration-150 font-medium;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 transition-colors duration-150 font-medium;
+  }
+
+  .card-rill {
+    @apply bg-card text-card-foreground border border-border rounded-md shadow-sm;
+  }
+
+  .input-rill {
+    @apply bg-background border border-input rounded-md px-4 py-3 text-base focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors duration-150;
+  }
+
+  /* Vietnamese text optimization */
+  .text-vietnamese {
+    text-rendering: optimizeLegibility;
+    -webkit-font-feature-settings: "kern" 1;
+    font-feature-settings: "kern" 1;
+  }
+}
+
+/* Keyframe animations */
+@keyframes vinyl-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
 }
