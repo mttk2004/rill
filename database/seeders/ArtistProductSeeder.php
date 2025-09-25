@@ -15,7 +15,25 @@ class ArtistProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Define specific artist-album relationships
+        $this->command->info('Starting Artist-Product relationship seeding...');
+
+        // Get all artists and products
+        $allArtists = Artist::active()->get();
+        $allProducts = Product::all();
+
+        $this->command->info("Found {$allArtists->count()} artists and {$allProducts->count()} products");
+
+        if ($allArtists->isEmpty()) {
+            $this->command->error('No artists found! Please run ArtistSeeder first.');
+            return;
+        }
+
+        if ($allProducts->isEmpty()) {
+            $this->command->error('No products found! Please run ProductSeeder first.');
+            return;
+        }
+
+        // Define specific artist-album relationships for famous albums
         $artistAlbumMappings = [
             'The Beatles' => ['Abbey Road'],
             'Pink Floyd' => ['The Dark Side of the Moon'],
@@ -27,35 +45,43 @@ class ArtistProductSeeder extends Seeder
             'Nirvana' => ['Nevermind'],
         ];
 
-        // Create the specific mappings
+        $assignedCount = 0;
+
+        // Create the specific mappings first
         foreach ($artistAlbumMappings as $artistName => $albumNames) {
-            $artist = Artist::where('slug', Str::slug($artistName))->first();
-            if (!$artist) continue;
+            $artist = $allArtists->where('slug', Str::slug($artistName))->first();
+            if (!$artist) {
+                $this->command->warn("Artist '{$artistName}' not found, skipping...");
+                continue;
+            }
 
             foreach ($albumNames as $albumName) {
-                $product = Product::where('slug', Str::slug($albumName))->first();
-                if (!$product) continue;
+                $product = $allProducts->where('slug', Str::slug($albumName))->first();
+                if (!$product) {
+                    $this->command->warn("Product '{$albumName}' not found, skipping...");
+                    continue;
+                }
 
-                // Attach artist to product with 'main' role
-                $artist->products()->attach($product->id, [
-                    'role' => 'main',
-                    'sort_order' => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                // Check if relationship already exists
+                if (!$product->artists()->where('artist_id', $artist->id)->exists()) {
+                    $artist->products()->attach($product->id, [
+                        'role' => 'main',
+                        'sort_order' => 1,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    $assignedCount++;
+                    $this->command->info("Assigned {$artist->name} to {$product->name}");
+                }
             }
         }
 
-        // For remaining products without artists, assign random artists
+        // For ALL remaining products, ensure they have at least one main artist
         $productsWithoutArtists = Product::whereDoesntHave('artists')->get();
-        $allArtists = Artist::active()->get();
+        $this->command->info("Found {$productsWithoutArtists->count()} products without artists");
 
         foreach ($productsWithoutArtists as $product) {
-            if ($allArtists->isEmpty()) {
-                continue; // Skip if no artists available
-            }
-
-            // Each product should have at least one main artist
+            // Each product MUST have at least one main artist
             $mainArtist = $allArtists->random();
             $product->artists()->attach($mainArtist->id, [
                 'role' => 'main',
@@ -63,6 +89,8 @@ class ArtistProductSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            $assignedCount++;
+            $this->command->info("Assigned {$mainArtist->name} as main artist to {$product->name}");
 
             // 30% chance of having a featured artist
             $availableForFeatured = $allArtists->where('id', '!=', $mainArtist->id);
@@ -74,6 +102,8 @@ class ArtistProductSeeder extends Seeder
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                $assignedCount++;
+                $this->command->info("Assigned {$featuredArtist->name} as featured artist to {$product->name}");
             }
 
             // 20% chance of having a composer (for jazz/classical)
@@ -87,6 +117,8 @@ class ArtistProductSeeder extends Seeder
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                    $assignedCount++;
+                    $this->command->info("Assigned {$composer->name} as composer to {$product->name}");
                 }
             }
 
@@ -101,8 +133,25 @@ class ArtistProductSeeder extends Seeder
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+                    $assignedCount++;
+                    $this->command->info("Assigned {$producer->name} as producer to {$product->name}");
                 }
             }
+        }
+
+        // Final verification
+        $productsStillWithoutArtists = Product::whereDoesntHave('artists')->count();
+        $totalArtistProductRelations = \DB::table('artist_product')->count();
+
+        $this->command->info("Seeding completed!");
+        $this->command->info("Total artist-product relationships created: {$assignedCount}");
+        $this->command->info("Total artist-product relationships in database: {$totalArtistProductRelations}");
+        $this->command->info("Products still without artists: {$productsStillWithoutArtists}");
+
+        if ($productsStillWithoutArtists > 0) {
+            $this->command->error("WARNING: {$productsStillWithoutArtists} products still have no artists!");
+        } else {
+            $this->command->info("SUCCESS: All products now have at least one artist!");
         }
     }
 }

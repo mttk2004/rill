@@ -30,6 +30,7 @@ class ArtistSeeder extends Seeder
 
         foreach ($famousArtists as $artistData) {
             $artistData['slug'] = \Illuminate\Support\Str::slug($artistData['name']);
+            $artistData['is_active'] = true; // Ensure famous artists are active
             Artist::factory()->create($artistData);
         }
 
