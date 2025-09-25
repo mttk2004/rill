@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pagination } from "@/components/ui/pagination";
 import { Search, Star, Grid, List, Disc3 } from "lucide-react";
 import { type ProductsPageData, Product } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
@@ -16,21 +17,38 @@ interface ProductsProps extends ProductsPageData {
     label?: string;
     artist?: string;
     sort?: string;
+    page?: number;
 }
 
-export default function Products({ products: productsData, pagination, ...props }: ProductsProps) {
+export default function Products({ products: productsData, pagination, filters, ...props }: ProductsProps) {
     const { auth } = usePage<SharedData>().props;
     const [searchTerm, setSearchTerm] = useState(props.search || '');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
-        const currentFilters = {
+        updateFilters({
             search: searchTerm || undefined,
+            page: 1, // Reset to first page when searching
+        });
+    };
+
+    const handleFilterChange = (key: string, value: string) => {
+        updateFilters({
+            [key]: value === 'all' || value === '' ? undefined : value,
+            page: 1, // Reset to first page when filtering
+        });
+    };
+
+    const updateFilters = (newFilters: Record<string, string | number | undefined>) => {
+        const currentFilters = {
+            search: props.search,
             genre: props.genre,
             label: props.label,
             artist: props.artist,
             sort: props.sort,
+            page: props.page,
+            ...newFilters,
         };
 
         // Remove empty values
@@ -42,7 +60,7 @@ export default function Products({ products: productsData, pagination, ...props 
 
         router.get('/products', currentFilters, {
             preserveState: true,
-            preserveScroll: true,
+            preserveScroll: false,
         });
     };
 
@@ -54,9 +72,15 @@ export default function Products({ products: productsData, pagination, ...props 
         sort: props.sort,
     };
 
-    // Mock data for genres and labels - in real app, this would come from backend
-    const genres = ["Tất cả", "Rock", "Pop", "Jazz", "Classical", "Progressive Rock"];
-    const labels = ["Tất cả", "Apple Records", "Harvest Records", "Epic Records", "Warner Bros", "Asylum Records"];
+    // Use real data from backend
+    const genres = filters?.genres ? ["Tất cả", ...filters.genres] : ["Tất cả"];
+    const labels = filters?.labels ? ["Tất cả", ...filters.labels] : ["Tất cả"];
+    const sortOptions = filters?.sort_options || [
+        { value: 'featured', label: 'Nổi bật' },
+        { value: 'newest', label: 'Mới nhất' },
+        { value: 'price_asc', label: 'Giá: Thấp đến cao' },
+        { value: 'price_desc', label: 'Giá: Cao đến thấp' },
+    ];
     return (
         <>
             <Head title="Sản phẩm - Rill" />
@@ -88,26 +112,32 @@ export default function Products({ products: productsData, pagination, ...props 
                                 />
                             </form>
 
-                            <Select defaultValue={props.genre || "all-genres"}>
+                            <Select
+                                value={props.genre || "all"}
+                                onValueChange={(value) => handleFilterChange('genre', value)}
+                            >
                                 <SelectTrigger className="w-48">
                                     <SelectValue placeholder="Thể loại" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {genres.map((genre) => (
-                                        <SelectItem key={genre} value={genre.toLowerCase().replace(/\s+/g, '-')}>
+                                        <SelectItem key={genre} value={genre === "Tất cả" ? "all" : genre}>
                                             {genre}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
 
-                            <Select defaultValue={props.label || "all-labels"}>
+                            <Select
+                                value={props.label || "all"}
+                                onValueChange={(value) => handleFilterChange('label', value)}
+                            >
                                 <SelectTrigger className="w-48">
                                     <SelectValue placeholder="Hãng đĩa" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {labels.map((label) => (
-                                        <SelectItem key={label} value={label.toLowerCase().replace(/\s+/g, '-')}>
+                                        <SelectItem key={label} value={label === "Tất cả" ? "all" : label}>
                                             {label}
                                         </SelectItem>
                                     ))}
@@ -136,34 +166,40 @@ export default function Products({ products: productsData, pagination, ...props 
                                 </Button>
                             </div>
 
-                            <Select defaultValue={props.sort || "popular"}>
+                            <Select
+                                value={props.sort || "featured"}
+                                onValueChange={(value) => handleFilterChange('sort', value)}
+                            >
                                 <SelectTrigger className="w-48">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="popular">Phổ biến</SelectItem>
-                                    <SelectItem value="price-low">Giá thấp đến cao</SelectItem>
-                                    <SelectItem value="price-high">Giá cao đến thấp</SelectItem>
-                                    <SelectItem value="newest">Mới nhất</SelectItem>
-                                    <SelectItem value="rating">Đánh giá cao</SelectItem>
+                                    {sortOptions.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
 
                     {/* Results Info */}
-                    <div className="flex items-center justify-between mb-6">
-                        <p className="text-muted-foreground">
-                            {pagination.total > 0 ? (
-                                <>Hiển thị <span className="font-medium">{pagination.from}-{pagination.to}</span> trong <span className="font-medium">{pagination.total}</span> sản phẩm</>
-                            ) : (
-                                'Không tìm thấy sản phẩm nào'
-                            )}
-                            {currentFilters.search && (
-                                <> cho "{currentFilters.search}"</>
-                            )}
-                        </p>
-                    </div>
+                    {pagination.total > 0 && (
+                        <div className="flex items-center justify-between mb-6">
+                            <p className="text-muted-foreground">
+                                {currentFilters.search && (
+                                    <>Kết quả tìm kiếm cho "<span className="font-medium">{currentFilters.search}</span>"</>
+                                )}
+                                {currentFilters.genre && currentFilters.genre !== 'all' && (
+                                    <>Thể loại: <span className="font-medium">{currentFilters.genre}</span></>
+                                )}
+                                {currentFilters.label && currentFilters.label !== 'all' && (
+                                    <>Hãng đĩa: <span className="font-medium">{currentFilters.label}</span></>
+                                )}
+                            </p>
+                        </div>
+                    )}
 
                     {/* Products Grid */}
                     {productsData.data.length > 0 ? (
@@ -250,42 +286,16 @@ export default function Products({ products: productsData, pagination, ...props 
                     )}
 
                     {/* Pagination */}
-                    {pagination.last_page > 1 && (
-                        <div className="flex justify-center mt-12">
-                            <div className="flex items-center space-x-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={pagination.current_page <= 1}
-                                >
-                                    Trước
-                                </Button>
-                                {Array.from({ length: Math.min(5, pagination.last_page) }, (_, i) => {
-                                    const page = i + 1;
-                                    return (
-                                        <Button
-                                            key={page}
-                                            variant={pagination.current_page === page ? "default" : "outline"}
-                                            size="sm"
-                                        >
-                                            {page}
-                                        </Button>
-                                    );
-                                })}
-                                {pagination.last_page > 5 && (
-                                    <>
-                                        <span className="px-2 text-muted-foreground">...</span>
-                                        <Button variant="outline" size="sm">{pagination.last_page}</Button>
-                                    </>
-                                )}
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    disabled={pagination.current_page >= pagination.last_page}
-                                >
-                                    Sau
-                                </Button>
-                            </div>
+                    {pagination.total > 0 && (
+                        <div className="mt-12">
+                            <Pagination
+                                currentPage={pagination.current_page}
+                                lastPage={pagination.last_page}
+                                total={pagination.total}
+                                from={pagination.from || 0}
+                                to={pagination.to || 0}
+                                filters={currentFilters}
+                            />
                         </div>
                     )}
                 </div>
