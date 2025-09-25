@@ -42,13 +42,13 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
             <SettingsLayout>
                 <div className="space-y-6">
                     <div>
-                        <h2 
+                        <h2
                             className="text-2xl font-bold text-vintage-primary dark:text-white mb-2"
                             style={{ fontFamily: "'Playfair Display', serif" }}
                         >
                             Thông tin cá nhân
                         </h2>
-                        <p 
+                        <p
                             className="text-vintage-tertiary dark:text-vintage-tertiary"
                             style={{ fontFamily: "'Crimson Text', serif" }}
                         >
@@ -60,7 +60,6 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                         {...ProfileController.update.form()}
                         options={{
                             preserveScroll: true,
-                            forceFormData: true,
                         }}
                         className="space-y-6"
                     >
@@ -217,9 +216,9 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     >
                                         <p className="text-sm text-green-600 dark:text-green-400">Đã lưu</p>
                                     </Transition>
-                                    
-                                    <Button 
-                                        disabled={processing} 
+
+                                    <Button
+                                        disabled={processing}
                                         data-test="update-profile-button"
                                         className="px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium transition-colors hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
