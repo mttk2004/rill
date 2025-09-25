@@ -75,71 +75,76 @@ export const Navigation = ({ user }: NavigationProps) => {
               <Search className="h-4 w-4" />
             </Button>
 
-            {/* Wishlist with Hover Card */}
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href="/wishlist">
-                    <Heart className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </HoverCardTrigger>
-              <HoverCardContent className="w-80">
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold">Danh sách yêu thích</h4>
-                  <p className="text-sm text-muted-foreground">
-                    6 sản phẩm đang chờ bạn
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-xs">
-                      <div className="w-8 h-8 bg-muted rounded"></div>
-                      <span>Rumours - Fleetwood Mac</span>
+            {/* Wishlist & Cart - Only show when logged in */}
+            {user && (
+              <>
+                {/* Wishlist with Hover Card */}
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href="/wishlist">
+                        <Heart className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">Danh sách yêu thích</h4>
+                      <p className="text-sm text-muted-foreground">
+                        6 sản phẩm đang chờ bạn
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-xs">
+                          <div className="w-8 h-8 bg-muted rounded"></div>
+                          <span>Rumours - Fleetwood Mac</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs">
+                          <div className="w-8 h-8 bg-muted rounded"></div>
+                          <span>Hotel California - Eagles</span>
+                        </div>
+                      </div>
+                      <Button size="sm" className="w-full">Xem tất cả</Button>
                     </div>
-                    <div className="flex items-center gap-2 text-xs">
-                      <div className="w-8 h-8 bg-muted rounded"></div>
-                      <span>Hotel California - Eagles</span>
-                    </div>
-                  </div>
-                  <Button size="sm" className="w-full">Xem tất cả</Button>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
+                  </HoverCardContent>
+                </HoverCard>
 
-            {/* Cart with Hover Card */}
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href="/cart">
-                    <ShoppingBag className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </HoverCardTrigger>
-              <HoverCardContent className="w-80">
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold">Giỏ hàng</h4>
-                  <p className="text-sm text-muted-foreground">
-                    3 sản phẩm • 1.550.000₫
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-muted rounded"></div>
-                        <span>Rumours</span>
+                {/* Cart with Hover Card */}
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href="/cart">
+                        <ShoppingBag className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">Giỏ hàng</h4>
+                      <p className="text-sm text-muted-foreground">
+                        3 sản phẩm • 1.550.000₫
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-muted rounded"></div>
+                            <span>Rumours</span>
+                          </div>
+                          <span>490.000₫</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-muted rounded"></div>
+                            <span>Hotel California</span>
+                          </div>
+                          <span>420.000₫</span>
+                        </div>
                       </div>
-                      <span>490.000₫</span>
+                      <Button size="sm" className="w-full">Thanh toán</Button>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-muted rounded"></div>
-                        <span>Hotel California</span>
-                      </div>
-                      <span>420.000₫</span>
-                    </div>
-                  </div>
-                  <Button size="sm" className="w-full">Thanh toán</Button>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
+                  </HoverCardContent>
+                </HoverCard>
+              </>
+            )}
 
             {/* User Dropdown */}
             {user ? (
@@ -225,6 +230,22 @@ export const Navigation = ({ user }: NavigationProps) => {
                   <Search className="h-4 w-4 mr-2" />
                   Tìm kiếm
                 </Button>
+                {user && (
+                  <>
+                    <Button variant="ghost" size="sm" className="w-full justify-start" asChild>
+                      <Link href="/wishlist">
+                        <Heart className="h-4 w-4 mr-2" />
+                        Danh sách yêu thích
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start" asChild>
+                      <Link href="/cart">
+                        <ShoppingBag className="h-4 w-4 mr-2" />
+                        Giỏ hàng
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>
