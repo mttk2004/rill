@@ -23,13 +23,20 @@ class ProductController extends Controller
     public function index(Request $request): Response
     {
         $filters = $request->only(['search', 'genre', 'label', 'artist', 'sort', 'page']);
-        
+
         $result = $this->productService->getProducts($filters);
 
         return Inertia::render('products', [
             'products' => $result['products'],
             'filters' => $result['filters'],
             'pagination' => $result['pagination'],
+            // Pass filter parameters to frontend
+            'search' => $filters['search'] ?? null,
+            'genre' => $filters['genre'] ?? null,
+            'label' => $filters['label'] ?? null,
+            'artist' => $filters['artist'] ?? null,
+            'sort' => $filters['sort'] ?? null,
+            'page' => $filters['page'] ?? 1,
         ]);
     }
 

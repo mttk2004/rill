@@ -137,9 +137,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                 onValueChange={(value) => handleFilterChange('genre', value)}
                             >
                                 <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="Thể loại">
-                                        {props.genre ? props.genre : "Tất cả"}
-                                    </SelectValue>
+                                    <SelectValue placeholder="Thể loại" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {genres.map((genre) => (
@@ -155,9 +153,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                 onValueChange={(value) => handleFilterChange('label', value)}
                             >
                                 <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="Hãng đĩa">
-                                        {props.label ? props.label : "Tất cả"}
-                                    </SelectValue>
+                                    <SelectValue placeholder="Hãng đĩa" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {labels.map((label) => (
@@ -195,9 +191,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                 onValueChange={(value) => handleFilterChange('sort', value)}
                             >
                                 <SelectTrigger className="w-48">
-                                    <SelectValue>
-                                        {sortOptions.find(option => option.value === (props.sort || "featured"))?.label || "Nổi bật"}
-                                    </SelectValue>
+                                    <SelectValue placeholder="Sắp xếp" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {sortOptions.map((option) => (
