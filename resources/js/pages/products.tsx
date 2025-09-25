@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pagination } from "@/components/ui/pagination";
 import { Search, Star, Grid, List, Disc3 } from "lucide-react";
 import { type ProductsPageData, Product } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage, Link } from '@inertiajs/react';
 import { useState, FormEvent } from 'react';
 import { type SharedData } from '@/types';
 
@@ -269,13 +269,15 @@ export default function Products({ products: productsData, pagination, filters, 
                                 >
                                     <CardContent className={`p-0 ${viewMode === "list" ? "flex" : ""}`}>
                                         <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
-                                            <div className={`w-full bg-muted flex items-center justify-center ${
-                                                viewMode === "list" ? "h-32" : "h-64"
-                                            } ${
-                                                viewMode === "list" ? "rounded-l-lg" : "rounded-t-lg"
-                                            }`}>
-                                                <Disc3 className="h-16 w-16 text-muted-foreground/30" />
-                                            </div>
+                                            <Link href={`/products/${product.slug}`}>
+                                                <div className={`w-full bg-muted flex items-center justify-center ${
+                                                    viewMode === "list" ? "h-32" : "h-64"
+                                                } ${
+                                                    viewMode === "list" ? "rounded-l-lg" : "rounded-t-lg"
+                                                }`}>
+                                                    <Disc3 className="h-16 w-16 text-muted-foreground/30" />
+                                                </div>
+                                            </Link>
                                             {product.is_featured && (
                                                 <Badge
                                                     variant="secondary"
@@ -287,39 +289,50 @@ export default function Products({ products: productsData, pagination, filters, 
                                         </div>
 
                                         <div className={`p-6 ${viewMode === "list" ? "flex-1" : ""}`}>
-                                            <div className={viewMode === "list" ? "flex justify-between items-start" : ""}>
-                                                <div className={viewMode === "list" ? "flex-1" : ""}>
-                                                    <h3 className="font-semibold text-lg mb-1 line-clamp-1">{product.name}</h3>
-                                                    <p className="text-muted-foreground mb-2">
-                                                        {product.artists?.map(artist => artist.name).join(', ') || 'Unknown Artist'}
-                                                    </p>
+                                            <Link href={`/products/${product.slug}`}>
+                                                <div className={viewMode === "list" ? "flex justify-between items-start" : ""}>
+                                                    <div className={viewMode === "list" ? "flex-1" : ""}>
+                                                        <h3 className="font-semibold text-lg mb-1 line-clamp-1 hover:text-accent transition-colors">{product.name}</h3>
+                                                        <p className="text-muted-foreground mb-2">
+                                                            {product.artists?.map(artist => artist.name).join(', ') || 'Unknown Artist'}
+                                                        </p>
 
-                                                    {viewMode === "list" && (
-                                                        <div className="text-sm text-muted-foreground mb-3">
-                                                            <p>Thể loại: {product.genre}</p>
-                                                            <p>Hãng đĩa: {product.label}</p>
+                                                        {viewMode === "list" && (
+                                                            <div className="text-sm text-muted-foreground mb-3">
+                                                                <p>Thể loại: {product.genre}</p>
+                                                                <p>Hãng đĩa: {product.label}</p>
+                                                            </div>
+                                                        )}
+
+                                                        <div className="flex items-center gap-2 mb-3">
+                                                            <Star className="h-4 w-4 fill-accent text-accent" />
+                                                            <span className="text-sm font-medium">4.8</span>
+                                                            <span className="text-xs text-muted-foreground">(125 đánh giá)</span>
                                                         </div>
-                                                    )}
+                                                    </div>
 
-                                                    <div className="flex items-center gap-2 mb-3">
-                                                        <Star className="h-4 w-4 fill-accent text-accent" />
-                                                        <span className="text-sm font-medium">4.8</span>
-                                                        <span className="text-xs text-muted-foreground">(125 đánh giá)</span>
+                                                    <div className={`flex ${viewMode === "list" ? "flex-col items-end" : "items-center justify-between"}`}>
+                                                        <div className={`flex items-center gap-2 ${viewMode === "list" ? "mb-3" : "mb-3"}`}>
+                                                            <span className="text-xl font-bold text-accent">{product.price?.toLocaleString('vi-VN')}đ</span>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </Link>
 
-                                                <div className={`flex ${viewMode === "list" ? "flex-col items-end" : "items-center justify-between"}`}>
-                                                    <div className={`flex items-center gap-2 ${viewMode === "list" ? "mb-3" : ""}`}>
-                                                        <span className="text-xl font-bold text-accent">{product.price?.toLocaleString('vi-VN')}đ</span>
-                                                    </div>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        className="hover:bg-accent hover:text-accent-foreground"
-                                                    >
-                                                        Thêm vào giỏ
-                                                    </Button>
-                                                </div>
+                                            <div className="mt-3">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="hover:bg-accent hover:text-accent-foreground"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        // Logic thêm vào giỏ hàng sẽ được implement sau
+                                                        console.log('Add to cart:', product.id);
+                                                    }}
+                                                >
+                                                    Thêm vào giỏ
+                                                </Button>
                                             </div>
                                         </div>
                                     </CardContent>
