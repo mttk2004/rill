@@ -34,9 +34,29 @@ export default function Products({ products: productsData, pagination, filters, 
     };
 
     const handleFilterChange = (key: string, value: string) => {
-        updateFilters({
-            [key]: value === 'all' || value === '' ? undefined : value,
+        const newValue = value === 'all' || value === '' ? undefined : value;
+
+        // Preserve existing filters and only update the changed one
+        const updatedFilters = {
+            search: props.search,
+            genre: props.genre,
+            label: props.label,
+            artist: props.artist,
+            sort: props.sort,
+            [key]: newValue,
             page: 1, // Reset to first page when filtering
+        };
+
+        // Remove empty values
+        Object.keys(updatedFilters).forEach(filterKey => {
+            if (!updatedFilters[filterKey as keyof typeof updatedFilters]) {
+                delete updatedFilters[filterKey as keyof typeof updatedFilters];
+            }
+        });
+
+        router.get('/products', updatedFilters, {
+            preserveState: true,
+            preserveScroll: false,
         });
     };
 
@@ -117,7 +137,9 @@ export default function Products({ products: productsData, pagination, filters, 
                                 onValueChange={(value) => handleFilterChange('genre', value)}
                             >
                                 <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="Thể loại" />
+                                    <SelectValue placeholder="Thể loại">
+                                        {props.genre ? props.genre : "Tất cả"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                     {genres.map((genre) => (
@@ -133,7 +155,9 @@ export default function Products({ products: productsData, pagination, filters, 
                                 onValueChange={(value) => handleFilterChange('label', value)}
                             >
                                 <SelectTrigger className="w-48">
-                                    <SelectValue placeholder="Hãng đĩa" />
+                                    <SelectValue placeholder="Hãng đĩa">
+                                        {props.label ? props.label : "Tất cả"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                     {labels.map((label) => (
@@ -171,7 +195,9 @@ export default function Products({ products: productsData, pagination, filters, 
                                 onValueChange={(value) => handleFilterChange('sort', value)}
                             >
                                 <SelectTrigger className="w-48">
-                                    <SelectValue />
+                                    <SelectValue>
+                                        {sortOptions.find(option => option.value === (props.sort || "featured"))?.label || "Nổi bật"}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent>
                                     {sortOptions.map((option) => (
@@ -181,23 +207,54 @@ export default function Products({ products: productsData, pagination, filters, 
                                     ))}
                                 </SelectContent>
                             </Select>
+
+                            {/* Clear Filters Button */}
+                            {(props.genre || props.label || props.search || (props.sort && props.sort !== 'featured')) && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        setSearchTerm('');
+                                        router.get('/products', {}, {
+                                            preserveState: true,
+                                            preserveScroll: false,
+                                        });
+                                    }}
+                                    className="text-muted-foreground hover:text-foreground"
+                                >
+                                    Xóa bộ lọc
+                                </Button>
+                            )}
                         </div>
                     </div>
 
                     {/* Results Info */}
                     {pagination.total > 0 && (
                         <div className="flex items-center justify-between mb-6">
-                            <p className="text-muted-foreground">
+                            <div className="flex flex-wrap items-center gap-2">
                                 {currentFilters.search && (
-                                    <>Kết quả tìm kiếm cho "<span className="font-medium">{currentFilters.search}</span>"</>
+                                    <span className="text-sm text-muted-foreground">
+                                        Tìm kiếm: <span className="font-medium text-foreground">"{currentFilters.search}"</span>
+                                    </span>
                                 )}
                                 {currentFilters.genre && currentFilters.genre !== 'all' && (
-                                    <>Thể loại: <span className="font-medium">{currentFilters.genre}</span></>
+                                    <span className="text-sm text-muted-foreground">
+                                        Thể loại: <span className="font-medium text-foreground">{currentFilters.genre}</span>
+                                    </span>
                                 )}
                                 {currentFilters.label && currentFilters.label !== 'all' && (
-                                    <>Hãng đĩa: <span className="font-medium">{currentFilters.label}</span></>
+                                    <span className="text-sm text-muted-foreground">
+                                        Hãng đĩa: <span className="font-medium text-foreground">{currentFilters.label}</span>
+                                    </span>
                                 )}
-                            </p>
+                                {currentFilters.sort && currentFilters.sort !== 'featured' && (
+                                    <span className="text-sm text-muted-foreground">
+                                        Sắp xếp: <span className="font-medium text-foreground">
+                                            {sortOptions.find(option => option.value === currentFilters.sort)?.label}
+                                        </span>
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     )}
 
