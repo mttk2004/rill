@@ -1,237 +1,296 @@
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import { send } from '@/routes/verification';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import { type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { User, Calendar, Upload } from 'lucide-react';
+import { User, Calendar, Upload, Mail, Phone, UserCircle, AlertCircle } from 'lucide-react';
 
 import DeleteUser from '@/components/delete-user';
-import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
-import { edit } from '@/routes/profile';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Cài đặt hồ sơ',
-        href: edit().url,
-    },
-];
+import SettingsLayout from '@/layouts/settings-layout';
 
 interface ProfilePageProps extends SharedData {
-    user: any;
+    user: {
+        name?: string;
+        email?: string;
+        phone?: string;
+        gender?: string;
+        date_of_birth?: string;
+        avatar_url?: string;
+    };
     mustVerifyEmail: boolean;
     status?: string;
 }
 
+interface AuthUser {
+    name?: string;
+    email?: string;
+    avatar_url?: string;
+    email_verified_at?: string | null;
+}
+
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth, user } = usePage<ProfilePageProps>().props;
+    const authUser = auth.user as AuthUser;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Cài đặt hồ sơ - Rill">
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
-            </Head>
+        <SettingsLayout
+            title="Cài đặt hồ sơ"
+            description="Quản lý và cập nhật thông tin cá nhân của bạn"
+        >
+            <Head title="Cài đặt hồ sơ - Rill" />
 
-            <SettingsLayout>
-                <div className="space-y-6">
+            <div className="space-y-8">
+                {/* Profile Header */}
+                <div className="flex items-center gap-6 p-6 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/10 rounded-xl border border-amber-200 dark:border-amber-800">
+                    <div className="relative">
+                        <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            {(user?.avatar_url || authUser?.avatar_url) ? (
+                                <img
+                                    src={user?.avatar_url || authUser?.avatar_url}
+                                    alt="Avatar"
+                                    className="w-full h-full rounded-full object-cover"
+                                />
+                            ) : (
+                                <User className="h-8 w-8" />
+                            )}
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center">
+                            <UserCircle className="h-3 w-3 text-white" />
+                        </div>
+                    </div>
                     <div>
-                        <h2
-                            className="text-2xl font-bold text-vintage-primary dark:text-white mb-2"
-                            style={{ fontFamily: "'Playfair Display', serif" }}
-                        >
-                            Thông tin cá nhân
-                        </h2>
-                        <p
-                            className="text-vintage-tertiary dark:text-vintage-tertiary"
-                            style={{ fontFamily: "'Crimson Text', serif" }}
-                        >
-                            Quản lý và cập nhật thông tin cá nhân của bạn
+                        <h3 className="text-xl font-bold text-amber-900 dark:text-amber-100">
+                            {user?.name || authUser?.name || 'Chưa có tên'}
+                        </h3>
+                        <p className="text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                            <Mail className="h-4 w-4" />
+                            {user?.email || authUser?.email || 'Chưa có email'}
                         </p>
                     </div>
+                </div>
 
-                    <Form
-                        {...ProfileController.update.form()}
-                        options={{
-                            preserveScroll: true,
-                        }}
-                        className="space-y-6"
-                    >
-                        {({ processing, recentlySuccessful, errors }) => (
-                            <>
+                <Form
+                    {...ProfileController.update.form()}
+                    options={{
+                        preserveScroll: true,
+                    }}
+                    className="space-y-8"
+                >
+                    {({ processing, recentlySuccessful, errors }) => (
+                        <>
+                            {/* Personal Information Section */}
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+                                        <User className="h-5 w-5 text-white" />
+                                    </div>
+                                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">
+                                        Thông tin cá nhân
+                                    </h4>
+                                </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Name Field */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name" className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                            <User className="h-4 w-4" />
                                             Họ và tên
                                         </Label>
                                         <Input
                                             id="name"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                            defaultValue={user?.name || auth.user?.name}
+                                            className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-700 dark:text-white transition-all duration-300 hover:border-amber-400"
+                                            defaultValue={user?.name || authUser?.name}
                                             name="name"
                                             required
                                             autoComplete="name"
                                             placeholder="Nhập họ và tên"
                                         />
-                                        <InputError className="mt-2" message={errors.name} />
+                                        <InputError className="text-red-500 text-sm" message={errors.name} />
                                     </div>
 
                                     {/* Email Field */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email" className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                            <Mail className="h-4 w-4" />
                                             Địa chỉ email
                                         </Label>
                                         <Input
                                             id="email"
                                             type="email"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                                            defaultValue={user?.email || auth.user?.email}
+                                            className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-700 dark:text-white transition-all duration-300 hover:border-amber-400"
+                                            defaultValue={user?.email || authUser?.email}
                                             name="email"
                                             required
                                             autoComplete="username"
                                             placeholder="Nhập địa chỉ email"
                                         />
-                                        <InputError className="mt-2" message={errors.email} />
+                                        <InputError className="text-red-500 text-sm" message={errors.email} />
                                     </div>
 
                                     {/* Phone Field */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="phone" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="phone" className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                            <Phone className="h-4 w-4" />
                                             Số điện thoại
                                         </Label>
                                         <Input
                                             id="phone"
                                             type="tel"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                            className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-700 dark:text-white transition-all duration-300 hover:border-amber-400"
                                             defaultValue={user?.phone || ''}
                                             name="phone"
                                             placeholder="Nhập số điện thoại"
                                         />
-                                        <InputError className="mt-2" message={errors.phone} />
+                                        <InputError className="text-red-500 text-sm" message={errors.phone} />
                                     </div>
 
                                     {/* Gender Field */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="gender" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="gender" className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                            <User className="h-4 w-4" />
                                             Giới tính
                                         </Label>
                                         <select
                                             id="gender"
                                             name="gender"
                                             defaultValue={user?.gender || ''}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                            className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-700 dark:text-white transition-all duration-300 hover:border-amber-400"
                                         >
                                             <option value="">Chọn giới tính</option>
                                             <option value="male">Nam</option>
                                             <option value="female">Nữ</option>
                                             <option value="other">Khác</option>
                                         </select>
-                                        <InputError className="mt-2" message={errors.gender} />
+                                        <InputError className="text-red-500 text-sm" message={errors.gender} />
                                     </div>
 
                                     {/* Date of Birth Field */}
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="date_of_birth" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label htmlFor="date_of_birth" className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                            <Calendar className="h-4 w-4" />
                                             Ngày sinh
                                         </Label>
                                         <Input
                                             id="date_of_birth"
                                             type="date"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                                            className="w-full md:w-1/2 px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-700 dark:text-white transition-all duration-300 hover:border-amber-400"
                                             defaultValue={user?.date_of_birth || ''}
                                             name="date_of_birth"
                                         />
-                                        <InputError className="mt-2" message={errors.date_of_birth} />
+                                        <InputError className="text-red-500 text-sm" message={errors.date_of_birth} />
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Avatar Upload Field */}
-                                <div className="grid gap-2">
-                                    <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {/* Avatar Upload Section */}
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-2 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
+                                        <Upload className="h-5 w-5 text-white" />
+                                    </div>
+                                    <h4 className="text-lg font-bold text-slate-900 dark:text-white">
                                         Ảnh đại diện
-                                    </Label>
-                                    <div className="flex items-center space-x-4">
-                                        {(user?.avatar_url || auth.user?.avatar_url) && (
-                                            <div className="relative">
-                                                <img
-                                                    src={user?.avatar_url || auth.user?.avatar_url}
-                                                    alt="Avatar hiện tại"
-                                                    className="h-16 w-16 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
-                                                />
-                                                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block text-center">Hiện tại</span>
-                                            </div>
-                                        )}
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                name="avatar"
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent dark:border-gray-600 dark:bg-gray-700 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-accent file:text-accent-foreground hover:file:bg-accent/90"
+                                    </h4>
+                                </div>
+
+                                <div className="flex items-center gap-6 p-6 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600">
+                                    {(user?.avatar_url || authUser?.avatar_url) && (
+                                        <div className="relative group">
+                                            <img
+                                                src={user?.avatar_url || authUser?.avatar_url}
+                                                alt="Avatar hiện tại"
+                                                className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-slate-800 shadow-lg group-hover:scale-105 transition-transform duration-300"
                                             />
-                                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                                Chọn ảnh định dạng JPG, PNG hoặc GIF. Kích thước tối đa 2MB.
+                                            <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                                <span className="text-white text-xs font-medium">Hiện tại</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="flex-1">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            name="avatar"
+                                            className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-700 dark:text-white transition-all duration-300 hover:border-amber-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-gradient-to-r file:from-amber-500 file:to-amber-600 file:text-white hover:file:from-amber-600 hover:file:to-amber-700 file:cursor-pointer file:transition-all file:duration-300"
+                                        />
+                                        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                                            📸 Chọn ảnh định dạng JPG, PNG hoặc GIF. Kích thước tối đa 2MB.
+                                        </p>
+                                    </div>
+                                </div>
+                                <InputError className="text-red-500 text-sm" message={errors.avatar} />
+                            </div>
+
+                            {/* Email verification notice */}
+                            {mustVerifyEmail && authUser.email_verified_at === null && (
+                                <div className="p-6 bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/10 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg">
+                                            <AlertCircle className="h-5 w-5 text-white" />
+                                        </div>
+                                        <div>
+                                            <h5 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                                                Email chưa được xác thực
+                                            </h5>
+                                            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                                                Địa chỉ email của bạn chưa được xác thực.{' '}
+                                                <Link
+                                                    href={send()}
+                                                    as="button"
+                                                    className="font-semibold underline decoration-yellow-500 underline-offset-4 transition-colors duration-300 hover:decoration-current hover:text-yellow-900 dark:hover:text-yellow-100"
+                                                >
+                                                    Bấm vào đây để gửi lại email xác thực.
+                                                </Link>
                                             </p>
                                         </div>
                                     </div>
-                                    <InputError className="mt-2" message={errors.avatar} />
+
+                                    {status === 'verification-link-sent' && (
+                                        <div className="mt-4 p-3 bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                            <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                                                ✅ Một liên kết xác thực mới đã được gửi đến địa chỉ email của bạn.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
+                            )}
 
-                                {/* Email verification notice */}
-                                {mustVerifyEmail && auth.user.email_verified_at === null && (
-                                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/50 dark:border-yellow-800">
-                                        <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                                            Địa chỉ email của bạn chưa được xác thực.{' '}
-                                            <Link
-                                                href={send()}
-                                                as="button"
-                                                className="text-yellow-900 dark:text-yellow-100 underline decoration-yellow-500 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current font-medium"
-                                            >
-                                                Bấm vào đây để gửi lại email xác thực.
-                                            </Link>
-                                        </p>
-
-                                        {status === 'verification-link-sent' && (
-                                            <div className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                                                Một liên kết xác thực mới đã được gửi đến địa chỉ email của bạn.
-                                            </div>
-                                        )}
+                            {/* Save Button */}
+                            <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-600">
+                                <Transition
+                                    show={recentlySuccessful}
+                                    enter="transition ease-in-out duration-300"
+                                    enterFrom="opacity-0 transform translate-x-2"
+                                    leave="transition ease-in-out duration-300"
+                                    leaveTo="opacity-0 transform -translate-x-2"
+                                >
+                                    <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <p className="text-sm font-medium">Đã lưu thành công</p>
                                     </div>
-                                )}
+                                </Transition>
 
-                                {/* Save Button */}
-                                <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <Transition
-                                        show={recentlySuccessful}
-                                        enter="transition ease-in-out"
-                                        enterFrom="opacity-0"
-                                        leave="transition ease-in-out"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <p className="text-sm text-green-600 dark:text-green-400">Đã lưu</p>
-                                    </Transition>
+                                <Button
+                                    disabled={processing}
+                                    data-test="update-profile-button"
+                                    className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {processing ? 'Đang lưu...' : 'Lưu thay đổi'}
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </Form>
 
-                                    <Button
-                                        disabled={processing}
-                                        data-test="update-profile-button"
-                                        className="px-6 py-3 bg-accent text-accent-foreground rounded-lg font-medium transition-colors hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {processing ? 'Đang lưu...' : 'Lưu thay đổi'}
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
+                {/* Delete User Section */}
+                <div className="pt-8 border-t border-slate-200 dark:border-slate-600">
+                    <DeleteUser />
                 </div>
-
-                <DeleteUser />
-            </SettingsLayout>
-        </AppLayout>
+            </div>
+        </SettingsLayout>
     );
 }
