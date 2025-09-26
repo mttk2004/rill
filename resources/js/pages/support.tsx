@@ -5,8 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Navigation } from "@/components/navigation";
+import { Badge } from "@/components/ui/badge";
 import {
-  HelpCircle,
   MessageCircle,
   Phone,
   Mail,
@@ -17,7 +17,11 @@ import {
   Truck,
   RefreshCw,
   ShieldCheck,
-  Send
+  Send,
+  Disc3,
+  Heart,
+  Headphones,
+  Star
 } from "lucide-react";
 import { type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
@@ -88,173 +92,272 @@ export default function Support() {
       <div className="min-h-screen bg-background">
         <Navigation user={auth.user} />
 
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-foreground mb-4 flex items-center justify-center gap-2">
-                <HelpCircle className="h-10 w-10 text-primary" />
-                Trung tâm hỗ trợ
+        <main className="min-h-screen">
+          {/* Hero Section */}
+          <section className="relative bg-gradient-to-br from-slate-900 via-accent/20 to-slate-800 text-white py-20 lg:py-32 overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.1),transparent_50%)]" />
+            <div className="absolute top-10 left-10 opacity-20">
+              <Disc3 className="w-32 h-32 animate-spin-slow text-accent/30" />
+            </div>
+            <div className="absolute bottom-10 right-10 opacity-20">
+              <Headphones className="w-40 h-40 text-accent/20" />
+            </div>
+            
+            <div className="container mx-auto px-4 text-center relative z-10">
+              <Badge variant="secondary" className="mb-6 px-4 py-2 text-sm font-medium bg-accent/20 text-accent-foreground border-accent/30">
+                🎧 Hỗ trợ 24/7
+              </Badge>
+              <h1 className="text-5xl lg:text-7xl font-bold mb-8 leading-tight">
+                Trung tâm
+                <span className="block bg-gradient-to-r from-accent via-yellow-500 to-accent bg-clip-text text-transparent">
+                  hỗ trợ khách hàng
+                </span>
               </h1>
-              <p className="text-xl text-muted-foreground">
-                Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7
+              <p className="text-xl lg:text-2xl text-slate-300 max-w-4xl mx-auto leading-relaxed mb-8">
+                Chúng tôi luôn sẵn sàng hỗ trợ bạn trong hành trình khám phá âm nhạc vinyl
               </p>
-            </div>
-
-            {/* Contact Methods */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              {contactMethods.map((method, index) => (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow border-0 shadow-vinyl">
-                  <CardHeader>
-                    <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
-                      {method.icon}
-                    </div>
-                    <CardTitle>{method.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <p className="font-semibold text-lg">{method.info}</p>
-                    <p className="text-sm text-muted-foreground">{method.description}</p>
-                    <Button className="w-full">{method.action}</Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* FAQ Section */}
-              <div>
-                <Card className="border-0 shadow-vinyl">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Search className="h-5 w-5 text-primary" />
-                      Câu hỏi thường gặp
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                  <Accordion type="single" collapsible className="w-full">
-                    {faqs.map((faq) => (
-                      <AccordionItem key={faq.id} value={faq.id}>
-                        <AccordionTrigger className="text-left">
-                          {faq.question}
-                        </AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground">
-                          {faq.answer}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="mt-6 border-0 shadow-vinyl">
-                  <CardHeader>
-                    <CardTitle>Hành động nhanh</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Package className="h-4 w-4 mr-2" />
-                      Theo dõi đơn hàng
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Đổi trả sản phẩm
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Hỗ trợ thanh toán
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <Truck className="h-4 w-4 mr-2" />
-                      Thông tin vận chuyển
-                    </Button>
-                    <Button variant="outline" className="w-full justify-start">
-                      <ShieldCheck className="h-4 w-4 mr-2" />
-                      Chính sách bảo mật
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Contact Form */}
-              <div>
-                <Card className="border-0 shadow-vinyl">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Send className="h-5 w-5 text-primary" />
-                      Gửi yêu cầu hỗ trợ
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Họ tên *</label>
-                        <Input placeholder="Nhập họ tên" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Email *</label>
-                        <Input type="email" placeholder="Nhập email" />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Số điện thoại</label>
-                        <Input placeholder="Nhập số điện thoại" />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">Loại yêu cầu *</label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Chọn loại yêu cầu" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="order">Vấn đề đơn hàng</SelectItem>
-                            <SelectItem value="product">Thông tin sản phẩm</SelectItem>
-                            <SelectItem value="payment">Thanh toán</SelectItem>
-                            <SelectItem value="shipping">Vận chuyển</SelectItem>
-                            <SelectItem value="return">Đổi trả</SelectItem>
-                            <SelectItem value="account">Tài khoản</SelectItem>
-                            <SelectItem value="other">Khác</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Mã đơn hàng (nếu có)</label>
-                      <Input placeholder="VD: RL-001234" />
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Nội dung *</label>
-                      <Textarea
-                        placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."
-                        rows={5}
-                      />
-                    </div>
-
-                    <Button className="w-full">
-                      <Send className="h-4 w-4 mr-2" />
-                      Gửi yêu cầu
-                    </Button>
-
-                    <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
-                      <div className="flex items-center gap-2 text-accent font-medium mb-2">
-                        <Clock className="h-4 w-4" />
-                        Thời gian phản hồi
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        • Email: Trong vòng 24 giờ<br/>
-                        • Điện thoại: Ngay lập tức (giờ hành chính)<br/>
-                        • Chat: 1-5 phút (T2-T6: 8:00-22:00)
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <div className="flex items-center gap-4 text-accent">
+                  <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+                  <span className="text-lg font-medium">Phản hồi nhanh chóng</span>
+                </div>
+                <div className="hidden sm:block w-px h-6 bg-accent/30" />
+                <div className="flex items-center gap-4 text-accent">
+                  <div className="w-2 h-2 bg-accent rounded-full animate-pulse animation-delay-300" />
+                  <span className="text-lg font-medium">Hỗ trợ chuyên nghiệp</span>
+                </div>
               </div>
             </div>
-          </div>
+          </section>
+
+          {/* Contact Methods */}
+          <section className="py-20 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-accent/5 to-slate-50" />
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="text-center mb-16">
+                <div className="inline-flex items-center gap-3 mb-6">
+                  <div className="w-12 h-px bg-gradient-to-r from-transparent to-accent" />
+                  <MessageCircle className="w-8 h-8 text-accent" />
+                  <div className="w-12 h-px bg-gradient-to-r from-accent to-transparent" />
+                </div>
+                <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-slate-900 to-accent bg-clip-text text-transparent">
+                  Liên hệ với chúng tôi
+                </h2>
+                <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                  Chọn cách thức liên hệ phù hợp để được hỗ trợ nhanh chóng
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {contactMethods.map((method, index) => (
+                  <Card 
+                    key={index} 
+                    className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in bg-gradient-to-br from-white to-accent/5"
+                    style={{ animationDelay: `${index * 0.2}s` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-accent/5 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <CardHeader className="text-center relative z-10">
+                      <div className="mx-auto w-20 h-20 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent rounded-2xl flex items-center justify-center text-accent mb-6 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-accent/20 transition-all duration-300">
+                        {method.icon}
+                      </div>
+                      <CardTitle className="text-2xl font-bold text-slate-900">{method.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4 text-center relative z-10">
+                      <p className="font-bold text-xl text-accent">{method.info}</p>
+                      <p className="text-slate-600 leading-relaxed">{method.description}</p>
+                      <Button 
+                        className="w-full shadow-lg hover:shadow-accent/30 transition-all duration-300"
+                        variant="default"
+                      >
+                        <Heart className="h-4 w-4 mr-2" />
+                        {method.action}
+                      </Button>
+                      <div className="absolute top-4 right-4 w-3 h-3 bg-accent rounded-full opacity-60 group-hover:animate-pulse" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Main Content */}
+          <section className="py-20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_75%,rgba(217,119,6,0.1),transparent_50%)]" />
+            
+            <div className="container mx-auto px-4 relative z-10">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 max-w-7xl mx-auto">
+                {/* FAQ Section */}
+                <div className="space-y-8">
+                  <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3 text-2xl font-bold text-white">
+                        <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center">
+                          <Search className="h-6 w-6 text-accent" />
+                        </div>
+                        Câu hỏi thường gặp
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Accordion type="single" collapsible className="w-full space-y-4">
+                        {faqs.map((faq) => (
+                          <AccordionItem 
+                            key={faq.id} 
+                            value={faq.id}
+                            className="border border-accent/20 rounded-xl px-6 bg-white/5 backdrop-blur-sm"
+                          >
+                            <AccordionTrigger className="text-left text-white hover:text-accent transition-colors duration-300 py-6">
+                              {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="text-slate-300 pb-6 leading-relaxed">
+                              {faq.answer}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </CardContent>
+                  </Card>
+
+                  {/* Quick Actions */}
+                  <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3 text-2xl font-bold text-white">
+                        <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center">
+                          <Star className="h-6 w-6 text-accent" />
+                        </div>
+                        Hành động nhanh
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Button variant="outline" className="w-full justify-start bg-white/10 border-accent/30 text-white hover:bg-accent hover:text-white transition-all duration-300">
+                        <Package className="h-5 w-5 mr-3" />
+                        Theo dõi đơn hàng
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start bg-white/10 border-accent/30 text-white hover:bg-accent hover:text-white transition-all duration-300">
+                        <RefreshCw className="h-5 w-5 mr-3" />
+                        Đổi trả sản phẩm
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start bg-white/10 border-accent/30 text-white hover:bg-accent hover:text-white transition-all duration-300">
+                        <CreditCard className="h-5 w-5 mr-3" />
+                        Hỗ trợ thanh toán
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start bg-white/10 border-accent/30 text-white hover:bg-accent hover:text-white transition-all duration-300">
+                        <Truck className="h-5 w-5 mr-3" />
+                        Thông tin vận chuyển
+                      </Button>
+                      <Button variant="outline" className="w-full justify-start bg-white/10 border-accent/30 text-white hover:bg-accent hover:text-white transition-all duration-300">
+                        <ShieldCheck className="h-5 w-5 mr-3" />
+                        Chính sách bảo mật
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Contact Form */}
+                <div>
+                  <Card className="border-0 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3 text-2xl font-bold text-white">
+                        <div className="w-12 h-12 bg-accent/20 rounded-xl flex items-center justify-center">
+                          <Send className="h-6 w-6 text-accent" />
+                        </div>
+                        Gửi yêu cầu hỗ trợ
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                          <label className="text-sm font-medium mb-3 block text-white">Họ tên *</label>
+                          <Input 
+                            placeholder="Nhập họ tên" 
+                            className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-3 block text-white">Email *</label>
+                          <Input 
+                            type="email" 
+                            placeholder="Nhập email" 
+                            className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                          <label className="text-sm font-medium mb-3 block text-white">Số điện thoại</label>
+                          <Input 
+                            placeholder="Nhập số điện thoại" 
+                            className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium mb-3 block text-white">Loại yêu cầu *</label>
+                          <Select>
+                            <SelectTrigger className="bg-white/10 border-accent/30 text-white focus:border-accent">
+                              <SelectValue placeholder="Chọn loại yêu cầu" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="order">Vấn đề đơn hàng</SelectItem>
+                              <SelectItem value="product">Thông tin sản phẩm</SelectItem>
+                              <SelectItem value="payment">Thanh toán</SelectItem>
+                              <SelectItem value="shipping">Vận chuyển</SelectItem>
+                              <SelectItem value="return">Đổi trả</SelectItem>
+                              <SelectItem value="account">Tài khoản</SelectItem>
+                              <SelectItem value="other">Khác</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-3 block text-white">Mã đơn hàng (nếu có)</label>
+                        <Input 
+                          placeholder="VD: RL-001234" 
+                          className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-3 block text-white">Nội dung *</label>
+                        <Textarea
+                          placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."
+                          rows={6}
+                          className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent resize-none"
+                        />
+                      </div>
+
+                      <Button className="w-full bg-accent hover:bg-accent/90 text-white shadow-xl hover:shadow-accent/30 transition-all duration-300 py-3">
+                        <Send className="h-5 w-5 mr-2" />
+                        Gửi yêu cầu hỗ trợ
+                      </Button>
+
+                      <div className="bg-gradient-to-r from-accent/20 to-accent/10 border border-accent/30 rounded-xl p-6 backdrop-blur-sm">
+                        <div className="flex items-center gap-3 text-accent font-bold mb-4">
+                          <Clock className="h-6 w-6" />
+                          Thời gian phản hồi
+                        </div>
+                        <div className="space-y-2 text-slate-300">
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 bg-accent rounded-full" />
+                            <span>Email: Trong vòng 24 giờ</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 bg-accent rounded-full" />
+                            <span>Điện thoại: Ngay lập tức (giờ hành chính)</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-2 h-2 bg-accent rounded-full" />
+                            <span>Chat: 1-5 phút (T2-T6: 8:00-22:00)</span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
       </div>
     </>
