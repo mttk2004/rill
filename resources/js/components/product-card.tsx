@@ -13,10 +13,10 @@ interface ProductCardProps {
   className?: string;
 }
 
-export function ProductCard({ 
-  product, 
-  viewMode = 'grid', 
-  index = 0, 
+export function ProductCard({
+  product,
+  viewMode = 'grid',
+  index = 0,
   showActions = true,
   className = ""
 }: ProductCardProps) {
@@ -134,7 +134,7 @@ export function ProductCard({
             </div>
           )}
         </div>
-        
+
         <div className="absolute bottom-4 right-4 w-3 h-3 bg-accent rounded-full opacity-60 group-hover:animate-pulse" />
       </CardContent>
     </Card>

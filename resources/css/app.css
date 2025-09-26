@@ -272,6 +272,15 @@
     animation-duration: 1s;
   }
 
+  /* Slow spin animations for floating vinyl records */
+  .animate-spin-slow {
+    animation: vinyl-spin 8s linear infinite;
+  }
+
+  .animate-spin-reverse {
+    animation: vinyl-spin-reverse 12s linear infinite;
+  }
+
   /* Hero section animations */
   .hero-fade-in {
     animation: hero-fade-in 1s ease-out forwards;
@@ -319,6 +328,15 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes vinyl-spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
   }
 }
 

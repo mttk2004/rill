@@ -65,14 +65,14 @@ export default function About() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.15),transparent_60%)]" />
-          
+
           <div className="absolute top-10 left-10 opacity-30">
             <Disc3 className="w-32 h-32 animate-spin-slow text-accent/40" />
           </div>
           <div className="absolute bottom-10 right-10 opacity-30">
             <Disc3 className="w-40 h-40 animate-reverse-spin text-accent/20" />
           </div>
-          
+
           <div className="container mx-auto px-4 text-center relative z-10 py-20 lg:py-32">
             <Badge variant="secondary" className="mb-6 px-6 py-3 text-sm font-semibold bg-accent/90 text-white border-0 shadow-lg">
               🎵 Câu chuyện của Rill
@@ -127,7 +127,7 @@ export default function About() {
         <section className="py-20 lg:py-28 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_75%,rgba(217,119,6,0.15),transparent_60%)]" />
-          
+
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-16">

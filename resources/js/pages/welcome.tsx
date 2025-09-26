@@ -178,9 +178,9 @@ export default function Welcome() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredProducts.map((product, index) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product as Product} 
+                <ProductCard
+                  key={product.id}
+                  product={product as Product}
                   index={index}
                   showActions={false}
                 />

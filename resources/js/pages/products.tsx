@@ -112,7 +112,7 @@ export default function Products({ products: productsData, pagination, filters, 
                     {/* Dark background with better contrast */}
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.15),transparent_60%)]" />
-                    
+
                     {/* Decorative elements with better visibility */}
                     <div className="absolute top-10 left-10 opacity-30">
                         <Disc3 className="w-32 h-32 animate-spin-slow text-accent/40" />
@@ -120,7 +120,7 @@ export default function Products({ products: productsData, pagination, filters, 
                     <div className="absolute bottom-10 right-10 opacity-30">
                         <Music className="w-40 h-40 text-accent/30" />
                     </div>
-                    
+
                     <div className="container mx-auto px-4 text-center relative z-10 py-20 lg:py-28">
                         <Badge variant="secondary" className="mb-6 px-6 py-3 text-sm font-semibold bg-accent/90 text-white border-0 shadow-lg">
                             🎵 Bộ sưu tập vinyl
@@ -156,7 +156,7 @@ export default function Products({ products: productsData, pagination, filters, 
                             </div>
                             <h2 className="text-2xl font-bold text-slate-900">Bộ lọc & tìm kiếm</h2>
                         </div>
-                        
+
                         <div className="flex flex-col lg:flex-row gap-6">
                             {/* Search & Filters */}
                             <div className="flex-1 space-y-4 lg:space-y-0 lg:flex lg:items-center lg:gap-4">
@@ -405,7 +405,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                                 </Button>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="absolute bottom-4 right-4 w-3 h-3 bg-accent rounded-full opacity-60 group-hover:animate-pulse" />
                                     </CardContent>
                                 </Card>
@@ -423,8 +423,8 @@ export default function Products({ products: productsData, pagination, filters, 
                             <p className="text-slate-600 text-lg max-w-md mx-auto mb-8">
                                 Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để khám phá thêm những album tuyệt vời.
                             </p>
-                            <Button 
-                                variant="default" 
+                            <Button
+                                variant="default"
                                 size="lg"
                                 onClick={() => {
                                     setSearchTerm('');
