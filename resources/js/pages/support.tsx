@@ -94,43 +94,42 @@ export default function Support() {
 
         <main className="min-h-screen">
           {/* Hero Section */}
-          <section className="relative bg-gradient-to-br from-slate-900 via-accent/20 to-slate-800 text-white py-20 lg:py-32 overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.1),transparent_50%)]" />
-            <div className="absolute top-10 left-10 opacity-20">
-              <Disc3 className="w-32 h-32 animate-spin-slow text-accent/30" />
+          <section className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.15),transparent_60%)]" />
+            
+            <div className="absolute top-10 left-10 opacity-30">
+              <Disc3 className="w-32 h-32 animate-spin-slow text-accent/40" />
             </div>
-            <div className="absolute bottom-10 right-10 opacity-20">
+            <div className="absolute bottom-10 right-10 opacity-30">
               <Headphones className="w-40 h-40 text-accent/20" />
             </div>
             
-            <div className="container mx-auto px-4 text-center relative z-10">
-              <Badge variant="secondary" className="mb-6 px-4 py-2 text-sm font-medium bg-accent/20 text-accent-foreground border-accent/30">
+            <div className="container mx-auto px-4 text-center relative z-10 py-20 lg:py-32">
+              <Badge variant="secondary" className="mb-6 px-6 py-3 text-sm font-semibold bg-accent/90 text-white border-0 shadow-lg">
                 🎧 Hỗ trợ 24/7
               </Badge>
-              <h1 className="text-5xl lg:text-7xl font-bold mb-8 leading-tight">
+              <h1 className="text-5xl lg:text-7xl font-bold mb-8 leading-tight text-white">
                 Trung tâm
-                <span className="block bg-gradient-to-r from-accent via-yellow-500 to-accent bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-accent via-yellow-400 to-accent bg-clip-text text-transparent drop-shadow-sm">
                   hỗ trợ khách hàng
                 </span>
               </h1>
-              <p className="text-xl lg:text-2xl text-slate-300 max-w-4xl mx-auto leading-relaxed mb-8">
+              <p className="text-xl lg:text-2xl text-slate-200 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-sm">
                 Chúng tôi luôn sẵn sàng hỗ trợ bạn trong hành trình khám phá âm nhạc vinyl
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <div className="flex items-center gap-4 text-accent">
-                  <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                  <span className="text-lg font-medium">Phản hồi nhanh chóng</span>
+                <div className="flex items-center gap-4 text-white bg-accent/20 px-6 py-3 rounded-full backdrop-blur-sm border border-accent/30">
+                  <div className="w-3 h-3 bg-accent rounded-full animate-pulse" />
+                  <span className="text-lg font-semibold">Phản hồi nhanh chóng</span>
                 </div>
-                <div className="hidden sm:block w-px h-6 bg-accent/30" />
-                <div className="flex items-center gap-4 text-accent">
-                  <div className="w-2 h-2 bg-accent rounded-full animate-pulse animation-delay-300" />
-                  <span className="text-lg font-medium">Hỗ trợ chuyên nghiệp</span>
+                <div className="flex items-center gap-4 text-white bg-accent/20 px-6 py-3 rounded-full backdrop-blur-sm border border-accent/30">
+                  <div className="w-3 h-3 bg-accent rounded-full animate-pulse animation-delay-300" />
+                  <span className="text-lg font-semibold">Hỗ trợ chuyên nghiệp</span>
                 </div>
               </div>
             </div>
-          </section>
-
-          {/* Contact Methods */}
+          </section>          {/* Contact Methods */}
           <section className="py-20 relative">
             <div className="absolute inset-0 bg-gradient-to-r from-slate-50 via-accent/5 to-slate-50" />
             <div className="container mx-auto px-4 relative z-10">
@@ -150,8 +149,8 @@ export default function Support() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 {contactMethods.map((method, index) => (
-                  <Card 
-                    key={index} 
+                  <Card
+                    key={index}
                     className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in bg-gradient-to-br from-white to-accent/5"
                     style={{ animationDelay: `${index * 0.2}s` }}
                   >
@@ -165,7 +164,7 @@ export default function Support() {
                     <CardContent className="space-y-4 text-center relative z-10">
                       <p className="font-bold text-xl text-accent">{method.info}</p>
                       <p className="text-slate-600 leading-relaxed">{method.description}</p>
-                      <Button 
+                      <Button
                         className="w-full shadow-lg hover:shadow-accent/30 transition-all duration-300"
                         variant="default"
                       >
@@ -183,8 +182,8 @@ export default function Support() {
           {/* Main Content */}
           <section className="py-20 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_75%,rgba(217,119,6,0.1),transparent_50%)]" />
-            
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_75%,rgba(217,119,6,0.15),transparent_60%)]" />
+
             <div className="container mx-auto px-4 relative z-10">
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-12 max-w-7xl mx-auto">
                 {/* FAQ Section */}
@@ -201,15 +200,15 @@ export default function Support() {
                     <CardContent>
                       <Accordion type="single" collapsible className="w-full space-y-4">
                         {faqs.map((faq) => (
-                          <AccordionItem 
-                            key={faq.id} 
+                          <AccordionItem
+                            key={faq.id}
                             value={faq.id}
                             className="border border-accent/20 rounded-xl px-6 bg-white/5 backdrop-blur-sm"
                           >
-                            <AccordionTrigger className="text-left text-white hover:text-accent transition-colors duration-300 py-6">
+                            <AccordionTrigger className="text-left text-white hover:text-accent transition-colors duration-300 py-6 drop-shadow-sm">
                               {faq.question}
                             </AccordionTrigger>
-                            <AccordionContent className="text-slate-300 pb-6 leading-relaxed">
+                            <AccordionContent className="text-slate-200 pb-6 leading-relaxed drop-shadow-sm">
                               {faq.answer}
                             </AccordionContent>
                           </AccordionItem>
@@ -268,16 +267,16 @@ export default function Support() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                           <label className="text-sm font-medium mb-3 block text-white">Họ tên *</label>
-                          <Input 
-                            placeholder="Nhập họ tên" 
+                          <Input
+                            placeholder="Nhập họ tên"
                             className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
                           />
                         </div>
                         <div>
                           <label className="text-sm font-medium mb-3 block text-white">Email *</label>
-                          <Input 
-                            type="email" 
-                            placeholder="Nhập email" 
+                          <Input
+                            type="email"
+                            placeholder="Nhập email"
                             className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
                           />
                         </div>
@@ -286,8 +285,8 @@ export default function Support() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                           <label className="text-sm font-medium mb-3 block text-white">Số điện thoại</label>
-                          <Input 
-                            placeholder="Nhập số điện thoại" 
+                          <Input
+                            placeholder="Nhập số điện thoại"
                             className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
                           />
                         </div>
@@ -312,8 +311,8 @@ export default function Support() {
 
                       <div>
                         <label className="text-sm font-medium mb-3 block text-white">Mã đơn hàng (nếu có)</label>
-                        <Input 
-                          placeholder="VD: RL-001234" 
+                        <Input
+                          placeholder="VD: RL-001234"
                           className="bg-white/10 border-accent/30 text-white placeholder:text-slate-400 focus:border-accent"
                         />
                       </div>

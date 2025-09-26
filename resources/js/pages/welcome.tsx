@@ -1,42 +1,44 @@
 import { Navigation } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ProductCard } from "@/components/product-card";
 import { Play, Star, ShoppingBag, Truck, Award, Users, Disc3 } from "lucide-react";
-import { type SharedData } from '@/types';
+import { type SharedData, type Product } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Welcome() {
   const { auth } = usePage<SharedData>().props;
 
-  const featuredProducts = [
+  const featuredProducts: Partial<Product>[] = [
     {
-      id: 1,
+      id: "1",
+      slug: "abbey-road-the-beatles",
       name: "Abbey Road - The Beatles",
-      artist: "The Beatles",
-      price: "1.250.000",
-      originalPrice: "1.500.000",
-      rating: 4.9,
-      image: "/placeholder-vinyl.jpg",
-      badge: "Bán chạy"
+      artists: [{ id: "1", slug: "the-beatles", name: "The Beatles" }],
+      price: 1250000,
+      genre: "Rock",
+      label: "Apple Records",
+      is_featured: true
     },
     {
-      id: 2,
+      id: "2",
+      slug: "dark-side-of-the-moon",
       name: "Dark Side of the Moon",
-      artist: "Pink Floyd",
-      price: "980.000",
-      rating: 4.8,
-      image: "/placeholder-vinyl.jpg",
-      badge: "Mới về"
+      artists: [{ id: "2", slug: "pink-floyd", name: "Pink Floyd" }],
+      price: 980000,
+      genre: "Progressive Rock",
+      label: "Harvest Records",
+      is_featured: true
     },
     {
-      id: 3,
+      id: "3",
+      slug: "thriller-michael-jackson",
       name: "Thriller - Michael Jackson",
-      artist: "Michael Jackson",
-      price: "1.100.000",
-      rating: 4.9,
-      image: "/placeholder-vinyl.jpg",
-      badge: "Giảm giá"
+      artists: [{ id: "3", slug: "michael-jackson", name: "Michael Jackson" }],
+      price: 1100000,
+      genre: "Pop",
+      label: "Epic Records",
+      is_featured: true
     }
   ];
 
@@ -83,7 +85,7 @@ export default function Welcome() {
                   <Disc3 className="h-4 w-4" />
                   <span className="text-sm font-medium">Cửa hàng đĩa than #1 Việt Nam</span>
                 </div>
-                
+
                 <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                   Khám phá
                   <span className="text-accent block relative">
@@ -91,12 +93,12 @@ export default function Welcome() {
                     <div className="absolute -bottom-2 left-0 w-full h-1 bg-accent/30 rounded-full"></div>
                   </span>
                 </h1>
-                
+
                 <p className="text-lg text-white/90 mb-8 leading-relaxed max-w-xl">
                   Bộ sưu tập đĩa than chính hãng từ những nghệ sĩ huyền thoại đến các album hiện đại.
                   Trải nghiệm âm nhạc thuần túy với chất lượng vượt thời gian.
                 </p>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button size="xl" className="group bg-accent hover:bg-accent/90 text-accent-foreground" asChild>
                     <Link href="/products">
@@ -104,7 +106,7 @@ export default function Welcome() {
                       Khám phá ngay
                     </Link>
                   </Button>
-                  <Button variant="outline" size="xl" className="group border-white/30 text-white hover:bg-white/10" asChild>
+                  <Button variant="outline" size="xl" className="group border-2 border-white/80 text-white hover:bg-white hover:text-slate-900 backdrop-blur-sm bg-white/10" asChild>
                     <Link href="/about">
                       <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                       Về chúng tôi
@@ -143,7 +145,7 @@ export default function Welcome() {
                     {/* Needle */}
                     <div className="absolute top-0 right-12 w-1 h-32 bg-accent/60 rounded-full origin-bottom transform rotate-12"></div>
                   </div>
-                  
+
                   {/* Floating Elements */}
                   <div className="absolute -top-8 -left-8 w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center animate-bounce">
                     <Star className="h-8 w-8 text-accent" />
@@ -161,7 +163,7 @@ export default function Welcome() {
         <section className="py-16 lg:py-24 relative">
           {/* Background Pattern */}
           <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background"></div>
-          
+
           <div className="relative container mx-auto px-4">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent mb-4">
@@ -176,72 +178,12 @@ export default function Welcome() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredProducts.map((product, index) => (
-                <Card
-                  key={product.id}
-                  className="group cursor-pointer animate-fade-in border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-background to-accent/5"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <CardContent className="p-0">
-                    <div className="relative overflow-hidden">
-                      <div className="w-full h-64 bg-gradient-to-br from-muted to-muted/50 rounded-t-lg flex items-center justify-center relative overflow-hidden">
-                        {/* Vinyl Record Effect */}
-                        <div className="absolute inset-0 bg-gradient-radial from-accent/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <Disc3 className="h-20 w-20 text-muted-foreground/30 group-hover:text-accent/50 transition-colors duration-300 group-hover:animate-spin-slow" />
-                      </div>
-                      {product.badge && (
-                        <Badge className="absolute top-4 left-4 bg-accent text-accent-foreground shadow-lg">
-                          {product.badge}
-                        </Badge>
-                      )}
-                      {/* Hover overlay */}
-                      <div className="absolute inset-0 bg-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <Button size="sm" className="bg-white text-accent hover:bg-white/90">
-                          Xem chi tiết
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="p-6 space-y-4">
-                      <div>
-                        <h3 className="font-semibold text-lg mb-1 line-clamp-1 group-hover:text-accent transition-colors">
-                          {product.name}
-                        </h3>
-                        <p className="text-muted-foreground">{product.artist}</p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-accent text-accent" />
-                          ))}
-                        </div>
-                        <span className="text-sm font-medium">{product.rating}</span>
-                        <span className="text-xs text-muted-foreground">(128 đánh giá)</span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xl font-bold text-accent">{product.price}đ</span>
-                            {product.originalPrice && (
-                              <span className="text-sm text-muted-foreground line-through">
-                                {product.originalPrice}đ
-                              </span>
-                            )}
-                          </div>
-                          {product.originalPrice && (
-                            <div className="text-xs text-green-600 font-medium">
-                              Tiết kiệm {((parseInt(product.originalPrice.replace(/\./g, '')) - parseInt(product.price.replace(/\./g, ''))) / 1000).toLocaleString()}K
-                            </div>
-                          )}
-                        </div>
-                        <Button size="sm" variant="outline" className="border-accent/30 text-accent hover:bg-accent hover:text-accent-foreground">
-                          Thêm vào giỏ
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ProductCard 
+                  key={product.id} 
+                  product={product as Product} 
+                  index={index}
+                  showActions={false}
+                />
               ))}
             </div>
 
@@ -265,7 +207,7 @@ export default function Welcome() {
                 Cam kết mang đến trải nghiệm mua sắm đĩa than tốt nhất với dịch vụ chuyên nghiệp
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {features.map((feature, index) => (
                 <Card
@@ -281,7 +223,7 @@ export default function Welcome() {
                     </div>
                     <h3 className="text-xl font-semibold mb-3 text-accent">{feature.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-                    
+
                     {/* Decorative element */}
                     <div className="mt-4 w-12 h-1 bg-gradient-to-r from-accent/30 to-accent/60 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </CardContent>
@@ -315,21 +257,21 @@ export default function Welcome() {
             <div className="absolute top-40 right-32 w-32 h-32 border border-accent/50 rounded-full"></div>
             <div className="absolute bottom-20 left-1/3 w-24 h-24 border border-accent/30 rounded-full"></div>
           </div>
-          
+
           <div className="relative container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center text-white">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent mb-6">
                 <Disc3 className="h-4 w-4" />
                 <span className="text-sm font-medium">Tham gia cộng đồng Rill</span>
               </div>
-              
+
               <h2 className="text-3xl lg:text-4xl font-bold mb-4">
                 Đăng ký nhận tin mới nhất
               </h2>
               <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto leading-relaxed">
                 Cập nhật những album mới, ưu đãi đặc biệt và sự kiện thú vị từ cộng đồng vinyl lovers Rill
               </p>
-              
+
               <div className="max-w-md mx-auto">
                 <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white/10 rounded-xl backdrop-blur-sm">
                   <input
@@ -342,7 +284,7 @@ export default function Welcome() {
                     Đăng ký ngay
                   </Button>
                 </div>
-                
+
                 <p className="text-white/70 text-sm mt-4">
                   🎵 Tham gia cùng hơn 5,000+ vinyl collectors khác
                 </p>

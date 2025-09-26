@@ -108,37 +108,40 @@ export default function Products({ products: productsData, pagination, filters, 
                 <Navigation user={auth.user} />
 
                 {/* Header */}
-                <section className="relative bg-gradient-to-br from-slate-900 via-accent/20 to-slate-800 text-white py-16 lg:py-24 overflow-hidden">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.1),transparent_50%)]" />
-                    <div className="absolute top-10 left-10 opacity-20">
-                        <Disc3 className="w-32 h-32 animate-spin-slow text-accent/30" />
+                <section className="relative overflow-hidden">
+                    {/* Dark background with better contrast */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.15),transparent_60%)]" />
+                    
+                    {/* Decorative elements with better visibility */}
+                    <div className="absolute top-10 left-10 opacity-30">
+                        <Disc3 className="w-32 h-32 animate-spin-slow text-accent/40" />
                     </div>
-                    <div className="absolute bottom-10 right-10 opacity-20">
-                        <Music className="w-40 h-40 text-accent/20" />
+                    <div className="absolute bottom-10 right-10 opacity-30">
+                        <Music className="w-40 h-40 text-accent/30" />
                     </div>
                     
-                    <div className="container mx-auto px-4 text-center relative z-10">
-                        <Badge variant="secondary" className="mb-6 px-4 py-2 text-sm font-medium bg-accent/20 text-accent-foreground border-accent/30">
+                    <div className="container mx-auto px-4 text-center relative z-10 py-20 lg:py-28">
+                        <Badge variant="secondary" className="mb-6 px-6 py-3 text-sm font-semibold bg-accent/90 text-white border-0 shadow-lg">
                             🎵 Bộ sưu tập vinyl
                         </Badge>
-                        <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
+                        <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight text-white">
                             Khám phá
-                            <span className="block bg-gradient-to-r from-accent via-yellow-500 to-accent bg-clip-text text-transparent">
+                            <span className="block bg-gradient-to-r from-accent via-yellow-400 to-accent bg-clip-text text-transparent drop-shadow-sm">
                                 đĩa than chính hãng
                             </span>
                         </h1>
-                        <p className="text-xl lg:text-2xl text-slate-300 max-w-4xl mx-auto leading-relaxed mb-8">
+                        <p className="text-xl lg:text-2xl text-slate-200 max-w-4xl mx-auto leading-relaxed mb-8 drop-shadow-sm">
                             Hơn {pagination.total ? pagination.total.toLocaleString('vi-VN') : '1,000'}+ album từ những nghệ sĩ huyền thoại thế giới
                         </p>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                            <div className="flex items-center gap-4 text-accent">
-                                <div className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-                                <span className="text-lg font-medium">Chính hãng 100%</span>
+                            <div className="flex items-center gap-4 text-white bg-accent/20 px-6 py-3 rounded-full backdrop-blur-sm border border-accent/30">
+                                <div className="w-3 h-3 bg-accent rounded-full animate-pulse" />
+                                <span className="text-lg font-semibold">Chính hãng 100%</span>
                             </div>
-                            <div className="hidden sm:block w-px h-6 bg-accent/30" />
-                            <div className="flex items-center gap-4 text-accent">
-                                <div className="w-2 h-2 bg-accent rounded-full animate-pulse animation-delay-300" />
-                                <span className="text-lg font-medium">Âm thanh hoàn hảo</span>
+                            <div className="flex items-center gap-4 text-white bg-accent/20 px-6 py-3 rounded-full backdrop-blur-sm border border-accent/30">
+                                <div className="w-3 h-3 bg-accent rounded-full animate-pulse animation-delay-300" />
+                                <span className="text-lg font-semibold">Âm thanh hoàn hảo</span>
                             </div>
                         </div>
                     </div>
