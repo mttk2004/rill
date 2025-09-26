@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/navigation";
-import { Package, Truck, CheckCircle, Clock, Eye, Download, X, Disc3 } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, Eye, Download, X, Disc3, Music2 } from "lucide-react";
 import { Link, Head, usePage } from "@inertiajs/react";
 import { useState } from "react";
 import { type SharedData } from '@/types';
@@ -157,58 +157,96 @@ export default function Orders() {
   return (
     <>
       <Head title="Đơn hàng của tôi - Rill" />
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
         <Navigation user={auth.user} />
 
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
+        {/* Hero Section */}
+        <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
+          
+          {/* Floating Vinyl Records */}
+          <div className="absolute top-10 left-10 animate-spin-slow">
+            <Disc3 className="h-20 w-20 text-amber-500/10" />
+          </div>
+          <div className="absolute top-20 right-10 animate-spin-reverse">
+            <Disc3 className="h-16 w-16 text-amber-500/5" />
+          </div>
+          
+          <div className="relative container mx-auto px-4 py-12">
+            <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                  <Package className="h-8 w-8 text-accent" />
+                <h1 className="text-4xl font-bold text-white drop-shadow-lg flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
+                    <Package className="h-8 w-8" />
+                  </div>
                   Đơn hàng của tôi
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-slate-200 drop-shadow">
                   Theo dõi và quản lý các đơn hàng của bạn
                 </p>
               </div>
             </div>
+          </div>
+        </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="all" className="text-sm">
+        <main className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            {/* Enhanced Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+              <TabsList className="grid w-full grid-cols-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
+                <TabsTrigger 
+                  value="all" 
+                  className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white"
+                >
                   Tất cả ({getOrderCount("all")})
                 </TabsTrigger>
-                <TabsTrigger value="pending" className="text-sm">
+                <TabsTrigger 
+                  value="pending" 
+                  className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-yellow-600 data-[state=active]:text-white"
+                >
                   Chờ xác nhận ({getOrderCount("pending")})
                 </TabsTrigger>
-                <TabsTrigger value="confirmed" className="text-sm">
+                <TabsTrigger 
+                  value="confirmed" 
+                  className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+                >
                   Đã xác nhận ({getOrderCount("confirmed")})
                 </TabsTrigger>
-                <TabsTrigger value="shipped" className="text-sm">
+                <TabsTrigger 
+                  value="shipped" 
+                  className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+                >
                   Đang giao ({getOrderCount("shipped")})
                 </TabsTrigger>
-                <TabsTrigger value="delivered" className="text-sm">
+                <TabsTrigger 
+                  value="delivered" 
+                  className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white"
+                >
                   Đã giao ({getOrderCount("delivered")})
                 </TabsTrigger>
-                <TabsTrigger value="cancelled" className="text-sm">
+                <TabsTrigger 
+                  value="cancelled" 
+                  className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white"
+                >
                   Đã hủy ({getOrderCount("cancelled")})
                 </TabsTrigger>
               </TabsList>
             </Tabs>
 
             {filteredOrders.length === 0 ? (
-              <Card className="text-center py-12 border-0 shadow-vinyl">
+              <Card className="text-center py-16 border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
                 <CardContent>
-                  <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">
+                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
+                    <Package className="h-10 w-10 text-slate-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">
                     {activeTab === "all" ? "Chưa có đơn hàng nào" : `Không có đơn hàng ${getStatusLabel(activeTab).toLowerCase()}`}
                   </h3>
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">
                     {activeTab === "all" ? "Bạn chưa có đơn hàng nào. Hãy khám phá và mua sắm ngay!" : `Hiện tại bạn không có đơn hàng nào ${getStatusLabel(activeTab).toLowerCase()}.`}
                   </p>
                   <Link href="/products">
-                    <Button>
+                    <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300" size="lg">
                       Khám phá sản phẩm
                     </Button>
                   </Link>
@@ -217,19 +255,37 @@ export default function Orders() {
             ) : (
               <div className="space-y-6">
                 {filteredOrders.map((order) => (
-                  <Card key={order.id} className="overflow-hidden border-0 shadow-vinyl">
-                    <CardHeader className="pb-4">
+                  <Card key={order.id} className="overflow-hidden border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm group hover:shadow-2xl transition-all duration-300">
+                    <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 pb-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <CardTitle className="flex items-center gap-2">
+                          <CardTitle className="flex items-center gap-3 text-slate-900 dark:text-white">
+                            <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
+                              <Package className="h-5 w-5 text-white" />
+                            </div>
                             Đơn hàng #{order.id}
                           </CardTitle>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                             Đặt ngày: {new Date(order.date).toLocaleDateString('vi-VN')}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={getStatusVariant(order.status) as "secondary" | "default" | "outline" | "destructive"} className="flex items-center gap-1">
+                          <Badge 
+                            variant={getStatusVariant(order.status) as "secondary" | "default" | "outline" | "destructive"} 
+                            className={`flex items-center gap-1 ${
+                              order.status === 'delivered' 
+                                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-0' 
+                                : order.status === 'shipped'
+                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0'
+                                : order.status === 'pending'
+                                ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-0'
+                                : order.status === 'confirmed'
+                                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0'
+                                : order.status === 'cancelled'
+                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-0'
+                                : ''
+                            }`}
+                          >
                             {getStatusIcon(order.status)}
                             {getStatusLabel(order.status)}
                           </Badge>
@@ -237,72 +293,84 @@ export default function Orders() {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-6 p-6">
                       {/* Order Items */}
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {order.items && order.items.length > 0 ? order.items.map((item) => (
-                          <div key={item.id} className="flex items-center gap-4 p-3 border rounded-lg">
-                            <div className="w-16 h-16 rounded bg-muted flex items-center justify-center">
-                              <Disc3 className="h-8 w-8 text-muted-foreground/30" />
+                          <div key={item.id} className="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-white dark:from-slate-700 dark:to-slate-600 border border-slate-200 dark:border-slate-600 rounded-xl hover:shadow-md transition-all duration-300">
+                            {/* Vinyl Record Image */}
+                            <div className="relative">
+                              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg">
+                                <Disc3 className="h-10 w-10 text-amber-500 group-hover:rotate-6 transition-transform duration-300" />
+                              </div>
+                              {/* Vinyl Label */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-4 h-4 bg-amber-500 rounded-full shadow-sm"></div>
+                              </div>
                             </div>
+                            
                             <div className="flex-1">
-                              <h4 className="font-medium">{item.title}</h4>
-                              <p className="text-sm text-muted-foreground">{item.artist}</p>
-                              <p className="text-sm">Số lượng: {item.quantity}</p>
+                              <h4 className="font-bold text-slate-900 dark:text-white">{item.title}</h4>
+                              <p className="text-slate-600 dark:text-slate-300 font-medium">{item.artist}</p>
+                              <p className="text-sm text-slate-500 dark:text-slate-400">Số lượng: <span className="font-semibold">{item.quantity}</span></p>
                             </div>
                             <div className="text-right">
-                              <p className="font-semibold">
+                              <p className="font-bold text-lg text-amber-600">
                                 {item.price.toLocaleString('vi-VN')}₫
                               </p>
                             </div>
                           </div>
                         )) : (
-                          <div className="text-center py-4 text-muted-foreground">
-                            <Package className="h-8 w-8 mx-auto mb-2" />
+                          <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+                            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
+                              <Package className="h-8 w-8" />
+                            </div>
                             <p>Không có sản phẩm nào trong đơn hàng này</p>
                           </div>
                         )}
                       </div>
 
                       {/* Order Summary */}
-                      <div className="border-t pt-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm text-muted-foreground">Địa chỉ giao hàng:</span>
-                          <span className="text-sm">{order.shippingAddress || "Chưa cập nhật"}</span>
-                        </div>
-                        {order.status !== "delivered" && order.status !== "cancelled" && order.estimatedDelivery && (
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm text-muted-foreground">Dự kiến giao:</span>
-                            <span className="text-sm">{new Date(order.estimatedDelivery).toLocaleDateString('vi-VN')}</span>
+                      <div className="border-t border-slate-200 dark:border-slate-600 pt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-slate-600 dark:text-slate-400">Địa chỉ giao hàng:</span>
+                            <span className="text-sm text-slate-900 dark:text-white font-medium">{order.shippingAddress || "Chưa cập nhật"}</span>
                           </div>
-                        )}
-                        <div className="flex justify-between items-center font-semibold text-lg">
-                          <span>Tổng cộng:</span>
-                          <span className="text-primary">{order.total.toLocaleString('vi-VN')}₫</span>
+                          {order.status !== "delivered" && order.status !== "cancelled" && order.estimatedDelivery && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-slate-600 dark:text-slate-400">Dự kiến giao:</span>
+                              <span className="text-sm text-slate-900 dark:text-white font-medium">{new Date(order.estimatedDelivery).toLocaleDateString('vi-VN')}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex justify-between items-center font-bold text-xl">
+                          <span className="text-slate-900 dark:text-white">Tổng cộng:</span>
+                          <span className="text-amber-600">{order.total.toLocaleString('vi-VN')}₫</span>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex gap-2 pt-4 border-t">
+                      <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-600 flex-wrap">
                         <Link href={`/orders/${order.id}`}>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300">
                             <Eye className="h-4 w-4 mr-2" />
                             Chi tiết
                           </Button>
                         </Link>
                         {order.status === "delivered" && (
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-2" />
-                            Hóa đơn
-                          </Button>
-                        )}
-                        {order.status === "delivered" && (
-                          <Button size="sm">
-                            Đánh giá
-                          </Button>
+                          <>
+                            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
+                              <Download className="h-4 w-4 mr-2" />
+                              Hóa đơn
+                            </Button>
+                            <Button size="sm" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">
+                              Đánh giá
+                            </Button>
+                          </>
                         )}
                         {order.status === "pending" && (
-                          <Button variant="destructive" size="sm">
+                          <Button variant="destructive" size="sm" className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700">
                             Hủy đơn
                           </Button>
                         )}

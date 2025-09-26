@@ -10,8 +10,7 @@ import {
   Settings,
   Package,
   LogOut,
-  UserCircle,
-  HelpCircle
+  UserCircle
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -40,7 +39,8 @@ export const Navigation = ({ user }: NavigationProps) => {
   const navItems = [
     { label: "Trang chủ", path: "/", icon: null },
     { label: "Sản phẩm", path: "/products", icon: null },
-    { label: "Về chúng tôi", path: "/about", icon: null }
+    { label: "Về chúng tôi", path: "/about", icon: null },
+    { label: "Hỗ trợ", path: "/support", icon: null }
   ];
 
   return (
@@ -171,12 +171,6 @@ export const Navigation = ({ user }: NavigationProps) => {
                     <Link href="/settings/appearance">
                       <Settings className="mr-2 h-4 w-4" />
                       Cài đặt
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/support">
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      Hỗ trợ
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
