@@ -56,7 +56,7 @@ export default function Cart() {
         {/* Hero Section */}
         <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
-          
+
           {/* Floating Vinyl Records */}
           <div className="absolute top-10 left-10 animate-spin-slow">
             <Disc3 className="h-20 w-20 text-amber-500/10" />
@@ -64,7 +64,7 @@ export default function Cart() {
           <div className="absolute top-20 right-10 animate-spin-reverse">
             <Disc3 className="h-16 w-16 text-amber-500/5" />
           </div>
-          
+
           <div className="relative container mx-auto px-4 py-12">
             <div className="flex items-center gap-4 mb-6">
               <Link href="/products">
@@ -104,7 +104,7 @@ export default function Cart() {
                             <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full shadow-md"></div>
                           </div>
                         </div>
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
                             <div className="flex-1 min-w-0">
@@ -209,12 +209,12 @@ export default function Cart() {
                   </CardHeader>
                   <CardContent className="space-y-4 p-6">
                     <div className="flex gap-2">
-                      <Input 
-                        placeholder="Nhập mã giảm giá" 
+                      <Input
+                        placeholder="Nhập mã giảm giá"
                         className="border-slate-200 focus:border-amber-500 focus:ring-amber-500"
                       />
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         className="border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300"
                       >
                         Áp dụng

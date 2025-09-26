@@ -163,7 +163,7 @@ export default function Orders() {
         {/* Hero Section */}
         <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
-          
+
           {/* Floating Vinyl Records */}
           <div className="absolute top-10 left-10 animate-spin-slow">
             <Disc3 className="h-20 w-20 text-amber-500/10" />
@@ -171,7 +171,7 @@ export default function Orders() {
           <div className="absolute top-20 right-10 animate-spin-reverse">
             <Disc3 className="h-16 w-16 text-amber-500/5" />
           </div>
-          
+
           <div className="relative container mx-auto px-4 py-12">
             <div className="flex justify-between items-center">
               <div>
@@ -194,38 +194,38 @@ export default function Orders() {
             {/* Enhanced Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
               <TabsList className="grid w-full grid-cols-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg">
-                <TabsTrigger 
-                  value="all" 
+                <TabsTrigger
+                  value="all"
                   className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-amber-600 data-[state=active]:text-white"
                 >
                   Tất cả ({getOrderCount("all")})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="pending" 
+                <TabsTrigger
+                  value="pending"
                   className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-yellow-600 data-[state=active]:text-white"
                 >
                   Chờ xác nhận ({getOrderCount("pending")})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="confirmed" 
+                <TabsTrigger
+                  value="confirmed"
                   className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white"
                 >
                   Đã xác nhận ({getOrderCount("confirmed")})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="shipped" 
+                <TabsTrigger
+                  value="shipped"
                   className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
                 >
                   Đang giao ({getOrderCount("shipped")})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="delivered" 
+                <TabsTrigger
+                  value="delivered"
                   className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white"
                 >
                   Đã giao ({getOrderCount("delivered")})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="cancelled" 
+                <TabsTrigger
+                  value="cancelled"
                   className="text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white"
                 >
                   Đã hủy ({getOrderCount("cancelled")})
@@ -270,11 +270,11 @@ export default function Orders() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge 
-                            variant={getStatusVariant(order.status) as "secondary" | "default" | "outline" | "destructive"} 
+                          <Badge
+                            variant={getStatusVariant(order.status) as "secondary" | "default" | "outline" | "destructive"}
                             className={`flex items-center gap-1 ${
-                              order.status === 'delivered' 
-                                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-0' 
+                              order.status === 'delivered'
+                                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-0'
                                 : order.status === 'shipped'
                                 ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0'
                                 : order.status === 'pending'
@@ -308,7 +308,7 @@ export default function Orders() {
                                 <div className="w-4 h-4 bg-amber-500 rounded-full shadow-sm"></div>
                               </div>
                             </div>
-                            
+
                             <div className="flex-1">
                               <h4 className="font-bold text-slate-900 dark:text-white">{item.title}</h4>
                               <p className="text-slate-600 dark:text-slate-300 font-medium">{item.artist}</p>

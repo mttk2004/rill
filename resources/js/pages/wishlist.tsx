@@ -91,7 +91,7 @@ export default function Wishlist() {
         {/* Hero Section */}
         <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
-          
+
           {/* Floating Vinyl Records */}
           <div className="absolute top-10 left-10 animate-spin-slow">
             <Disc3 className="h-20 w-20 text-amber-500/10" />
@@ -99,7 +99,7 @@ export default function Wishlist() {
           <div className="absolute top-20 right-10 animate-spin-reverse">
             <Disc3 className="h-16 w-16 text-amber-500/5" />
           </div>
-          
+
           <div className="relative container mx-auto px-4 py-12">
             <div className="flex justify-between items-center">
               <div>
@@ -166,7 +166,7 @@ export default function Wishlist() {
                               </div>
                             </div>
                           </div>
-                          
+
                           {/* Status Badges */}
                           <div className="absolute top-3 left-3 flex flex-col gap-2">
                             {item.onSale && (
@@ -180,7 +180,7 @@ export default function Wishlist() {
                               </Badge>
                             )}
                           </div>
-                          
+
                           {/* Remove from Wishlist */}
                           <Button
                             variant="ghost"
@@ -189,7 +189,7 @@ export default function Wishlist() {
                           >
                             <Trash2 className="h-5 w-5" />
                           </Button>
-                          
+
                           {/* Out of Stock Overlay */}
                           {!item.inStock && (
                             <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center backdrop-blur-sm">
@@ -237,8 +237,8 @@ export default function Wishlist() {
                             <Button
                               size="sm"
                               className={`flex-1 transition-all duration-300 ${
-                                item.inStock 
-                                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl' 
+                                item.inStock
+                                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl'
                                   : 'bg-slate-300 text-slate-500 cursor-not-allowed'
                               }`}
                               disabled={!item.inStock}
