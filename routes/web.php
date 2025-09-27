@@ -107,8 +107,9 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
 // Admin routes
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    // Redirect dashboard to admin statistics
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        return redirect()->route('admin.statistics');
     })->name('dashboard');
 
     // Admin management routes

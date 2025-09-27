@@ -2,7 +2,7 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { dashboard, products } from '@/routes';
+import { products } from '@/routes';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
@@ -25,7 +25,7 @@ import {
 const getAdminNavItems = (): NavItem[] => [
     {
         title: 'Tổng quan',
-        href: dashboard(),
+        href: '/admin/statistics',
         icon: LayoutGrid,
     },
     {
@@ -105,7 +105,7 @@ export function AppSidebar() {
     const navItems = isAdmin ? getAdminNavItems() : getCustomerNavItems();
 
     // Determine the home link based on user role
-    const homeHref = isAdmin ? dashboard() : products();
+    const homeHref = isAdmin ? '/admin/statistics' : products();
 
     return (
         <Sidebar collapsible="icon" variant="inset">

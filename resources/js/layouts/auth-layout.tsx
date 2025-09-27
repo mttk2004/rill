@@ -1,14 +1,14 @@
 import { Navigation } from '@/components/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function AuthLayout({ 
-    children, 
-    title, 
+export default function AuthLayout({
+    children,
+    title,
     description
-}: { 
-    children: React.ReactNode; 
-    title: string; 
-    description: string; 
+}: {
+    children: React.ReactNode;
+    title: string;
+    description: string;
 }) {
     return (
         <div className="min-h-screen bg-background">

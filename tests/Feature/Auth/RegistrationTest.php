@@ -15,5 +15,6 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
+    // Regular users still go to dashboard route
     $response->assertRedirect(route('dashboard', absolute: false));
 });

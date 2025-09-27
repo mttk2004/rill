@@ -11,7 +11,7 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
     const { auth } = usePage<SharedData>().props;
-    
+
     return (
         <div className="min-h-screen bg-background">
             <Navigation user={auth.user} />
