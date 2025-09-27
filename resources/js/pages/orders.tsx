@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/navigation";
-import { Package, Truck, CheckCircle, Clock, Eye, Download, X, Disc3, Music2 } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, Eye, Download, X, Disc3 } from "lucide-react";
 import { Link, Head, usePage } from "@inertiajs/react";
 import { useState } from "react";
 import { type SharedData } from '@/types';

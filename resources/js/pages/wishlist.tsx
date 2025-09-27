@@ -2,8 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
-import { ProductCard } from "@/components/product-card";
-import { Heart, ShoppingCart, Trash2, Share2, Disc3, Music2 } from "lucide-react";
+import { Heart, ShoppingCart, Trash2, Share2, Disc3 } from "lucide-react";
 import { Link, Head, usePage } from "@inertiajs/react";
 import { type SharedData } from '@/types';
 

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/navigation";
-import { Minus, Plus, Trash2, ShoppingCart, Heart, ArrowLeft, Disc3, Music2, Package, Truck } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, Heart, ArrowLeft, Disc3 } from "lucide-react";
 import { Link, Head, usePage } from "@inertiajs/react";
 import { type SharedData } from '@/types';
 
