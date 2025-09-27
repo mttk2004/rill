@@ -337,10 +337,10 @@ const AdminOrders = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <Head title="Quản lý đơn hàng - Admin" />
+      <Head title="Quản lý đơn hàng" />
       <AdminNavigation />
-
-      <main className="flex-1 ml-64 p-8">
+      
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
@@ -657,7 +657,7 @@ const AdminOrders = () => {
             )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
