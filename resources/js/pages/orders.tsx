@@ -10,82 +10,177 @@ import { type SharedData } from '@/types';
 
 const orders = [
   {
-    id: "RL-001234",
-    date: "2024-01-20",
+    id: 1,
+    order_number: "RL-001234",
+    user_id: 1,
     status: "delivered",
-    total: 1670000,
+    subtotal: 1590000,
+    discount_amount: 50000,
+    total_amount: 1540000,
+    currency: "VND",
+    shipping_address: {
+      full_name: "Nguyễn Văn A",
+      phone: "0901234567",
+      address_line_1: "123 Nguyễn Văn A",
+      district: "Quận 1",
+      city: "TP.HCM",
+      ward: "Phường Bến Nghé"
+    },
+    billing_address: null,
+    notes: "Gọi trước khi giao hàng",
+    placed_at: "2024-01-20T10:30:00Z",
+    created_at: "2024-01-20T10:30:00Z",
+    updated_at: "2024-01-24T16:30:00Z",
     items: [
       {
         id: 1,
-        title: "Rumours",
-        artist: "Fleetwood Mac",
-        price: 490000,
-        image: "/placeholder-vinyl.jpg",
-        quantity: 1
+        product_id: 1,
+        product_name: "Rumours",
+        product_sku: "FL-RUM-001",
+        artist_name: "Fleetwood Mac",
+        quantity: 1,
+        unit_price: 490000,
+        total_price: 490000,
+        image: "/placeholder-vinyl.jpg"
       },
       {
         id: 2,
-        title: "Hotel California",
-        artist: "Eagles",
-        price: 420000,
-        image: "/placeholder-vinyl.jpg",
-        quantity: 1
+        product_id: 2,
+        product_name: "Hotel California",
+        product_sku: "EG-HOT-001",
+        artist_name: "Eagles",
+        quantity: 1,
+        unit_price: 420000,
+        total_price: 420000,
+        image: "/placeholder-vinyl.jpg"
       },
       {
         id: 3,
-        title: "The Wall",
-        artist: "Pink Floyd",
-        price: 680000,
-        image: "/placeholder-vinyl.jpg",
-        quantity: 1
+        product_id: 3,
+        product_name: "The Wall",
+        product_sku: "PF-WAL-001",
+        artist_name: "Pink Floyd",
+        quantity: 1,
+        unit_price: 680000,
+        total_price: 680000,
+        image: "/placeholder-vinyl.jpg"
       }
     ],
-    shippingAddress: "123 Nguyễn Văn A, Quận 1, TP.HCM",
-    estimatedDelivery: "2024-01-25"
+    payment: {
+      payment_method: "cod",
+      payment_status: "completed",
+      amount: 1540000,
+      processed_at: "2024-01-24T16:30:00Z"
+    },
+    status_history: [
+      { status: "pending", created_at: "2024-01-20T10:30:00Z", notes: "Đơn hàng được đặt" },
+      { status: "confirmed", created_at: "2024-01-20T14:00:00Z", notes: "Đơn hàng được xác nhận" },
+      { status: "shipped", created_at: "2024-01-22T09:00:00Z", notes: "Đơn hàng được giao cho đơn vị vận chuyển" },
+      { status: "delivered", created_at: "2024-01-24T16:30:00Z", notes: "Đơn hàng đã được giao thành công" }
+    ]
   },
   {
-    id: "RL-001233",
-    date: "2024-01-18",
+    id: 2,
+    order_number: "RL-001233",
+    user_id: 1,
     status: "shipped",
-    total: 920000,
+    subtotal: 920000,
+    discount_amount: 0,
+    total_amount: 920000,
+    currency: "VND",
+    shipping_address: {
+      full_name: "Nguyễn Văn A",
+      phone: "0901234567",
+      address_line_1: "456 Trần Hưng Đạo",
+      district: "Quận 5",
+      city: "TP.HCM",
+      ward: "Phường 14"
+    },
+    billing_address: null,
+    notes: null,
+    placed_at: "2024-01-18T09:15:00Z",
+    created_at: "2024-01-18T09:15:00Z",
+    updated_at: "2024-01-22T09:00:00Z",
     items: [
       {
         id: 4,
-        title: "Back in Black",
-        artist: "AC/DC",
-        price: 400000,
-        image: "/placeholder-vinyl.jpg",
-        quantity: 1
+        product_id: 4,
+        product_name: "Back in Black",
+        product_sku: "AC-BIB-001",
+        artist_name: "AC/DC",
+        quantity: 1,
+        unit_price: 400000,
+        total_price: 400000,
+        image: "/placeholder-vinyl.jpg"
       },
       {
         id: 5,
-        title: "Bohemian Rhapsody",
-        artist: "Queen",
-        price: 520000,
-        image: "/placeholder-vinyl.jpg",
-        quantity: 1
+        product_id: 5,
+        product_name: "Bohemian Rhapsody",
+        product_sku: "QU-BRH-001",
+        artist_name: "Queen",
+        quantity: 1,
+        unit_price: 520000,
+        total_price: 520000,
+        image: "/placeholder-vinyl.jpg"
       }
     ],
-    shippingAddress: "456 Trần Hưng Đạo, Quận 5, TP.HCM",
-    estimatedDelivery: "2024-01-22"
+    payment: {
+      payment_method: "cod",
+      payment_status: "pending",
+      amount: 920000,
+      processed_at: null
+    },
+    status_history: [
+      { status: "pending", created_at: "2024-01-18T09:15:00Z", notes: "Đơn hàng được đặt" },
+      { status: "confirmed", created_at: "2024-01-18T15:30:00Z", notes: "Đơn hàng được xác nhận" },
+      { status: "shipped", created_at: "2024-01-22T09:00:00Z", notes: "Đơn hàng đang trên đường giao" }
+    ]
   },
   {
-    id: "RL-001232",
-    date: "2024-01-15",
+    id: 3,
+    order_number: "RL-001232",
+    user_id: 1,
     status: "pending",
-    total: 460000,
+    subtotal: 460000,
+    discount_amount: 0,
+    total_amount: 460000,
+    currency: "VND",
+    shipping_address: {
+      full_name: "Nguyễn Văn A",
+      phone: "0901234567",
+      address_line_1: "789 Lê Văn Việt",
+      district: "Quận 7",
+      city: "TP.HCM",
+      ward: "Phường Tân Phú"
+    },
+    billing_address: null,
+    notes: "Giao hàng giờ hành chính",
+    placed_at: "2024-01-15T14:20:00Z",
+    created_at: "2024-01-15T14:20:00Z",
+    updated_at: "2024-01-15T14:20:00Z",
     items: [
       {
         id: 6,
-        title: "Thriller",
-        artist: "Michael Jackson",
-        price: 460000,
-        image: "/placeholder-vinyl.jpg",
-        quantity: 1
+        product_id: 6,
+        product_name: "Thriller",
+        product_sku: "MJ-THR-001",
+        artist_name: "Michael Jackson",
+        quantity: 1,
+        unit_price: 460000,
+        total_price: 460000,
+        image: "/placeholder-vinyl.jpg"
       }
     ],
-    shippingAddress: "789 Lê Văn Việt, Quận 7, TP.HCM",
-    estimatedDelivery: "2024-01-20"
+    payment: {
+      payment_method: "cod",
+      payment_status: "pending",
+      amount: 460000,
+      processed_at: null
+    },
+    status_history: [
+      { status: "pending", created_at: "2024-01-15T14:20:00Z", notes: "Đơn hàng chờ xác nhận" }
+    ]
   }
 ];
 
@@ -152,6 +247,17 @@ export default function Orders() {
   const getOrderCount = (status: string) => {
     if (status === "all") return orders.length;
     return orders.filter(order => order.status === status).length;
+  };
+
+  const formatAddress = (address: { address_line_1: string; ward: string; district: string; city: string }) => {
+    return `${address.address_line_1}, ${address.ward}, ${address.district}, ${address.city}`;
+  };
+
+  const getEstimatedDelivery = (order: { placed_at: string }) => {
+    const placedDate = new Date(order.placed_at);
+    const estimatedDate = new Date(placedDate);
+    estimatedDate.setDate(placedDate.getDate() + 5); // Add 5 days for delivery
+    return estimatedDate.toLocaleDateString('vi-VN');
   };
 
   return (
@@ -263,11 +369,16 @@ export default function Orders() {
                             <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
                               <Package className="h-5 w-5 text-white" />
                             </div>
-                            Đơn hàng #{order.id}
+                            Đơn hàng #{order.order_number}
                           </CardTitle>
                           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                            Đặt ngày: {new Date(order.date).toLocaleDateString('vi-VN')}
+                            Đặt ngày: {new Date(order.placed_at).toLocaleDateString('vi-VN')}
                           </p>
+                          {order.discount_amount > 0 && (
+                            <p className="text-sm text-green-600 mt-1">
+                              Đã tiết kiệm: {order.discount_amount.toLocaleString('vi-VN')}₫
+                            </p>
+                          )}
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge
@@ -310,13 +421,19 @@ export default function Orders() {
                             </div>
 
                             <div className="flex-1">
-                              <h4 className="font-bold text-slate-900 dark:text-white">{item.title}</h4>
-                              <p className="text-slate-600 dark:text-slate-300 font-medium">{item.artist}</p>
-                              <p className="text-sm text-slate-500 dark:text-slate-400">Số lượng: <span className="font-semibold">{item.quantity}</span></p>
+                              <h4 className="font-bold text-slate-900 dark:text-white">{item.product_name}</h4>
+                              <p className="text-slate-600 dark:text-slate-300 font-medium">{item.artist_name}</p>
+                              <p className="text-sm text-slate-500 dark:text-slate-400">
+                                SKU: <span className="font-mono">{item.product_sku}</span> |
+                                Số lượng: <span className="font-semibold">{item.quantity}</span>
+                              </p>
                             </div>
                             <div className="text-right">
                               <p className="font-bold text-lg text-amber-600">
-                                {item.price.toLocaleString('vi-VN')}₫
+                                {item.total_price.toLocaleString('vi-VN')}₫
+                              </p>
+                              <p className="text-sm text-slate-500">
+                                {item.unit_price.toLocaleString('vi-VN')}₫/cái
                               </p>
                             </div>
                           </div>
@@ -333,20 +450,57 @@ export default function Orders() {
                       {/* Order Summary */}
                       <div className="border-t border-slate-200 dark:border-slate-600 pt-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600 dark:text-slate-400">Địa chỉ giao hàng:</span>
-                            <span className="text-sm text-slate-900 dark:text-white font-medium">{order.shippingAddress || "Chưa cập nhật"}</span>
-                          </div>
-                          {order.status !== "delivered" && order.status !== "cancelled" && order.estimatedDelivery && (
+                          <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-slate-600 dark:text-slate-400">Dự kiến giao:</span>
-                              <span className="text-sm text-slate-900 dark:text-white font-medium">{new Date(order.estimatedDelivery).toLocaleDateString('vi-VN')}</span>
+                              <span className="text-sm text-slate-600 dark:text-slate-400">Người nhận:</span>
+                              <span className="text-sm text-slate-900 dark:text-white font-medium">{order.shipping_address.full_name}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-slate-600 dark:text-slate-400">Số điện thoại:</span>
+                              <span className="text-sm text-slate-900 dark:text-white font-medium">{order.shipping_address.phone}</span>
+                            </div>
+                            <div className="flex justify-between items-start">
+                              <span className="text-sm text-slate-600 dark:text-slate-400">Địa chỉ giao hàng:</span>
+                              <span className="text-sm text-slate-900 dark:text-white font-medium text-right max-w-[200px]">
+                                {formatAddress(order.shipping_address)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            {order.status !== "delivered" && order.status !== "cancelled" && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-sm text-slate-600 dark:text-slate-400">Dự kiến giao:</span>
+                                <span className="text-sm text-slate-900 dark:text-white font-medium">{getEstimatedDelivery(order)}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-slate-600 dark:text-slate-400">Phương thức thanh toán:</span>
+                              <span className="text-sm text-slate-900 dark:text-white font-medium uppercase">{order.payment.payment_method}</span>
+                            </div>
+                            {order.notes && (
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm text-slate-600 dark:text-slate-400">Ghi chú:</span>
+                                <span className="text-sm text-slate-900 dark:text-white font-medium text-right max-w-[200px]">{order.notes}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-600 dark:text-slate-400">Tạm tính:</span>
+                            <span className="text-slate-900 dark:text-white">{order.subtotal.toLocaleString('vi-VN')}₫</span>
+                          </div>
+                          {order.discount_amount > 0 && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-600 dark:text-slate-400">Giảm giá:</span>
+                              <span className="text-green-600">-{order.discount_amount.toLocaleString('vi-VN')}₫</span>
                             </div>
                           )}
-                        </div>
-                        <div className="flex justify-between items-center font-bold text-xl">
-                          <span className="text-slate-900 dark:text-white">Tổng cộng:</span>
-                          <span className="text-amber-600">{order.total.toLocaleString('vi-VN')}₫</span>
+                          <div className="flex justify-between items-center font-bold text-xl border-t pt-2">
+                            <span className="text-slate-900 dark:text-white">Tổng cộng:</span>
+                            <span className="text-amber-600">{order.total_amount.toLocaleString('vi-VN')}₫</span>
+                          </div>
                         </div>
                       </div>
 
