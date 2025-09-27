@@ -12,7 +12,8 @@ import {
   Settings,
   User,
   LogOut,
-  Disc
+  Disc,
+  Ticket
 } from "lucide-react";
 import { type SharedData } from '@/types';
 
@@ -22,6 +23,7 @@ const adminNavItems = [
   { name: "Khách hàng", href: "/admin/customers", icon: Users },
   { name: "Sản phẩm", href: "/admin/products", icon: Package },
   { name: "Nghệ sĩ", href: "/admin/artists", icon: Music },
+  { name: "Voucher", href: "/admin/vouchers", icon: Ticket },
   { name: "Thống kê", href: "/admin/statistics", icon: BarChart3 },
 ];
 

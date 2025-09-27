@@ -133,6 +133,19 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::get('/artists', function () {
             return Inertia::render('admin/artists');
         })->name('admin.artists');
+
+        Route::get('/vouchers', function () {
+            return Inertia::render('admin/vouchers');
+        })->name('admin.vouchers');
+
+        Route::get('/vouchers/create', function () {
+            return Inertia::render('admin/vouchers/create');
+        })->name('admin.vouchers.create');
+
+        Route::get('/vouchers/{voucher}/edit', function () {
+            // Mock data - thực tế sẽ load voucher từ database
+            return Inertia::render('admin/vouchers/edit');
+        })->name('admin.vouchers.edit');
     });
 });
 
