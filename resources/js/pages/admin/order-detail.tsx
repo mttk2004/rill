@@ -105,7 +105,7 @@ export default function OrderDetailPage({ order }: Props) {
               <ArrowLeft className="h-4 w-4" />
               Quay lại danh sách
             </Link>
-            
+
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
@@ -115,7 +115,7 @@ export default function OrderDetailPage({ order }: Props) {
                   Đặt ngày {new Date(order.placed_at).toLocaleDateString('vi-VN')} lúc {new Date(order.placed_at).toLocaleTimeString('vi-VN')}
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-4">
                 <Badge className={`${getStatusColor(order.status)} border-0 flex items-center gap-1 px-4 py-2 text-base`}>
                   {getStatusIcon(order.status)}
@@ -227,7 +227,7 @@ export default function OrderDetailPage({ order }: Props) {
                       <p className="text-sm text-slate-600 dark:text-slate-400">Khách hàng #{order.user.id}</p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
                       <Mail className="h-4 w-4 text-slate-400" />
@@ -280,16 +280,16 @@ export default function OrderDetailPage({ order }: Props) {
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600 dark:text-slate-400">Phương thức:</span>
                     <Badge variant="secondary" className="uppercase font-medium">
-                      {order.payment.payment_method === 'cod' ? 'Tiền mặt' : 
+                      {order.payment.payment_method === 'cod' ? 'Tiền mặt' :
                        order.payment.payment_method === 'bank_transfer' ? 'Chuyển khoản' : 'Thẻ'}
                     </Badge>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600 dark:text-slate-400">Trạng thái:</span>
-                    <Badge 
-                      className={order.payment.payment_status === 'completed' 
-                        ? 'bg-green-500 text-white' 
+                    <Badge
+                      className={order.payment.payment_status === 'completed'
+                        ? 'bg-green-500 text-white'
                         : order.payment.payment_status === 'pending'
                         ? 'bg-yellow-500 text-white'
                         : 'bg-red-500 text-white'
@@ -299,14 +299,14 @@ export default function OrderDetailPage({ order }: Props) {
                        order.payment.payment_status === 'pending' ? 'Chờ thanh toán' : 'Thất bại'}
                     </Badge>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600 dark:text-slate-400">Số tiền:</span>
                     <span className="font-semibold text-amber-600">
                       {order.payment.amount.toLocaleString('vi-VN')}₫
                     </span>
                   </div>
-                  
+
                   {order.payment.processed_at && (
                     <div className="pt-2 border-t border-slate-200 dark:border-slate-600">
                       <div className="flex justify-between items-center">
@@ -339,14 +339,14 @@ export default function OrderDetailPage({ order }: Props) {
                         </Button>
                       </>
                     )}
-                    
+
                     {order.status === 'confirmed' && (
                       <Button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-0">
                         <Truck className="h-4 w-4 mr-2" />
                         Giao hàng
                       </Button>
                     )}
-                    
+
                     {order.status === 'shipped' && (
                       <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0">
                         <CheckCircle className="h-4 w-4 mr-2" />

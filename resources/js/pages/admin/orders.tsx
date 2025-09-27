@@ -487,7 +487,7 @@ const AdminOrders = () => {
                         <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex-shrink-0">
                           <Package className="h-4 w-4 text-white" />
                         </div>
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold text-slate-900 dark:text-white">
@@ -498,7 +498,7 @@ const AdminOrders = () => {
                               {getStatusLabel(order.status)}
                             </Badge>
                           </div>
-                          
+
                           <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
                             <span className="truncate">{order.user.name}</span>
                             <span className="hidden sm:inline">•</span>
@@ -521,7 +521,7 @@ const AdminOrders = () => {
                             {order.payment.payment_method}
                           </p>
                         </div>
-                        
+
                         <div className="flex items-center gap-2">
                           <Link href={`/admin/orders/${order.id}`}>
                             <Button size="sm" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">
@@ -529,7 +529,7 @@ const AdminOrders = () => {
                               Chi tiết
                             </Button>
                           </Link>
-                          
+
                           {/* Quick Actions */}
                           {order.status === 'pending' && (
                             <Button size="sm" variant="outline" className="border-green-200 text-green-600 hover:bg-green-50 px-2">
@@ -544,7 +544,7 @@ const AdminOrders = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Notes preview */}
                     {order.notes && (
                       <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-600">
