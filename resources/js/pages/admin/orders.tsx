@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -331,15 +331,11 @@ const AdminOrders = () => {
   const processingOrders = orders.filter(order => order.status === "pending").length;
   const deliveredOrders = orders.filter(order => order.status === "delivered").length;
 
-  const formatAddress = (address: { address_line_1: string; ward: string; district: string; city: string }) => {
-    return `${address.address_line_1}, ${address.ward}, ${address.district}, ${address.city}`;
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Head title="Quản lý đơn hàng" />
       <AdminNavigation />
-      
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -465,8 +461,8 @@ const AdminOrders = () => {
             </Card>
           </div>
 
-          {/* Orders List */}
-          <div className="space-y-4">
+          {/* Orders List - Compact View */}
+          <div className="space-y-3">
             {filteredOrders.length === 0 ? (
               <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
                 <CardContent className="p-12 text-center">
@@ -483,174 +479,80 @@ const AdminOrders = () => {
               </Card>
             ) : (
               filteredOrders.map((order) => (
-                <Card key={order.id} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-                  <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700">
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
-                          <Package className="h-5 w-5 text-white" />
+                <Card key={order.id} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      {/* Left Side - Order Info */}
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex-shrink-0">
+                          <Package className="h-4 w-4 text-white" />
                         </div>
-                        <div>
-                          <CardTitle className="text-slate-900 dark:text-white">
-                            Đơn hàng #{order.order_number}
-                          </CardTitle>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm text-slate-600 dark:text-slate-400 mt-1">
-                            <span>Khách hàng: {order.user.name}</span>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-slate-900 dark:text-white">
+                              #{order.order_number}
+                            </h3>
+                            <Badge className={`${getStatusColor(order.status)} border-0 flex items-center gap-1 text-xs px-2 py-1`}>
+                              {getStatusIcon(order.status)}
+                              {getStatusLabel(order.status)}
+                            </Badge>
+                          </div>
+                          
+                          <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                            <span className="truncate">{order.user.name}</span>
                             <span className="hidden sm:inline">•</span>
-                            <span>{order.user.email}</span>
+                            <span className="hidden md:inline truncate">{order.user.email}</span>
                             <span className="hidden sm:inline">•</span>
-                            <span>{new Date(order.placed_at).toLocaleDateString('vi-VN')}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Badge className={`${getStatusColor(order.status)} border-0 flex items-center gap-1`}>
-                          {getStatusIcon(order.status)}
-                          {getStatusLabel(order.status)}
-                        </Badge>
-                        <span className="font-bold text-lg text-amber-600">
-                          {order.total_amount.toLocaleString('vi-VN')}₫
-                        </span>
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="p-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Order Items */}
-                      <div>
-                        <h4 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                          <Package2 className="h-4 w-4" />
-                          Sản phẩm ({order.items.length})
-                        </h4>
-                        <div className="space-y-2">
-                          {order.items.map((item) => (
-                            <div key={item.id} className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-50 to-white dark:from-slate-700 dark:to-slate-600 rounded-lg">
-                              <div className="flex-1">
-                                <p className="font-medium text-slate-900 dark:text-white">{item.product_name}</p>
-                                <p className="text-sm text-slate-600 dark:text-slate-300">{item.artist_name}</p>
-                                <p className="text-xs text-slate-500 font-mono">SKU: {item.product_sku}</p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-semibold text-amber-600">
-                                  {item.total_price.toLocaleString('vi-VN')}₫
-                                </p>
-                                <p className="text-xs text-slate-500">
-                                  {item.quantity} x {item.unit_price.toLocaleString('vi-VN')}₫
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Order Summary */}
-                        <div className="mt-4 p-4 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-900/20 dark:to-amber-800/20 rounded-lg border border-amber-200 dark:border-amber-700">
-                          <div className="space-y-1 text-sm">
-                            <div className="flex justify-between">
-                              <span className="text-slate-600 dark:text-slate-400">Tạm tính:</span>
-                              <span className="text-slate-900 dark:text-white">{order.subtotal.toLocaleString('vi-VN')}₫</span>
-                            </div>
-                            {order.discount_amount > 0 && (
-                              <div className="flex justify-between">
-                                <span className="text-slate-600 dark:text-slate-400">Giảm giá:</span>
-                                <span className="text-green-600">-{order.discount_amount.toLocaleString('vi-VN')}₫</span>
-                              </div>
-                            )}
-                            <div className="flex justify-between font-bold text-base border-t pt-1">
-                              <span className="text-slate-900 dark:text-white">Tổng cộng:</span>
-                              <span className="text-amber-600">{order.total_amount.toLocaleString('vi-VN')}₫</span>
-                            </div>
+                            <span>{order.items.length} sản phẩm</span>
+                            <span className="hidden lg:inline">•</span>
+                            <span className="hidden lg:inline">{new Date(order.placed_at).toLocaleDateString('vi-VN')}</span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Shipping & Payment Info */}
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                            <Truck className="h-4 w-4" />
-                            Thông tin giao hàng
-                          </h4>
-                          <div className="p-4 bg-gradient-to-r from-slate-50 to-white dark:from-slate-700 dark:to-slate-600 rounded-lg space-y-2">
-                            <div>
-                              <p className="font-medium text-slate-900 dark:text-white">{order.shipping_address.full_name}</p>
-                              <p className="text-sm text-slate-600 dark:text-slate-300">{order.shipping_address.phone}</p>
-                              <p className="text-sm text-slate-600 dark:text-slate-300">{formatAddress(order.shipping_address)}</p>
-                            </div>
-                            {order.notes && (
-                              <div className="pt-2 border-t border-slate-200 dark:border-slate-500">
-                                <p className="text-xs text-slate-500">Ghi chú: {order.notes}</p>
-                              </div>
-                            )}
-                          </div>
+                      {/* Right Side - Price & Actions */}
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className="text-right">
+                          <p className="font-bold text-lg text-amber-600">
+                            {order.total_amount.toLocaleString('vi-VN')}₫
+                          </p>
+                          <p className="text-xs text-slate-500 uppercase">
+                            {order.payment.payment_method}
+                          </p>
                         </div>
-
-                        <div>
-                          <h4 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                            <DollarSign className="h-4 w-4" />
-                            Thanh toán
-                          </h4>
-                          <div className="p-4 bg-gradient-to-r from-slate-50 to-white dark:from-slate-700 dark:to-slate-600 rounded-lg space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-slate-600 dark:text-slate-400">Phương thức:</span>
-                              <Badge variant="secondary" className="uppercase">
-                                {order.payment.payment_method}
-                              </Badge>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-sm text-slate-600 dark:text-slate-400">Trạng thái:</span>
-                              <Badge
-                                className={order.payment.payment_status === 'completed'
-                                  ? 'bg-green-500 text-white'
-                                  : order.payment.payment_status === 'pending'
-                                  ? 'bg-yellow-500 text-white'
-                                  : 'bg-red-500 text-white'
-                                }
-                              >
-                                {order.payment.payment_status === 'completed' ? 'Đã thanh toán' :
-                                 order.payment.payment_status === 'pending' ? 'Chờ thanh toán' : 'Đã hủy'}
-                              </Badge>
-                            </div>
-                            {order.payment.processed_at && (
-                              <div className="flex justify-between items-center">
-                                <span className="text-sm text-slate-600 dark:text-slate-400">Thanh toán lúc:</span>
-                                <span className="text-sm text-slate-900 dark:text-white">
-                                  {new Date(order.payment.processed_at).toLocaleString('vi-VN')}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex flex-wrap gap-2 pt-4">
+                        
+                        <div className="flex items-center gap-2">
                           <Link href={`/admin/orders/${order.id}`}>
                             <Button size="sm" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">
-                              <Eye className="h-4 w-4 mr-2" />
+                              <Eye className="h-4 w-4 mr-1" />
                               Chi tiết
                             </Button>
                           </Link>
+                          
+                          {/* Quick Actions */}
                           {order.status === 'pending' && (
-                            <Button size="sm" variant="outline" className="border-green-200 text-green-600 hover:bg-green-50">
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Xác nhận
+                            <Button size="sm" variant="outline" className="border-green-200 text-green-600 hover:bg-green-50 px-2">
+                              <CheckCircle className="h-4 w-4" />
                             </Button>
                           )}
                           {order.status === 'confirmed' && (
-                            <Button size="sm" variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50">
-                              <Truck className="h-4 w-4 mr-2" />
-                              Giao hàng
-                            </Button>
-                          )}
-                          {(order.status === 'pending' || order.status === 'confirmed') && (
-                            <Button size="sm" variant="outline" className="border-red-200 text-red-600 hover:bg-red-50">
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Hủy
+                            <Button size="sm" variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50 px-2">
+                              <Truck className="h-4 w-4" />
                             </Button>
                           )}
                         </div>
                       </div>
                     </div>
+                    
+                    {/* Notes preview */}
+                    {order.notes && (
+                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-600">
+                        <p className="text-xs text-slate-500 italic truncate">
+                          📝 {order.notes}
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))
@@ -660,6 +562,4 @@ const AdminOrders = () => {
       </div>
     </div>
   );
-};
-
-export default AdminOrders;
+};export default AdminOrders;
