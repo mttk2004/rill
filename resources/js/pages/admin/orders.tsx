@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { AdminNavigation } from '@/components/admin-navigation';
-import { Package, Search, Eye, Filter, ShoppingCart, Clock, CheckCircle, Truck, Package2, XCircle, DollarSign } from 'lucide-react';
+import { Package, Search, Eye, Filter, ShoppingCart, Clock, CheckCircle, Truck, Package2, XCircle, DollarSign, MapPin, Phone } from 'lucide-react';
 
 const orders = [
   {
@@ -331,9 +332,14 @@ const AdminOrders = () => {
   const processingOrders = orders.filter(order => order.status === "pending").length;
   const deliveredOrders = orders.filter(order => order.status === "delivered").length;
 
+  const formatAddress = (address: { address_line_1: string; ward: string; district: string; city: string }) => {
+    return `${address.address_line_1}, ${address.ward}, ${address.district}, ${address.city}`;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <Head title="Quản lý đơn hàng" />
+    <TooltipProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <Head title="Quản lý đơn hàng" />
       <AdminNavigation />
 
       <div className="container mx-auto px-4 py-8">
@@ -490,9 +496,96 @@ const AdminOrders = () => {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-slate-900 dark:text-white">
-                              #{order.order_number}
-                            </h3>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <h3 className="font-semibold text-slate-900 dark:text-white cursor-help hover:text-amber-600 transition-colors">
+                                  #{order.order_number}
+                                </h3>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-sm p-0 border-0 bg-transparent shadow-none">
+                                <Card className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border shadow-xl">
+                                  <CardContent className="p-4 space-y-3">
+                                    {/* Order Header */}
+                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-600">
+                                      <Package className="h-4 w-4 text-amber-600" />
+                                      <span className="font-semibold text-slate-900 dark:text-white">
+                                        Đơn hàng #{order.order_number}
+                                      </span>
+                                    </div>
+
+                                    {/* Items Preview */}
+                                    <div className="space-y-1">
+                                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">
+                                        Sản phẩm ({order.items.length})
+                                      </p>
+                                      <div className="space-y-1">
+                                        {order.items.slice(0, 2).map((item, index) => (
+                                          <div key={index} className="flex justify-between text-xs">
+                                            <span className="text-slate-700 dark:text-slate-300 truncate pr-2">
+                                              {item.product_name} - {item.artist_name}
+                                            </span>
+                                            <span className="text-slate-600 dark:text-slate-400">
+                                              x{item.quantity}
+                                            </span>
+                                          </div>
+                                        ))}
+                                        {order.items.length > 2 && (
+                                          <p className="text-xs text-slate-500 italic">
+                                            +{order.items.length - 2} sản phẩm khác
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Shipping Address */}
+                                    <div className="space-y-1">
+                                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                        <MapPin className="h-3 w-3" />
+                                        Địa chỉ giao hàng
+                                      </p>
+                                      <div className="text-xs text-slate-700 dark:text-slate-300">
+                                        <p className="font-medium">{order.shipping_address.full_name}</p>
+                                        <p className="flex items-center gap-1">
+                                          <Phone className="h-3 w-3" />
+                                          {order.shipping_address.phone}
+                                        </p>
+                                        <p className="text-slate-600 dark:text-slate-400">
+                                          {formatAddress(order.shipping_address)}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Payment Status */}
+                                    <div className="flex items-center justify-between pt-1 border-t border-slate-200 dark:border-slate-600">
+                                      <div className="flex items-center gap-2">
+                                        <DollarSign className="h-3 w-3 text-amber-600" />
+                                        <span className="text-xs text-slate-600 dark:text-slate-400">
+                                          {order.payment.payment_method === 'cod' ? 'Tiền mặt' :
+                                           order.payment.payment_method === 'bank_transfer' ? 'Chuyển khoản' : 'Thẻ'}
+                                        </span>
+                                      </div>
+                                      <Badge className={order.payment.payment_status === 'completed' 
+                                        ? 'bg-green-500 text-white text-xs' 
+                                        : order.payment.payment_status === 'pending'
+                                        ? 'bg-yellow-500 text-white text-xs'
+                                        : 'bg-red-500 text-white text-xs'
+                                      }>
+                                        {order.payment.payment_status === 'completed' ? 'Đã thanh toán' :
+                                         order.payment.payment_status === 'pending' ? 'Chờ thanh toán' : 'Thất bại'}
+                                      </Badge>
+                                    </div>
+
+                                    {/* Notes */}
+                                    {order.notes && (
+                                      <div className="bg-amber-50 dark:bg-amber-900/20 p-2 rounded text-xs">
+                                        <p className="text-slate-600 dark:text-slate-400 font-medium mb-1">Ghi chú:</p>
+                                        <p className="text-slate-700 dark:text-slate-300">{order.notes}</p>
+                                      </div>
+                                    )}
+                                  </CardContent>
+                                </Card>
+                              </TooltipContent>
+                            </Tooltip>
                             <Badge className={`${getStatusColor(order.status)} border-0 flex items-center gap-1 text-xs px-2 py-1`}>
                               {getStatusIcon(order.status)}
                               {getStatusLabel(order.status)}
@@ -560,6 +653,7 @@ const AdminOrders = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };export default AdminOrders;
