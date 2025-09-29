@@ -564,8 +564,8 @@ const AdminOrders = () => {
                                            order.payment.payment_method === 'bank_transfer' ? 'Chuyển khoản' : 'Thẻ'}
                                         </span>
                                       </div>
-                                      <Badge className={order.payment.payment_status === 'completed' 
-                                        ? 'bg-green-500 text-white text-xs' 
+                                      <Badge className={order.payment.payment_status === 'completed'
+                                        ? 'bg-green-500 text-white text-xs'
                                         : order.payment.payment_status === 'pending'
                                         ? 'bg-yellow-500 text-white text-xs'
                                         : 'bg-red-500 text-white text-xs'
