@@ -78,7 +78,7 @@ const AdminArtists = () => {
       slug: "pink-floyd",
       description: "Ban nhạc progressive rock nổi tiếng với những album concept đình đám như The Dark Side of the Moon và The Wall. Được thành lập tại London năm 1965, nổi tiếng với âm thanh thực nghiệm và các buổi biểu diễn hoành tráng.",
       image: "/placeholder-vinyl.jpg",
-      country: "United Kingdom", 
+      country: "United Kingdom",
       is_active: true,
       created_at: "2024-01-12T09:15:00Z",
       updated_at: "2024-01-18T16:45:00Z"
@@ -107,7 +107,7 @@ const AdminArtists = () => {
     },
     {
       id: 5,
-      name: "Led Zeppelin", 
+      name: "Led Zeppelin",
       slug: "led-zeppelin",
       description: "Ban nhạc hard rock huyền thoại, được coi là một trong những ban nhạc có ảnh hưởng nhất đến sự phát triển của heavy metal và hard rock. Với những bài hát kinh điển như Stairway to Heaven và Kashmir.",
       image: "/placeholder-vinyl.jpg",
@@ -161,7 +161,7 @@ const AdminArtists = () => {
       <Head title="Quản lý nghệ sĩ" />
       <AdminNavigation />
 
-      <div className="px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
