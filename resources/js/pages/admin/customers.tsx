@@ -15,12 +15,8 @@ import {
   Upload,
   Mail,
   Phone,
-  ShoppingBag,
-  DollarSign,
   CheckCircle,
   XCircle,
-  Crown,
-  Star,
   TrendingUp
 } from "lucide-react";
 import { Head } from "@inertiajs/react";
@@ -40,13 +36,7 @@ const AdminCustomers = () => {
       avatar: "/placeholder-vinyl.jpg",
       is_active: true,
       created_at: "2023-05-15T09:00:00Z",
-      updated_at: "2024-01-20T14:30:00Z",
-      // Calculated fields from relationships
-      total_orders: 12,
-      total_spent: 15650000,
-      last_order_date: "2024-01-20",
-      customer_level: "premium" as const,
-      addresses_count: 2
+      updated_at: "2024-01-20T14:30:00Z"
     },
     {
       id: 2,
@@ -60,13 +50,7 @@ const AdminCustomers = () => {
       avatar: null,
       is_active: true,
       created_at: "2023-08-22T10:00:00Z",
-      updated_at: "2024-01-18T16:45:00Z",
-      // Calculated fields
-      total_orders: 8,
-      total_spent: 9200000,
-      last_order_date: "2024-01-18",
-      customer_level: "silver" as const,
-      addresses_count: 1
+      updated_at: "2024-01-18T16:45:00Z"
     },
     {
       id: 3,
@@ -80,13 +64,7 @@ const AdminCustomers = () => {
       avatar: "/placeholder-vinyl.jpg",
       is_active: true,
       created_at: "2022-12-10T08:30:00Z",
-      updated_at: "2024-01-19T12:20:00Z",
-      // Calculated fields
-      total_orders: 25,
-      total_spent: 32400000,
-      last_order_date: "2024-01-19",
-      customer_level: "vip" as const,
-      addresses_count: 3
+      updated_at: "2024-01-19T12:20:00Z"
     },
     {
       id: 4,
@@ -100,13 +78,7 @@ const AdminCustomers = () => {
       avatar: null,
       is_active: true,
       created_at: "2024-01-01T12:00:00Z",
-      updated_at: "2024-01-15T18:30:00Z",
-      // Calculated fields
-      total_orders: 3,
-      total_spent: 2100000,
-      last_order_date: "2024-01-15",
-      customer_level: "bronze" as const,
-      addresses_count: 1
+      updated_at: "2024-01-15T18:30:00Z"
     },
     {
       id: 5,
@@ -120,46 +92,26 @@ const AdminCustomers = () => {
       avatar: "/placeholder-vinyl.jpg",
       is_active: false,
       created_at: "2023-11-20T08:15:00Z",
-      updated_at: "2023-12-15T10:00:00Z",
-      // Calculated fields
-      total_orders: 0,
-      total_spent: 0,
-      last_order_date: null,
-      customer_level: "bronze" as const,
-      addresses_count: 0
+      updated_at: "2023-12-15T10:00:00Z"
     }
   ];
 
-  const getStatusBadge = (is_active: boolean, customer_level: string) => {
-    if (!is_active) {
+  const getStatusBadge = (is_active: boolean) => {
+    if (is_active) {
       return (
-        <Badge className="bg-red-500 text-white border-0">
+        <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
+          <CheckCircle className="h-3 w-3 mr-1" />
+          Hoạt động
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0">
           <XCircle className="h-3 w-3 mr-1" />
           Không hoạt động
         </Badge>
       );
     }
-
-    const levelConfig = {
-      vip: { icon: Crown, label: "VIP", className: "bg-gradient-to-r from-purple-500 to-purple-600 text-white border-0" },
-      premium: { icon: Star, label: "Premium", className: "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0" },
-      silver: { icon: TrendingUp, label: "Silver", className: "bg-gradient-to-r from-slate-400 to-slate-500 text-white border-0" },
-      bronze: { icon: CheckCircle, label: "Bronze", className: "bg-gradient-to-r from-orange-400 to-orange-500 text-white border-0" }
-    };
-
-    const config = levelConfig[customer_level as keyof typeof levelConfig] || levelConfig.bronze;
-    const IconComponent = config.icon;
-
-    return (
-      <Badge className={config.className}>
-        <IconComponent className="h-3 w-3 mr-1" />
-        {config.label}
-      </Badge>
-    );
-  };
-
-  const formatCurrency = (amount: number) => {
-    return amount === 0 ? "0₫" : `${amount.toLocaleString('vi-VN')}₫`;
   };
 
   const formatDate = (dateString: string | null) => {
@@ -181,7 +133,7 @@ const AdminCustomers = () => {
     const birth = new Date(dateOfBirth);
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
@@ -266,7 +218,7 @@ const AdminCustomers = () => {
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
-                    <Crown className="h-6 w-6 text-white" />
+                    <CheckCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -396,7 +348,7 @@ const AdminCustomers = () => {
                       <div className="lg:col-span-2">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold text-lg text-slate-900 dark:text-white">{customer.name}</h3>
-                          {getStatusBadge(customer.is_active, customer.customer_level)}
+                          {getStatusBadge(customer.is_active)}
                           {!customer.email_verified_at && (
                             <Badge className="bg-yellow-100 text-yellow-800 text-xs border-0">
                               Chưa xác thực
@@ -414,44 +366,53 @@ const AdminCustomers = () => {
                           </div>
                           <div className="flex items-center gap-1">
                             <Users className="h-3 w-3" />
-                            {getGenderIcon(customer.gender)} {calculateAge(customer.date_of_birth)} tuổi • {customer.addresses_count} địa chỉ
+                            {getGenderIcon(customer.gender)} {calculateAge(customer.date_of_birth)} tuổi
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Hạng khách hàng</p>
-                        <p className="font-bold text-lg text-amber-600 capitalize">
-                          {customer.customer_level}
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Vai trò</p>
+                        <p className="font-bold text-lg text-slate-900 dark:text-white">
+                          Khách hàng
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Từ {formatDate(customer.created_at)}
+                          Tham gia: {formatDate(customer.created_at)}
                         </p>
                       </div>
 
                       <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Đơn hàng</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Xác thực email</p>
                         <div className="flex items-center gap-1">
-                          <ShoppingBag className="h-4 w-4 text-blue-600" />
-                          <span className="font-bold text-lg text-slate-900 dark:text-white">{customer.total_orders}</span>
+                          {customer.email_verified_at ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <span className="font-bold text-lg text-green-600">Đã xác thực</span>
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="h-4 w-4 text-red-600" />
+                              <span className="font-bold text-lg text-red-600">Chưa xác thực</span>
+                            </>
+                          )}
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Gần nhất: {formatDate(customer.last_order_date)}
+                          {customer.email_verified_at 
+                            ? `Xác thực: ${formatDate(customer.email_verified_at)}` 
+                            : 'Chưa xác thực email'}
                         </p>
                       </div>
 
                       <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Tổng chi tiêu</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Cập nhật cuối</p>
                         <div className="flex items-center gap-1">
-                          <DollarSign className="h-4 w-4 text-amber-600" />
+                          <TrendingUp className="h-4 w-4 text-amber-600" />
                           <span className="font-bold text-amber-600 text-lg">
-                            {formatCurrency(customer.total_spent)}
+                            {formatDate(customer.updated_at)}
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Trung bình: {customer.total_orders > 0
-                            ? formatCurrency(Math.round(customer.total_spent / customer.total_orders))
-                            : '0₫'}
+                          Trạng thái: {customer.is_active ? 'Hoạt động' : 'Không hoạt động'}
                         </p>
                       </div>
 
