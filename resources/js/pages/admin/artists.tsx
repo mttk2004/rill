@@ -15,9 +15,48 @@ import {
   Download,
   Upload,
   Globe,
-  Calendar
+  Calendar,
+  Users,
+  Disc,
+  TrendingUp
 } from "lucide-react";
 import { Head } from "@inertiajs/react";
+
+// Helper functions
+const getStatusBadge = (isActive: boolean) => {
+  if (isActive) {
+    return (
+      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
+        Hoạt động
+      </Badge>
+    );
+  }
+  return (
+    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-100 border-slate-200">
+      Không hoạt động
+    </Badge>
+  );
+};
+
+const getProductCount = (artistId: number) => {
+  // In real app, this would come from the backend
+  const productCounts = {
+    1: 12,
+    2: 8,
+    3: 15,
+    4: 6,
+    5: 23
+  };
+  return productCounts[artistId as keyof typeof productCounts] || 0;
+};
+
+const formatDate = (dateString: string) => {
+  return new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(new Date(dateString));
+};
 
 const AdminArtists = () => {
 
@@ -26,94 +65,83 @@ const AdminArtists = () => {
       id: 1,
       name: "The Beatles",
       slug: "the-beatles",
-      country: "United Kingdom",
-      description: "Ban nhạc rock huyền thoại từ Liverpool, được thành lập năm 1960...",
+      description: "Ban nhạc rock huyền thoại từ Liverpool, được thành lập năm 1960. Gồm John Lennon, Paul McCartney, George Harrison và Ringo Starr, họ được coi là ban nhạc có ảnh hưởng nhất trong lịch sử âm nhạc đại chúng.",
       image: "/placeholder-vinyl.jpg",
-      totalProducts: 12,
-      totalSales: 456,
-      revenue: "142.500.000",
-      status: "active",
-      createdAt: "2024-01-15",
-      lastUpdated: "2024-01-20"
+      country: "United Kingdom",
+      is_active: true,
+      created_at: "2024-01-15T10:30:00Z",
+      updated_at: "2024-01-20T14:30:00Z"
     },
     {
       id: 2,
       name: "Pink Floyd",
       slug: "pink-floyd",
-      country: "United Kingdom",
-      description: "Ban nhạc progressive rock nổi tiếng với những album concept đình đám...",
+      description: "Ban nhạc progressive rock nổi tiếng với những album concept đình đám như The Dark Side of the Moon và The Wall. Được thành lập tại London năm 1965, nổi tiếng với âm thanh thực nghiệm và các buổi biểu diễn hoành tráng.",
       image: "/placeholder-vinyl.jpg",
-      totalProducts: 8,
-      totalSales: 234,
-      revenue: "89.200.000",
-      status: "active",
-      createdAt: "2024-01-12",
-      lastUpdated: "2024-01-18"
+      country: "United Kingdom", 
+      is_active: true,
+      created_at: "2024-01-12T09:15:00Z",
+      updated_at: "2024-01-18T16:45:00Z"
     },
     {
       id: 3,
       name: "Michael Jackson",
       slug: "michael-jackson",
-      country: "United States",
-      description: "Ông hoàng nhạc pop, một trong những nghệ sĩ bán chạy nhất mọi thời đại...",
+      description: "Ông hoàng nhạc pop, một trong những nghệ sĩ bán chạy nhất mọi thời đại. Với những album kinh điển như Thriller, Bad và Dangerous, ông đã thay đổi bộ mặt của ngành công nghiệp âm nhạc và giải trí.",
       image: "/placeholder-vinyl.jpg",
-      totalProducts: 6,
-      totalSales: 187,
-      revenue: "67.800.000",
-      status: "active",
-      createdAt: "2024-01-10",
-      lastUpdated: "2024-01-16"
+      country: "United States",
+      is_active: true,
+      created_at: "2024-01-10T08:20:00Z",
+      updated_at: "2024-01-16T12:10:00Z"
     },
     {
       id: 4,
       name: "Eagles",
       slug: "eagles",
-      country: "United States",
-      description: "Ban nhạc rock Mỹ được thành lập năm 1971, nổi tiếng với album Hotel California...",
+      description: "Ban nhạc rock Mỹ được thành lập năm 1971, nổi tiếng với album Hotel California. Phong cách âm nhạc kết hợp giữa rock, country và folk đã tạo nên âm thanh đặc trưng và thu hút hàng triệu người hâm mộ trên toàn thế giới.",
       image: "/placeholder-vinyl.jpg",
-      totalProducts: 5,
-      totalSales: 145,
-      revenue: "52.300.000",
-      status: "active",
-      createdAt: "2024-01-08",
-      lastUpdated: "2024-01-14"
+      country: "United States",
+      is_active: true,
+      created_at: "2024-01-08T14:45:00Z",
+      updated_at: "2024-01-14T09:30:00Z"
     },
     {
       id: 5,
-      name: "Led Zeppelin",
+      name: "Led Zeppelin", 
       slug: "led-zeppelin",
-      country: "United Kingdom",
-      description: "Ban nhạc hard rock huyền thoại, được coi là một trong những ban nhạc có ảnh hưởng nhất...",
+      description: "Ban nhạc hard rock huyền thoại, được coi là một trong những ban nhạc có ảnh hưởng nhất đến sự phát triển của heavy metal và hard rock. Với những bài hát kinh điển như Stairway to Heaven và Kashmir.",
       image: "/placeholder-vinyl.jpg",
-      totalProducts: 9,
-      totalSales: 98,
-      revenue: "34.600.000",
-      status: "draft",
-      createdAt: "2024-01-05",
-      lastUpdated: "2024-01-10"
+      country: "United Kingdom",
+      is_active: false,
+      created_at: "2024-01-05T16:00:00Z",
+      updated_at: "2024-01-10T11:20:00Z"
     }
   ];
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      active: { variant: "default" as const, label: "Đang hoạt động", color: "bg-green-100 text-green-800" },
-      draft: { variant: "secondary" as const, label: "Nháp", color: "bg-gray-100 text-gray-800" },
-      inactive: { variant: "destructive" as const, label: "Không hoạt động", color: "bg-red-100 text-red-800" }
-    };
-
-    const config = variants[status as keyof typeof variants] || variants.draft;
-    return (
-      <Badge
-        variant={config.variant}
-        className={config.color}
-      >
-        {config.label}
-      </Badge>
-    );
+  const getStatusBadge = (is_active: boolean) => {
+    if (is_active) {
+      return (
+        <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
+          Hoạt động
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge className="bg-gradient-to-r from-gray-500 to-gray-600 text-white border-0">
+          Không hoạt động
+        </Badge>
+      );
+    }
   };
 
-  const formatCurrency = (amount: string) => {
-    return `${amount}đ`;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('vi-VN');
+  };
+
+  const getProductCount = (artistId: number) => {
+    // In real app, this would come from backend API
+    const productCounts = { 1: 12, 2: 8, 3: 6, 4: 5, 5: 9 };
+    return productCounts[artistId as keyof typeof productCounts] || 0;
   };
 
   const countries = [
@@ -129,240 +157,270 @@ const AdminArtists = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Head title="Quản lý nghệ sĩ - Admin" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <Head title="Quản lý nghệ sĩ" />
       <AdminNavigation />
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Music className="h-8 w-8" />
-              Quản lý Nghệ sĩ
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Quản lý thông tin nghệ sĩ và ban nhạc trong cửa hàng
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button variant="accent">
-              <Plus className="h-4 w-4 mr-2" />
-              Thêm nghệ sĩ
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="shadow-vinyl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Tổng nghệ sĩ</p>
-                  <p className="text-2xl font-bold">127</p>
+      <div className="px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
+                  <Music className="h-6 w-6 text-white" />
                 </div>
-                <Music className="h-8 w-8 text-accent" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-vinyl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Đang hoạt động</p>
-                  <p className="text-2xl font-bold text-green-600">95</p>
-                </div>
-                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <div className="h-3 w-3 rounded-full bg-green-600"></div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-vinyl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Quốc gia</p>
-                  <p className="text-2xl font-bold">24</p>
-                </div>
-                <Globe className="h-8 w-8 text-accent" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-vinyl">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Mới thêm tháng này</p>
-                  <p className="text-2xl font-bold text-blue-600">8</p>
-                </div>
-                <Calendar className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Filters */}
-        <Card className="mb-6 shadow-vinyl">
-          <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Tìm theo tên nghệ sĩ, slug..."
-                  className="pl-10"
-                />
-              </div>
-
-              <Select defaultValue="all-status">
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Trạng thái" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all-status">Tất cả trạng thái</SelectItem>
-                  <SelectItem value="active">Đang hoạt động</SelectItem>
-                  <SelectItem value="draft">Nháp</SelectItem>
-                  <SelectItem value="inactive">Không hoạt động</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select defaultValue="all-countries">
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Quốc gia" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countries.map((country) => (
-                    <SelectItem
-                      key={country}
-                      value={country.toLowerCase().replace(/\s+/g, '-')}
-                    >
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Button variant="outline">
-                <Filter className="h-4 w-4 mr-2" />
-                Bộ lọc
+                Quản lý Nghệ sĩ
+              </h1>
+              <p className="text-slate-600 dark:text-slate-400 mt-2 ml-12">
+                Quản lý thông tin nghệ sĩ và ban nhạc trong cửa hàng
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50">
+                <Upload className="h-4 w-4 mr-2" />
+                Import
+              </Button>
+              <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+              <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">
+                <Plus className="h-4 w-4 mr-2" />
+                Thêm nghệ sĩ
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Results Info */}
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-muted-foreground">
-            Hiển thị <span className="font-medium">1-5</span> trong <span className="font-medium">127</span> nghệ sĩ
-          </p>
-          <Select defaultValue="name-asc">
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="name-asc">Tên A-Z</SelectItem>
-              <SelectItem value="name-desc">Tên Z-A</SelectItem>
-              <SelectItem value="products-desc">Nhiều sản phẩm nhất</SelectItem>
-              <SelectItem value="sales-desc">Bán chạy nhất</SelectItem>
-              <SelectItem value="revenue-desc">Doanh thu cao nhất</SelectItem>
-              <SelectItem value="newest">Mới nhất</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Artists List */}
-        <div className="space-y-4">
-          {artists.map((artist, index) => (
-            <Card
-              key={artist.id}
-              className="shadow-vinyl animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  {/* Artist Image */}
-                  <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0">
-                    <img
-                      src={artist.image}
-                      alt={artist.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+                    <Music className="h-6 w-6 text-white" />
                   </div>
-
-                  {/* Artist Info */}
-                  <div className="flex-1 grid grid-cols-1 lg:grid-cols-6 gap-4">
-                    <div className="lg:col-span-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-lg">{artist.name}</h3>
-                        {getStatusBadge(artist.status)}
-                      </div>
-                      <div className="flex items-center gap-1 text-muted-foreground text-sm mb-2">
-                        <Globe className="h-3 w-3" />
-                        {artist.country}
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {artist.description}
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-muted-foreground">Sản phẩm</p>
-                      <p className="font-bold text-2xl">{artist.totalProducts}</p>
-                      <p className="text-xs text-muted-foreground">albums</p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-muted-foreground">Đã bán</p>
-                      <p className="font-bold text-2xl text-blue-600">{artist.totalSales}</p>
-                      <p className="text-xs text-muted-foreground">bản</p>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-muted-foreground">Doanh thu</p>
-                      <p className="font-bold text-accent">{formatCurrency(artist.revenue)}</p>
-                      <p className="text-xs text-muted-foreground">tổng cộng</p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                      Tổng nghệ sĩ
+                    </p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                      127
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-8">
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" disabled>Trước</Button>
-            <Button variant="default" size="sm">1</Button>
-            <Button variant="outline" size="sm">2</Button>
-            <Button variant="outline" size="sm">3</Button>
-            <span className="px-2 text-muted-foreground">...</span>
-            <Button variant="outline" size="sm">26</Button>
-            <Button variant="outline" size="sm">Sau</Button>
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-lg">
+                    <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                      <div className="h-3 w-3 rounded-full bg-green-600"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                      Hoạt động
+                    </p>
+                    <p className="text-2xl font-bold text-green-600">
+                      95
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
+                    <Globe className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                      Quốc gia
+                    </p>
+                    <p className="text-2xl font-bold text-purple-600">
+                      24
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                      Mới thêm tháng này
+                    </p>
+                    <p className="text-2xl font-bold text-amber-600">
+                      8
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters */}
+          <Card className="mb-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Tìm theo tên nghệ sĩ, slug..."
+                    className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
+                  />
+                </div>
+
+                <Select defaultValue="all-status">
+                  <SelectTrigger className="w-48 border-slate-200">
+                    <SelectValue placeholder="Trạng thái" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all-status">Tất cả trạng thái</SelectItem>
+                    <SelectItem value="active">Hoạt động</SelectItem>
+                    <SelectItem value="inactive">Không hoạt động</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select defaultValue="all-countries">
+                  <SelectTrigger className="w-48 border-slate-200">
+                    <SelectValue placeholder="Quốc gia" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem
+                        key={country}
+                        value={country.toLowerCase().replace(/\s+/g, '-')}
+                      >
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Bộ lọc
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Results Info */}
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-slate-600 dark:text-slate-400">
+              Hiển thị <span className="font-medium text-slate-900 dark:text-white">1-5</span> trong <span className="font-medium text-slate-900 dark:text-white">127</span> nghệ sĩ
+            </p>
+            <Select defaultValue="name-asc">
+              <SelectTrigger className="w-48 border-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name-asc">Tên A-Z</SelectItem>
+                <SelectItem value="name-desc">Tên Z-A</SelectItem>
+                <SelectItem value="newest">Mới nhất</SelectItem>
+                <SelectItem value="country-asc">Quốc gia A-Z</SelectItem>
+                <SelectItem value="active-first">Hoạt động trước</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Artists List */}
+          <div className="space-y-4">
+            {artists.map((artist, index) => (
+              <Card
+                key={artist.id}
+                className="group relative overflow-hidden bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-amber-50/20 to-amber-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <CardContent className="p-6 relative z-10">
+                  <div className="flex items-center gap-4">
+                    {/* Artist Image */}
+                    <div className="w-20 h-20 rounded-full overflow-hidden flex-shrink-0 relative">
+                      <img
+                        src={artist.image}
+                        alt={artist.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      {artist.is_active && (
+                        <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                      )}
+                    </div>
+
+                    {/* Artist Info */}
+                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-6 gap-4">
+                      <div className="lg:col-span-2">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-lg text-slate-900 dark:text-white">{artist.name}</h3>
+                          {getStatusBadge(artist.is_active)}
+                        </div>
+                        <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400 text-sm mb-2">
+                          <Globe className="h-3 w-3" />
+                          {artist.country}
+                        </div>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                          {artist.description}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Sản phẩm</p>
+                        <p className="font-bold text-2xl text-slate-900 dark:text-white">{getProductCount(artist.id)}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-500">albums</p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Ngày tạo</p>
+                        <p className="font-bold text-blue-600 text-lg">{formatDate(artist.created_at)}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-500">thêm vào</p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Cập nhật cuối</p>
+                        <p className="font-bold text-amber-600 text-lg">{formatDate(artist.updated_at)}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-500">lần cuối</p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="flex justify-center mt-8">
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" disabled className="border-slate-200">Trước</Button>
+              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">1</Button>
+              <Button variant="outline" size="sm" className="border-slate-200">2</Button>
+              <Button variant="outline" size="sm" className="border-slate-200">3</Button>
+              <span className="px-2 text-slate-500 dark:text-slate-400">...</span>
+              <Button variant="outline" size="sm" className="border-slate-200">26</Button>
+              <Button variant="outline" size="sm" className="border-slate-200">Sau</Button>
+            </div>
           </div>
         </div>
       </div>
