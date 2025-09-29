@@ -218,14 +218,14 @@ const AdminCustomers = () => {
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
-                    <CheckCircle className="h-6 w-6 text-white" />
+                    <Mail className="h-6 w-6 text-white" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                      VIP
+                      Đã xác thực email
                     </p>
                     <p className="text-2xl font-bold text-purple-600">
-                      156
+                      1,734
                     </p>
                   </div>
                 </div>
@@ -397,8 +397,8 @@ const AdminCustomers = () => {
                           )}
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {customer.email_verified_at 
-                            ? `Xác thực: ${formatDate(customer.email_verified_at)}` 
+                          {customer.email_verified_at
+                            ? `Xác thực: ${formatDate(customer.email_verified_at)}`
                             : 'Chưa xác thực email'}
                         </p>
                       </div>
