@@ -51,25 +51,28 @@ export interface Artist {
 }
 
 export interface Product {
-    id: string;
+    id: number;
     name: string;
     slug: string;
     description: string;
     detailed_description?: string;
+    sku: string;
     price: number;
+    cost_price?: number;
     compare_price?: number;
     stock_quantity: number;
+    min_stock_level: number;
     genre: string;
     label: string;
     image?: string;
     is_featured: boolean;
     status: 'active' | 'inactive' | 'out_of_stock';
+    meta_title?: string;
+    meta_description?: string;
     artists: Artist[];
-    main_artists: string[];
-    featured_artists: string[];
-    in_stock: boolean;
-    low_stock: boolean;
-    discount_percentage?: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string;
 }
 
 export interface ProductFilters {

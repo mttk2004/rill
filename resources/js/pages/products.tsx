@@ -149,12 +149,12 @@ export default function Products({ products: productsData, pagination, filters, 
 
                 <div className="container mx-auto px-4 py-12">
                     {/* Filters */}
-                    <div className="backdrop-blur-sm bg-white/80 rounded-2xl p-8 shadow-xl border border-accent/10 mb-12">
+                    <div className="backdrop-blur-sm bg-white/80 dark:bg-slate-800/80 rounded-2xl p-8 shadow-xl border border-accent/10 mb-12">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-gradient-to-br from-accent/10 to-amber-200/20 rounded-xl flex items-center justify-center">
                                 <Filter className="w-5 h-5 text-accent" />
                             </div>
-                            <h2 className="text-2xl font-bold text-slate-900">Bộ lọc & tìm kiếm</h2>
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Bộ lọc & tìm kiếm</h2>
                         </div>
 
                         <div className="flex flex-col lg:flex-row gap-6">
@@ -166,7 +166,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                         placeholder="Tìm kiếm album, nghệ sĩ..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="pl-12 h-12 bg-white/80 border-accent/20 focus:border-accent shadow-sm"
+                                        className="pl-12 h-12 bg-white/80 dark:bg-slate-700/80 border-accent/20 focus:border-accent focus:ring-accent/20 shadow-sm"
                                     />
                                 </form>
 
@@ -174,7 +174,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                     value={props.genre || "all"}
                                     onValueChange={(value) => handleFilterChange('genre', value)}
                                 >
-                                    <SelectTrigger className="w-56 h-12 bg-white/80 border-accent/20 focus:border-accent shadow-sm">
+                                    <SelectTrigger className="w-56 h-12 bg-white/80 dark:bg-slate-700/80 border-accent/20 focus:border-accent shadow-sm">
                                         <SelectValue placeholder="Thể loại" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -190,7 +190,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                     value={props.label || "all"}
                                     onValueChange={(value) => handleFilterChange('label', value)}
                                 >
-                                    <SelectTrigger className="w-56 h-12 bg-white/80 border-accent/20 focus:border-accent shadow-sm">
+                                    <SelectTrigger className="w-56 h-12 bg-white/80 dark:bg-slate-700/80 border-accent/20 focus:border-accent shadow-sm">
                                         <SelectValue placeholder="Hãng đĩa" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -205,12 +205,16 @@ export default function Products({ products: productsData, pagination, filters, 
 
                             {/* View Mode & Sort */}
                             <div className="flex items-center gap-4">
-                                <div className="flex border border-accent/20 rounded-xl overflow-hidden bg-white/60">
+                                <div className="flex border border-accent/20 rounded-xl overflow-hidden bg-white/60 dark:bg-slate-700/60">
                                     <Button
                                         variant={viewMode === "grid" ? "default" : "ghost"}
                                         size="sm"
                                         onClick={() => setViewMode("grid")}
-                                        className={`rounded-r-none h-10 ${viewMode === "grid" ? "bg-accent text-white" : ""}`}
+                                        className={`rounded-r-none h-10 ${
+                                            viewMode === "grid"
+                                                ? "bg-gradient-to-r from-accent to-amber-600 text-white border-0"
+                                                : "text-slate-600 dark:text-slate-300 hover:bg-accent/10"
+                                        }`}
                                     >
                                         <Grid className="h-4 w-4" />
                                     </Button>
@@ -218,7 +222,11 @@ export default function Products({ products: productsData, pagination, filters, 
                                         variant={viewMode === "list" ? "default" : "ghost"}
                                         size="sm"
                                         onClick={() => setViewMode("list")}
-                                        className={`rounded-l-none h-10 ${viewMode === "list" ? "bg-accent text-white" : ""}`}
+                                        className={`rounded-l-none h-10 ${
+                                            viewMode === "list"
+                                                ? "bg-gradient-to-r from-accent to-amber-600 text-white border-0"
+                                                : "text-slate-600 dark:text-slate-300 hover:bg-accent/10"
+                                        }`}
                                     >
                                         <List className="h-4 w-4" />
                                     </Button>
@@ -228,7 +236,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                     value={props.sort || "featured"}
                                     onValueChange={(value) => handleFilterChange('sort', value)}
                                 >
-                                    <SelectTrigger className="w-56 h-12 bg-white/80 border-accent/20 focus:border-accent shadow-sm">
+                                    <SelectTrigger className="w-56 h-12 bg-white/80 dark:bg-slate-700/80 border-accent/20 focus:border-accent shadow-sm">
                                         <SelectValue placeholder="Sắp xếp" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -252,7 +260,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                                 preserveScroll: false,
                                             });
                                         }}
-                                        className="h-10 border-accent/20 text-accent hover:bg-accent hover:text-white"
+                                        className="h-10 border-accent/20 text-accent hover:bg-gradient-to-r hover:from-accent hover:to-amber-600 hover:text-white transition-all duration-300"
                                     >
                                         Xóa bộ lọc
                                     </Button>
@@ -341,11 +349,9 @@ export default function Products({ products: productsData, pagination, filters, 
                                                         <h3 className="font-bold text-xl mb-2 line-clamp-1 hover:text-accent transition-colors group-hover:text-accent">
                                                             {product.name}
                                                         </h3>
-                                                        <p className="text-slate-600 mb-3 font-medium">
-                                                            {product.artists?.map(artist => artist.name).join(', ') || 'Unknown Artist'}
-                                                        </p>
-
-                                                        {viewMode === "list" && (
+                                        <p className="text-slate-600 mb-3 font-medium">
+                                            {product.artists?.find(artist => artist.role === 'main')?.name || product.artists?.[0]?.name || 'Unknown Artist'}
+                                        </p>                                                        {viewMode === "list" && (
                                                             <div className="text-sm text-slate-500 mb-4 space-y-1">
                                                                 <p className="flex items-center gap-2">
                                                                     <span className="w-2 h-2 bg-accent rounded-full" />
@@ -371,28 +377,56 @@ export default function Products({ products: productsData, pagination, filters, 
 
                                                     <div className={`flex ${viewMode === "list" ? "flex-col items-end" : "items-center justify-between"}`}>
                                                         <div className={`flex items-center gap-2 ${viewMode === "list" ? "mb-4" : "mb-4"}`}>
+                                                            {product.compare_price && product.compare_price > product.price && (
+                                                                <span className="text-sm line-through text-slate-400">
+                                                                    {product.compare_price.toLocaleString('vi-VN')}đ
+                                                                </span>
+                                                            )}
                                                             <span className="text-2xl font-bold bg-gradient-to-r from-accent to-orange-600 bg-clip-text text-transparent">
                                                                 {product.price?.toLocaleString('vi-VN')}đ
                                                             </span>
+                                                            {product.compare_price && product.compare_price > product.price && (
+                                                                <Badge className="bg-red-500 text-white text-xs">
+                                                                    -{Math.round((1 - product.price / product.compare_price) * 100)}%
+                                                                </Badge>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </Link>
 
                                             <div className="flex gap-3">
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        console.log('Add to cart:', product.id);
-                                                    }}
-                                                >
-                                                    <ShoppingCart className="w-4 h-4 mr-2" />
-                                                    Thêm vào giỏ
-                                                </Button>
+                                                {product.status === 'out_of_stock' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        disabled
+                                                        className="flex-1 border-red-300 text-red-500 opacity-50"
+                                                    >
+                                                        Hết hàng
+                                                    </Button>
+                                                ) : (
+                                                    <>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                console.log('Add to cart:', product.id);
+                                                            }}
+                                                        >
+                                                            <ShoppingCart className="w-4 h-4 mr-2" />
+                                                            Thêm vào giỏ
+                                                        </Button>
+                                                        {product.stock_quantity <= product.min_stock_level && (
+                                                            <Badge className="bg-orange-500 text-white text-xs absolute top-2 left-2">
+                                                                Sắp hết
+                                                            </Badge>
+                                                        )}
+                                                    </>
+                                                )}
                                                 <Button
                                                     size="sm"
                                                     variant="default"
@@ -433,7 +467,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                         preserveScroll: false,
                                     });
                                 }}
-                                className="bg-accent hover:bg-accent/90"
+                                className="bg-gradient-to-r from-accent to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0"
                             >
                                 Xem tất cả sản phẩm
                             </Button>
