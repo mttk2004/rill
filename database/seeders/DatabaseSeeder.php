@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             ArtistSeeder::class,
             ProductSeeder::class,
             ArtistProductSeeder::class,
+            ShippingAddressSeeder::class,
+            ShoppingCartItemSeeder::class,
         ]);
     }
 }
