@@ -19,11 +19,11 @@ return new class extends Migration
             $table->integer('quantity'); // Số lượng
             $table->decimal('unit_price', 10, 2); // Giá đơn vị
             $table->timestamps(); // created_at, updated_at
-            
+
             // Foreign key constraints
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-            
+
             // Indexes for performance
             $table->index('user_id');
             $table->index('session_id');

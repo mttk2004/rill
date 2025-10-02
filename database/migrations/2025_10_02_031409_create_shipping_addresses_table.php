@@ -24,10 +24,10 @@ return new class extends Migration
             $table->string('postal_code', 20)->nullable(); // Mã bưu điện
             $table->boolean('is_default')->default(false); // Địa chỉ mặc định
             $table->timestamps(); // created_at, updated_at
-            
+
             // Foreign key constraint
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            
+
             // Index for performance
             $table->index('user_id');
             $table->index(['user_id', 'is_default']); // For finding default address

@@ -25,7 +25,6 @@ class User extends Authenticatable
         'password',
         'role',
         'phone',
-        'address',
         'gender',
         'date_of_birth',
         'avatar',
@@ -80,4 +79,46 @@ class User extends Authenticatable
     {
         return $this->avatar ? asset('storage/' . $this->avatar) : null;
     }
+
+    /**
+     * Get the shipping addresses for the user.
+     */
+    public function shippingAddresses()
+    {
+        return $this->hasMany(ShippingAddress::class);
+    }
+
+    /**
+     * Get the default shipping address for the user.
+     */
+    public function defaultShippingAddress()
+    {
+        return $this->hasOne(ShippingAddress::class)->where('is_default', true);
+    }
+
+    /**
+     * Get the shopping cart items for the user.
+     */
+    public function shoppingCartItems()
+    {
+        return $this->hasMany(ShoppingCartItem::class);
+    }
+
+    // TODO: Uncomment when Order model is created
+    // /**
+    //  * Get the orders for the user.
+    //  */
+    // public function orders()
+    // {
+    //     return $this->hasMany(Order::class);
+    // }
+
+    // TODO: Uncomment when ProductReview model is created
+    // /**
+    //  * Get the product reviews for the user.
+    //  */
+    // public function productReviews()
+    // {
+    //     return $this->hasMany(ProductReview::class);
+    // }
 }

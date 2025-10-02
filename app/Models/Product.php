@@ -161,6 +161,14 @@ class Product extends Model
     }
 
     /**
+     * Get the shopping cart items for the product.
+     */
+    public function shoppingCartItems()
+    {
+        return $this->hasMany(ShoppingCartItem::class);
+    }
+
+    /**
      * Get the route key for the model.
      */
     public function getRouteKeyName(): string
