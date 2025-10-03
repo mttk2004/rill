@@ -12,6 +12,10 @@ Route::get('/', function () {
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
+// Cart routes accessible to both guests and authenticated users
+Route::get('/cart/summary', [App\Http\Controllers\CartController::class, 'summary'])->name('cart.summary');
+Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add.public');
+
 Route::get('/about', function () {
     return Inertia::render('about');
 })->name('about');
@@ -22,9 +26,11 @@ Route::get('/support', function () {
 
 // Customer routes (authenticated only)
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
-    Route::get('/cart', function () {
-        return Inertia::render('cart');
-    })->name('cart');
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart');
+    Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
     Route::get('/orders', function () {
         return Inertia::render('orders');
     })->name('orders');

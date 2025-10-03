@@ -20,10 +20,10 @@ class ShippingAddressSeeder extends Seeder
         foreach ($users as $user) {
             // Create 1-3 shipping addresses for each user
             $addressCount = rand(1, 3);
-            
+
             for ($i = 0; $i < $addressCount; $i++) {
                 $isDefault = $i === 0; // First address is always default
-                
+
                 if ($user->email === 'admin@rill.local') {
                     // Admin user gets a Hanoi address
                     ShippingAddress::factory()
@@ -34,7 +34,7 @@ class ShippingAddressSeeder extends Seeder
                             'is_default' => $isDefault,
                         ]);
                 } elseif ($user->email === 'customer@rill.local') {
-                    // Customer gets a Ho Chi Minh address  
+                    // Customer gets a Ho Chi Minh address
                     ShippingAddress::factory()
                         ->hoChiMinh()
                         ->create([
@@ -63,7 +63,7 @@ class ShippingAddressSeeder extends Seeder
                 'address_line_2' => 'Tầng 5',
                 'city' => 'Hồ Chí Minh',
                 'district' => 'Quận 1',
-                'ward' => 'Phường Bến Nghé', 
+                'ward' => 'Phường Bến Nghé',
                 'postal_code' => '700000',
                 'is_default' => true,
             ],

@@ -71,7 +71,7 @@ class User extends Authenticatable
     {
         return $this->role === 'customer';
     }
-    
+
     /**
      * Get the avatar URL attribute.
      */

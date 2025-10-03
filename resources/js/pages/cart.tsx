@@ -5,47 +5,86 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/navigation";
 import { Minus, Plus, Trash2, ShoppingCart, Heart, ArrowLeft, Disc3 } from "lucide-react";
-import { Link, Head, usePage } from "@inertiajs/react";
+import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData } from '@/types';
+import { useState } from 'react';
 
-const cartItems = [
-  {
-    id: 1,
-    title: "The Dark Side of the Moon",
-    artist: "Pink Floyd",
-    price: 450000,
-    quantity: 1,
-    image: "/placeholder-vinyl.jpg",
-    condition: "Mint",
-    format: "LP"
-  },
-  {
-    id: 2,
-    title: "Abbey Road",
-    artist: "The Beatles",
-    price: 520000,
-    quantity: 2,
-    image: "/placeholder-vinyl.jpg",
-    condition: "Near Mint",
-    format: "LP"
-  },
-  {
-    id: 3,
-    title: "Thriller",
-    artist: "Michael Jackson",
-    price: 380000,
-    quantity: 1,
-    image: "/placeholder-vinyl.jpg",
-    condition: "Very Good+",
-    format: "LP"
-  }
-];
+interface CartItem {
+  id: number;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    price: number;
+    image_url: string | null;
+    stock_quantity: number;
+    is_featured: boolean;
+    status: string;
+    artists: Array<{
+      id: string;
+      name: string;
+      slug: string;
+    }>;
+  };
+}
+
+interface CartSummary {
+  total_items: number;
+  total_amount: number;
+  items_count: number;
+  formatted_total: string;
+}
+
+interface CartPageProps extends SharedData {
+  cartItems: CartItem[];
+  cartSummary: CartSummary;
+}
 
 export default function Cart() {
-  const { auth } = usePage<SharedData>().props;
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = 50000;
-  const total = subtotal + shipping;
+  const { auth, cartItems, cartSummary } = usePage<CartPageProps>().props;
+  const [isUpdating, setIsUpdating] = useState<number | null>(null);
+
+  const shipping = cartSummary.total_amount >= 1000000 ? 0 : 50000;
+  const total = cartSummary.total_amount + shipping;
+
+  const updateQuantity = async (cartItemId: number, newQuantity: number) => {
+    setIsUpdating(cartItemId);
+    try {
+      await router.put(`/cart/${cartItemId}`, { quantity: newQuantity }, {
+        preserveState: true,
+        onSuccess: () => {
+          setIsUpdating(null);
+        },
+        onError: () => {
+          setIsUpdating(null);
+        }
+      });
+    } catch {
+      setIsUpdating(null);
+    }
+  };
+
+  const removeItem = async (cartItemId: number) => {
+    setIsUpdating(cartItemId);
+    try {
+      await router.delete(`/cart/${cartItemId}`, {
+        preserveState: true,
+        onSuccess: () => {
+          setIsUpdating(null);
+        },
+        onError: () => {
+          setIsUpdating(null);
+        }
+      });
+    } catch {
+      setIsUpdating(null);
+    }
+  };
 
   return (
     <>
@@ -80,7 +119,7 @@ export default function Cart() {
                   </div>
                   Giỏ hàng
                 </h1>
-                <p className="text-slate-200 drop-shadow">{cartItems.length} sản phẩm đang chờ thanh toán</p>
+                <p className="text-slate-200 drop-shadow">{cartSummary.items_count} sản phẩm đang chờ thanh toán</p>
               </div>
             </div>
           </div>
@@ -88,8 +127,26 @@ export default function Cart() {
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
+            {cartItems.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="max-w-md mx-auto">
+                  <div className="mb-8">
+                    <ShoppingCart className="h-24 w-24 text-slate-300 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Giỏ hàng trống</h2>
+                    <p className="text-slate-600 dark:text-slate-300">
+                      Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá bộ sưu tập vinyl tuyệt vời của chúng tôi!
+                    </p>
+                  </div>
+                  <Link href="/products">
+                    <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3">
+                      Khám phá sản phẩm
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-6">
                 {cartItems.map((item) => (
                   <Card key={item.id} className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm group hover:shadow-2xl transition-all duration-300">
                     <CardContent className="p-6">
@@ -97,28 +154,51 @@ export default function Cart() {
                         {/* Vinyl Record Image */}
                         <div className="relative">
                           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                            <Disc3 className="h-16 w-16 text-amber-500 group-hover:rotate-12 transition-transform duration-300" />
+                            {item.product.image_url ? (
+                              <img
+                                src={item.product.image_url}
+                                alt={item.product.name}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            ) : (
+                              <Disc3 className="h-16 w-16 text-amber-500 group-hover:rotate-12 transition-transform duration-300" />
+                            )}
                           </div>
                           {/* Vinyl Label */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full shadow-md"></div>
-                          </div>
+                          {!item.product.image_url && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full shadow-md"></div>
+                            </div>
+                          )}
                         </div>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate group-hover:text-amber-600 transition-colors">
-                                {item.title}
-                              </h3>
-                              <p className="text-slate-600 dark:text-slate-300 font-medium">{item.artist}</p>
+                              <Link href={`/products/${item.product.slug}`}>
+                                <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate group-hover:text-amber-600 transition-colors hover:text-amber-600">
+                                  {item.product.name}
+                                </h3>
+                              </Link>
+                              <p className="text-slate-600 dark:text-slate-300 font-medium">
+                                {item.product.artists.map(artist => artist.name).join(', ')}
+                              </p>
                               <div className="flex gap-2 mt-2">
-                                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800">
-                                  {item.condition}
+                                <Badge variant="outline" className={`${
+                                  item.product.status === 'active'
+                                    ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800'
+                                    : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800'
+                                }`}>
+                                  {item.product.status === 'active' ? 'Còn hàng' : 'Hết hàng'}
                                 </Badge>
                                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800">
-                                  {item.format}
+                                  Vinyl LP
                                 </Badge>
+                                {item.product.is_featured && (
+                                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800">
+                                    Nổi bật
+                                  </Badge>
+                                )}
                               </div>
                             </div>
                             <Button
@@ -133,13 +213,25 @@ export default function Cart() {
                           <div className="flex justify-between items-center mt-6">
                             {/* Quantity Controls */}
                             <div className="flex items-center gap-3">
-                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200"
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={isUpdating === item.id || item.quantity <= 1}
+                              >
                                 <Minus className="h-4 w-4" />
                               </Button>
                               <span className="w-12 text-center font-semibold text-slate-900 dark:text-white">
                                 {item.quantity}
                               </span>
-                              <Button variant="outline" size="sm" className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200"
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}
+                              >
                                 <Plus className="h-4 w-4" />
                               </Button>
                             </div>
@@ -147,11 +239,11 @@ export default function Cart() {
                             {/* Price */}
                             <div className="text-right">
                               <p className="text-xl font-bold text-amber-600">
-                                {(item.price * item.quantity).toLocaleString('vi-VN')}₫
+                                {item.total_price.toLocaleString('vi-VN')}₫
                               </p>
                               {item.quantity > 1 && (
                                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                                  {item.price.toLocaleString('vi-VN')}₫ / cái
+                                  {item.unit_price.toLocaleString('vi-VN')}₫ / cái
                                 </p>
                               )}
                             </div>
@@ -161,6 +253,8 @@ export default function Cart() {
                               variant="ghost"
                               size="sm"
                               className="text-slate-400 hover:text-red-500 hover:bg-red-50 ml-4 transition-colors"
+                              onClick={() => removeItem(item.id)}
+                              disabled={isUpdating === item.id}
                             >
                               <Trash2 className="h-5 w-5" />
                             </Button>
@@ -184,12 +278,14 @@ export default function Cart() {
                   </CardHeader>
                   <CardContent className="space-y-4 p-6">
                     <div className="flex justify-between py-2">
-                      <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartItems.length} sản phẩm)</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{subtotal.toLocaleString('vi-VN')}₫</span>
+                      <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartSummary.total_items} sản phẩm)</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
                     </div>
                     <div className="flex justify-between py-2">
                       <span className="text-slate-600 dark:text-slate-300">Phí vận chuyển</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{shipping.toLocaleString('vi-VN')}₫</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {shipping === 0 ? 'Miễn phí' : `${shipping.toLocaleString('vi-VN')}₫`}
+                      </span>
                     </div>
                     <Separator className="border-slate-200 dark:border-slate-600" />
                     <div className="flex justify-between text-lg font-bold py-2">
@@ -255,8 +351,9 @@ export default function Cart() {
                     </div>
                   </CardContent>
                 </Card>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </main>
       </div>

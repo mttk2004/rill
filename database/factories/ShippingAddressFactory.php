@@ -40,21 +40,21 @@ class ShippingAddressFactory extends Factory
                 'wards' => ['Phường Cái Khế', 'Phường Thới Bình', 'Phường Hưng Lợi', 'Phường An Hòa', 'Phường Tân An']
             ]
         ];
-        
+
         $city = $this->faker->randomKey($vietnameseLocations);
         $locationData = $vietnameseLocations[$city];
         $district = $this->faker->randomElement($locationData['districts']);
         $ward = $this->faker->randomElement($locationData['wards']);
-        
+
         $streetNames = [
-            'Nguyễn Trãi', 'Lê Lợi', 'Hai Bà Trưng', 'Trần Hưng Đạo', 'Nguyễn Huệ', 
+            'Nguyễn Trãi', 'Lê Lợi', 'Hai Bà Trưng', 'Trần Hưng Đạo', 'Nguyễn Huệ',
             'Điện Biên Phủ', 'Võ Văn Tần', 'Cách Mạng Tháng Tam', 'Nguyễn Thị Minh Khai',
             'Lý Tự Trọng', 'Nam Kỳ Khởi Nghĩa', 'Pasteur', 'Lê Duẩn', 'Hoàng Văn Thụ'
         ];
-        
+
         $streetNumber = $this->faker->numberBetween(1, 999);
         $streetName = $this->faker->randomElement($streetNames);
-        
+
         return [
             'user_id' => User::factory(),
             'full_name' => $this->faker->name(),

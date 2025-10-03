@@ -32,8 +32,8 @@ import {
     Filter,
 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
 import { useCategoryMenu } from '@/hooks/use-category-menu';
+import { useCart } from '@/hooks/use-cart';
 import { Loader2 } from 'lucide-react';
 
 interface CustomerHeaderProps {
@@ -42,7 +42,7 @@ interface CustomerHeaderProps {
 
 // Icon mapping for different categories
 const getIconForCategory = (slug: string) => {
-    const iconMap: { [key: string]: any } = {
+    const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
         // Genres
         'rock': Music,
         'pop': Mic,
@@ -60,17 +60,9 @@ const getIconForCategory = (slug: string) => {
     return iconMap[slug] || Disc;
 };
 
-// Mock cart data
-const cartItems = [
-    { id: 1, title: 'Abbey Road - The Beatles', price: 450000, quantity: 1, image: '/placeholder-vinyl.jpg' },
-    { id: 2, title: 'Dark Side of the Moon - Pink Floyd', price: 380000, quantity: 1, image: '/placeholder-vinyl.jpg' },
-];
-
 export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
-    const [cartOpen, setCartOpen] = useState(false);
     const { data: categoryData, loading: categoryLoading, error: categoryError } = useCategoryMenu();
-    const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const { cartSummary } = useCart();
 
     return (
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
@@ -336,12 +328,12 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="relative">
                             <ShoppingCart className="h-4 w-4" />
-                            {cartItemCount > 0 && (
+                            {cartSummary.total_items > 0 && (
                                 <Badge
                                     variant="destructive"
                                     className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
                                 >
-                                    {cartItemCount}
+                                    {cartSummary.total_items}
                                 </Badge>
                             )}
                         </Button>
@@ -359,30 +351,29 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                                     </h3>
                                 </div>
                                 <Badge variant="secondary" className="bg-accent/10 text-accent border-accent/20">
-                                    {cartItemCount} sản phẩm
+                                    {cartSummary.total_items} sản phẩm
                                 </Badge>
                             </div>
                         </div>
 
-                        {cartItems.length > 0 ? (
+                        {cartSummary.items_count > 0 ? (
                             <>
-                                <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-                                    {cartItems.map((item) => (
-                                        <div key={item.id} className="flex items-center gap-3 p-4 border-b last:border-b-0 hover:bg-accent/5 transition-colors">
-                                            <div className="h-12 w-12 bg-gradient-to-br from-accent/10 to-accent/20 rounded-lg flex items-center justify-center">
-                                                <Disc className="h-6 w-6 text-accent" />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium truncate">{item.title}</p>
-                                                <p className="text-sm text-accent font-medium">
-                                                    {item.price.toLocaleString('vi-VN')}đ
-                                                </p>
-                                            </div>
-                                            <div className="text-sm font-bold text-vintage-primary dark:text-white">
-                                                x{item.quantity}
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div className="p-6 text-center">
+                                    <div className="h-16 w-16 bg-gradient-to-br from-accent/10 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                                        <ShoppingCart className="h-8 w-8 text-accent" />
+                                    </div>
+                                    <p
+                                        className="text-vintage-primary dark:text-white font-medium mb-2"
+                                        style={{ fontFamily: "'Playfair Display', serif" }}
+                                    >
+                                        {cartSummary.total_items} sản phẩm trong giỏ hàng
+                                    </p>
+                                    <p
+                                        className="text-vintage-tertiary dark:text-vintage-tertiary text-sm mb-4"
+                                        style={{ fontFamily: "'Crimson Text', serif" }}
+                                    >
+                                        Xem chi tiết sản phẩm và thanh toán
+                                    </p>
                                 </div>
 
                                 <div className="p-4 border-t bg-gradient-to-r from-accent/5 to-accent/10">
@@ -397,7 +388,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                                             className="font-black text-xl text-accent"
                                             style={{ fontFamily: "'Playfair Display', serif" }}
                                         >
-                                            {cartTotal.toLocaleString('vi-VN')}đ
+                                            {cartSummary.formatted_total}
                                         </span>
                                     </div>
                                     <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-medium" asChild>

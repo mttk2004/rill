@@ -52,7 +52,7 @@ class Product extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($product) {
             if (empty($product->slug)) {
                 $product->slug = Str::slug($product->name);
@@ -61,7 +61,7 @@ class Product extends Model
                 $product->sku = 'VINYL-' . strtoupper(Str::random(8));
             }
         });
-        
+
         static::updating(function ($product) {
             if ($product->isDirty('name') && empty($product->getOriginal('slug'))) {
                 $product->slug = Str::slug($product->name);
@@ -166,6 +166,14 @@ class Product extends Model
     public function shoppingCartItems()
     {
         return $this->hasMany(ShoppingCartItem::class);
+    }
+
+    /**
+     * Get the image URL attribute.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 
     /**
