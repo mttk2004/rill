@@ -4,10 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/navigation";
-import { Minus, Plus, Trash2, ShoppingCart, Heart, ArrowLeft, Disc3 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, Heart, ArrowLeft, Disc3, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface CartItem {
   id: number;
@@ -48,42 +48,62 @@ interface CartPageProps extends SharedData {
 export default function Cart() {
   const { auth, cartItems, cartSummary } = usePage<CartPageProps>().props;
   const [isUpdating, setIsUpdating] = useState<number | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const shipping = cartSummary.total_amount >= 1000000 ? 0 : 50000;
   const total = cartSummary.total_amount + shipping;
 
-  const updateQuantity = async (cartItemId: number, newQuantity: number) => {
-    setIsUpdating(cartItemId);
-    try {
-      await router.put(`/cart/${cartItemId}`, { quantity: newQuantity }, {
-        preserveState: true,
-        onSuccess: () => {
-          setIsUpdating(null);
-        },
-        onError: () => {
-          setIsUpdating(null);
-        }
-      });
-    } catch {
-      setIsUpdating(null);
+  // Auto-hide messages after 3 seconds
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 3000);
+      return () => clearTimeout(timer);
     }
+  }, [message]);
+
+  const updateQuantity = async (cartItemId: number, newQuantity: number) => {
+    if (newQuantity <= 0) {
+      removeItem(cartItemId);
+      return;
+    }
+    
+    setIsUpdating(cartItemId);
+    setMessage(null);
+    
+    router.put(`/cart/${cartItemId}`, { quantity: newQuantity }, {
+      preserveState: true,
+      onSuccess: (page) => {
+        setIsUpdating(null);
+        setMessage({ type: 'success', text: 'Đã cập nhật số lượng sản phẩm!' });
+      },
+      onError: (errors) => {
+        setIsUpdating(null);
+        const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể cập nhật số lượng';
+        setMessage({ type: 'error', text: typeof errorMessage === 'string' ? errorMessage : 'Có lỗi xảy ra khi cập nhật số lượng' });
+      }
+    });
   };
 
   const removeItem = async (cartItemId: number) => {
-    setIsUpdating(cartItemId);
-    try {
-      await router.delete(`/cart/${cartItemId}`, {
-        preserveState: true,
-        onSuccess: () => {
-          setIsUpdating(null);
-        },
-        onError: () => {
-          setIsUpdating(null);
-        }
-      });
-    } catch {
-      setIsUpdating(null);
+    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+      return;
     }
+    
+    setIsUpdating(cartItemId);
+    setMessage(null);
+    
+    router.delete(`/cart/${cartItemId}`, {
+      preserveState: true,
+      onSuccess: (page) => {
+        setIsUpdating(null);
+        setMessage({ type: 'success', text: 'Đã xóa sản phẩm khỏi giỏ hàng!' });
+      },
+      onError: (errors) => {
+        setIsUpdating(null);
+        const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể xóa sản phẩm';
+        setMessage({ type: 'error', text: typeof errorMessage === 'string' ? errorMessage : 'Có lỗi xảy ra khi xóa sản phẩm' });
+      }
+    });
   };
 
   return (
@@ -124,6 +144,32 @@ export default function Cart() {
             </div>
           </div>
         </div>
+
+        {/* Success/Error Message */}
+        {message && (
+          <div className={`fixed top-4 right-4 z-50 max-w-md p-4 rounded-xl shadow-lg border transition-all duration-300 transform ${
+            message.type === 'success' 
+              ? 'bg-green-50 border-green-200 text-green-800' 
+              : 'bg-red-50 border-red-200 text-red-800'
+          }`}>
+            <div className="flex items-center gap-3">
+              {message.type === 'success' ? (
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              ) : (
+                <XCircle className="h-5 w-5 text-red-600" />
+              )}
+              <span className="font-medium">{message.text}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMessage(null)}
+                className="ml-auto h-6 w-6 p-0 hover:bg-transparent"
+              >
+                ×
+              </Button>
+            </div>
+          </div>
+        )}
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-7xl mx-auto">
@@ -216,23 +262,38 @@ export default function Cart() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200"
+                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200 transition-all duration-200"
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 disabled={isUpdating === item.id || item.quantity <= 1}
                               >
-                                <Minus className="h-4 w-4" />
+                                {isUpdating === item.id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  <Minus className="h-4 w-4" />
+                                )}
                               </Button>
-                              <span className="w-12 text-center font-semibold text-slate-900 dark:text-white">
-                                {item.quantity}
-                              </span>
+                              <div className="relative">
+                                <span className="w-12 text-center font-semibold text-slate-900 dark:text-white block">
+                                  {item.quantity}
+                                </span>
+                                {isUpdating === item.id && (
+                                  <div className="absolute inset-0 bg-white/80 dark:bg-slate-800/80 rounded flex items-center justify-center">
+                                    <Loader2 className="h-3 w-3 animate-spin text-amber-600" />
+                                  </div>
+                                )}
+                              </div>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200"
+                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200 transition-all duration-200"
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                 disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}
                               >
-                                <Plus className="h-4 w-4" />
+                                {isUpdating === item.id ? (
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                ) : (
+                                  <Plus className="h-4 w-4" />
+                                )}
                               </Button>
                             </div>
 
@@ -250,13 +311,23 @@ export default function Cart() {
 
                             {/* Remove Button */}
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              className="text-slate-400 hover:text-red-500 hover:bg-red-50 ml-4 transition-colors"
+                              className="px-3 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all duration-200 min-w-[80px]"
                               onClick={() => removeItem(item.id)}
                               disabled={isUpdating === item.id}
                             >
-                              <Trash2 className="h-5 w-5" />
+                              {isUpdating === item.id ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  Removing
+                                </>
+                              ) : (
+                                <>
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Remove
+                                </>
+                              )}
                             </Button>
                           </div>
                         </div>
