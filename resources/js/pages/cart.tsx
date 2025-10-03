@@ -46,12 +46,21 @@ interface CartPageProps extends SharedData {
 }
 
 export default function Cart() {
-  const { auth, cartItems, cartSummary } = usePage<CartPageProps>().props;
+  const pageProps = usePage<CartPageProps & { flash?: { message?: string } }>().props;
+  const { auth, cartItems, cartSummary } = pageProps;
   const [isUpdating, setIsUpdating] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const shipping = cartSummary.total_amount >= 1000000 ? 0 : 50000;
   const total = cartSummary.total_amount + shipping;
+
+  // Handle flash messages from Laravel and auto-hide after 3 seconds
+  useEffect(() => {
+    if (pageProps.flash?.message) {
+      setMessage({ type: 'success', text: pageProps.flash.message });
+      setIsUpdating(null); // Reset loading state
+    }
+  }, [pageProps.flash]);
 
   // Auto-hide messages after 3 seconds
   useEffect(() => {
@@ -66,18 +75,15 @@ export default function Cart() {
       removeItem(cartItemId);
       return;
     }
-    
+
     setIsUpdating(cartItemId);
     setMessage(null);
-    
+
     router.put(`/cart/${cartItemId}`, { quantity: newQuantity }, {
-      preserveState: true,
-      onSuccess: (page) => {
+      onFinish: () => {
         setIsUpdating(null);
-        setMessage({ type: 'success', text: 'Đã cập nhật số lượng sản phẩm!' });
       },
       onError: (errors) => {
-        setIsUpdating(null);
         const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể cập nhật số lượng';
         setMessage({ type: 'error', text: typeof errorMessage === 'string' ? errorMessage : 'Có lỗi xảy ra khi cập nhật số lượng' });
       }
@@ -88,18 +94,15 @@ export default function Cart() {
     if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
       return;
     }
-    
+
     setIsUpdating(cartItemId);
     setMessage(null);
-    
+
     router.delete(`/cart/${cartItemId}`, {
-      preserveState: true,
-      onSuccess: (page) => {
+      onFinish: () => {
         setIsUpdating(null);
-        setMessage({ type: 'success', text: 'Đã xóa sản phẩm khỏi giỏ hàng!' });
       },
       onError: (errors) => {
-        setIsUpdating(null);
         const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể xóa sản phẩm';
         setMessage({ type: 'error', text: typeof errorMessage === 'string' ? errorMessage : 'Có lỗi xảy ra khi xóa sản phẩm' });
       }
@@ -148,8 +151,8 @@ export default function Cart() {
         {/* Success/Error Message */}
         {message && (
           <div className={`fixed top-4 right-4 z-50 max-w-md p-4 rounded-xl shadow-lg border transition-all duration-300 transform ${
-            message.type === 'success' 
-              ? 'bg-green-50 border-green-200 text-green-800' 
+            message.type === 'success'
+              ? 'bg-green-50 border-green-200 text-green-800'
               : 'bg-red-50 border-red-200 text-red-800'
           }`}>
             <div className="flex items-center gap-3">

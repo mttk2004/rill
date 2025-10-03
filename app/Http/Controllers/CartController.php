@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 
 class CartController extends Controller
 {
@@ -76,7 +77,7 @@ class CartController extends Controller
     /**
      * Update cart item quantity
      */
-    public function update(Request $request, int $cartItemId): JsonResponse
+    public function update(Request $request, int $cartItemId)
     {
         $request->validate([
             'quantity' => 'required|integer|min:0',
@@ -87,17 +88,25 @@ class CartController extends Controller
             $request->input('quantity')
         );
 
-        return response()->json($result);
+        if (!$result['success']) {
+            return back()->withErrors(['message' => $result['message']]);
+        }
+
+        return back()->with('message', $result['message']);
     }
 
     /**
      * Remove item from cart
      */
-    public function remove(int $cartItemId): JsonResponse
+    public function remove(int $cartItemId)
     {
         $result = $this->cartService->removeFromCart($cartItemId);
 
-        return response()->json($result);
+        if (!$result['success']) {
+            return back()->withErrors(['message' => $result['message']]);
+        }
+
+        return back()->with('message', $result['message']);
     }
 
     /**
