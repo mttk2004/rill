@@ -54,13 +54,7 @@ export default function Cart() {
   const shipping = cartSummary.total_amount >= 1000000 ? 0 : 50000;
   const total = cartSummary.total_amount + shipping;
 
-  // Handle flash messages from Laravel and auto-hide after 3 seconds
-  useEffect(() => {
-    if (pageProps.flash?.message) {
-      setMessage({ type: 'success', text: pageProps.flash.message });
-      setIsUpdating(null); // Reset loading state
-    }
-  }, [pageProps.flash]);
+  // Flash messages are now handled directly in onSuccess callbacks
 
   // Auto-hide messages after 3 seconds
   useEffect(() => {
@@ -80,8 +74,14 @@ export default function Cart() {
     setMessage(null);
 
     router.put(`/cart/${cartItemId}`, { quantity: newQuantity }, {
+      preserveScroll: true,
+      preserveState: true,
+      only: ['cartItems', 'cartSummary'],
       onFinish: () => {
         setIsUpdating(null);
+      },
+      onSuccess: () => {
+        setMessage({ type: 'success', text: 'Đã cập nhật số lượng!' });
       },
       onError: (errors) => {
         const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể cập nhật số lượng';
@@ -99,8 +99,14 @@ export default function Cart() {
     setMessage(null);
 
     router.delete(`/cart/${cartItemId}`, {
+      preserveScroll: true,
+      preserveState: true,
+      only: ['cartItems', 'cartSummary'],
       onFinish: () => {
         setIsUpdating(null);
+      },
+      onSuccess: () => {
+        setMessage({ type: 'success', text: 'Đã xóa sản phẩm!' });
       },
       onError: (errors) => {
         const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể xóa sản phẩm';

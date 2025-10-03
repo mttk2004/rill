@@ -39,7 +39,8 @@ export function Pagination({
 
         router.get('/products', newFilters, {
             preserveState: true,
-            preserveScroll: false,
+            preserveScroll: true,
+            only: ['products', 'pagination', 'filters'],
         });
     };
 

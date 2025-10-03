@@ -56,7 +56,8 @@ export default function Products({ products: productsData, pagination, filters, 
 
         router.get('/products', updatedFilters, {
             preserveState: true,
-            preserveScroll: false,
+            preserveScroll: true,
+            only: ['products', 'pagination', 'filters'],
         });
     };
 
@@ -80,7 +81,8 @@ export default function Products({ products: productsData, pagination, filters, 
 
         router.get('/products', currentFilters, {
             preserveState: true,
-            preserveScroll: false,
+            preserveScroll: true,
+            only: ['products', 'pagination', 'filters'],
         });
     };
 
@@ -186,7 +188,8 @@ export default function Products({ products: productsData, pagination, filters, 
                                                 setSearchTerm('');
                                                 router.get('/products', {}, {
                                                     preserveState: true,
-                                                    preserveScroll: false,
+                                                    preserveScroll: true,
+                                                    only: ['products', 'pagination', 'filters'],
                                                 });
                                             }}
                                             className="h-10 px-4 border-accent/30 text-accent hover:bg-gradient-to-r hover:from-accent hover:to-amber-600 hover:text-white hover:border-transparent transition-all duration-300 shadow-sm"
@@ -634,7 +637,8 @@ export default function Products({ products: productsData, pagination, filters, 
                                     setSearchTerm('');
                                     router.get('/products', {}, {
                                         preserveState: true,
-                                        preserveScroll: false,
+                                        preserveScroll: true,
+                                        only: ['products', 'pagination', 'filters'],
                                     });
                                 }}
                                 className="bg-gradient-to-r from-accent to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0"
