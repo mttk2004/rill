@@ -1,0 +1,30 @@
+{
+  "name": "Rill Vinyl Store Dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "laravel.test",
+  "workspaceFolder": "/var/www/html",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "mikestead.dotenv",
+        "ryannaddy.laravel-artisan",
+        "onecentlin.laravel-blade"
+      ]
+    }
+  },
+  "forwardPorts": [
+    8000,
+    5173
+  ],
+  "postCreateCommand": "composer install && npm install",
+  "remoteUser": "sail",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    }
+  }
+}
