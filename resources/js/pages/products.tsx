@@ -8,8 +8,10 @@ import { Pagination } from "@/components/ui/pagination";
 import { Search, Star, Grid, List, Disc3, Heart, Music, Filter, ShoppingCart } from "lucide-react";
 import { type ProductsPageData, Product } from '@/types';
 import { Head, router, usePage, Link } from '@inertiajs/react';
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, MouseEvent } from 'react';
 import { type SharedData } from '@/types';
+import { useCart } from '@/hooks/use-cart';
+import { Toaster, toast } from 'sonner';
 
 interface ProductsProps extends ProductsPageData {
     search?: string;
@@ -22,8 +24,20 @@ interface ProductsProps extends ProductsPageData {
 
 export default function Products({ products: productsData, pagination, filters, ...props }: ProductsProps) {
     const { auth } = usePage<SharedData>().props;
+    const { addToCart } = useCart();
     const [searchTerm, setSearchTerm] = useState(props.search || '');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+    const handleAddToCart = (e: MouseEvent<HTMLButtonElement>, productId: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        toast.promise(addToCart(productId, 1), {
+            loading: 'Đang thêm vào giỏ hàng...',
+            success: 'Đã thêm sản phẩm vào giỏ hàng!',
+            error: (err) => err.message || 'Đã xảy ra lỗi.',
+        });
+    };
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
@@ -106,6 +120,7 @@ export default function Products({ products: productsData, pagination, filters, 
     return (
         <>
             <Head title="Sản phẩm - Rill" />
+            <Toaster richColors />
             <div className="min-h-screen bg-background">
                 <Navigation user={auth.user} />
 
@@ -584,11 +599,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                                             size="sm"
                                                             variant="outline"
                                                             className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                console.log('Add to cart:', product.id);
-                                                            }}
+                                                            onClick={(e) => handleAddToCart(e, product.id)}
                                                         >
                                                             <ShoppingCart className="w-4 h-4 mr-2" />
                                                             Thêm vào giỏ
