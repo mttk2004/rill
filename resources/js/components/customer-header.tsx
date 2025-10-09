@@ -62,7 +62,7 @@ const getIconForCategory = (slug: string) => {
 
 export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
     const { data: categoryData, loading: categoryLoading, error: categoryError } = useCategoryMenu();
-    const { cartSummary } = useCart();
+    const { cartSummary, cartItems, fetchCartItems } = useCart();
 
     return (
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
@@ -324,7 +324,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                 </DropdownMenu>
 
                 {/* Cart with flyout */}
-                <DropdownMenu>
+                <DropdownMenu onOpenChange={(open) => open && fetchCartItems()}>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="relative">
                             <ShoppingCart className="h-4 w-4" />
@@ -356,26 +356,24 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                             </div>
                         </div>
 
-                        {cartSummary.items_count > 0 ? (
+                        {cartItems.length > 0 ? (
                             <>
-                                <div className="p-6 text-center">
-                                    <div className="h-16 w-16 bg-gradient-to-br from-accent/10 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <ShoppingCart className="h-8 w-8 text-accent" />
-                                    </div>
-                                    <p
-                                        className="text-vintage-primary dark:text-white font-medium mb-2"
-                                        style={{ fontFamily: "'Playfair Display', serif" }}
-                                    >
-                                        {cartSummary.total_items} sản phẩm trong giỏ hàng
-                                    </p>
-                                    <p
-                                        className="text-vintage-tertiary dark:text-vintage-tertiary text-sm mb-4"
-                                        style={{ fontFamily: "'Crimson Text', serif" }}
-                                    >
-                                        Xem chi tiết sản phẩm và thanh toán
-                                    </p>
+                                <div className="max-h-64 overflow-y-auto">
+                                    {cartItems.map((item) => (
+                                        <div key={item.id} className="flex items-center gap-3 p-4 border-b hover:bg-accent/5 transition-colors">
+                                            <div className="h-12 w-12 bg-gradient-to-br from-accent/10 to-accent/20 rounded-lg flex items-center justify-center">
+                                                <Disc className="h-6 w-6 text-accent" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate">{item.product.name}</p>
+                                                <p className="text-xs text-muted-foreground truncate">{item.product.artists.map(a => a.name).join(', ')}</p>
+                                                <p className="text-sm text-accent font-medium mt-1">
+                                                    {item.quantity} x {item.unit_price.toLocaleString('vi-VN')}đ
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-
                                 <div className="p-4 border-t bg-gradient-to-r from-accent/5 to-accent/10">
                                     <div className="flex items-center justify-between mb-3">
                                         <span
