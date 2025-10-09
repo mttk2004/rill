@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -34,78 +35,8 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/orders', function () {
         return Inertia::render('orders');
     })->name('orders');
-    Route::get('/orders/{order}', function () {
-        // Mock data for testing - in real app this would come from database
-        $mockOrder = [
-            'id' => 'RL-001234',
-            'date' => '2024-01-20',
-            'status' => 'delivered',
-            'total' => 1670000,
-            'delivered_date' => '2024-01-24',
-            'payment_method' => 'COD',
-            'items' => [
-                [
-                    'id' => 1,
-                    'title' => 'Rumours',
-                    'artist_name' => 'Fleetwood Mac',
-                    'price' => 490000,
-                    'image_url' => null,
-                    'quantity' => 1,
-                    'sku' => 'FL-RUM-001'
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'Hotel California',
-                    'artist_name' => 'Eagles',
-                    'price' => 420000,
-                    'image_url' => null,
-                    'quantity' => 1,
-                    'sku' => 'EG-HOT-001'
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'The Wall',
-                    'artist_name' => 'Pink Floyd',
-                    'price' => 680000,
-                    'image_url' => null,
-                    'quantity' => 1,
-                    'sku' => 'PF-WAL-001'
-                ]
-            ],
-            'shipping_address' => [
-                'name' => 'Nguyễn Văn A',
-                'phone' => '0901234567',
-                'address' => '123 Nguyễn Văn A, Quận 1, TP.HCM',
-                'notes' => 'Gọi trước khi giao hàng'
-            ],
-            'timeline' => [
-                [
-                    'status' => 'pending',
-                    'date' => '2024-01-20 10:30',
-                    'description' => 'Đơn hàng được đặt'
-                ],
-                [
-                    'status' => 'confirmed',
-                    'date' => '2024-01-20 14:00',
-                    'description' => 'Đơn hàng được xác nhận'
-                ],
-                [
-                    'status' => 'shipped',
-                    'date' => '2024-01-22 09:00',
-                    'description' => 'Đơn hàng được giao cho đơn vị vận chuyển'
-                ],
-                [
-                    'status' => 'delivered',
-                    'date' => '2024-01-24 16:30',
-                    'description' => 'Đơn hàng đã được giao thành công'
-                ]
-            ]
-        ];
-
-        return Inertia::render('order-detail', [
-            'order' => $mockOrder
-        ]);
-    })->name('orders.show');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/wishlist', function () {
         return Inertia::render('wishlist');
     })->name('wishlist');
