@@ -28,7 +28,6 @@ Route::get('/support', function () {
 // Customer routes (authenticated only)
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart');
-    Route::get('/cart/items', [App\Http\Controllers\CartController::class, 'items'])->name('cart.items');
     Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
     Route::put('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
