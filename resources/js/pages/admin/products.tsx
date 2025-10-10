@@ -176,10 +176,6 @@ const AdminProducts = () => {
     return price.toLocaleString('vi-VN') + 'đ';
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Head title="Quản lý sản phẩm" />

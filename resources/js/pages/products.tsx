@@ -20,9 +20,10 @@ interface ProductsProps extends ProductsPageData {
     artist?: string;
     sort?: string;
     page?: number;
+    cartItemProductIds: string[];
 }
 
-export default function Products({ products: productsData, pagination, filters, ...props }: ProductsProps) {
+export default function Products({ products: productsData, pagination, filters, cartItemProductIds, ...props }: ProductsProps) {
     const { auth } = usePage<SharedData>().props;
     const { addToCart } = useCart();
     const [searchTerm, setSearchTerm] = useState(props.search || '');
@@ -600,6 +601,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                                             variant="outline"
                                                             className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
                                                             onClick={(e) => handleAddToCart(e, product.id)}
+                                                            disabled={cartItemProductIds.includes(product.id)}
                                                         >
                                                             <ShoppingCart className="w-4 h-4 mr-2" />
                                                             Thêm vào giỏ

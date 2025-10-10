@@ -62,7 +62,7 @@ const getIconForCategory = (slug: string) => {
 
 export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
     const { data: categoryData, loading: categoryLoading, error: categoryError } = useCategoryMenu();
-    const { cartSummary, cartItems, fetchCartItems } = useCart();
+    const { cartSummary, cartItems, refresh: fetchCartData } = useCart();
 
     return (
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
@@ -324,7 +324,7 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                 </DropdownMenu>
 
                 {/* Cart with flyout */}
-                <DropdownMenu onOpenChange={(open) => open && fetchCartItems()}>
+                <DropdownMenu onOpenChange={(open) => open && fetchCartData()}>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="relative">
                             <ShoppingCart className="h-4 w-4" />
@@ -366,7 +366,6 @@ export function CustomerHeader({ breadcrumbs = [] }: CustomerHeaderProps) {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium truncate">{item.product.name}</p>
-                                                <p className="text-xs text-muted-foreground truncate">{item.product.artists.map(a => a.name).join(', ')}</p>
                                                 <p className="text-sm text-accent font-medium mt-1">
                                                     {item.quantity} x {item.unit_price.toLocaleString('vi-VN')}đ
                                                 </p>

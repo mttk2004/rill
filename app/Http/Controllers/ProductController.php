@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Services\CartService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,10 +12,12 @@ use Inertia\Response;
 class ProductController extends Controller
 {
     protected ProductService $productService;
+    protected CartService $cartService;
 
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, CartService $cartService)
     {
         $this->productService = $productService;
+        $this->cartService = $cartService;
     }
 
     /**
@@ -25,11 +28,14 @@ class ProductController extends Controller
         $filters = $request->only(['search', 'genre', 'label', 'artist', 'sort', 'page']);
 
         $result = $this->productService->getProducts($filters);
+        $cartItems = $this->cartService->getCartItems();
+        $cartItemProductIds = $cartItems->pluck('product_id')->toArray();
 
         return Inertia::render('products', [
             'products' => $result['products'],
             'filters' => $result['filters'],
             'pagination' => $result['pagination'],
+            'cartItemProductIds' => $cartItemProductIds,
             // Pass filter parameters to frontend
             'search' => $filters['search'] ?? null,
             'genre' => $filters['genre'] ?? null,

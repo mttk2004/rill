@@ -51,7 +51,7 @@ export interface Artist {
 }
 
 export interface Product {
-    id: number;
+    id: string;
     name: string;
     slug: string;
     description: string;
@@ -70,6 +70,10 @@ export interface Product {
     meta_title?: string;
     meta_description?: string;
     artists: Artist[];
+    main_artists?: Artist[];
+    in_stock?: boolean;
+    low_stock?: boolean;
+    discount_percentage?: number;
     created_at: string;
     updated_at: string;
     deleted_at?: string;
@@ -91,11 +95,17 @@ export interface Pagination {
     to: number;
 }
 
+export interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
 export interface ProductsPageData {
     products: {
         data: Product[];
-        links: any[];
-        meta: any;
+        links: PaginationLink[];
+        meta: Pagination;
     };
     filters: ProductFilters;
     pagination: Pagination;
