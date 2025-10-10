@@ -11,7 +11,7 @@ import { Head, router, usePage, Link } from '@inertiajs/react';
 import { useState, FormEvent, MouseEvent } from 'react';
 import { type SharedData } from '@/types';
 import { useCart } from '@/hooks/use-cart';
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface ProductsProps extends ProductsPageData {
     search?: string;
@@ -121,7 +121,6 @@ export default function Products({ products: productsData, pagination, filters, 
     return (
         <>
             <Head title="Sản phẩm - Rill" />
-            <Toaster richColors />
             <div className="min-h-screen bg-background">
                 <Navigation user={auth.user} />
 
