@@ -25,6 +25,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { useCart } from "@/hooks/use-cart";
 
 interface NavigationProps {
   user?: {
@@ -34,6 +35,7 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ user }: NavigationProps) => {
+  const { cartSummary, cartItems, loading } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
@@ -112,34 +114,61 @@ export const Navigation = ({ user }: NavigationProps) => {
                 <HoverCard>
                   <HoverCardTrigger asChild>
                     <Button variant="ghost" size="icon" asChild>
-                      <Link href="/cart">
+                      <Link href="/cart" className="relative">
+                        {cartSummary.items_count > 0 && (
+                          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">
+                            {cartSummary.items_count}
+                          </span>
+                        )}
                         <ShoppingBag className="h-4 w-4" />
                       </Link>
                     </Button>
                   </HoverCardTrigger>
                   <HoverCardContent className="w-80">
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-semibold">Giỏ hàng</h4>
-                      <p className="text-sm text-muted-foreground">
-                        3 sản phẩm • 1.550.000₫
-                      </p>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-muted rounded"></div>
-                            <span>Rumours</span>
-                          </div>
-                          <span>490.000₫</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-muted rounded"></div>
-                            <span>Hotel California</span>
-                          </div>
-                          <span>420.000₫</span>
-                        </div>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-sm font-semibold">Giỏ hàng</h4>
+                        <span className="text-sm text-muted-foreground">
+                          {cartSummary.items_count} sản phẩm
+                        </span>
                       </div>
-                      <Button size="sm" className="w-full">Thanh toán</Button>
+
+                      {loading ? (
+                        <div className="text-center text-sm text-muted-foreground py-4">Đang tải...</div>
+                      ) : cartItems.length === 0 ? (
+                        <div className="text-center text-sm text-muted-foreground py-4">
+                          Giỏ hàng của bạn đang trống.
+                        </div>
+                      ) : (
+                        <div className="max-h-60 overflow-y-auto space-y-3 pr-2">
+                          {cartItems.map((item) => (
+                            <div key={item.id} className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-3 overflow-hidden">
+                                <div className="w-10 h-10 bg-muted rounded-md flex-shrink-0">
+                                  {/* Placeholder for image */}
+                                </div>
+                                <div className="flex-grow overflow-hidden">
+                                  <p className="font-medium truncate">{item.product.name}</p>
+                                  <p className="text-muted-foreground">SL: {item.quantity}</p>
+                                </div>
+                              </div>
+                              <span className="font-semibold">{item.unit_price.toLocaleString('vi-VN')}đ</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {cartItems.length > 0 && (
+                        <div className="border-t pt-4 space-y-3">
+                          <div className="flex justify-between items-center text-sm font-semibold">
+                            <span>Tổng cộng</span>
+                            <span>{cartSummary.formatted_total}</span>
+                          </div>
+                          <Button size="sm" className="w-full" asChild>
+                            <Link href="/cart">Đến giỏ hàng</Link>
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </HoverCardContent>
                 </HoverCard>

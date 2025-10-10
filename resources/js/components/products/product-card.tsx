@@ -14,9 +14,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         }).format(price);
     };
 
-    const mainArtistsText = product.main_artists.length > 0 
-        ? product.main_artists.join(', ') 
-        : 'Unknown Artist';
+    const mainArtistsText = (product.main_artists && product.main_artists.length > 0)
+        ? product.main_artists.map(a => a.name).join(', ')
+        : (product.artists[0]?.name || 'Unknown Artist');
 
     return (
         <div className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border border-gray-200 dark:border-gray-700">

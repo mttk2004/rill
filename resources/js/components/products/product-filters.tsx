@@ -29,18 +29,18 @@ export default function ProductFilters({ filters, currentFilters }: ProductFilte
     };
 
     const updateFilter = (filterType: string, value: string) => {
-        const newFilters = { ...currentFilters };
-        
-        if (newFilters[filterType as keyof typeof newFilters] === value) {
-            // Remove filter if clicking the same value
-            delete newFilters[filterType as keyof typeof newFilters];
+        const newFilters: Record<string, string | undefined> = { ...currentFilters };
+
+        if (newFilters[filterType] === value) {
+            // Remove filter if clicking the same value again
+            delete newFilters[filterType];
         } else {
             // Set new filter value
-            (newFilters as any)[filterType] = value;
+            newFilters[filterType] = value;
         }
 
-        // Remove page parameter when filtering
-        delete (newFilters as any).page;
+        // Reset page to 1 when filters change
+        delete newFilters.page;
 
         router.get('/products', newFilters, {
             preserveState: true,

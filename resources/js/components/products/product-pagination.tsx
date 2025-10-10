@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductPaginationProps {
     pagination: Pagination;
-    currentFilters: Record<string, any>;
+    currentFilters: Record<string, string | number | undefined>;
 }
 
 export default function ProductPagination({ pagination, currentFilters }: ProductPaginationProps) {
@@ -24,7 +24,7 @@ export default function ProductPagination({ pagination, currentFilters }: Produc
         const maxVisible = 5;
         
         let start = Math.max(1, current_page - Math.floor(maxVisible / 2));
-        let end = Math.min(last_page, start + maxVisible - 1);
+        const end = Math.min(last_page, start + maxVisible - 1);
         
         if (end - start + 1 < maxVisible) {
             start = Math.max(1, end - maxVisible + 1);

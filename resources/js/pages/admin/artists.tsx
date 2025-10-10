@@ -15,48 +15,9 @@ import {
   Download,
   Upload,
   Globe,
-  Calendar,
-  Users,
-  Disc,
-  TrendingUp
+  Calendar
 } from "lucide-react";
 import { Head } from "@inertiajs/react";
-
-// Helper functions
-const getStatusBadge = (isActive: boolean) => {
-  if (isActive) {
-    return (
-      <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
-        Hoạt động
-      </Badge>
-    );
-  }
-  return (
-    <Badge className="bg-slate-100 text-slate-600 hover:bg-slate-100 border-slate-200">
-      Không hoạt động
-    </Badge>
-  );
-};
-
-const getProductCount = (artistId: number) => {
-  // In real app, this would come from the backend
-  const productCounts = {
-    1: 12,
-    2: 8,
-    3: 15,
-    4: 6,
-    5: 23
-  };
-  return productCounts[artistId as keyof typeof productCounts] || 0;
-};
-
-const formatDate = (dateString: string) => {
-  return new Intl.DateTimeFormat('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  }).format(new Date(dateString));
-};
 
 const AdminArtists = () => {
 
