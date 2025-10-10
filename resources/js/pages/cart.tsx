@@ -76,12 +76,12 @@ export default function Cart() {
     router.put(`/cart/${cartItemId}`, { quantity: newQuantity }, {
       preserveScroll: true,
       preserveState: true,
-      only: ['cartItems', 'cartSummary'],
       onFinish: () => {
         setIsUpdating(null);
       },
       onSuccess: () => {
         setMessage({ type: 'success', text: 'Đã cập nhật số lượng!' });
+        router.reload();
       },
       onError: (errors) => {
         const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể cập nhật số lượng';
@@ -101,12 +101,12 @@ export default function Cart() {
     router.delete(`/cart/${cartItemId}`, {
       preserveScroll: true,
       preserveState: true,
-      only: ['cartItems', 'cartSummary'],
       onFinish: () => {
         setIsUpdating(null);
       },
       onSuccess: () => {
         setMessage({ type: 'success', text: 'Đã xóa sản phẩm!' });
+        router.reload();
       },
       onError: (errors) => {
         const errorMessage = errors.message || Object.values(errors)[0] || 'Không thể xóa sản phẩm';

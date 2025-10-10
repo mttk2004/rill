@@ -129,26 +129,4 @@ class CartController extends Controller
         return response()->json($summary);
     }
 
-    /**
-     * Get cart items as JSON for flyout menu
-     */
-    public function items(): JsonResponse
-    {
-        $cartItems = $this->cartService->getCartItems();
-
-        $formattedItems = $cartItems->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'quantity' => $item->quantity,
-                'unit_price' => $item->unit_price,
-                'product' => [
-                    'name' => $item->product->name,
-                    'slug' => $item->product->slug,
-                    'image_url' => $item->product->image_url,
-                ],
-            ];
-        });
-
-        return response()->json($formattedItems);
-    }
 }
