@@ -66,7 +66,6 @@ export default function ProductDetail({ product, cartItemProductIds }: ProductDe
     return (
         <>
             <Head title={`${product.name} - Rill`} />
-            <Toaster richColors />
             <div className="min-h-screen bg-background">
                 <Navigation user={auth.user} />
 
