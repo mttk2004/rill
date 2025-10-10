@@ -8,7 +8,7 @@ import { Link, Head, usePage } from '@inertiajs/react';
 import { useState, MouseEvent } from "react";
 import { Product, SharedData } from '@/types';
 import { useCart } from "@/hooks/use-cart";
-import { Toaster, toast } from 'sonner';
+import { toast } from 'sonner';
 
 interface ProductDetailProps {
     product: Product;
