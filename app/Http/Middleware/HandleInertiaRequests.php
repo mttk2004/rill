@@ -57,6 +57,7 @@ class HandleInertiaRequests extends Middleware
                             'quantity' => $item->quantity,
                             'unit_price' => $item->unit_price,
                             'product' => [
+                                'id' => $item->product->id,
                                 'name' => $item->product->name,
                                 'slug' => $item->product->slug,
                                 'image_url' => $item->product->image_url,
