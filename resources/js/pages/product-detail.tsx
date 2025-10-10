@@ -5,21 +5,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/navigation";
 import { Heart, ShoppingCart, Star, Disc3, Calendar, Music, ArrowLeft } from "lucide-react";
 import { Link, Head, usePage } from '@inertiajs/react';
-import { useState } from "react";
+import { useState, MouseEvent } from "react";
 import { Product, SharedData } from '@/types';
+import { useCart } from "@/hooks/use-cart";
+import { Toaster, toast } from 'sonner';
 
 interface ProductDetailProps {
     product: Product;
+    cartItemProductIds: string[];
 }
 
-export default function ProductDetail({ product }: ProductDetailProps) {
+export default function ProductDetail({ product, cartItemProductIds }: ProductDetailProps) {
     const { auth } = usePage<SharedData>().props;
+    const { addToCart } = useCart();
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
 
-    const handleAddToCart = () => {
-        // Logic thêm vào giỏ hàng sẽ được implement sau
-        console.log(`Added ${quantity} of ${product.name} to cart`);
+    const isInCart = cartItemProductIds.includes(product.id);
+
+    const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        toast.promise(addToCart(product.id, quantity), {
+            loading: 'Đang thêm vào giỏ hàng...',
+            success: `Đã thêm ${quantity} sản phẩm vào giỏ!`,
+            error: (err) => err.message || 'Đã xảy ra lỗi.',
+        });
     };
 
     const handleWishlist = () => {
@@ -56,6 +66,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     return (
         <>
             <Head title={`${product.name} - Rill`} />
+            <Toaster richColors />
             <div className="min-h-screen bg-background">
                 <Navigation user={auth.user} />
 
@@ -256,10 +267,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                         <Button
                                             className="flex-1"
                                             onClick={handleAddToCart}
-                                            disabled={!product.in_stock}
+                                            disabled={!product.in_stock || isInCart}
                                         >
                                             <ShoppingCart className="h-4 w-4 mr-2" />
-                                            {product.in_stock ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
+                                            {isInCart ? 'Đã có trong giỏ' : (product.in_stock ? 'Thêm vào giỏ hàng' : 'Hết hàng')}
                                         </Button>
                                         <Button
                                             variant="outline"
@@ -666,7 +677,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                                         "Mỗi đĩa than là một báu vật âm nhạc cần được bảo vệ cẩn thận từ kho đến tay người yêu nhạc."
                                                     </p>
                                                     <footer className="text-xs text-muted-foreground font-medium">
-                                                        — Cam kết từ Rill Vinyl Store
+                                                        — Triết lý Rill Vinyl Store
                                                     </footer>
                                                 </blockquote>
                                             </div>

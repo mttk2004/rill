@@ -55,6 +55,9 @@ class ProductController extends Controller
             $query->orderByPivot('sort_order');
         }]);
 
+        $cartItems = $this->cartService->getCartItems();
+        $cartItemProductIds = $cartItems->pluck('product_id')->toArray();
+
         return Inertia::render('product-detail', [
             'product' => [
                 'id' => $product->id,
@@ -83,7 +86,8 @@ class ProductController extends Controller
                 'featured_artists' => $product->artists->where('pivot.role', 'featured')->values(),
                 'in_stock' => $product->isInStock(),
                 'low_stock' => $product->isLowStock(),
-            ]
+            ],
+            'cartItemProductIds' => $cartItemProductIds,
         ]);
     }
 }
