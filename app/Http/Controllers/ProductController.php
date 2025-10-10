@@ -28,14 +28,11 @@ class ProductController extends Controller
         $filters = $request->only(['search', 'genre', 'label', 'artist', 'sort', 'page']);
 
         $result = $this->productService->getProducts($filters);
-        $cartItems = $this->cartService->getCartItems();
-        $cartItemProductIds = $cartItems->pluck('product_id')->toArray();
 
         return Inertia::render('products', [
             'products' => $result['products'],
             'filters' => $result['filters'],
             'pagination' => $result['pagination'],
-            'cartItemProductIds' => $cartItemProductIds,
             // Pass filter parameters to frontend
             'search' => $filters['search'] ?? null,
             'genre' => $filters['genre'] ?? null,
@@ -54,9 +51,6 @@ class ProductController extends Controller
         $product->load(['artists' => function ($query) {
             $query->orderByPivot('sort_order');
         }]);
-
-        $cartItems = $this->cartService->getCartItems();
-        $cartItemProductIds = $cartItems->pluck('product_id')->toArray();
 
         return Inertia::render('product-detail', [
             'product' => [
@@ -87,7 +81,6 @@ class ProductController extends Controller
                 'in_stock' => $product->isInStock(),
                 'low_stock' => $product->isLowStock(),
             ],
-            'cartItemProductIds' => $cartItemProductIds,
         ]);
     }
 }
