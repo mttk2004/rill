@@ -598,8 +598,8 @@ export default function Products({ products: productsData, pagination, filters, 
                                                     <>
                                                         <Button
                                                             size="sm"
-                                                            variant="outline"
-                                                            className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
+                                                            variant="default"
+                                                            className="flex-1 bg-accent hover:bg-accent/90 shadow-sm"
                                                             onClick={(e) => handleAddToCart(e, product.id)}
                                                             disabled={cartItemProductIds.includes(product.id)}
                                                         >
@@ -615,8 +615,8 @@ export default function Products({ products: productsData, pagination, filters, 
                                                 )}
                                                 <Button
                                                     size="sm"
-                                                    variant="default"
-                                                    className="bg-accent hover:bg-accent/90 shadow-sm"
+                                                    variant="outline"
+                                                    className="border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
                                                     asChild
                                                 >
                                                     <Link href={`/products/${product.slug}`}>

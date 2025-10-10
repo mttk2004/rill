@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { type FlyoutCartItem } from "@/types";
 import {
   HoverCard,
   HoverCardContent,
@@ -35,7 +36,7 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ user }: NavigationProps) => {
-  const { cartSummary, cartItems, loading } = useCart();
+  const { cartSummary, cartItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
@@ -133,15 +134,13 @@ export const Navigation = ({ user }: NavigationProps) => {
                         </span>
                       </div>
 
-                      {loading ? (
-                        <div className="text-center text-sm text-muted-foreground py-4">Đang tải...</div>
-                      ) : cartItems.length === 0 ? (
+                      {cartItems.length === 0 ? (
                         <div className="text-center text-sm text-muted-foreground py-4">
                           Giỏ hàng của bạn đang trống.
                         </div>
                       ) : (
                         <div className="max-h-60 overflow-y-auto space-y-3 pr-2">
-                          {cartItems.map((item) => (
+                          {cartItems.map((item: FlyoutCartItem) => (
                             <div key={item.id} className="flex items-center justify-between text-xs">
                               <div className="flex items-center gap-3 overflow-hidden">
                                 <div className="w-10 h-10 bg-muted rounded-md flex-shrink-0">

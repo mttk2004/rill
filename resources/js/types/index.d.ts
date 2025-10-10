@@ -22,11 +22,33 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface CartSummary {
+    total_items: number;
+    total_amount: number;
+    items_count: number;
+    formatted_total: string;
+}
+
+export interface FlyoutCartItem {
+    id: number;
+    quantity: number;
+    unit_price: number;
+    product: {
+        name: string;
+        slug: string;
+        image_url: string | null;
+    };
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    cart: {
+        summary: CartSummary;
+        items: FlyoutCartItem[];
+    };
     [key: string]: unknown;
 }
 
