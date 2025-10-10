@@ -8,7 +8,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { Search, Star, Grid, List, Disc3, Heart, Music, Filter, ShoppingCart } from "lucide-react";
 import { type ProductsPageData, Product } from '@/types';
 import { Head, router, usePage, Link } from '@inertiajs/react';
-import { useState, FormEvent, MouseEvent } from 'react';
+import { useState, FormEvent, MouseEvent, useMemo } from 'react';
 import { type SharedData } from '@/types';
 import { useCart } from '@/hooks/use-cart';
 import { toast } from 'sonner';
@@ -20,12 +20,14 @@ interface ProductsProps extends ProductsPageData {
     artist?: string;
     sort?: string;
     page?: number;
-    cartItemProductIds: string[];
 }
 
-export default function Products({ products: productsData, pagination, filters, cartItemProductIds, ...props }: ProductsProps) {
-    const { auth } = usePage<SharedData>().props;
+export default function Products({ products: productsData, pagination, filters, ...props }: ProductsProps) {
+    const { auth, cart } = usePage<SharedData>().props;
     const { addToCart } = useCart();
+
+    const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
+
     const [searchTerm, setSearchTerm] = useState(props.search || '');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -51,7 +53,6 @@ export default function Products({ products: productsData, pagination, filters, 
     const handleFilterChange = (key: string, value: string) => {
         const newValue = value === 'all' || value === '' ? undefined : value;
 
-        // Preserve existing filters and only update the changed one
         const updatedFilters = {
             search: props.search,
             genre: props.genre,
@@ -62,7 +63,6 @@ export default function Products({ products: productsData, pagination, filters, 
             page: 1, // Reset to first page when filtering
         };
 
-        // Remove empty values
         Object.keys(updatedFilters).forEach(filterKey => {
             if (!updatedFilters[filterKey as keyof typeof updatedFilters]) {
                 delete updatedFilters[filterKey as keyof typeof updatedFilters];
@@ -87,7 +87,6 @@ export default function Products({ products: productsData, pagination, filters, 
             ...newFilters,
         };
 
-        // Remove empty values
         Object.keys(currentFilters).forEach(key => {
             if (!currentFilters[key as keyof typeof currentFilters]) {
                 delete currentFilters[key as keyof typeof currentFilters];
@@ -109,7 +108,6 @@ export default function Products({ products: productsData, pagination, filters, 
         sort: props.sort,
     };
 
-    // Use real data from backend
     const genres = filters?.genres ? ["Tất cả", ...filters.genres] : ["Tất cả"];
     const labels = filters?.labels ? ["Tất cả", ...filters.labels] : ["Tất cả"];
     const sortOptions = filters?.sort_options || [
@@ -124,13 +122,10 @@ export default function Products({ products: productsData, pagination, filters, 
             <div className="min-h-screen bg-background">
                 <Navigation user={auth.user} />
 
-                {/* Header */}
                 <section className="relative overflow-hidden">
-                    {/* Dark background with better contrast */}
                     <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(217,119,6,0.15),transparent_60%)]" />
 
-                    {/* Decorative elements with better visibility */}
                     <div className="absolute top-10 left-10 opacity-30">
                         <Disc3 className="w-32 h-32 animate-spin-slow text-accent/40" />
                     </div>
@@ -165,14 +160,11 @@ export default function Products({ products: productsData, pagination, filters, 
                 </section>
 
                 <div className="container mx-auto px-4 py-8 lg:py-12">
-                    {/* Enhanced Professional Filter Interface */}
                     <div className="relative backdrop-blur-xl bg-gradient-to-br from-white/90 via-white/80 to-accent/5 dark:from-slate-800/90 dark:via-slate-800/80 dark:to-slate-700/50 rounded-3xl shadow-2xl border border-accent/20 dark:border-slate-600/20 mb-8 lg:mb-12 overflow-hidden">
-                        {/* Background Pattern */}
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(217,119,6,0.08),transparent_60%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(217,119,6,0.15),transparent_60%)]" />
                         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDIxNywgMTE5LCA2LCAwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
 
                         <div className="relative z-10 p-6 lg:p-8">
-                            {/* Header */}
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 lg:mb-8">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-gradient-to-br from-accent to-amber-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -188,7 +180,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                     </div>
                                 </div>
 
-                                {/* Active Filters Count */}
                                 {(props.genre || props.label || props.search || (props.sort && props.sort !== 'featured')) && (
                                     <div className="flex items-center gap-3">
                                         <div className="px-4 py-2 bg-accent/10 dark:bg-accent/20 rounded-full border border-accent/20">
@@ -216,9 +207,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                 )}
                             </div>
 
-                            {/* Main Filter Interface */}
                             <div className="space-y-6 lg:space-y-0">
-                                {/* Search Bar - Full Width on Mobile */}
                                 <div className="w-full lg:mb-6">
                                     <form onSubmit={handleSearch} className="relative group">
                                         <div className="absolute inset-0 bg-gradient-to-r from-accent/20 to-amber-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -245,9 +234,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                     </form>
                                 </div>
 
-                                {/* Filters Row - Responsive Grid */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:gap-6">
-                                    {/* Genre Filter */}
                                     <div className="lg:col-span-1 xl:col-span-1">
                                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Thể loại</label>
                                         <Select
@@ -274,7 +261,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                         </Select>
                                     </div>
 
-                                    {/* Label Filter */}
                                     <div className="lg:col-span-1 xl:col-span-1">
                                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Hãng đĩa</label>
                                         <Select
@@ -301,7 +287,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                         </Select>
                                     </div>
 
-                                    {/* Sort Filter */}
                                     <div className="lg:col-span-1 xl:col-span-1">
                                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Sắp xếp</label>
                                         <Select
@@ -325,7 +310,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                         </Select>
                                     </div>
 
-                                    {/* View Mode Toggle */}
                                     <div className="lg:col-span-1 xl:col-span-1">
                                         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Hiển thị</label>
                                         <div className="flex h-12 border-2 border-slate-200/50 dark:border-slate-600/50 rounded-xl overflow-hidden bg-white/90 dark:bg-slate-700/90 shadow-sm hover:shadow-md transition-all duration-300">
@@ -359,7 +343,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                         </div>
                                     </div>
 
-                                    {/* Quick Actions */}
                                     <div className="sm:col-span-2 lg:col-span-2 xl:col-span-2 flex flex-col justify-end">
                                         <div className="flex gap-3 h-12">
                                             <Button
@@ -374,7 +357,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                                 variant="default"
                                                 className="flex-1 h-full bg-gradient-to-r from-accent to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 rounded-xl font-semibold"
                                                 onClick={() => {
-                                                    // Add to favorites or advanced search functionality
                                                     console.log('Advanced search or save filters');
                                                 }}
                                             >
@@ -388,15 +370,12 @@ export default function Products({ products: productsData, pagination, filters, 
                             </div>
                         </div>
 
-                        {/* Decorative Elements */}
                         <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-accent/10 to-amber-500/10 rounded-full blur-xl" />
                         <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-accent/5 to-amber-500/5 rounded-full blur-lg" />
                     </div>
 
-                    {/* Enhanced Results Info */}
                     {pagination.total > 0 && (
                         <div className="mb-8">
-                            {/* Results Summary */}
                             <div className="bg-gradient-to-r from-slate-50 to-accent/5 dark:from-slate-800/50 dark:to-slate-700/30 rounded-2xl p-6 border border-slate-200/50 dark:border-slate-700/50 shadow-sm">
                                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -414,7 +393,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                             </div>
                                         </div>
 
-                                        {/* Active Filters Tags */}
                                         <div className="flex flex-wrap items-center gap-2">
                                             {currentFilters.search && (
                                                 <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-accent/10 to-amber-500/10 border border-accent/20 rounded-full shadow-sm">
@@ -467,7 +445,6 @@ export default function Products({ products: productsData, pagination, filters, 
                                         </div>
                                     </div>
 
-                                    {/* View Stats */}
                                     <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -483,7 +460,6 @@ export default function Products({ products: productsData, pagination, filters, 
                         </div>
                     )}
 
-                    {/* Products Grid */}
                     {productsData.data.length > 0 ? (
                         <div className={`grid gap-8 ${
                             viewMode === "grid"
@@ -600,7 +576,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                                             variant="default"
                                                             className="flex-1 bg-accent hover:bg-accent/90 shadow-sm"
                                                             onClick={(e) => handleAddToCart(e, product.id)}
-                                                            disabled={cartItemProductIds.includes(product.id)}
+                                                            disabled={cartItemProductIds.has(product.id)}
                                                         >
                                                             <ShoppingCart className="w-4 h-4 mr-2" />
                                                             Thêm vào giỏ

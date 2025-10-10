@@ -34,6 +34,7 @@ export interface FlyoutCartItem {
     quantity: number;
     unit_price: number;
     product: {
+        id: string;
         name: string;
         slug: string;
         image_url: string | null;
