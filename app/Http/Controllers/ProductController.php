@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Services\CartService;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,12 +11,10 @@ use Inertia\Response;
 class ProductController extends Controller
 {
     protected ProductService $productService;
-    protected CartService $cartService;
 
-    public function __construct(ProductService $productService, CartService $cartService)
+    public function __construct(ProductService $productService)
     {
         $this->productService = $productService;
-        $this->cartService = $cartService;
     }
 
     /**
@@ -80,7 +77,7 @@ class ProductController extends Controller
                 'featured_artists' => $product->artists->where('pivot.role', 'featured')->values(),
                 'in_stock' => $product->isInStock(),
                 'low_stock' => $product->isLowStock(),
-            ],
+            ]
         ]);
     }
 }
