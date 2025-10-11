@@ -1,32 +1,25 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/navigation";
 import { Heart, ShoppingCart, Star, Disc3, Calendar, Music, ArrowLeft } from "lucide-react";
 import { Link, Head, usePage } from '@inertiajs/react';
-import { useState, MouseEvent, useMemo } from "react";
+import { useState } from "react";
 import { Product, SharedData } from '@/types';
-import { useCart } from "@/hooks/use-cart";
-import { toast } from 'sonner';
 
 interface ProductDetailProps {
     product: Product;
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
-    const { auth, cart } = usePage<SharedData>().props;
-    const { addToCart } = useCart();
+    const { auth } = usePage<SharedData>().props;
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
 
-    const isInCart = useMemo(() => cart.items.some(item => item.product.id === product.id), [cart.items, product.id]);
-
-    const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        toast.promise(addToCart(product.id, quantity), {
-            loading: 'Đang thêm vào giỏ hàng...',
-            success: `Đã thêm ${quantity} sản phẩm vào giỏ!`,
-            error: (err) => err.message || 'Đã xảy ra lỗi.',
-        });
+    const handleAddToCart = () => {
+        // Logic thêm vào giỏ hàng sẽ được implement sau
+        console.log(`Added ${quantity} of ${product.name} to cart`);
     };
 
     const handleWishlist = () => {
@@ -38,6 +31,24 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     const discountPercentage = product.compare_price
         ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
         : null;
+
+    // Mock reviews data - sẽ được thay thế bằng real data từ backend
+    const mockReviews = [
+        {
+            id: 1,
+            user: "Minh Hoàng",
+            rating: 5,
+            date: "2024-01-15",
+            comment: "Chất lượng âm thanh tuyệt vời! Đóng gói cẩn thận. Rất hài lòng với sản phẩm."
+        },
+        {
+            id: 2,
+            user: "Thu Hà",
+            rating: 4,
+            date: "2024-01-10",
+            comment: "Album kinh điển, chất lượng đĩa rất tốt. Giao hàng nhanh."
+        }
+    ];
 
     const mockRating = 4.8;
     const mockReviewCount = 156;
@@ -248,7 +259,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                             disabled={!product.in_stock || isInCart}
                                         >
                                             <ShoppingCart className="h-4 w-4 mr-2" />
-                                            {isInCart ? 'Đã có trong giỏ' : (product.in_stock ? 'Thêm vào giỏ hàng' : 'Hết hàng')}
+                                            {product.in_stock ? 'Thêm vào giỏ hàng' : 'Hết hàng'}
                                         </Button>
                                         <Button
                                             variant="outline"
