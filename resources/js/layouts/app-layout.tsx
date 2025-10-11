@@ -2,7 +2,6 @@ import { Navigation } from '@/components/navigation';
 import { type BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
-import { Toaster } from 'sonner';
 import { type SharedData } from '@/types';
 
 interface AppLayoutProps {
@@ -19,7 +18,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <main className="container mx-auto px-4 py-8">
                 {children}
             </main>
-            <Toaster richColors position="top-right" />
         </div>
     );
 }
