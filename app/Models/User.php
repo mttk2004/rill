@@ -104,21 +104,19 @@ class User extends Authenticatable
         return $this->hasMany(ShoppingCartItem::class);
     }
 
-    // TODO: Uncomment when Order model is created
-    // /**
-    //  * Get the orders for the user.
-    //  */
-    // public function orders()
-    // {
-    //     return $this->hasMany(Order::class);
-    // }
+    /**
+     * Get the orders for the user.
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
-    // TODO: Uncomment when ProductReview model is created
-    // /**
-    //  * Get the product reviews for the user.
-    //  */
-    // public function productReviews()
-    // {
-    //     return $this->hasMany(ProductReview::class);
-    // }
+    /**
+     * Get the product reviews for the user.
+     */
+    public function productReviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 }
