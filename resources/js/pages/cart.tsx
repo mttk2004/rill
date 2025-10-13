@@ -334,7 +334,10 @@ export default function Cart() {
                       <span className="text-slate-900 dark:text-white">Tổng cộng</span>
                       <span className="text-amber-600">{total.toLocaleString('vi-VN')}₫</span>
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300" size="lg">
+                    <Button
+                      onClick={() => router.get('/checkout')}
+                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300" size="lg"
+                    >
                       Tiến hành thanh toán
                     </Button>
                   </CardContent>
