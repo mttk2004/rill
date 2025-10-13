@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('artist_product', function (Blueprint $table) {
-            $table->id();
             $table->string('product_id', 19)->comment('Sản phẩm');
             $table->string('artist_id', 19)->comment('Nghệ sĩ');
             $table->enum('role', ['main', 'featured', 'composer', 'producer'])->default('main')->comment('Vai trò');
@@ -23,12 +22,10 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('artist_id')->references('id')->on('artists')->onDelete('cascade');
             
-            // Unique constraint to avoid duplicates
-            $table->unique(['product_id', 'artist_id']);
+            // Primary key
+            $table->primary(['product_id', 'artist_id']);
             
             // Indexes
-            $table->index('product_id');
-            $table->index('artist_id');
             $table->index('role');
         });
     }

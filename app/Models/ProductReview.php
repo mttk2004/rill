@@ -12,6 +12,9 @@ class ProductReview extends Model
 {
     use HasFactory, HasSnowflakeId, SoftDeletes;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'product_id',
         'user_id',

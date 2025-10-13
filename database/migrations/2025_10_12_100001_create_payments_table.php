@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary();
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->string('id', 19)->primary();
+            $table->string('order_id', 19);
             $table->enum('payment_method', ['cod']);
             $table->enum('payment_status', ['pending', 'completed', 'failed', 'cancelled'])->default('pending');
             $table->decimal('amount', 12, 2);
@@ -22,6 +22,8 @@ return new class extends Migration
             $table->json('gateway_response')->nullable();
             $table->timestamp('processed_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });
     }
 

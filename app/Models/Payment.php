@@ -11,6 +11,9 @@ class Payment extends Model
 {
     use HasFactory, HasSnowflakeId;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'order_id',
         'payment_method',

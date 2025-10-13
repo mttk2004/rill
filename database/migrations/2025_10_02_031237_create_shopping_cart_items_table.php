@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('shopping_cart_items', function (Blueprint $table) {
-            $table->id(); // bigint primary key
-            $table->unsignedBigInteger('user_id')->nullable(); // FK users.id, NULL for guest users
-            $table->string('session_id', 255)->nullable(); // Session cho guest users
-            $table->string('product_id', 19); // FK products.id (Snowflake ID)
-            $table->integer('quantity'); // Số lượng
-            $table->decimal('unit_price', 10, 2); // Giá đơn vị
+            $table->string('id', 19)->primary()->comment('Snowflake ID');
+            $table->string('user_id', 19)->nullable()->comment('FK users.id, NULL for guest users');
+            $table->string('session_id', 255)->nullable()->comment('Session cho guest users');
+            $table->string('product_id', 19)->comment('FK products.id (Snowflake ID)');
+            $table->integer('quantity')->comment('Số lượng');
+            $table->decimal('unit_price', 10, 2)->comment('Giá đơn vị');
             $table->timestamps(); // created_at, updated_at
 
             // Foreign key constraints
@@ -25,9 +25,7 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
 
             // Indexes for performance
-            $table->index('user_id');
             $table->index('session_id');
-            $table->index('product_id');
         });
     }
 
