@@ -183,4 +183,20 @@ class Product extends Model
     {
         return 'slug';
     }
+
+    /**
+     * Get the order items for the product.
+     */
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Get the product reviews for the product.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 }

@@ -7,35 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\HasSnowflakeId;
 
-class OrderItem extends Model
+class Payment extends Model
 {
     use HasFactory, HasSnowflakeId;
 
-    public $incrementing = false;
-    protected $keyType = 'string';
-
     protected $fillable = [
         'order_id',
-        'product_id',
-        'product_name',
-        'product_sku',
-        'quantity',
-        'unit_price',
-        'total_price',
+        'payment_method',
+        'payment_status',
+        'amount',
+        'currency',
+        'transaction_id',
+        'gateway_response',
+        'processed_at',
     ];
 
     protected $casts = [
-        'unit_price' => 'decimal:2',
-        'total_price' => 'decimal:2',
+        'gateway_response' => 'array',
+        'processed_at' => 'datetime',
     ];
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
-    }
-
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -15,32 +16,23 @@ class Order extends Model
     use HasFactory, HasSnowflakeId, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
-        'shipping_address_id',
         'order_number',
+        'user_id',
         'status',
-        'total_amount',
-        'subtotal_amount',
+        'subtotal',
         'discount_amount',
+        'total_amount',
+        'currency',
+        'shipping_address',
+        'billing_address',
         'notes',
-        'payment_method',
-        'payment_status',
         'placed_at',
-        'confirmed_at',
-        'shipped_at',
-        'delivered_at',
-        'cancelled_at',
     ];
 
     protected $casts = [
-        'total_amount' => 'decimal:2',
-        'subtotal_amount' => 'decimal:2',
-        'discount_amount' => 'decimal:2',
+        'shipping_address' => 'array',
+        'billing_address' => 'array',
         'placed_at' => 'datetime',
-        'confirmed_at' => 'datetime',
-        'shipped_at' => 'datetime',
-        'delivered_at' => 'datetime',
-        'cancelled_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -62,13 +54,13 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function shippingAddress(): BelongsTo
-    {
-        return $this->belongsTo(ShippingAddress::class);
-    }
-
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
     }
 }
