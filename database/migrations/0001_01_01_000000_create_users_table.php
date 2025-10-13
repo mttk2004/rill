@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->string('id', 19)->primary();
             $table->string('name'); // Họ và tên
             $table->string('email')->unique(); // Email đăng nhập
             $table->timestamp('email_verified_at')->nullable(); // Thời gian verify email
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true); // Trạng thái hoạt động
             $table->rememberToken();
             $table->timestamps(); // created_at, updated_at
-            $table->timestamp('deleted_at')->nullable(); // Thời gian xóa (soft delete)
+            $table->softDeletes(); // deleted_at
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -36,7 +36,7 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->string('user_id', 19)->nullable()->index();
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');

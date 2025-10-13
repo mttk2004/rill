@@ -13,6 +13,9 @@ class Artist extends Model
 {
     use HasFactory, HasSnowflakeId, SoftDeletes;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     /**
      * The attributes that are mass assignable.
      */

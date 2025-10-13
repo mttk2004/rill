@@ -12,24 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('shipping_addresses', function (Blueprint $table) {
-            $table->id(); // bigint primary key
-            $table->unsignedBigInteger('user_id'); // FK users.id
-            $table->string('full_name', 255); // Họ tên người nhận
-            $table->string('phone', 10); // Số điện thoại
-            $table->string('address_line_1', 255); // Địa chỉ dòng 1
-            $table->string('address_line_2', 255)->nullable(); // Địa chỉ dòng 2
-            $table->string('city', 100); // Thành phố
-            $table->string('district', 100); // Quận/Huyện
-            $table->string('ward', 100); // Phường/Xã
-            $table->string('postal_code', 20)->nullable(); // Mã bưu điện
-            $table->boolean('is_default')->default(false); // Địa chỉ mặc định
+            $table->string('id', 19)->primary()->comment('Snowflake ID');
+            $table->string('user_id', 19)->comment('FK users.id');
+            $table->string('full_name', 255)->comment('Họ tên người nhận');
+            $table->string('phone', 10)->comment('Số điện thoại');
+            $table->string('address_line_1', 255)->comment('Địa chỉ dòng 1');
+            $table->string('address_line_2', 255)->nullable()->comment('Địa chỉ dòng 2');
+            $table->string('city', 100)->comment('Thành phố');
+            $table->string('district', 100)->comment('Quận/Huyện');
+            $table->string('ward', 100)->comment('Phường/Xã');
+            $table->string('postal_code', 20)->nullable()->comment('Mã bưu điện');
+            $table->boolean('is_default')->default(false)->comment('Địa chỉ mặc định');
             $table->timestamps(); // created_at, updated_at
 
             // Foreign key constraint
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             // Index for performance
-            $table->index('user_id');
             $table->index(['user_id', 'is_default']); // For finding default address
         });
     }

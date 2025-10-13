@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_reviews', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary();
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('order_item_id')->nullable()->constrained('order_items')->onDelete('set null');
+            $table->string('id', 19)->primary();
+            $table->string('product_id', 19);
+            $table->string('user_id', 19);
+            $table->string('order_item_id', 19)->nullable();
             $table->tinyInteger('rating');
             $table->string('title')->nullable();
             $table->text('comment');
@@ -23,6 +23,10 @@ return new class extends Migration
             $table->text('rejection_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('order_item_id')->references('id')->on('order_items')->onDelete('set null');
         });
     }
 

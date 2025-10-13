@@ -15,6 +15,9 @@ class Order extends Model
 {
     use HasFactory, HasSnowflakeId, SoftDeletes;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
         'order_number',
         'user_id',

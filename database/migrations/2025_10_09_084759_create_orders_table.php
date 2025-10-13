@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary();
+            $table->string('id', 19)->primary();
             $table->string('order_number', 50)->unique();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('user_id', 19)->nullable();
             $table->enum('status', ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'])->default('pending');
             $table->decimal('subtotal', 12, 2);
             $table->decimal('discount_amount', 12, 2)->default(0);
@@ -26,6 +26,8 @@ return new class extends Migration
             $table->timestamp('placed_at');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSnowflakeId;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ShoppingCartItem extends Model
 {
-    use HasFactory;
+    use HasFactory, HasSnowflakeId;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
