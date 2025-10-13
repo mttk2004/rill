@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -32,11 +33,16 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::put('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+
+    // Checkout and Order Placement
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/orders', [CheckoutController::class, 'store'])->name('orders.store');
+
     Route::get('/orders', function () {
         return Inertia::render('orders');
     })->name('orders');
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/thank-you', [OrderController::class, 'thankYou'])->name('orders.thank-you');
     Route::get('/wishlist', function () {
         return Inertia::render('wishlist');
     })->name('wishlist');
