@@ -19,16 +19,24 @@ def run(playwright):
         expect(page).to_have_url("http://localhost:8000/orders")
         print("Navigated to orders page.")
 
-        # Wait for the page to load
-        page.wait_for_selector("text=Lịch sử mua hàng")
+        # Wait for the page to load and take a screenshot of the "All" tab
+        page.wait_for_selector("text=Tất cả")
+        page.screenshot(path="jules-scratch/verification/orders_all_tab_after_fix.png")
+        print("Screenshot of 'All' tab taken.")
 
-        # Take a screenshot
-        page.screenshot(path="jules-scratch/verification/orders_page.png")
-        print("Screenshot taken.")
+        # Click on the "Đang giao" (shipped) tab
+        page.get_by_role("tab", name="Đang giao").click()
+        # Wait for the content to update - a good way is to wait for the URL to contain the status
+        expect(page).to_have_url("http://localhost:8000/orders?status=shipped")
+        print("Clicked on 'Shipped' tab.")
+
+        # Take a screenshot of the "Shipped" tab view
+        page.screenshot(path="jules-scratch/verification/orders_shipped_tab_after_fix.png")
+        print("Screenshot of 'Shipped' tab taken.")
 
     except Exception as e:
         print(f"An error occurred: {e}")
-        page.screenshot(path="jules-scratch/verification/error.png")
+        page.screenshot(path="jules-scratch/verification/error_after_fix.png")
 
     finally:
         context.close()
