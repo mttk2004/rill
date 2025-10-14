@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Package, Truck, CheckCircle, Clock, Eye, X, Disc3, Star } from "lucide-react";
 import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData, type Paginator } from '@/types';
-import route from 'ziggy-js';
+import { route } from 'ziggy-js';
 
 // Define TypeScript interfaces for props
 interface OrderItem {
