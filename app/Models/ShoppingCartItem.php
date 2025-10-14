@@ -34,6 +34,13 @@ class ShoppingCartItem extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['total_price'];
+
+    /**
      * Get the user that owns the cart item.
      */
     public function user(): BelongsTo
