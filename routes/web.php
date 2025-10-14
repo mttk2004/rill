@@ -38,9 +38,7 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::post('/orders', [CheckoutController::class, 'store'])->name('orders.store');
 
-    Route::get('/orders', function () {
-        return Inertia::render('orders');
-    })->name('orders');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/thank-you', [OrderController::class, 'thankYou'])->name('orders.thank-you');
     Route::get('/wishlist', function () {
