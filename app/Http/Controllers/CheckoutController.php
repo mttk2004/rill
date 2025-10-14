@@ -34,7 +34,7 @@ class CheckoutController extends Controller
 
         $cartSummary = [
             'total_items' => $cartItems->sum('quantity'),
-            'total_amount' => $cartItems->sum(fn($item) => $item->quantity * $item->unit_price),
+            'total_amount' => $cartItems->sum(fn($item) => $item->total_price),
         ];
 
         return Inertia::render('checkout', [
