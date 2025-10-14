@@ -5,6 +5,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from 'sonner';
 import { initializeTheme } from './hooks/use-appearance';
+import { route } from 'ziggy-js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -13,6 +14,9 @@ createInertiaApp({
     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
     setup({ el, App, props }) {
         const root = createRoot(el);
+        const ziggy = (props.initialPage.props as any).ziggy;
+
+        route.setZiggy(ziggy);
 
         root.render(
             <>
