@@ -1,15 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Package, Truck, CheckCircle, Clock, Eye, X, Disc3, Star } from "lucide-react";
+import { Package, Eye, Disc3, Star } from "lucide-react";
 import { Link, Head, usePage, router } from "@inertiajs/react";
-import { type SharedData, type Paginator } from '@/types';
-import { route } from 'ziggy-js';
+import { type SharedData } from '@/types';
+import { type PaginationLink } from '@/types';
+import route from 'ziggy-js';
 
 // Define TypeScript interfaces for props
+interface Paginator<T> {
+    data: T[];
+    links: PaginationLink[];
+}
+
 interface OrderItem {
     id: string;
     product_name: string;
@@ -56,7 +62,7 @@ const getStatusBadgeClass = (status: string) => {
 };
 
 // Pagination Component
-const Pagination = ({ links }: { links: Paginator<any>['links'] }) => (
+const Pagination = ({ links }: { links: PaginationLink[] }) => (
     <div className="flex justify-center items-center space-x-2 mt-8">
         {links.map((link, index) => {
             if (!link.url) {
@@ -145,7 +151,7 @@ export default function Orders() {
                     </Card>
                     ) : (
                     <div className="space-y-4">
-                        {orders.data.map((order) => (
+                        {orders.data.map((order: Order) => (
                             <Tooltip key={order.id}>
                                 <TooltipTrigger asChild>
                                     <Card className="border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm group hover:shadow-xl hover:scale-[1.01] hover:bg-amber-50/50 dark:hover:bg-slate-700/50 transition-all duration-300">
@@ -190,7 +196,7 @@ export default function Orders() {
                                 <TooltipContent>
                                     <p className="font-semibold">Sản phẩm trong đơn:</p>
                                     <ul className="list-disc list-inside">
-                                        {order.items.map(item => <li key={item.id}>{item.product_name}</li>)}
+                                        {order.items.map((item: OrderItem) => <li key={item.id}>{item.product_name}</li>)}
                                         {order.items_count > 3 && <li>... và {order.items_count - 3} sản phẩm khác.</li>}
                                     </ul>
                                 </TooltipContent>
