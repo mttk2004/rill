@@ -13,16 +13,29 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Auth::user()
+        $validated = $request->validate([
+            'status' => 'nullable|in:pending,confirmed,shipped,delivered,cancelled',
+        ]);
+
+        $query = Auth::user()
             ->orders()
+            ->withCount('items')
+            ->with(['items.product']);
+
+        if (!empty($validated['status'])) {
+            $query->where('status', $validated['status']);
+        }
+
+        $orders = $query
             ->orderBy('placed_at', 'desc')
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('orders', [
             'orders' => $orders,
+            'filters' => $request->only(['status']),
         ]);
     }
 

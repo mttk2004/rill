@@ -1,22 +1,42 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
-import { Package, Truck, CheckCircle, Clock, Eye, X, Disc3 } from "lucide-react";
-import { Link, Head, usePage } from "@inertiajs/react";
+import { Package, Truck, CheckCircle, Clock, Eye, X, Disc3, MessageSquareQuote } from "lucide-react";
+import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData, type Paginator } from '@/types';
 
 // Define TypeScript interfaces for props
+interface Product {
+    name: string;
+}
+
+interface OrderItem {
+    product: Product;
+}
+
 interface Order {
     id: string;
     order_number: string;
     placed_at: string;
     status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
     total_amount: number;
+    items_count: number;
+    items: OrderItem[];
 }
 
 interface OrdersPageProps extends SharedData {
     orders: Paginator<Order>;
+    filters: {
+        status?: string;
+    }
 }
 
 // Helper functions for status
@@ -72,9 +92,31 @@ const Pagination = ({ links }: { links: Paginator<any>['links'] }) => (
 );
 
 
+const orderStatuses = [
+    { value: "all", label: "Tất cả" },
+    { value: "pending", label: "Chờ xác nhận" },
+    { value: "confirmed", label: "Đã xác nhận" },
+    { value: "shipped", label: "Đang giao" },
+    { value: "delivered", label: "Đã giao" },
+    { value: "cancelled", label: "Đã hủy" },
+];
+
 export default function Orders() {
   const pageProps = usePage<OrdersPageProps>().props;
-  const { auth, orders } = pageProps;
+  const { auth, orders, filters } = pageProps;
+
+  const handleTabChange = (status: string) => {
+    const newStatus = status === 'all' ? undefined : status;
+
+    router.get(
+        route('orders.index'),
+        { status: newStatus },
+        {
+            preserveState: true,
+            replace: true,
+        }
+    );
+  };
 
   return (
     <>
@@ -98,61 +140,100 @@ export default function Orders() {
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
-            {orders.data.length === 0 ? (
-              <Card className="text-center py-16 border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                <CardContent>
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
-                    <Package className="h-10 w-10 text-slate-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Bạn chưa có đơn hàng nào</h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">Hãy khám phá và mua sắm những đĩa vinyl tuyệt vời!</p>
-                  <Link href="/products">
-                    <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300" size="lg">
-                      Bắt đầu mua sắm
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle>Lịch sử mua hàng</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="divide-y divide-slate-200 dark:divide-slate-700">
-                    {orders.data.map((order) => (
-                      <div key={order.id} className="py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 -mx-6 px-6">
-                        <div className="space-y-1">
-                          <p className="font-bold text-amber-600">#{order.order_number}</p>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Ngày đặt: {new Date(order.placed_at).toLocaleDateString('vi-VN')}
-                          </p>
-                        </div>
-                        <div>
-                          <Badge className={`text-white border-0 ${getStatusVariant(order.status)}`}>
-                            {getStatusLabel(order.status)}
-                          </Badge>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-lg text-slate-900 dark:text-white">
-                            {order.total_amount.toLocaleString('vi-VN')}₫
-                          </p>
-                        </div>
-                        <div>
-                          <Link href={`/orders/${order.id}`}>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-4 w-4 mr-2" />
-                              Xem chi tiết
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
+            <Tabs value={filters.status || 'all'} onValueChange={handleTabChange} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-4">
+                    {orderStatuses.map((status) => (
+                        <TabsTrigger key={status.value} value={status.value}>
+                            {status.label}
+                        </TabsTrigger>
                     ))}
-                  </div>
-                  <Pagination links={orders.links} />
-                </CardContent>
-              </Card>
-            )}
+                </TabsList>
+                <TabsContent value={filters.status || 'all'}>
+                    {orders.data.length === 0 ? (
+                      <Card className="text-center py-16 border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                        <CardContent>
+                          <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
+                            <Package className="h-10 w-10 text-slate-500" />
+                          </div>
+                          <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Không tìm thấy đơn hàng</h3>
+                          <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">Không có đơn hàng nào khớp với bộ lọc hiện tại.</p>
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                        <CardContent className="p-0">
+                          <TooltipProvider delayDuration={100}>
+                            <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                                {orders.data.map((order) => (
+                                    <Tooltip key={order.id}>
+                                        <TooltipTrigger asChild>
+                                            <div className="py-4 flex items-center justify-between transition-all duration-300 hover:shadow-md hover:bg-slate-50/80 dark:hover:bg-slate-800/50 px-6 group">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="space-y-1 w-32">
+                                                        <p className="font-bold text-amber-600 transition-colors group-hover:text-amber-500">#{order.order_number}</p>
+                                                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                                                            {new Date(order.placed_at).toLocaleDateString('vi-VN')}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <Badge className={`text-white border-0 ${getStatusVariant(order.status)}`}>
+                                                            {getStatusIcon(order.status)}
+                                                            {getStatusLabel(order.status)}
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-6">
+                                                    <div className="text-right w-36">
+                                                        <p className="font-bold text-lg text-slate-900 dark:text-white">
+                                                            {order.total_amount.toLocaleString('vi-VN')}₫
+                                                        </p>
+                                                        <p className="text-sm text-slate-500 dark:text-slate-400">{order.items_count} sản phẩm</p>
+                                                    </div>
+                                                    <div className="space-x-2 flex items-center">
+                                                        <Button variant="outline" size="sm" asChild>
+                                                            <Link href={`/orders/${order.id}`}>
+                                                                <Eye className="h-4 w-4 mr-2" />
+                                                                Xem chi tiết
+                                                            </Link>
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            disabled={order.status !== 'delivered'}
+                                                            asChild
+                                                        >
+                                                            <Link href="#" className={order.status !== 'delivered' ? 'pointer-events-none' : ''}>
+                                                                <MessageSquareQuote className="h-4 w-4 mr-2" />
+                                                                Đánh giá
+                                                            </Link>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" align="start">
+                                            <p className="font-bold mb-1">Gồm:</p>
+                                            <ul className="list-disc list-inside text-slate-600 dark:text-slate-300">
+                                                {order.items.slice(0, 2).map((item, index) => (
+                                                    <li key={index}>{item.product.name}</li>
+                                                ))}
+                                            </ul>
+                                            {order.items_count > 2 && (
+                                                <p className="mt-1 text-slate-500 dark:text-slate-400">... và {order.items_count - 2} sản phẩm khác.</p>
+                                            )}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ))}
+                            </div>
+                        </TooltipProvider>
+                          <div className="p-6">
+                            <Pagination links={orders.links} />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>
