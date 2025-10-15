@@ -203,7 +203,7 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                                 </CardHeader>
                                 <CardContent className="p-6">
                                     <div className="space-y-6">
-                                        {order.timeline.filter(Boolean).map((event, index) => (
+                                        {(order.timeline || []).filter(Boolean).map((event, index) => (
                                             <div key={index} className="flex items-start gap-4 group">
                                                 <div className={`mt-1 p-2 rounded-full transition-all duration-300 ${
                                                     index === order.timeline.length - 1 
