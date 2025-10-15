@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,10 +47,10 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
-        $order->load(['items.product.artists', 'payment']);
+        $order->load(['items.product.artists', 'payment', 'shipping_address']);
 
         return Inertia::render('order-detail', [
-            'order' => $order,
+            'order' => new OrderResource($order),
         ]);
     }
 
