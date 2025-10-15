@@ -47,7 +47,7 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
-        $order->load(['items.product.artists', 'payment']);
+        $order->load(['items.product.artists', 'payment', 'shipping_address']);
 
         return Inertia::render('order-detail', [
             'order' => new OrderResource($order),
