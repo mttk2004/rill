@@ -23,9 +23,9 @@ class OrderResource extends JsonResource
             'payment_method' => $this->payment->payment_method,
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'shipping_address' => [
-                'name' => $this->shipping_address->full_name,
-                'phone' => $this->shipping_address->phone,
-                'address' => "{$this->shipping_address->address_line_1}, {$this->shipping_address->ward}, {$this->shipping_address->district}, {$this->shipping_address->city}",
+                'name' => $this->shipping_address['full_name'],
+                'phone' => $this->shipping_address['phone'],
+                'address' => "{$this->shipping_address['address_line_1']}, {$this->shipping_address['ward']}, {$this->shipping_address['district']}, {$this->shipping_address['city']}",
                 'notes' => $this->notes,
             ],
             'timeline' => [
