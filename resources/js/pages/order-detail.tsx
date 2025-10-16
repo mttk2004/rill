@@ -313,7 +313,7 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                                     <div className="flex justify-between py-2">
                                         <span className="text-slate-600 dark:text-slate-300">Tạm tính:</span>
                                         <span className="font-semibold text-slate-900 dark:text-white">
-                                            {order.total.toLocaleString('vi-VN')}₫
+                                            {(order.total || 0).toLocaleString('vi-VN')}₫
                                         </span>
                                     </div>
                                     <div className="flex justify-between py-2">
@@ -324,7 +324,7 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                                         <div className="flex justify-between">
                                             <span className="text-lg font-bold text-slate-900 dark:text-white">Tổng cộng:</span>
                                             <span className="text-xl font-bold text-amber-600">
-                                                {order.total.toLocaleString('vi-VN')}₫
+                                                {(order.total || 0).toLocaleString('vi-VN')}₫
                                             </span>
                                         </div>
                                     </div>
