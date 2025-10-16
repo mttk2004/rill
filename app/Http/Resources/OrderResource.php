@@ -20,9 +20,9 @@ class OrderResource extends JsonResource
             'status' => $this->status,
             'total' => (float) $this->total_amount,
             'delivered_date' => $this->when($this->status === 'delivered', $this->updated_at),
-            'payment_method' => $this->payment->payment_method,
+            'payment_method' => $this->whenLoaded('payment', fn() => $this->payment->payment_method, 'N/A'),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
-            'shipping_address' => [
+            'shipping_address' => $this->shipping_address ? [
                 'name' => $this->shipping_address['full_name'],
                 'phone' => $this->shipping_address['phone'],
                 'address' => "{$this->shipping_address['address_line_1']}, {$this->shipping_address['ward']}, {$this->shipping_address['district']}, {$this->shipping_address['city']}",
