@@ -16,7 +16,7 @@ class OrderService
     public function createOrderFromCart(User $user, array $data): Order
     {
         return DB::transaction(function () use ($user, $data) {
-            $cartItems = ShoppingCartItem::where('user_id', $user->id)->get();
+            $cartItems = ShoppingCartItem::with('product')->where('user_id', $user->id)->get();
 
             if ($cartItems->isEmpty()) {
                 throw new \Exception('Cannot create order from an empty cart.');
