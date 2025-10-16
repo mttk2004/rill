@@ -27,7 +27,7 @@ class OrderResource extends JsonResource
                 'phone' => $this->shipping_address['phone'],
                 'address' => "{$this->shipping_address['address_line_1']}, {$this->shipping_address['ward']}, {$this->shipping_address['district']}, {$this->shipping_address['city']}",
                 'notes' => $this->notes,
-            ],
+            ] : null,
             'timeline' => [
                 // This is a simplified timeline. A real app would use order_status_histories
                 ['status' => 'pending', 'date' => $this->placed_at, 'description' => 'Đơn hàng đã được đặt'],
