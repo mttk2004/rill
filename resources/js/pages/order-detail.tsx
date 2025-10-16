@@ -159,10 +159,10 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                         </Link>
                         <div>
                             <h1 className="text-3xl font-bold text-white drop-shadow-lg">
-                                Đơn hàng #{order.id}
+                                Đơn hàng #{(order.id || 'N/A')}
                             </h1>
                             <p className="text-slate-200 drop-shadow">
-                                Đặt ngày {new Date(order.date).toLocaleDateString('vi-VN')}
+                                Đặt ngày {new Date(order.date || Date.now()).toLocaleDateString('vi-VN')}
                             </p>
                         </div>
                     </div>
@@ -179,24 +179,24 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                                 <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg">
                                     <CardTitle className="flex items-center gap-3">
                                         <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
-                                            {getStatusIcon(order.status)}
+                                            {getStatusIcon(order.status || 'pending')}
                                         </div>
                                         <div>
                                             <span className="text-slate-900 dark:text-white">Trạng thái đơn hàng</span>
                                             <Badge 
-                                                variant={getStatusVariant(order.status)} 
+                                                variant={getStatusVariant(order.status || 'pending')}
                                                 className={`ml-3 ${
-                                                    order.status === 'delivered' 
+                                                    (order.status || 'pending') === 'delivered'
                                                         ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-0' 
-                                                        : order.status === 'shipped'
+                                                        : (order.status || 'pending') === 'shipped'
                                                         ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0'
-                                                        : order.status === 'confirmed'
+                                                        : (order.status || 'pending') === 'confirmed'
                                                         ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0'
                                                         : ''
                                                 }`}
                                             >
-                                                {getStatusIcon(order.status)}
-                                                <span className="ml-1">{getStatusLabel(order.status)}</span>
+                                                {getStatusIcon(order.status || 'pending')}
+                                                <span className="ml-1">{getStatusLabel(order.status || 'pending')}</span>
                                             </Badge>
                                         </div>
                                     </CardTitle>
@@ -234,13 +234,13 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                                             <Package className="h-5 w-5 text-white" />
                                         </div>
                                         <span className="text-slate-900 dark:text-white">
-                                            Sản phẩm ({order.items ? order.items.length : 0} sản phẩm)
+                                            Sản phẩm ({(order.items || []).length} sản phẩm)
                                         </span>
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
                                     <div className="space-y-6">
-                                        {order.items && order.items.length > 0 ? order.items.map((item) => (
+                                        {(order.items || []).length > 0 ? (order.items || []).map((item) => (
                                             <div key={item.id} className="group relative bg-gradient-to-r from-slate-50 to-white dark:from-slate-700 dark:to-slate-600 p-6 rounded-xl border border-slate-200 dark:border-slate-600 hover:shadow-lg transition-all duration-300">
                                                 <div className="flex items-center gap-6">
                                                     {/* Product Image with Vinyl Effect */}
@@ -332,7 +332,7 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                                         <p className="text-sm text-slate-600 dark:text-slate-400">
                                             Phương thức thanh toán: 
                                             <span className="font-semibold text-slate-900 dark:text-white ml-1">
-                                                {order.payment_method}
+                                                {order.payment_method || 'N/A'}
                                             </span>
                                         </p>
                                     </div>
@@ -352,18 +352,18 @@ const OrderDetail = ({ order }: OrderDetailProps) => {
                                 <CardContent className="p-6">
                                     <div className="space-y-3">
                                         <p className="font-bold text-slate-900 dark:text-white">
-                                            {order.shipping_address.name}
+                                            {(order.shipping_address || {}).name || 'N/A'}
                                         </p>
                                         <p className="font-semibold text-slate-700 dark:text-slate-300">
-                                            {order.shipping_address.phone}
+                                            {(order.shipping_address || {}).phone || 'N/A'}
                                         </p>
                                         <p className="text-slate-600 dark:text-slate-400">
-                                            {order.shipping_address.address}
+                                            {(order.shipping_address || {}).address || 'N/A'}
                                         </p>
-                                        {order.shipping_address.notes && (
+                                        {(order.shipping_address || {}).notes && (
                                             <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                                                 <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
-                                                    Ghi chú: {order.shipping_address.notes}
+                                                    Ghi chú: {(order.shipping_address || {}).notes}
                                                 </p>
                                             </div>
                                         )}
