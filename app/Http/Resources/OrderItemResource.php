@@ -17,10 +17,11 @@ class OrderItemResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->product_name,
-            'artist_name' => $this->product->artists->first()->name ?? 'N/A', // Simplified for MVP
-            'price' => $this->total_price,
-            'image_url' => $this->whenLoaded('product', $this->product->image),
-            'quantity' => $this->quantity,
+            'artist_name' => $this->whenLoaded('product', fn() => $this->product->artists->first()->name ?? 'N/A', 'N/A'),
+            'price' => (float) $this->total_price, // Ensure it's a number for frontend
+            'unit_price' => (float) $this->unit_price,
+            'image_url' => $this->whenLoaded('product', fn() => $this->product->image, null),
+            'quantity' => (int) $this->quantity,
             'sku' => $this->product_sku,
         ];
     }

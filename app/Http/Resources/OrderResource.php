@@ -15,17 +15,30 @@ class OrderResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->order_number,
+            'id' => $this->order_number, // Frontend expects order_number as id
+            'order_id' => $this->id, // Actual database ID
+            'order_number' => $this->order_number,
             'date' => $this->placed_at,
             'status' => $this->status,
+            'subtotal' => (float) $this->subtotal,
+            'discount_amount' => (float) $this->discount_amount,
             'total' => (float) $this->total_amount,
+            'currency' => $this->currency ?? 'VND',
             'delivered_date' => $this->when($this->status === 'delivered', $this->updated_at),
-            'payment_method' => $this->whenLoaded('payment', fn() => $this->payment->payment_method, 'N/A'),
+            'payment_method' => $this->whenLoaded('payment', function() {
+                $method = $this->payment?->payment_method ?? 'N/A';
+                return $method === 'cod' ? 'Thanh toán khi nhận hàng' : $method;
+            }, 'N/A'),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'shipping_address' => $this->shipping_address ? [
-                'name' => $this->shipping_address['full_name'],
-                'phone' => $this->shipping_address['phone'],
-                'address' => "{$this->shipping_address['address_line_1']}, {$this->shipping_address['ward']}, {$this->shipping_address['district']}, {$this->shipping_address['city']}",
+                'name' => $this->shipping_address['full_name'] ?? 'N/A',
+                'phone' => $this->shipping_address['phone'] ?? 'N/A',
+                'address' => implode(', ', array_filter([
+                    $this->shipping_address['address_line_1'] ?? '',
+                    $this->shipping_address['ward'] ?? '',
+                    $this->shipping_address['district'] ?? '',
+                    $this->shipping_address['city'] ?? ''
+                ])),
                 'notes' => $this->notes,
             ] : null,
             'timeline' => [
