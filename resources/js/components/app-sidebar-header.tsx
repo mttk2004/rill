@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { CustomerHeader } from '@/components/customer-header';
+import { Navigation } from '@/components/navigation';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
@@ -9,9 +9,9 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     const { auth } = usePage<SharedData>().props;
     const isAdmin = auth.user?.role === 'admin';
 
-    // Use CustomerHeader for customer users, simple header for admin
+    // Use Navigation for customer users, simple header for admin
     if (!isAdmin) {
-        return <CustomerHeader breadcrumbs={breadcrumbs} />;
+        return <Navigation user={auth.user} />;
     }
 
     // Default simple header for admin
