@@ -46,7 +46,7 @@ interface NavigationProps {
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
   const { url } = usePage();
-  const isActive = url.startsWith(href);
+  const isActive = href === "/" ? url === "/" : url.startsWith(href);
   return (
     <Link
       href={href}
@@ -125,9 +125,9 @@ export const Navigation = ({ user }: NavigationProps) => {
                   </Tooltip>
 
                   <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HoverCardTrigger asChild>
                           <Button variant="ghost" size="icon" asChild>
                             <Link href="/cart" className="relative">
                               {cartSummary.items_count > 0 && (
@@ -138,10 +138,10 @@ export const Navigation = ({ user }: NavigationProps) => {
                               <ShoppingBag className="h-4 w-4" />
                             </Link>
                           </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Giỏ hàng</p></TooltipContent>
-                      </Tooltip>
-                    </HoverCardTrigger>
+                        </HoverCardTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent><p>Giỏ hàng</p></TooltipContent>
+                    </Tooltip>
                     <HoverCardContent className="w-80" align="end">
                       <div className="space-y-4">
                         <h4 className="text-sm font-semibold">Giỏ hàng ({cartSummary.items_count})</h4>
