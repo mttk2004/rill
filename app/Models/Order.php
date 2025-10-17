@@ -66,12 +66,4 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
-
-    /**
-     * Get the route key for the model.
-     */
-    public function getRouteKeyName(): string
-    {
-        return 'order_number';
-    }
 }

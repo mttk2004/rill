@@ -30,6 +30,7 @@ interface TimelineEvent {
 
 interface Order {
   id: string;
+  order_id: string; // Database primary key
   date: string;
   status: string;
   total: number;
@@ -381,7 +382,7 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                 <CardContent className="p-6 space-y-3">
                   {order.status === "delivered" && (
                     <>
-                      <a href={route('orders.invoice', { order: order.id })}>
+                      <a href={route('orders.invoice', { order: order.order_id })}>
                         <Button
                           variant="outline"
                           className="w-full border-amber-200 hover:bg-amber-50 hover:text-amber-700 transition-all duration-300"
