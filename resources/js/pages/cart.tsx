@@ -163,54 +163,57 @@ export default function Cart() {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {cartItems.map((item) => (
-                  <Card key={item.id} className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm group hover:shadow-2xl transition-all duration-300">
-                    <CardContent className="p-4 flex gap-4">
-                        <div className="relative flex-shrink-0">
-                          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                            {item.product.image_url ? (
-                              <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover rounded-full" />
-                            ) : (
-                              <Disc3 className="h-12 w-12 text-amber-500 group-hover:rotate-12 transition-transform duration-300" />
-                            )}
+                <div className="lg:col-span-2">
+                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                      <CardContent className="p-0">
+                          <div className="grid grid-cols-1 md:grid-cols-2">
+                              {cartItems.map((item, index) => (
+                                  <div key={item.id} className={`p-6 flex gap-4 ${index % 2 === 0 ? 'md:border-r' : ''} ${index < cartItems.length - 2 ? 'md:border-b' : ''} border-slate-200 dark:border-slate-700`}>
+                                      <div className="relative flex-shrink-0">
+                                          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg">
+                                              {item.product.image_url ? (
+                                                  <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover rounded-full" />
+                                              ) : (
+                                                  <Disc3 className="h-12 w-12 text-amber-500" />
+                                              )}
+                                          </div>
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                          <div className="flex justify-between items-start">
+                                              <div className="flex-1 min-w-0">
+                                                  <Link href={`/products/${item.product.slug}`}>
+                                                      <h3 className="font-bold text-md text-slate-900 dark:text-white truncate hover:text-amber-600 transition-colors">
+                                                          {item.product.name}
+                                                      </h3>
+                                                  </Link>
+                                                  <p className="text-sm text-slate-600 dark:text-slate-300 font-medium truncate">
+                                                      {item.product.artists.map(artist => artist.name).join(', ')}
+                                                  </p>
+                                              </div>
+                                              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" onClick={() => removeItem(item.id)} disabled={isUpdating === item.id}>
+                                                  <Trash2 className="h-4 w-4" />
+                                              </Button>
+                                          </div>
+                                          <div className="flex justify-between items-end mt-2">
+                                              <div className="flex items-center gap-2">
+                                                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={isUpdating === item.id || item.quantity <= 1}>
+                                                      {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Minus className="h-4 w-4" />}
+                                                  </Button>
+                                                  <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                                                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity + 1)} disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}>
+                                                      {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-4 w-4" />}
+                                                  </Button>
+                                              </div>
+                                              <p className="text-lg font-bold text-amber-600">
+                                                  {item.total_price.toLocaleString('vi-VN')}₫
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              ))}
                           </div>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                            <div className="flex justify-between items-start">
-                                <div className="flex-1 min-w-0">
-                                    <Link href={`/products/${item.product.slug}`}>
-                                        <h3 className="font-bold text-md text-slate-900 dark:text-white truncate group-hover:text-amber-600 transition-colors hover:text-amber-600">
-                                            {item.product.name}
-                                        </h3>
-                                    </Link>
-                                    <p className="text-sm text-slate-600 dark:text-slate-300 font-medium truncate">
-                                        {item.product.artists.map(artist => artist.name).join(', ')}
-                                    </p>
-                                </div>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
-                                    <Trash2 className="h-4 w-4" onClick={() => removeItem(item.id)} disabled={isUpdating === item.id}/>
-                                </Button>
-                            </div>
-                            <div className="flex justify-between items-end mt-2">
-                                <div className="flex items-center gap-2">
-                                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={isUpdating === item.id || item.quantity <= 1}>
-                                        {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Minus className="h-4 w-4" />}
-                                    </Button>
-                                    <span className="w-8 text-center font-semibold">{item.quantity}</span>
-                                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity + 1)} disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}>
-                                        {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-4 w-4" />}
-                                    </Button>
-                                </div>
-                                <p className="text-lg font-bold text-amber-600">
-                                    {item.total_price.toLocaleString('vi-VN')}₫
-                                </p>
-                            </div>
-                        </div>
-                    </CardContent>
+                      </CardContent>
                   </Card>
-                ))}
                 </div>
 
               {/* Sidebar */}
