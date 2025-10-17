@@ -85,7 +85,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                             </div>
 
                             {/* Product Info */}
-                            <div className="md:col-span-3 lg:col-span-1 space-y-6">
+                            <div className="md:col-span-3 lg:col-span-1 space-y-4">
                                 <div>
                                     <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">{product.name}</h1>
                                     <div className="flex items-center gap-2 mb-4">
@@ -103,6 +103,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                                             ))}
                                         </div>
                                         <span className="text-sm text-muted-foreground">{mockRating} ({mockReviewCount} đánh giá)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-4">
+                                        <Badge variant="outline">{product.genre}</Badge>
+                                        <Badge variant="outline">{product.label}</Badge>
                                     </div>
                                 </div>
 
@@ -148,10 +152,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                         {/* Description and other details in Tabs */}
                         <div className="mt-12">
                             <Tabs defaultValue="description" className="w-full">
-                                <TabsList className="border-b justify-start bg-transparent p-0 rounded-none">
-                                    <TabsTrigger value="description" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Mô tả chi tiết</TabsTrigger>
-                                    <TabsTrigger value="reviews" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Đánh giá</TabsTrigger>
-                                    <TabsTrigger value="shipping" className="data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Vận chuyển & Đổi trả</TabsTrigger>
+                                <TabsList className="justify-start bg-transparent p-0 rounded-none">
+                                    <TabsTrigger value="description" className="text-lg font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Mô tả chi tiết</TabsTrigger>
+                                    <TabsTrigger value="reviews" className="text-lg font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Đánh giá</TabsTrigger>
+                                    <TabsTrigger value="shipping" className="text-lg font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Vận chuyển & Đổi trả</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="description" className="py-6">
                                     <div className="prose dark:prose-invert max-w-none">
