@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Pagination } from "@/components/ui/pagination";
 import { Search, Grid, List, Disc3, Music, ShoppingCart, SlidersHorizontal } from "lucide-react";
-import { type ProductsPageData, Product } from '@/types';
+import { type ProductsPageData, Product, type Pagination as PaginationType, type ProductFilters } from '@/types';
 import { Head, router, usePage, Link } from '@inertiajs/react';
 import { useState, FormEvent, MouseEvent, useMemo } from 'react';
 import { type SharedData } from '@/types';
@@ -15,98 +15,79 @@ import { useCart } from '@/hooks/use-cart';
 import { toast } from 'sonner';
 
 interface ProductsProps extends ProductsPageData {
-    search?: string;
-    genre?: string;
-    label?: string;
-    artist?: string;
-    sort?: string;
-    page?: number;
+  search?: string;
+  genre?: string;
+  label?: string;
+  artist?: string;
+  sort?: string;
+  page?: number;
 }
 
-export default function Products({ products: productsData, pagination, filters, ...props }: ProductsProps) {
-    const { auth, cart } = usePage<SharedData>().props;
-    const { addToCart } = useCart();
+export default function Products({ products: productsData, pagination: paginationProp, filters: filtersProp, ...props }: ProductsProps) {
+  const { auth, cart } = usePage<SharedData>().props;
+  const { addToCart } = useCart();
 
-    const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
+  // Normalize data - handle both direct data and wrapped { data: ... }
+  const pagination = (paginationProp && typeof paginationProp === 'object' && 'data' in paginationProp ? paginationProp.data : paginationProp) as PaginationType;
+  const filters = (filtersProp && typeof filtersProp === 'object' && 'data' in filtersProp ? filtersProp.data : filtersProp) as ProductFilters;
 
-    const [searchTerm, setSearchTerm] = useState(props.search || '');
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]); const [searchTerm, setSearchTerm] = useState(props.search || '');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-    const handleAddToCart = (e: MouseEvent<HTMLButtonElement>, productId: string) => {
-        e.preventDefault();
-        e.stopPropagation();
+  const handleAddToCart = (e: MouseEvent<HTMLButtonElement>, productId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-        toast.promise(addToCart(productId, 1), {
-            loading: 'Đang thêm vào giỏ hàng...',
-            success: 'Đã thêm sản phẩm vào giỏ hàng!',
-            error: (err) => err.message || 'Đã xảy ra lỗi.',
-        });
+    toast.promise(addToCart(productId, 1), {
+      loading: 'Đang thêm vào giỏ hàng...',
+      success: 'Đã thêm sản phẩm vào giỏ hàng!',
+      error: (err) => err.message || 'Đã xảy ra lỗi.',
+    });
+  };
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    updateFilters({
+      search: searchTerm || undefined,
+      page: 1, // Reset to first page when searching
+    });
+  };
+
+  const handleFilterChange = (key: string, value: string) => {
+    const newValue = value === 'all' || value === '' ? undefined : value;
+
+    const updatedFilters = {
+      search: props.search,
+      genre: props.genre,
+      label: props.label,
+      artist: props.artist,
+      sort: props.sort,
+      [key]: newValue,
+      page: 1, // Reset to first page when filtering
     };
 
-    const handleSearch = (e: FormEvent) => {
-        e.preventDefault();
-        updateFilters({
-            search: searchTerm || undefined,
-            page: 1, // Reset to first page when searching
-        });
-    };
+    Object.keys(updatedFilters).forEach(filterKey => {
+      if (!updatedFilters[filterKey as keyof typeof updatedFilters]) {
+        delete updatedFilters[filterKey as keyof typeof updatedFilters];
+      }
+    });
 
-    const handleFilterChange = (key: string, value: string) => {
-        const newValue = value === 'all' || value === '' ? undefined : value;
+    router.get('/products', updatedFilters, {
+      preserveState: true,
+      preserveScroll: true,
+      only: ['products', 'pagination', 'filters'],
+    });
+  };
 
-        const updatedFilters = {
-            search: props.search,
-            genre: props.genre,
-            label: props.label,
-            artist: props.artist,
-            sort: props.sort,
-            [key]: newValue,
-            page: 1, // Reset to first page when filtering
-        };
-
-        Object.keys(updatedFilters).forEach(filterKey => {
-            if (!updatedFilters[filterKey as keyof typeof updatedFilters]) {
-                delete updatedFilters[filterKey as keyof typeof updatedFilters];
-            }
-        });
-
-        router.get('/products', updatedFilters, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['products', 'pagination', 'filters'],
-        });
-    };
-
-    const updateFilters = (newFilters: Record<string, string | number | undefined>) => {
-        const currentFilters = {
-            search: props.search,
-            genre: props.genre,
-            label: props.label,
-            artist: props.artist,
-            sort: props.sort,
-            page: props.page,
-            ...newFilters,
-        };
-
-        Object.keys(currentFilters).forEach(key => {
-            if (!currentFilters[key as keyof typeof currentFilters]) {
-                delete currentFilters[key as keyof typeof currentFilters];
-            }
-        });
-
-        router.get('/products', currentFilters, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['products', 'pagination', 'filters'],
-        });
-    };
-
+  const updateFilters = (newFilters: Record<string, string | number | undefined>) => {
     const currentFilters = {
-        search: props.search,
-        genre: props.genre,
-        label: props.label,
-        artist: props.artist,
-        sort: props.sort,
+      search: props.search,
+      genre: props.genre,
+      label: props.label,
+      artist: props.artist,
+      sort: props.sort,
+      page: props.page,
+      ...newFilters,
     };
 
     const genres = filters?.genres ? ["Tất cả", ...filters.genres] : ["Tất cả"];
