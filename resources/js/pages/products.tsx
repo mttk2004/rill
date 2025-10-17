@@ -290,7 +290,7 @@ export default function Products({ products: productsData, pagination, filters, 
                                             {product.status === 'out_of_stock' ? (
                                                 <Button size="sm" variant="outline" disabled>Hết hàng</Button>
                                             ) : (
-                                                <Button size="sm" onClick={(e) => handleAddToCart(e, product.id)} disabled={cartItemProductIds.has(product.id)}>
+                                                <Button size="sm" onClick={(e) => handleAddToCart(e, product.id)} disabled={cartItemProductIds.has(product.id)} className="bg-accent hover:bg-accent/90 text-accent-foreground">
                                                     <ShoppingCart className="h-4 w-4 mr-2" />
                                                     {cartItemProductIds.has(product.id) ? 'Đã thêm' : 'Thêm vào giỏ'}
                                                     </Button>
