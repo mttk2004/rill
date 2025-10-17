@@ -163,239 +163,145 @@ export default function Cart() {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-6">
-                {cartItems.map((item) => (
-                  <Card key={item.id} className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm group hover:shadow-2xl transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className="flex gap-6">
-                        {/* Vinyl Record Image */}
-                        <div className="relative">
-                          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                            {item.product.image_url ? (
-                              <img
-                                src={item.product.image_url}
-                                alt={item.product.name}
-                                className="w-full h-full object-cover rounded-full"
-                              />
-                            ) : (
-                              <Disc3 className="h-16 w-16 text-amber-500 group-hover:rotate-12 transition-transform duration-300" />
-                            )}
-                          </div>
-                          {/* Vinyl Label */}
-                          {!item.product.image_url && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full shadow-md"></div>
+                <div className="lg:col-span-2">
+                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                    <CardContent className="p-0">
+                      <div className="grid grid-cols-1 md:grid-cols-2">
+                        {cartItems.map((item, index) => (
+                          <div key={item.id} className={`p-6 flex gap-4 ${index % 2 === 0 ? 'md:border-r' : ''} ${index < cartItems.length - 2 ? 'md:border-b' : ''} border-slate-200 dark:border-slate-700`}>
+                            <div className="relative flex-shrink-0">
+                              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg">
+                                {item.product.image_url ? (
+                                  <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover rounded-full" />
+                                ) : (
+                                  <Disc3 className="h-12 w-12 text-amber-500" />
+                                )}
+                              </div>
                             </div>
-                          )}
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between items-start">
                             <div className="flex-1 min-w-0">
-                              <Link href={`/products/${item.product.slug}`}>
-                                <h3 className="font-bold text-lg text-slate-900 dark:text-white truncate group-hover:text-amber-600 transition-colors hover:text-amber-600">
-                                  {item.product.name}
-                                </h3>
-                              </Link>
-                              <p className="text-slate-600 dark:text-slate-300 font-medium">
-                                {item.product.artists.map(artist => artist.name).join(', ')}
-                              </p>
-                              <div className="flex gap-2 mt-2">
-                                <Badge variant="outline" className={`${
-                                  item.product.status === 'active'
-                                    ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800'
-                                    : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800'
-                                }`}>
-                                  {item.product.status === 'active' ? 'Còn hàng' : 'Hết hàng'}
-                                </Badge>
-                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800">
-                                  Vinyl LP
-                                </Badge>
-                                {item.product.is_featured && (
-                                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800">
-                                    Nổi bật
-                                  </Badge>
-                                )}
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1 min-w-0">
+                                  <Link href={`/products/${item.product.slug}`}>
+                                    <h3 className="font-bold text-md text-slate-900 dark:text-white truncate hover:text-amber-600 transition-colors">
+                                      {item.product.name}
+                                    </h3>
+                                  </Link>
+                                  <p className="text-sm text-slate-600 dark:text-slate-300 font-medium truncate">
+                                    {item.product.artists.map(artist => artist.name).join(', ')}
+                                  </p>
+                                </div>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" onClick={() => removeItem(item.id)} disabled={isUpdating === item.id}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                               </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                            >
-                              <Heart className="h-5 w-5" />
-                            </Button>
-                          </div>
-
-                          <div className="flex justify-between items-center mt-6">
-                            {/* Quantity Controls */}
-                            <div className="flex items-center gap-3">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200 transition-all duration-200"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                disabled={isUpdating === item.id || item.quantity <= 1}
-                              >
-                                {isUpdating === item.id ? (
-                                  <Loader2 className="h-3 w-3 animate-spin" />
-                                ) : (
-                                  <Minus className="h-4 w-4" />
-                                )}
-                              </Button>
-                              <div className="relative">
-                                <span className="w-12 text-center font-semibold text-slate-900 dark:text-white block">
-                                  {item.quantity}
-                                </span>
-                                {isUpdating === item.id && (
-                                  <div className="absolute inset-0 bg-white/80 dark:bg-slate-800/80 rounded flex items-center justify-center">
-                                    <Loader2 className="h-3 w-3 animate-spin text-amber-600" />
-                                  </div>
-                                )}
-                              </div>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 w-8 p-0 hover:bg-amber-50 hover:border-amber-200 transition-all duration-200"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}
-                              >
-                                {isUpdating === item.id ? (
-                                  <Loader2 className="h-3 w-3 animate-spin" />
-                                ) : (
-                                  <Plus className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </div>
-
-                            {/* Price */}
-                            <div className="text-right">
-                              <p className="text-xl font-bold text-amber-600">
-                                {item.total_price.toLocaleString('vi-VN')}₫
-                              </p>
-                              {item.quantity > 1 && (
-                                <p className="text-sm text-slate-500 dark:text-slate-400">
-                                  {item.unit_price.toLocaleString('vi-VN')}₫ / cái
+                              <div className="flex justify-between items-end mt-2">
+                                <div className="flex items-center gap-2">
+                                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={isUpdating === item.id || item.quantity <= 1}>
+                                    {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Minus className="h-4 w-4" />}
+                                  </Button>
+                                  <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity + 1)} disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}>
+                                    {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-4 w-4" />}
+                                  </Button>
+                                </div>
+                                <p className="text-lg font-bold text-amber-600">
+                                  {item.total_price.toLocaleString('vi-VN')}₫
                                 </p>
-                              )}
+                              </div>
                             </div>
-
-                            {/* Remove Button */}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="px-3 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all duration-200 min-w-[80px]"
-                              onClick={() => removeItem(item.id)}
-                              disabled={isUpdating === item.id}
-                            >
-                              {isUpdating === item.id ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                  Removing
-                                </>
-                              ) : (
-                                <>
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Remove
-                                </>
-                              )}
-                            </Button>
                           </div>
-                        </div>
+                        ))}
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
+                </div>
 
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Order Summary */}
-                <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                  <CardHeader className="bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-t-lg">
-                    <CardTitle className="flex items-center gap-2">
-                      <ShoppingCart className="h-5 w-5" />
-                      Tóm tắt đơn hàng
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4 p-6">
-                    <div className="flex justify-between py-2">
-                      <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartSummary.total_items} sản phẩm)</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <span className="text-slate-600 dark:text-slate-300">Phí vận chuyển</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">
-                        {shipping === 0 ? 'Miễn phí' : `${shipping.toLocaleString('vi-VN')}₫`}
-                      </span>
-                    </div>
-                    <Separator className="border-slate-200 dark:border-slate-600" />
-                    <div className="flex justify-between text-lg font-bold py-2">
-                      <span className="text-slate-900 dark:text-white">Tổng cộng</span>
-                      <span className="text-amber-600">{total.toLocaleString('vi-VN')}₫</span>
-                    </div>
-                    <Button
-                      onClick={() => router.get('/checkout')}
-                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300" size="lg"
-                    >
-                      Tiến hành thanh toán
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* Discount Code */}
-                <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                  <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg">
-                    <CardTitle className="text-slate-900 dark:text-white">Mã giảm giá</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4 p-6">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Nhập mã giảm giá"
-                        className="border-slate-200 focus:border-amber-500 focus:ring-amber-500"
-                      />
+                {/* Sidebar */}
+                <div className="space-y-6">
+                  {/* Order Summary */}
+                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+                        <ShoppingCart className="h-5 w-5 text-amber-500" />
+                        Tóm tắt đơn hàng
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartSummary.total_items} sản phẩm)</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-300">Phí vận chuyển</span>
+                        <span className="font-semibold text-green-600">Miễn phí</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between text-lg font-bold">
+                        <span className="text-slate-900 dark:text-white">Tổng cộng</span>
+                        <span className="text-amber-600">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
+                      </div>
                       <Button
-                        variant="outline"
-                        className="border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300"
+                        onClick={() => router.get('/checkout')}
+                        className="w-full" size="lg"
                       >
-                        Áp dụng
+                        Tiến hành thanh toán
                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
 
-                {/* Shipping Information */}
-                <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                  <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg">
-                    <CardTitle className="text-slate-900 dark:text-white">Thông tin vận chuyển</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 p-6">
-                    <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm">🚚</span>
+                  {/* Discount Code */}
+                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                    <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg">
+                      <CardTitle className="text-slate-900 dark:text-white">Mã giảm giá</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4 p-6">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Nhập mã giảm giá"
+                          className="border-slate-200 focus:border-amber-500 focus:ring-amber-500"
+                        />
+                        <Button
+                          variant="outline"
+                          className="border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300"
+                        >
+                          Áp dụng
+                        </Button>
                       </div>
-                      <p className="text-sm text-green-800 dark:text-green-200 font-medium">
-                        Miễn phí vận chuyển cho đơn hàng trên 1.000.000₫
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm">📦</span>
+                    </CardContent>
+                  </Card>
+
+                  {/* Shipping Information */}
+                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                    <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg">
+                      <CardTitle className="text-slate-900 dark:text-white">Thông tin vận chuyển</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 p-6">
+                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm">🚚</span>
+                        </div>
+                        <p className="text-sm text-green-800 dark:text-green-200 font-medium">
+                          Miễn phí vận chuyển cho đơn hàng trên 1.000.000₫
+                        </p>
                       </div>
-                      <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
-                        Giao hàng trong 3-5 ngày làm việc
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                      <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm">🔄</span>
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm">📦</span>
+                        </div>
+                        <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                          Giao hàng trong 3-5 ngày làm việc
+                        </p>
                       </div>
-                      <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
-                        Đổi trả miễn phí trong 30 ngày
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                        <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm">🔄</span>
+                        </div>
+                        <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+                          Đổi trả miễn phí trong 30 ngày
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             )}
