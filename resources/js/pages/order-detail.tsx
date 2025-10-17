@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, Truck, CheckCircle, Clock, ArrowLeft, X, Download, MessageCircle, Disc3, Music2 } from "lucide-react";
 import { Link } from "@inertiajs/react";
+import { route } from 'ziggy-js';
 
 interface Product {
   id: number;
@@ -380,13 +381,15 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                 <CardContent className="p-6 space-y-3">
                   {order.status === "delivered" && (
                     <>
-                      <Button
-                        variant="outline"
-                        className="w-full border-amber-200 hover:bg-amber-50 hover:text-amber-700 transition-all duration-300"
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Tải hóa đơn
-                      </Button>
+                      <a href={route('orders.invoice', { order: order.id })}>
+                        <Button
+                          variant="outline"
+                          className="w-full border-amber-200 hover:bg-amber-50 hover:text-amber-700 transition-all duration-300"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Tải hóa đơn
+                        </Button>
+                      </a>
                       <Button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                         Đánh giá sản phẩm
                       </Button>

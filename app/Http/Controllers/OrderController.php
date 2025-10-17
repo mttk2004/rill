@@ -65,4 +65,27 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
+
+    /**
+     * Download the invoice for a specific order.
+     *
+     * @param  \App\Models\Order  $order
+     * @return \Illuminate\Http\Response
+     */
+    public function downloadInvoice(Order $order)
+    {
+        Gate::authorize('view', $order);
+
+        // Invoices are only available for delivered orders.
+        if ($order->status !== 'delivered') {
+            abort(403, 'Invoice is not available for this order status.');
+        }
+
+        $order->load(['items.product', 'payment']);
+
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('invoices.order', compact('order'));
+
+        return $pdf->download('hoadon_' . $order->order_number . '.pdf');
+    }
 }
