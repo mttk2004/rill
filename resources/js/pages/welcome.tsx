@@ -6,40 +6,11 @@ import { Play, Star, ShoppingBag, Truck, Award, Users, Disc3 } from "lucide-reac
 import { type Product } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
-const Welcome = () => {
-  const featuredProducts: Partial<Product>[] = [
-    {
-      id: "1",
-      slug: "abbey-road-the-beatles",
-      name: "Abbey Road - The Beatles",
-      artists: [{ id: "1", slug: "the-beatles", name: "The Beatles" }],
-      price: 1250000,
-      genre: "Rock",
-      label: "Apple Records",
-      is_featured: true
-    },
-    {
-      id: "2",
-      slug: "dark-side-of-the-moon",
-      name: "Dark Side of the Moon",
-      artists: [{ id: "2", slug: "pink-floyd", name: "Pink Floyd" }],
-      price: 980000,
-      genre: "Progressive Rock",
-      label: "Harvest Records",
-      is_featured: true
-    },
-    {
-      id: "3",
-      slug: "thriller-michael-jackson",
-      name: "Thriller - Michael Jackson",
-      artists: [{ id: "3", slug: "michael-jackson", name: "Michael Jackson" }],
-      price: 1100000,
-      genre: "Pop",
-      label: "Epic Records",
-      is_featured: true
-    }
-  ];
+interface WelcomeProps {
+  featuredProducts: Product[];
+}
 
+const Welcome = ({ featuredProducts }: WelcomeProps) => {
   const features = [
     {
       icon: Award,
@@ -63,7 +34,6 @@ const Welcome = () => {
       <Head title="Rill - Cửa hàng Đĩa Than Online" />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/95 to-primary/90">
-        {/* Vintage Pattern Overlay */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-transparent" />
           <div className="absolute inset-0 opacity-10">
@@ -109,7 +79,6 @@ const Welcome = () => {
                 </Button>
               </div>
 
-              {/* Stats */}
               <div className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-white/20">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-accent">1,000+</div>
@@ -126,10 +95,8 @@ const Welcome = () => {
               </div>
             </div>
 
-            {/* Hero Image */}
             <div className="relative lg:justify-self-end">
               <div className="relative w-full max-w-md mx-auto">
-                {/* Vinyl Record Animation */}
                 <div className="relative w-80 h-80 mx-auto">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/20 to-accent/40 animate-spin-slow"></div>
                   <div className="absolute inset-4 rounded-full bg-gradient-to-r from-accent to-accent/80 flex items-center justify-center">
@@ -137,11 +104,9 @@ const Welcome = () => {
                       <Disc3 className="h-6 w-6 text-accent" />
                     </div>
                   </div>
-                  {/* Needle */}
                   <div className="absolute top-0 right-12 w-1 h-32 bg-accent/60 rounded-full origin-bottom transform rotate-12"></div>
                 </div>
 
-                {/* Floating Elements */}
                 <div className="absolute -top-8 -left-8 w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center animate-bounce">
                   <Star className="h-8 w-8 text-accent" />
                 </div>
@@ -154,46 +119,45 @@ const Welcome = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-16 lg:py-24 relative">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background"></div>
+      {featuredProducts && featuredProducts.length > 0 && (
+        <section className="py-16 lg:py-24 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-accent/5 to-background"></div>
 
-        <div className="relative container mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent mb-4">
-              <Disc3 className="h-4 w-4" />
-              <span className="text-sm font-medium">Bộ sưu tập đặc biệt</span>
+          <div className="relative container mx-auto px-4">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent mb-4">
+                <Disc3 className="h-4 w-4" />
+                <span className="text-sm font-medium">Bộ sưu tập đặc biệt</span>
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-accent">Sản phẩm nổi bật</h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+                Những album kinh điển được yêu thích nhất bởi cộng đồng sưu tầm đĩa than
+              </p>
             </div>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-accent">Sản phẩm nổi bật</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-              Những album kinh điển được yêu thích nhất bởi cộng đồng sưu tầm đĩa than
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product as Product}
-                index={index}
-                showActions={false}
-              />
-            ))}
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {featuredProducts.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  index={index}
+                  showActions={false}
+                />
+              ))}
+            </div>
 
-          <div className="text-center mt-12">
-            <Button size="lg" className="bg-accent/10 text-accent border-2 border-accent/20 hover:bg-accent hover:text-accent-foreground" asChild>
-              <Link href="/products">
-                <Disc3 className="mr-2 h-5 w-5" />
-                Xem toàn bộ bộ sưu tập
-              </Link>
-            </Button>
+            <div className="text-center mt-12">
+              <Button size="lg" className="bg-accent/10 text-accent border-2 border-accent/20 hover:bg-accent hover:text-accent-foreground" asChild>
+                <Link href="/products">
+                  <Disc3 className="mr-2 h-5 w-5" />
+                  Xem toàn bộ bộ sưu tập
+                </Link>
+              </Button>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Features Section */}
       <section className="py-16 bg-gradient-to-br from-accent/5 via-background to-accent/10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -213,20 +177,17 @@ const Welcome = () => {
                 <CardContent className="p-8">
                   <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent/10 text-accent mb-6 group-hover:bg-accent group-hover:text-accent-foreground transition-all duration-300">
                     <feature.icon className="h-10 w-10 group-hover:scale-110 transition-transform duration-300" />
-                    {/* Decorative ring */}
                     <div className="absolute inset-0 rounded-full border-2 border-accent/20 group-hover:border-accent/40 transition-colors duration-300"></div>
                   </div>
                   <h3 className="text-xl font-semibold mb-3 text-accent">{feature.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
 
-                  {/* Decorative element */}
                   <div className="mt-4 w-12 h-1 bg-gradient-to-r from-accent/30 to-accent/60 rounded-full mx-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* Additional Features */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { icon: '🎵', title: '1000+ Albums', desc: 'Bộ sưu tập đa dạng' },
@@ -244,9 +205,7 @@ const Welcome = () => {
         </div>
       </section>
 
-      {/* Newsletter Section */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-primary via-primary/95 to-primary/90 relative overflow-hidden">
-        {/* Background Vinyl Records */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-40 h-40 border-2 border-accent rounded-full"></div>
           <div className="absolute top-40 right-32 w-32 h-32 border border-accent/50 rounded-full"></div>
@@ -285,7 +244,6 @@ const Welcome = () => {
               </p>
             </div>
 
-            {/* Social Proof */}
             <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
               <div className="text-center">
                 <div className="text-2xl font-bold text-accent">5,000+</div>
