@@ -78,7 +78,6 @@ export default function Products({ products: productsData, pagination: paginatio
     router.get('/products', currentFilters, {
       preserveState: true,
       preserveScroll: true,
-      only: ['products', 'pagination', 'filters'],
     });
   };
 
