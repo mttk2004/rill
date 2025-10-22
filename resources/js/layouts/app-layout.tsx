@@ -7,21 +7,21 @@ import { Toaster } from 'sonner';
 import { type SharedData } from '@/types';
 
 interface AppLayoutProps {
-    children: ReactNode;
-    breadcrumbs?: BreadcrumbItem[];
+  children: ReactNode;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-    const { auth } = usePage<SharedData>().props;
+  const { auth } = usePage<SharedData>().props;
 
-    return (
-        <div className="min-h-screen flex flex-col bg-background">
-            <Navigation user={auth.user} />
-            <main className="flex-grow container mx-auto px-4 py-8">
-                {children}
-            </main>
-            <Footer />
-            <Toaster richColors position="top-right" />
-        </div>
-    );
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navigation user={auth.user} />
+      <main className="flex-grow container mx-auto">
+        {children}
+      </main>
+      <Footer />
+      <Toaster richColors position="top-right" />
+    </div>
+  );
 }

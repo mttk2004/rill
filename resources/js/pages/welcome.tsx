@@ -44,7 +44,7 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
           </div>
         </div>
 
-        <div className="relative container mx-auto px-4 py-24 lg:py-32">
+        <div className="relative container mx-auto px-4 pt-8  pb-12 lg:pt-16 lg:pb-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="hero-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent mb-6">
