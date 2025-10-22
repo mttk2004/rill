@@ -31,7 +31,8 @@ export default function Products({ products: productsData, pagination: paginatio
   const pagination = (paginationProp && typeof paginationProp === 'object' && 'data' in paginationProp ? paginationProp.data : paginationProp) as PaginationType;
   const filters = (filtersProp && typeof filtersProp === 'object' && 'data' in filtersProp ? filtersProp.data : filtersProp) as ProductFilters;
 
-  const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]); const [searchTerm, setSearchTerm] = useState(props.search || '');
+  const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
+  const [searchTerm, setSearchTerm] = useState(props.search || '');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const handleAddToCart = (e: MouseEvent<HTMLButtonElement>, productId: string) => {
@@ -55,28 +56,7 @@ export default function Products({ products: productsData, pagination: paginatio
 
   const handleFilterChange = (key: string, value: string) => {
     const newValue = value === 'all' || value === '' ? undefined : value;
-
-    const updatedFilters = {
-      search: props.search,
-      genre: props.genre,
-      label: props.label,
-      artist: props.artist,
-      sort: props.sort,
-      [key]: newValue,
-      page: 1, // Reset to first page when filtering
-    };
-
-    Object.keys(updatedFilters).forEach(filterKey => {
-      if (!updatedFilters[filterKey as keyof typeof updatedFilters]) {
-        delete updatedFilters[filterKey as keyof typeof updatedFilters];
-      }
-    });
-
-    router.get('/products', updatedFilters, {
-      preserveState: true,
-      preserveScroll: true,
-      only: ['products', 'pagination', 'filters'],
-    });
+    updateFilters({ [key]: newValue, page: 1 });
   };
 
   const updateFilters = (newFilters: Record<string, string | number | undefined>) => {
@@ -86,7 +66,6 @@ export default function Products({ products: productsData, pagination: paginatio
       label: props.label,
       artist: props.artist,
       sort: props.sort,
-      page: props.page,
       ...newFilters,
     };
 
@@ -119,6 +98,7 @@ export default function Products({ products: productsData, pagination: paginatio
     { value: 'price_asc', label: 'Giá: Thấp đến cao' },
     { value: 'price_desc', label: 'Giá: Cao đến thấp' },
   ];
+
   return (
     <>
       <Head title="Sản phẩm - Rill" />
