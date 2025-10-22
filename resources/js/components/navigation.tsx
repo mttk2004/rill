@@ -1,4 +1,4 @@
-import { Link, usePage } from "@inertiajs/react";
+import { Link, usePage, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import {
   ShoppingBag,
@@ -10,8 +10,9 @@ import {
   Package,
   LogOut,
   UserCircle,
+  X, // Import X icon
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react"; // Import useRef, useEffect
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/hover-card";
 import { useCart } from "@/hooks/use-cart";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input"; // Import Input
 
 interface NavigationProps {
   user?: {
@@ -64,6 +66,23 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
 export const Navigation = ({ user }: NavigationProps) => {
   const { cartSummary, cartItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showSearchInput, setShowSearchInput] = useState(false); // State for search input visibility
+  const [searchInputValue, setSearchInputValue] = useState(''); // State for search input value
+  const searchInputRef = useRef<HTMLInputElement>(null); // Ref for focusing input
+
+  useEffect(() => {
+    if (showSearchInput && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [showSearchInput]);
+
+  const handleSearchSubmit = () => {
+    if (searchInputValue.trim()) {
+      router.get('/products', { search: searchInputValue.trim() });
+      setShowSearchInput(false); // Hide input after search
+      setSearchInputValue(''); // Clear input
+    }
+  };
 
   const navItems = [
     { label: "Trang chủ", path: "/" },
@@ -83,30 +102,83 @@ export const Navigation = ({ user }: NavigationProps) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between relative"> {/* Added relative here */}
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="relative">
-              <Disc3 className="h-8 w-8 text-amber-500 transition-transform group-hover:rotate-180" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">Rill</span>
-          </Link>
+          {!showSearchInput && ( // Conditionally render logo
+            <Link href="/" className="flex items-center space-x-2 group mr-8 md:mr-16">
+              <div className="relative">
+                <Disc3 className="h-8 w-8 text-amber-500 transition-transform group-hover:rotate-180" />
+              </div>
+              <span className="text-xl font-bold tracking-tight">Rill</span>
+            </Link>
+          )}
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {navItems.map((item) => (
-              <NavLink key={item.path} href={item.path}>
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
+          {!showSearchInput && ( // Conditionally render desktop nav
+            <nav className="hidden md:flex items-center space-x-6">
+              {navItems.map((item) => (
+                <NavLink key={item.path} href={item.path}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+          )}
+
+          {/* Search Input Field */}
+          <div
+            className={cn(
+              "absolute inset-x-0 md:relative md:inset-x-auto flex-grow flex items-center transition-all duration-300 ease-in-out",
+              showSearchInput ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full md:opacity-0 md:translate-x-0 pointer-events-none"
+            )}
+          >
+            {showSearchInput && (
+              <div className="relative w-full">
+                <Input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Tìm kiếm sản phẩm..."
+                  value={searchInputValue}
+                  onChange={(e) => setSearchInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSearchSubmit();
+                    }
+                  }}
+                  onBlur={() => {
+                    // Hide input if empty and loses focus
+                    if (!searchInputValue.trim()) {
+                      setShowSearchInput(false);
+                    }
+                  }}
+                  className="w-full pr-10"
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 -translate-y-1/2"
+                  onClick={() => {
+                    setShowSearchInput(false);
+                    setSearchInputValue('');
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
 
           {/* Actions */}
           <div className="flex items-center space-x-1">
             <TooltipProvider delayDuration={100}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hidden sm:flex">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn("hidden sm:flex", showSearchInput && "hidden")} // Hide search icon when input is shown
+                    onClick={() => setShowSearchInput(!showSearchInput)}
+                  >
                     <Search className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -182,7 +254,7 @@ export const Navigation = ({ user }: NavigationProps) => {
             </TooltipProvider>
 
             {/* User Dropdown */}
-            {user ? (
+            {!showSearchInput && user ? ( // Conditionally render user dropdown
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 h-9">
@@ -219,25 +291,29 @@ export const Navigation = ({ user }: NavigationProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex items-center space-x-2 pl-2">
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/login">Đăng nhập</Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link href="/register">Đăng ký</Link>
-                </Button>
-              </div>
+              !showSearchInput && ( // Conditionally render login/register buttons
+                <div className="flex items-center space-x-2 pl-2">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link href="/login">Đăng nhập</Link>
+                  </Button>
+                  <Button size="sm" asChild>
+                    <Link href="/register">Đăng ký</Link>
+                  </Button>
+                </div>
+              )
             )}
 
             {/* Mobile menu button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
+            {!showSearchInput && ( // Conditionally render mobile menu button
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
 
@@ -256,7 +332,16 @@ export const Navigation = ({ user }: NavigationProps) => {
                 </Link>
               ))}
               <div className="px-4 pt-2 border-t">
-                <Button variant="ghost" size="sm" className="w-full justify-start">
+                {/* Mobile search button - now toggles the main search input */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setShowSearchInput(true); // Show search input
+                    setIsMenuOpen(false); // Close mobile menu
+                  }}
+                >
                   <Search className="h-4 w-4 mr-2" />
                   Tìm kiếm
                 </Button>
