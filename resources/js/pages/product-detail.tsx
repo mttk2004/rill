@@ -6,28 +6,23 @@ import { Heart, ShoppingCart, Star, Disc3, Calendar, Music, ArrowLeft } from "lu
 import { Link, Head, usePage } from '@inertiajs/react';
 import { useState, MouseEvent, useMemo } from "react";
 import { Product, SharedData } from '@/types';
-import { useCart } from "@/hooks/use-cart";
-import { toast } from 'sonner';
+import { useCartStore } from "@/store/useCartStore";
 
 interface ProductDetailProps {
   product: Product;
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
-  const { auth, cart } = usePage<SharedData>().props;
-  const { addToCart } = useCart();
+  const { auth } = usePage<SharedData>().props;
+  const { addToCart, items: cartItems } = useCartStore();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const isInCart = useMemo(() => cart.items.some(item => item.product.id === product.id), [cart.items, product.id]);
+  const isInCart = useMemo(() => cartItems.some(item => item.product.id === product.id), [cartItems, product.id]);
 
   const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    toast.promise(addToCart(product.id, quantity), {
-      loading: 'Đang thêm vào giỏ hàng...',
-      success: `Đã thêm ${quantity} sản phẩm vào giỏ!`,
-      error: (err) => err.message || 'Đã xảy ra lỗi.',
-    });
+    addToCart(product.id, quantity);
   };
 
   const handleWishlist = () => {
@@ -45,7 +40,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     <>
       <Head title={`${product.name} - Rill`} />
       <div className="min-h-screen bg-background">
-        <Navigation user={auth.user} />
+        <Navigation />
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">

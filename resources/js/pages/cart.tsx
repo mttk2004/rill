@@ -1,58 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/navigation";
-import { Minus, Plus, Trash2, ShoppingCart, Heart, ArrowLeft, Disc3, Loader2 } from "lucide-react";
-import { Link, Head, usePage, router } from "@inertiajs/react";
-import { type SharedData } from '@/types';
+import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft, Disc3, Loader2 } from "lucide-react";
+import { Link, Head, router } from "@inertiajs/react";
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-interface CartItem {
-  id: number;
-  product_id: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  product: {
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-    price: number;
-    image_url: string | null;
-    stock_quantity: number;
-    is_featured: boolean;
-    status: string;
-    artists: Array<{
-      id: string;
-      name: string;
-      slug: string;
-    }>;
-  };
-}
-
-interface CartSummary {
-  total_items: number;
-  total_amount: number;
-  items_count: number;
-  formatted_total: string;
-}
-
-interface CartPageProps extends SharedData {
-  cartItems: CartItem[];
-  cartSummary: CartSummary;
-}
+import { useCartStore } from "@/store/useCartStore";
 
 export default function Cart() {
-  const pageProps = usePage<CartPageProps>().props;
-  const { auth, cartItems, cartSummary } = pageProps;
+  const { items: cartItems, summary: cartSummary } = useCartStore();
   const [isUpdating, setIsUpdating] = useState<number | null>(null);
-
-  const shipping = cartSummary.total_amount >= 1000000 ? 0 : 50000;
-  const total = cartSummary.total_amount + shipping;
 
   const updateQuantity = async (cartItemId: number, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -107,7 +67,6 @@ export default function Cart() {
     <>
       <Head title="Giỏ hàng - Rill" />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-        <Navigation user={auth.user} />
 
         {/* Hero Section */}
         <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">

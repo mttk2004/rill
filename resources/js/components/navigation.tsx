@@ -35,17 +35,10 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { useCart } from "@/hooks/use-cart";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useCartStore } from "@/store/useCartStore";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input"; // Import Input
-
-interface NavigationProps {
-  user?: {
-    name: string;
-    email: string;
-    avatar?: string;
-  } | null;
-}
 
 const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
   const { url } = usePage();
@@ -64,8 +57,9 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
 };
 
 
-export const Navigation = ({ user }: NavigationProps) => {
-  const { cartSummary, cartItems } = useCart();
+export const Navigation = () => {
+  const { user, isAuthenticated } = useAuthStore();
+  const { summary: cartSummary, items: cartItems } = useCartStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false); // State for search input visibility
   const [searchInputValue, setSearchInputValue] = useState(''); // State for search input value
@@ -186,7 +180,7 @@ export const Navigation = ({ user }: NavigationProps) => {
                 <TooltipContent><p>Tìm kiếm</p></TooltipContent>
               </Tooltip>
 
-              {user && (
+              {isAuthenticated && (
                 <>
                   <Tooltip>
                     <TooltipTrigger asChild>
