@@ -70,6 +70,12 @@ export interface SharedData {
     summary: CartSummary;
     items: FlyoutCartItem[];
   };
+  flash?: {
+    success?: string;
+    error?: string;
+    info?: string;
+    warning?: string;
+  };
   [key: string]: unknown;
 }
 

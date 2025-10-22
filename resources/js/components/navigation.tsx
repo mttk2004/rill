@@ -11,6 +11,7 @@ import {
   LogOut,
   UserCircle,
   X, // Import X icon
+  Home, // Import Home icon
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react"; // Import useRef, useEffect
 import {
@@ -275,6 +276,9 @@ export const Navigation = ({ user }: NavigationProps) => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/settings/profile"><UserCircle className="mr-2 h-4 w-4" />Hồ sơ cá nhân</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/addresses"><Home className="mr-2 h-4 w-4" />Địa chỉ</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/orders"><Package className="mr-2 h-4 w-4" />Đơn hàng của tôi</Link>

@@ -4,6 +4,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AddressController;
+use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -44,6 +46,10 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/wishlist', function () {
         return Inertia::render('wishlist');
     })->name('wishlist');
+
+    // Address management
+    Route::resource('addresses', AddressController::class);
+    Route::put('addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
 });
 
 // Admin routes
@@ -163,3 +169,9 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});

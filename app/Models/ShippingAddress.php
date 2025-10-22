@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasSnowflakeId;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\HasSnowflakeId;
 
 class ShippingAddress extends Model
 {
@@ -14,9 +14,6 @@ class ShippingAddress extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    /**
-     * The attributes that are mass assignable.
-     */
     protected $fillable = [
         'user_id',
         'full_name',
@@ -30,9 +27,6 @@ class ShippingAddress extends Model
         'is_default',
     ];
 
-    /**
-     * The attributes that should be cast.
-     */
     protected $casts = [
         'is_default' => 'boolean',
     ];
@@ -46,30 +40,19 @@ class ShippingAddress extends Model
     }
 
     /**
-     * Get the full address as a formatted string.
+     * The "booted" method of the model.
+     *
+     * @return void
      */
-    public function getFullAddressAttribute(): string
+    protected static function booted()
     {
-        $address = collect([
-            $this->address_line_1,
-            $this->address_line_2,
-            $this->ward,
-            $this->district,
-            $this->city,
-        ])->filter()->implode(', ');
-
-        if ($this->postal_code) {
-            $address .= ' ' . $this->postal_code;
-        }
-
-        return $address;
-    }
-
-    /**
-     * Scope to get only default addresses.
-     */
-    public function scopeDefault($query)
-    {
-        return $query->where('is_default', true);
+        static::saving(function (self $address) {
+            // Ensure only one default address per user
+            if ($address->is_default) {
+                self::where('user_id', $address->user_id)
+                    ->where('id', '!=', $address->id)
+                    ->update(['is_default' => false]);
+            }
+        });
     }
 }
