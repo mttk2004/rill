@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/product-card";
 import { Play, Star, ShoppingBag, Truck, Award, Users, Disc3 } from "lucide-react";
 import { type Product } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { type ReactNode } from "react";
 
 interface WelcomeProps {
   featuredProducts: Product[];
@@ -265,6 +266,6 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
   );
 }
 
-Welcome.layout = page => <AppLayout children={page} />
+Welcome.layout = (page: ReactNode) => <AppLayout children={page} />
 
 export default Welcome;
