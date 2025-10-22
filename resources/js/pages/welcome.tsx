@@ -266,3 +266,5 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
 }
 
 Welcome.layout = page => <AppLayout children={page} />
+
+export default Welcome;
