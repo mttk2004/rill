@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class HomeController extends Controller
+{
+    public function index()
+    {
+        $featuredProducts = Product::with('artists')
+            ->where('is_featured', true)
+            ->inRandomOrder()
+            ->limit(4)
+            ->get();
+
+        return Inertia::render('welcome', [
+            'featuredProducts' => $featuredProducts,
+        ]);
+    }
+}
