@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { route } from 'ziggy-js';
-import { Plus, Edit, Trash, CheckCircle } from 'lucide-react';
+import { Plus, Edit, Trash, MapPin, Phone, User, Star, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -148,236 +148,328 @@ export default function Addresses({ addresses }: AddressesPageProps) {
   return (
     <>
       <Head title="Địa chỉ của tôi - Rill" />
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
         <Navigation user={auth.user} />
 
         <main className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Địa chỉ của tôi</CardTitle>
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm"><Plus className="mr-2 h-4 w-4" />Thêm địa chỉ mới</Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>{editingAddress ? 'Chỉnh sửa địa chỉ' : 'Thêm địa chỉ mới'}</DialogTitle>
-                      <DialogDescription>
-                        {editingAddress ? 'Cập nhật thông tin địa chỉ của bạn.' : 'Thêm một địa chỉ giao hàng mới.'}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        {/* Row 1: Full Name and Phone in 2 columns */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name="full_name"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Họ tên người nhận</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Nguyễn Văn A" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="phone"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Số điện thoại</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="09xxxxxxxx" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        {/* Row 2: Address Line 1 (full width) */}
+          <div className="max-w-5xl mx-auto space-y-6">
+            {/* Header Section */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                  <MapPin className="h-8 w-8 text-accent" />
+                  Địa chỉ của tôi
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  Quản lý địa chỉ giao hàng để có trải nghiệm mua sắm tốt nhất
+                </p>
+              </div>
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="shadow-lg">
+                    <Plus className="mr-2 h-5 w-5" />
+                    Thêm địa chỉ mới
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl">{editingAddress ? 'Chỉnh sửa địa chỉ' : 'Thêm địa chỉ mới'}</DialogTitle>
+                    <DialogDescription>
+                      {editingAddress ? 'Cập nhật thông tin địa chỉ của bạn.' : 'Thêm một địa chỉ giao hàng mới.'}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      {/* Row 1: Full Name and Phone in 2 columns */}
+                      <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name="address_line_1"
+                          name="full_name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Địa chỉ dòng 1</FormLabel>
+                              <FormLabel>Họ tên người nhận</FormLabel>
                               <FormControl>
-                                <Input placeholder="Số nhà, tên đường" {...field} />
+                                <Input placeholder="Nguyễn Văn A" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-
-                        {/* Row 3: Address Line 2 (full width, optional) */}
                         <FormField
                           control={form.control}
-                          name="address_line_2"
+                          name="phone"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Địa chỉ dòng 2 (Tùy chọn)</FormLabel>
+                              <FormLabel>Số điện thoại</FormLabel>
                               <FormControl>
-                                <Input placeholder="Tòa nhà, tầng, căn hộ" {...field} value={field.value || ''} />
+                                <Input placeholder="09xxxxxxxx" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+                      </div>
 
-                        {/* Row 4: City and District in 2 columns */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name="city"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Thành phố</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Hồ Chí Minh" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="district"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Quận/Huyện</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Quận 1" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                      {/* Row 2: Address Line 1 (full width) */}
+                      <FormField
+                        control={form.control}
+                        name="address_line_1"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Địa chỉ dòng 1</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Số nhà, tên đường" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                        {/* Row 5: Ward and Postal Code in 2 columns */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name="ward"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Phường/Xã</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Phường Đa Kao" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name="postal_code"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Mã bưu điện (Tùy chọn)</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="70000" {...field} value={field.value || ''} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                      {/* Row 3: Address Line 2 (full width, optional) */}
+                      <FormField
+                        control={form.control}
+                        name="address_line_2"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Địa chỉ dòng 2 (Tùy chọn)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Tòa nhà, tầng, căn hộ" {...field} value={field.value || ''} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                        {/* Row 6: Default Address Setting */}
+                      {/* Row 4: City and District in 2 columns */}
+                      <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name="is_default"
+                          name="city"
                           render={({ field }) => (
-                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                              <div className="space-y-0.5">
-                                <FormLabel className="text-base">Đặt làm mặc định</FormLabel>
-                                <DialogDescription>
-                                  Đặt địa chỉ này làm địa chỉ giao hàng mặc định của bạn.
-                                </DialogDescription>
-                              </div>
+                            <FormItem>
+                              <FormLabel>Thành phố</FormLabel>
                               <FormControl>
-                                <RadioGroup
-                                  onValueChange={(value) => field.onChange(value === 'true')}
-                                  value={field.value ? 'true' : 'false'}
-                                  className="flex flex-col space-y-1"
-                                >
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="true" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">Có</FormLabel>
-                                  </FormItem>
-                                  <FormItem className="flex items-center space-x-3 space-y-0">
-                                    <FormControl>
-                                      <RadioGroupItem value="false" />
-                                    </FormControl>
-                                    <FormLabel className="font-normal">Không</FormLabel>
-                                  </FormItem>
-                                </RadioGroup>
+                                <Input placeholder="Hồ Chí Minh" {...field} />
                               </FormControl>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
-                        <DialogFooter>
-                          <Button type="submit" disabled={form.formState.isSubmitting}>
-                            {form.formState.isSubmitting ? 'Đang lưu...' : 'Lưu địa chỉ'}
-                          </Button>
-                        </DialogFooter>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </Dialog>
-              </CardHeader>
-              <CardContent>
-                {addresses.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Bạn chưa có địa chỉ nào. Hãy thêm một địa chỉ mới!
-                  </div>
-                ) : (
-                  <div className="grid gap-4">
-                    {addresses.map((address) => (
-                      <Card key={address.id} className={address.is_default ? 'border-amber-500 ring-2 ring-amber-500' : ''}>
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <div className="flex items-center gap-2 mb-2">
-                                <h4 className="font-semibold">{address.full_name}</h4>
-                                {address.is_default && <CheckCircle className="h-4 w-4 text-green-500" />}
-                              </div>
-                              <p className="text-sm text-muted-foreground">{address.phone}</p>
-                              <p className="text-sm">{address.address_line_1}{address.address_line_2 && `, ${address.address_line_2}`}</p>
-                              <p className="text-sm text-muted-foreground">{address.ward}, {address.district}, {address.city}</p>
-                              {address.postal_code && <p className="text-sm text-muted-foreground">Mã bưu điện: {address.postal_code}</p>}
+                        <FormField
+                          control={form.control}
+                          name="district"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Quận/Huyện</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Quận 1" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Row 5: Ward and Postal Code in 2 columns */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="ward"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phường/Xã</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Phường Đa Kao" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="postal_code"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Mã bưu điện (Tùy chọn)</FormLabel>
+                              <FormControl>
+                                <Input placeholder="70000" {...field} value={field.value || ''} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Row 6: Default Address Setting */}
+                      <FormField
+                        control={form.control}
+                        name="is_default"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border-2 border-accent/20 bg-accent/5 p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base font-semibold">Đặt làm mặc định</FormLabel>
+                              <DialogDescription>
+                                Đặt địa chỉ này làm địa chỉ giao hàng mặc định của bạn.
+                              </DialogDescription>
                             </div>
-                            <div className="flex gap-2">
-                              <Button variant="outline" size="icon" onClick={() => handleEdit(address)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              {!address.is_default && (
-                                <Button variant="outline" size="icon" onClick={() => handleDelete(address.id)}>
-                                  <Trash className="h-4 w-4" />
-                                </Button>
-                              )}
-                              {!address.is_default && (
-                                <Button variant="outline" size="sm" onClick={() => handleSetDefault(address.id)}>
-                                  Đặt làm mặc định
-                                </Button>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={(value) => field.onChange(value === 'true')}
+                                value={field.value ? 'true' : 'false'}
+                                className="flex flex-col space-y-1"
+                              >
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="true" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Có</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="false" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">Không</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <DialogFooter className="gap-2">
+                        <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
+                          Hủy
+                        </Button>
+                        <Button type="submit" disabled={form.formState.isSubmitting}>
+                          {form.formState.isSubmitting ? 'Đang lưu...' : 'Lưu địa chỉ'}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* Address Cards */}
+            {addresses.length === 0 ? (
+              <Card className="border-2 border-dashed border-accent/30">
+                <CardContent className="flex flex-col items-center justify-center py-16">
+                  <div className="rounded-full bg-accent/10 p-6 mb-4">
+                    <Home className="h-12 w-12 text-accent" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">Chưa có địa chỉ nào</h3>
+                  <p className="text-muted-foreground mb-6 text-center">
+                    Hãy thêm địa chỉ giao hàng để trải nghiệm mua sắm thuận tiện hơn
+                  </p>
+                  <Button onClick={() => setIsModalOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Thêm địa chỉ đầu tiên
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-6">
+                {addresses.map((address) => (
+                  <Card
+                    key={address.id}
+                    className={`group transition-all hover:shadow-lg ${address.is_default
+                        ? 'border-2 border-accent shadow-md ring-2 ring-accent/20'
+                        : 'border-2 border-transparent hover:border-accent/30'
+                      }`}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        {/* Address Info */}
+                        <div className="flex-1 space-y-3">
+                          {/* Name & Default Badge */}
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                              <User className="h-5 w-5 text-accent" />
+                              <h4 className="font-bold text-lg">{address.full_name}</h4>
+                            </div>
+                            {address.is_default && (
+                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent text-white text-xs font-semibold">
+                                <Star className="h-3 w-3 fill-white" />
+                                Mặc định
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Phone */}
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="h-4 w-4 text-accent/70" />
+                            <span className="text-sm font-medium">{address.phone}</span>
+                          </div>
+
+                          {/* Address */}
+                          <div className="flex items-start gap-2">
+                            <MapPin className="h-4 w-4 text-accent/70 mt-0.5 flex-shrink-0" />
+                            <div className="text-sm space-y-1">
+                              <p className="font-medium text-foreground">
+                                {address.address_line_1}
+                                {address.address_line_2 && `, ${address.address_line_2}`}
+                              </p>
+                              <p className="text-muted-foreground">
+                                {address.ward}, {address.district}, {address.city}
+                              </p>
+                              {address.postal_code && (
+                                <p className="text-muted-foreground text-xs">
+                                  Mã bưu điện: {address.postal_code}
+                                </p>
                               )}
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-col gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(address)}
+                            className="w-full"
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Sửa
+                          </Button>
+
+                          {!address.is_default && (
+                            <>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleSetDefault(address.id)}
+                                className="w-full"
+                              >
+                                <Star className="mr-2 h-4 w-4" />
+                                Đặt mặc định
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDelete(address.id)}
+                                className="w-full"
+                              >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Xóa
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {/* Info Note */}
+            {addresses.length > 0 && addresses.length < 3 && (
+              <div className="bg-accent/5 border border-accent/20 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground text-center">
+                  💡 Bạn có thể lưu tối đa 3 địa chỉ giao hàng
+                </p>
+              </div>
+            )}
           </div>
         </main>
       </div>
