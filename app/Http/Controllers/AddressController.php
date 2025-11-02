@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreShippingAddressRequest;
 use App\Http\Requests\UpdateShippingAddressRequest;
+use App\Http\Resources\ShippingAddressResource;
 use App\Models\ShippingAddress;
 use App\Services\AddressService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -13,6 +15,8 @@ use Inertia\Response;
 
 class AddressController extends Controller
 {
+    use AuthorizesRequests;
+
     protected AddressService $addressService;
 
     public function __construct(AddressService $addressService)
@@ -38,6 +42,8 @@ class AddressController extends Controller
      */
     public function store(StoreShippingAddressRequest $request): RedirectResponse
     {
+        $this->authorize('create', ShippingAddress::class);
+
         $user = Auth::user();
         $this->addressService->createAddress($user, $request->validated());
 
@@ -50,10 +56,7 @@ class AddressController extends Controller
      */
     public function update(UpdateShippingAddressRequest $request, ShippingAddress $address): RedirectResponse
     {
-        // Policy check: ensure user owns the address
-        if ($address->user_id !== Auth::id()) {
-            abort(403, 'Bạn không có quyền chỉnh sửa địa chỉ này.');
-        }
+        $this->authorize('update', $address);
 
         $this->addressService->updateAddress($address, $request->validated());
 
@@ -66,10 +69,7 @@ class AddressController extends Controller
      */
     public function destroy(ShippingAddress $address): RedirectResponse
     {
-        // Policy check: ensure user owns the address
-        if ($address->user_id !== Auth::id()) {
-            abort(403, 'Bạn không có quyền xóa địa chỉ này.');
-        }
+        $this->authorize('delete', $address);
 
         try {
             $this->addressService->deleteAddress($address);
@@ -86,10 +86,7 @@ class AddressController extends Controller
      */
     public function setDefault(ShippingAddress $address): RedirectResponse
     {
-        // Policy check: ensure user owns the address
-        if ($address->user_id !== Auth::id()) {
-            abort(403, 'Bạn không có quyền đặt địa chỉ này làm mặc định.');
-        }
+        $this->authorize('setDefault', $address);
 
         try {
             $this->addressService->setDefaultAddress(Auth::user(), $address);

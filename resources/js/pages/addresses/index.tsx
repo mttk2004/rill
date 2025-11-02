@@ -160,7 +160,7 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                   <DialogTrigger asChild>
                     <Button size="sm"><Plus className="mr-2 h-4 w-4" />Thêm địa chỉ mới</Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>{editingAddress ? 'Chỉnh sửa địa chỉ' : 'Thêm địa chỉ mới'}</DialogTitle>
                       <DialogDescription>
@@ -169,32 +169,37 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                     </DialogHeader>
                     <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="full_name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Họ tên người nhận</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Nguyễn Văn A" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="phone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Số điện thoại</FormLabel>
-                              <FormControl>
-                                <Input placeholder="09xxxxxxxx" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        {/* Row 1: Full Name and Phone in 2 columns */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="full_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Họ tên người nhận</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Nguyễn Văn A" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Số điện thoại</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="09xxxxxxxx" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        {/* Row 2: Address Line 1 (full width) */}
                         <FormField
                           control={form.control}
                           name="address_line_1"
@@ -208,6 +213,8 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                             </FormItem>
                           )}
                         />
+
+                        {/* Row 3: Address Line 2 (full width, optional) */}
                         <FormField
                           control={form.control}
                           name="address_line_2"
@@ -221,58 +228,68 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                             </FormItem>
                           )}
                         />
-                        <FormField
-                          control={form.control}
-                          name="city"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Thành phố</FormLabel>
-                              <FormControl>
-                                <Input placeholder="TP. Hồ Chí Minh" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="district"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Quận/Huyện</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Quận 1" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="ward"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Phường/Xã</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Phường Bến Nghé" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="postal_code"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Mã bưu điện (Tùy chọn)</FormLabel>
-                              <FormControl>
-                                <Input placeholder="70000" {...field} value={field.value || ''} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+
+                        {/* Row 4: City and District in 2 columns */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Thành phố</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Hồ Chí Minh" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="district"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Quận/Huyện</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Quận 1" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        {/* Row 5: Ward and Postal Code in 2 columns */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="ward"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Phường/Xã</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Phường Đa Kao" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="postal_code"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Mã bưu điện (Tùy chọn)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="70000" {...field} value={field.value || ''} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        {/* Row 6: Default Address Setting */}
                         <FormField
                           control={form.control}
                           name="is_default"

@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Order;
+use App\Models\ShippingAddress;
 use App\Policies\OrderPolicy;
+use App\Policies\ShippingAddressPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -15,6 +17,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Order::class => OrderPolicy::class,
+        ShippingAddress::class => ShippingAddressPolicy::class,
     ];
 
     /**
