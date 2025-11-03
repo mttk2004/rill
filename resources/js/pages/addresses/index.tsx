@@ -1,3 +1,4 @@
+import AppLayout from "@/layouts/app-layout";
 import { Head, usePage, router } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
@@ -12,7 +13,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
-import { Navigation } from '@/components/navigation';
 import { type SharedData } from '@/types';
 
 interface ShippingAddress {
@@ -50,7 +50,7 @@ const addressSchema = z.object({
 type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function Addresses({ addresses }: AddressesPageProps) {
-  const { auth, flash } = usePage<SharedData>().props;
+  const { flash } = usePage<SharedData>().props;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<ShippingAddress | null>(null);
 
@@ -146,10 +146,9 @@ export default function Addresses({ addresses }: AddressesPageProps) {
   };
 
   return (
-    <>
+    <AppLayout>
       <Head title="Địa chỉ của tôi - Rill" />
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
-        <Navigation user={auth.user} />
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-5xl mx-auto space-y-6">
@@ -372,8 +371,8 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                   <Card
                     key={address.id}
                     className={`group transition-all hover:shadow-lg ${address.is_default
-                        ? 'border-2 border-accent shadow-md ring-2 ring-accent/20'
-                        : 'border-2 border-transparent hover:border-accent/30'
+                      ? 'border-2 border-accent shadow-md ring-2 ring-accent/20'
+                      : 'border-2 border-transparent hover:border-accent/30'
                       }`}
                   >
                     <CardContent className="p-6">
@@ -473,6 +472,6 @@ export default function Addresses({ addresses }: AddressesPageProps) {
           </div>
         </main>
       </div>
-    </>
+    </AppLayout>
   );
 }

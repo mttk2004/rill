@@ -1,14 +1,11 @@
-import { Navigation } from "@/components/navigation";
+import AppLayout from "@/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Award, Users, Truck, Clock, Disc3 } from "lucide-react";
-import { type SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 
 export default function About() {
-  const { auth } = usePage<SharedData>().props;
-
   const stats = [
     { icon: Users, label: "Khách hàng hài lòng", value: "10,000+" },
     { icon: Award, label: "Đĩa than chính hãng", value: "1,500+" },
@@ -56,11 +53,9 @@ export default function About() {
   ];
 
   return (
-    <>
+    <AppLayout>
       <Head title="Về chúng tôi - Rill" />
       <div className="min-h-screen bg-background">
-        <Navigation user={auth.user} />
-
         {/* Hero Section */}
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
@@ -337,6 +332,6 @@ export default function About() {
           </div>
         </section>
       </div>
-    </>
+    </AppLayout>
   );
 }

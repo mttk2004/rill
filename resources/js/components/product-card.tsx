@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Star, Disc3, Heart, ShoppingCart } from "lucide-react";
 import { Link } from '@inertiajs/react';
 import { type Product } from '@/types';
+import { MouseEvent } from 'react';
 
 interface ProductCardProps {
   product: Product;
@@ -11,6 +12,8 @@ interface ProductCardProps {
   index?: number;
   showActions?: boolean;
   className?: string;
+  onAddToCart?: (e: MouseEvent<HTMLButtonElement>, productId: string) => void;
+  isInCart?: boolean;
 }
 
 export function ProductCard({
@@ -18,24 +21,23 @@ export function ProductCard({
   viewMode = 'grid',
   index = 0,
   showActions = true,
-  className = ""
+  className = "",
+  onAddToCart,
+  isInCart = false
 }: ProductCardProps) {
   return (
     <Card
-      className={`group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in bg-gradient-to-br from-white to-accent/5 ${
-        viewMode === "list" ? "flex-row" : ""
-      } ${className}`}
+      className={`group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in bg-gradient-to-br from-white to-accent/5 ${viewMode === "list" ? "flex-row" : ""
+        } ${className}`}
       style={{ animationDelay: `${index * 0.1}s` }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-accent/5 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <CardContent className={`p-0 relative z-10 ${viewMode === "list" ? "flex" : ""}`}>
         <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
           <Link href={`/products/${product.slug}`}>
-            <div className={`relative w-full bg-gradient-to-br from-slate-100 to-accent/10 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-500 ${
-              viewMode === "list" ? "h-32" : "h-72"
-            } ${
-              viewMode === "list" ? "rounded-l-xl" : "rounded-t-xl"
-            }`}>
+            <div className={`relative w-full bg-gradient-to-br from-slate-100 to-accent/10 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-500 ${viewMode === "list" ? "h-32" : "h-72"
+              } ${viewMode === "list" ? "rounded-l-xl" : "rounded-t-xl"
+              }`}>
               <Disc3 className="h-20 w-20 text-accent/40 animate-spin-slow group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
@@ -108,19 +110,31 @@ export function ProductCard({
 
           {showActions && (
             <div className="flex gap-3">
-              <Button
-                size="sm"
-                variant="outline"
-                className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('Add to cart:', product.id);
-                }}
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Thêm vào giỏ
-              </Button>
+              {product.status === 'out_of_stock' ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1"
+                  disabled
+                >
+                  Hết hàng
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm"
+                  onClick={(e) => {
+                    if (onAddToCart) {
+                      onAddToCart(e, product.id);
+                    }
+                  }}
+                  disabled={isInCart}
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  {isInCart ? 'Đã thêm' : 'Thêm vào giỏ'}
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="default"

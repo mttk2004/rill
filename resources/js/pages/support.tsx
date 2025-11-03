@@ -1,10 +1,10 @@
+import AppLayout from "@/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Navigation } from "@/components/navigation";
 import { Badge } from "@/components/ui/badge";
 import {
   MessageCircle,
@@ -23,8 +23,7 @@ import {
   Headphones,
   Star
 } from "lucide-react";
-import { type SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 
 const faqs = [
   {
@@ -84,14 +83,10 @@ const contactMethods = [
 ];
 
 export default function Support() {
-  const { auth } = usePage<SharedData>().props;
-
   return (
-    <>
+    <AppLayout>
       <Head title="Hỗ trợ - Rill" />
       <div className="min-h-screen bg-background">
-        <Navigation user={auth.user} />
-
         <main className="min-h-screen">
           {/* Hero Section */}
           <section className="relative overflow-hidden">
@@ -359,6 +354,6 @@ export default function Support() {
           </section>
         </main>
       </div>
-    </>
+    </AppLayout>
   );
 }
