@@ -27,6 +27,22 @@ export function ProductsFiltersMobile({
   sortOptions,
   onFilterChange,
 }: ProductsFiltersMobileProps) {
+  // Get display values
+  const getGenreDisplay = () => {
+    if (!currentGenre || currentGenre === 'all') return 'Tất cả';
+    return currentGenre;
+  };
+
+  const getLabelDisplay = () => {
+    if (!currentLabel || currentLabel === 'all') return 'Tất cả';
+    return currentLabel;
+  };
+
+  const getSortDisplay = () => {
+    const option = sortOptions.find(opt => opt.value === currentSort);
+    return option?.label || 'Nổi bật';
+  };
+
   return (
     <div className="md:hidden flex items-center justify-between w-full">
       <Sheet>
@@ -38,47 +54,68 @@ export function ProductsFiltersMobile({
         </SheetTrigger>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Bộ lọc</SheetTitle>
+            <SheetTitle>Bộ lọc & Sắp xếp</SheetTitle>
           </SheetHeader>
-          <div className="py-4 space-y-4">
-            <Select value={currentGenre} onValueChange={(value) => onFilterChange('genre', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Thể loại" />
-              </SelectTrigger>
-              <SelectContent>
-                {genres.map((genre) => (
-                  <SelectItem key={genre} value={genre === "Tất cả" ? "all" : genre}>
-                    {genre}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="py-6 space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                Thể loại
+              </label>
+              <Select value={currentGenre} onValueChange={(value) => onFilterChange('genre', value)}>
+                <SelectTrigger>
+                  <SelectValue>
+                    {getGenreDisplay()}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {genres.map((genre) => (
+                    <SelectItem key={genre} value={genre === "Tất cả" ? "all" : genre}>
+                      {genre}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={currentLabel} onValueChange={(value) => onFilterChange('label', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Hãng đĩa" />
-              </SelectTrigger>
-              <SelectContent>
-                {labels.map((label) => (
-                  <SelectItem key={label} value={label === "Tất cả" ? "all" : label}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                Hãng đĩa
+              </label>
+              <Select value={currentLabel} onValueChange={(value) => onFilterChange('label', value)}>
+                <SelectTrigger>
+                  <SelectValue>
+                    {getLabelDisplay()}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {labels.map((label) => (
+                    <SelectItem key={label} value={label === "Tất cả" ? "all" : label}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={currentSort} onValueChange={(value) => onFilterChange('sort', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Sắp xếp" />
-              </SelectTrigger>
-              <SelectContent>
-                {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                Sắp xếp theo
+              </label>
+              <Select value={currentSort} onValueChange={(value) => onFilterChange('sort', value)}>
+                <SelectTrigger>
+                  <SelectValue>
+                    {getSortDisplay()}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {sortOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </SheetContent>
       </Sheet>

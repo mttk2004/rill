@@ -116,7 +116,7 @@ export default function Products({ products: productsData, pagination: paginatio
           <div className="max-w-7xl mx-auto">
             <Card className="mb-8 border-0 shadow-lg bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
               <CardContent className="p-4">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                   <ProductsSearchBar
                     searchTerm={searchTerm}
                     onSearchChange={setSearchTerm}
@@ -146,9 +146,7 @@ export default function Products({ products: productsData, pagination: paginatio
                   />
                 </div>
               </CardContent>
-            </Card>
-
-            {pagination && pagination.total > 0 && (
+            </Card>            {pagination && pagination.total > 0 && (
               <ProductsStatsBar
                 from={pagination.from || 0}
                 to={pagination.to || 0}
