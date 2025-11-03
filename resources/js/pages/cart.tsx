@@ -121,8 +121,8 @@ export default function Cart() {
             <Disc3 className="h-16 w-16 text-amber-500/5" />
           </div>
 
-          <div className="relative container mx-auto px-4 py-12">
-            <div className="flex items-center gap-4 mb-6">
+          <div className="relative container mx-auto px-4 py-8">
+            <div className="flex items-center gap-4 mb-4">
               <Link href="/products">
                 <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -130,108 +130,209 @@ export default function Cart() {
                 </Button>
               </Link>
               <div>
-                <h1 className="text-4xl font-bold text-white drop-shadow-lg flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-white drop-shadow-lg flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
-                    <ShoppingCart className="h-8 w-8" />
+                    <ShoppingCart className="h-6 w-6" />
                   </div>
                   Giỏ hàng
                 </h1>
-                <p className="text-slate-200 drop-shadow">{cartSummary.items_count} sản phẩm đang chờ thanh toán</p>
+                <p className="text-sm text-slate-200 drop-shadow">{cartSummary.items_count} sản phẩm đang chờ thanh toán</p>
               </div>
             </div>
           </div>
         </div>
 
-        <main className="container mx-auto px-4 py-8">
-          <div className="max-w-7xl mx-auto">
-            {cartItems.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="max-w-md mx-auto">
-                  <div className="mb-8">
-                    <ShoppingCart className="h-24 w-24 text-slate-300 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Giỏ hàng trống</h2>
-                    <p className="text-slate-600 dark:text-slate-300">
-                      Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá bộ sưu tập vinyl tuyệt vời của chúng tôi!
-                    </p>
-                  </div>
-                  <Link href="/products">
-                    <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3">
-                      Khám phá sản phẩm
-                    </Button>
-                  </Link>
+        <main className="container mx-auto px-4 py-6">
+          <div className="max-w-7xl mx-auto">{cartItems.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <div className="mb-8">
+                  <ShoppingCart className="h-24 w-24 text-slate-300 mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Giỏ hàng trống</h2>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá bộ sưu tập vinyl tuyệt vời của chúng tôi!
+                  </p>
                 </div>
+                <Link href="/products">
+                  <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3">
+                    Khám phá sản phẩm
+                  </Button>
+                </Link>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                    <CardContent className="p-0">
-                      <div className="grid grid-cols-1 md:grid-cols-2">
-                        {cartItems.map((item, index) => (
-                          <div key={item.id} className={`p-6 flex gap-4 ${index % 2 === 0 ? 'md:border-r' : ''} ${index < cartItems.length - 2 ? 'md:border-b' : ''} border-slate-200 dark:border-slate-700`}>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left: Cart Items List (2/3) */}
+              <div className="lg:col-span-2 space-y-4">
+                <Card className="border-0 shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700">
+                    <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
+                      Sản phẩm ({cartSummary.total_items})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                      {cartItems.map((item) => (
+                        <div key={item.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                          <div className="flex gap-4">
+                            {/* Product Image */}
                             <div className="relative flex-shrink-0">
-                              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-lg">
+                              <div className="w-24 h-24 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-md overflow-hidden">
                                 {item.product.image_url ? (
-                                  <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover rounded-full" />
+                                  <img
+                                    src={item.product.image_url}
+                                    alt={item.product.name}
+                                    className="w-full h-full object-cover"
+                                  />
                                 ) : (
                                   <Disc3 className="h-12 w-12 text-amber-500" />
                                 )}
                               </div>
                             </div>
+
+                            {/* Product Info */}
                             <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-start">
+                              <div className="flex justify-between gap-4">
                                 <div className="flex-1 min-w-0">
                                   <Link href={`/products/${item.product.slug}`}>
-                                    <h3 className="font-bold text-md text-slate-900 dark:text-white truncate hover:text-amber-600 transition-colors">
+                                    <h3 className="font-semibold text-base text-slate-900 dark:text-white hover:text-amber-600 transition-colors line-clamp-1">
                                       {item.product.name}
                                     </h3>
                                   </Link>
-                                  <p className="text-sm text-slate-600 dark:text-slate-300 font-medium truncate">
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-1">
                                     {item.product.artists.map(artist => artist.name).join(', ')}
                                   </p>
+
+                                  {/* Mobile: Price & Quantity */}
+                                  <div className="flex items-center gap-4 mt-3 md:hidden">
+                                    <div className="flex items-center gap-2">
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                        disabled={isUpdating === item.id || item.quantity <= 1}
+                                      >
+                                        {isUpdating === item.id ? (
+                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <Minus className="h-3 w-3" />
+                                        )}
+                                      </Button>
+                                      <span className="w-10 text-center font-semibold text-sm">
+                                        {item.quantity}
+                                      </span>
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                        disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}
+                                      >
+                                        {isUpdating === item.id ? (
+                                          <Loader2 className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <Plus className="h-3 w-3" />
+                                        )}
+                                      </Button>
+                                    </div>
+                                    <div className="flex-1 text-right">
+                                      <p className="text-lg font-bold text-amber-600">
+                                        {item.total_price.toLocaleString('vi-VN')}₫
+                                      </p>
+                                      <p className="text-xs text-slate-500">
+                                        {item.unit_price.toLocaleString('vi-VN')}₫/cái
+                                      </p>
+                                    </div>
+                                  </div>
                                 </div>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" onClick={() => removeItem(item.id)} disabled={isUpdating === item.id}>
+
+                                {/* Desktop: Delete Button */}
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex-shrink-0"
+                                  onClick={() => removeItem(item.id)}
+                                  disabled={isUpdating === item.id}
+                                >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex justify-between items-end mt-2">
-                                <div className="flex items-center gap-2">
-                                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={isUpdating === item.id || item.quantity <= 1}>
-                                    {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Minus className="h-4 w-4" />}
-                                  </Button>
-                                  <span className="w-8 text-center font-semibold">{item.quantity}</span>
-                                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(item.id, item.quantity + 1)} disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}>
-                                    {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-4 w-4" />}
-                                  </Button>
+
+                              {/* Desktop: Quantity & Price Row */}
+                              <div className="hidden md:flex items-center justify-between mt-3 pt-3 border-t border-slate-100 dark:border-slate-700">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-sm text-slate-600 dark:text-slate-400">Số lượng:</span>
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                      disabled={isUpdating === item.id || item.quantity <= 1}
+                                    >
+                                      {isUpdating === item.id ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <Minus className="h-3 w-3" />
+                                      )}
+                                    </Button>
+                                    <span className="w-12 text-center font-semibold">
+                                      {item.quantity}
+                                    </span>
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="h-8 w-8"
+                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                      disabled={isUpdating === item.id || item.quantity >= item.product.stock_quantity}
+                                    >
+                                      {isUpdating === item.id ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <Plus className="h-3 w-3" />
+                                      )}
+                                    </Button>
+                                  </div>
+                                  <span className="text-xs text-slate-500">
+                                    (Còn {item.product.stock_quantity} sản phẩm)
+                                  </span>
                                 </div>
-                                <p className="text-lg font-bold text-amber-600">
-                                  {item.total_price.toLocaleString('vi-VN')}₫
-                                </p>
+
+                                <div className="text-right">
+                                  <p className="text-xl font-bold text-amber-600">
+                                    {item.total_price.toLocaleString('vi-VN')}₫
+                                  </p>
+                                  <p className="text-xs text-slate-500">
+                                    {item.unit_price.toLocaleString('vi-VN')}₫ × {item.quantity}
+                                  </p>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
-                {/* Sidebar */}
-                <div className="space-y-6">
-                  {/* Order Summary */}
-                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                    <CardHeader>
+              {/* Right: Sidebar (1/3) - Sticky */}
+              <div className="lg:col-span-1">
+                <div className="sticky top-4 space-y-4">{/* Order Summary */}
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700">
                       <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
                         <ShoppingCart className="h-5 w-5 text-amber-500" />
                         Tóm tắt đơn hàng
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartSummary.total_items} sản phẩm)</span>
                         <span className="font-semibold text-slate-900 dark:text-white">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
                       </div>
-                      <div className="flex justify-between">
+                      <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-300">Phí vận chuyển</span>
                         <span className="font-semibold text-green-600">Miễn phí</span>
                       </div>
@@ -242,7 +343,8 @@ export default function Cart() {
                       </div>
                       <Button
                         onClick={() => router.get('/checkout')}
-                        className="w-full" size="lg"
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700"
+                        size="lg"
                       >
                         Tiến hành thanh toán
                       </Button>
@@ -250,19 +352,20 @@ export default function Cart() {
                   </Card>
 
                   {/* Discount Code */}
-                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                    <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg">
-                      <CardTitle className="text-slate-900 dark:text-white">Mã giảm giá</CardTitle>
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base text-slate-900 dark:text-white">Mã giảm giá</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4 p-6">
+                    <CardContent className="space-y-3">
                       <div className="flex gap-2">
                         <Input
                           placeholder="Nhập mã giảm giá"
-                          className="border-slate-200 focus:border-amber-500 focus:ring-amber-500"
+                          className="text-sm"
                         />
                         <Button
                           variant="outline"
-                          className="border-amber-200 text-amber-600 hover:bg-amber-50 hover:border-amber-300"
+                          size="sm"
+                          className="border-amber-200 text-amber-600 hover:bg-amber-50"
                         >
                           Áp dụng
                         </Button>
@@ -270,33 +373,24 @@ export default function Cart() {
                     </CardContent>
                   </Card>
 
-                  {/* Shipping Information */}
-                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                    <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 rounded-t-lg">
-                      <CardTitle className="text-slate-900 dark:text-white">Thông tin vận chuyển</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 p-6">
-                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm">🚚</span>
-                        </div>
-                        <p className="text-sm text-green-800 dark:text-green-200 font-medium">
+                  {/* Shipping Info - Compact */}
+                  <Card className="border-0 shadow-lg">
+                    <CardContent className="space-y-2 p-4">
+                      <div className="flex items-start gap-2 text-xs">
+                        <span className="text-green-600">✓</span>
+                        <p className="text-slate-600 dark:text-slate-300">
                           Miễn phí vận chuyển cho đơn hàng trên 1.000.000₫
                         </p>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm">📦</span>
-                        </div>
-                        <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
+                      <div className="flex items-start gap-2 text-xs">
+                        <span className="text-blue-600">✓</span>
+                        <p className="text-slate-600 dark:text-slate-300">
                           Giao hàng trong 3-5 ngày làm việc
                         </p>
                       </div>
-                      <div className="flex items-center gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                        <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm">🔄</span>
-                        </div>
-                        <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+                      <div className="flex items-start gap-2 text-xs">
+                        <span className="text-amber-600">✓</span>
+                        <p className="text-slate-600 dark:text-slate-300">
                           Đổi trả miễn phí trong 30 ngày
                         </p>
                       </div>
@@ -304,7 +398,8 @@ export default function Cart() {
                   </Card>
                 </div>
               </div>
-            )}
+            </div>
+          )}
           </div>
         </main>
       </div>
