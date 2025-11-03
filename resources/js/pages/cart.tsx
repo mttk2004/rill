@@ -8,7 +8,7 @@ import { Minus, Plus, Trash2, ShoppingCart, Heart, ArrowLeft, Disc3, Loader2 } f
 import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData } from '@/types';
 import { useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from 'react-toastify';
 
 interface CartItem {
   id: number;

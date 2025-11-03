@@ -4,7 +4,7 @@ import { Link, Head, usePage, useForm } from '@inertiajs/react';
 import { useState, MouseEvent, useMemo, useEffect, useRef } from "react";
 import { Product, SharedData } from '@/types';
 import { useCart } from "@/hooks/use-cart";
-import { toast } from 'sonner';
+import { toast } from 'react-toastify';
 import AppLayout from "@/layouts/app-layout";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { ProductInfoHeader } from "@/components/product/product-info-header";
@@ -81,16 +81,21 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
     });
   };
 
-  const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleAddToCart = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    toast.promise(addToCart(product.id, quantity), {
-      loading: 'Đang thêm vào giỏ hàng...',
-      success: `Đã thêm ${quantity} sản phẩm vào giỏ!`,
-      error: (err) => err.message || 'Đã xảy ra lỗi.',
+    const promise = addToCart(product.id, quantity);
+    
+    toast.promise(promise, {
+      pending: 'Đang thêm vào giỏ hàng...',
+      success: `Đã thêm ${quantity} sản phẩm vào giỏ! 🎉`,
+      error: {
+        render({ data }: { data: Error | unknown }) {
+          const error = data as Error;
+          return error?.message || 'Đã xảy ra lỗi khi thêm vào giỏ hàng';
+        }
+      }
     });
-  };
-
-  const handleWishlist = () => {
+  };  const handleWishlist = () => {
     setIsWishlisted(!isWishlisted);
   };
 

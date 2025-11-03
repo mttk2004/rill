@@ -1,9 +1,10 @@
 import '../css/app.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { Toaster } from 'sonner';
+import { ToastContainer } from 'react-toastify';
 import { initializeTheme } from './hooks/use-appearance';
 import { Ziggy } from './ziggy';
 
@@ -21,7 +22,19 @@ createInertiaApp({
     root.render(
       <>
         <App {...props} />
-        <Toaster richColors position="top-right" />
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          className="custom-toast-container"
+        />
       </>
     );
   },

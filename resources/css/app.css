@@ -178,7 +178,8 @@
   }
 
   body {
-    @apply bg-background text-foreground font-['Inter',system-ui,sans-serif];
+    @apply bg-background text-foreground;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   }
 
   /* Custom design system classes */
@@ -217,52 +218,53 @@
 
 /* Custom scrollbar styles for category menu */
 .scrollbar-thin {
-    scrollbar-width: thin;
+  scrollbar-width: thin;
 }
 
 .scrollbar-thumb-gray-300::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .scrollbar-thumb-gray-300::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
-    background-color: rgb(209 213 219);
-    border-radius: 3px;
+  background-color: rgb(209 213 219);
+  border-radius: 3px;
 }
 
 .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(156 163 175);
+  background-color: rgb(156 163 175);
 }
 
 .dark .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
-    background-color: rgb(75 85 99);
+  background-color: rgb(75 85 99);
 }
 
 .dark .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(107 114 128);
-    --vintage-tertiary: #fbbf24;
-    --vintage-amber-50: #422006;
-    --vintage-amber-100: #451a03;
-    --vintage-amber-200: #78350f;
-    --vintage-orange-50: #431407;
+  background-color: rgb(107 114 128);
+  --vintage-tertiary: #fbbf24;
+  --vintage-amber-50: #422006;
+  --vintage-amber-100: #451a03;
+  --vintage-amber-200: #78350f;
+  --vintage-orange-50: #431407;
 }
 
 @layer base {
-    * {
-        @apply border-border;
-    }
+  * {
+    @apply border-border;
+  }
 
-    body {
-        @apply bg-background text-foreground;
-        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  }
 }
 
 @layer components {
+
   /* Vinyl Record Animation */
   .vinyl-spin {
     animation: vinyl-spin 3s linear infinite;
@@ -326,6 +328,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -335,6 +338,7 @@
   from {
     transform: rotate(360deg);
   }
+
   to {
     transform: rotate(0deg);
   }
@@ -345,6 +349,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -356,6 +361,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -366,6 +372,7 @@
   from {
     height: 0;
   }
+
   to {
     height: var(--radix-accordion-content-height);
   }
@@ -375,7 +382,97 @@
   from {
     height: var(--radix-accordion-content-height);
   }
+
   to {
     height: 0;
   }
+}
+
+/* React Toastify Custom Styles */
+.custom-toast-container {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.Toastify__toast {
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-width: 1px;
+}
+
+.Toastify__toast--success {
+  background-color: white;
+  border-color: rgb(187 247 208);
+}
+
+.dark .Toastify__toast--success {
+  background-color: rgb(30 41 59);
+  border-color: rgb(22 101 52);
+}
+
+.Toastify__toast--error {
+  background-color: white;
+  border-color: rgb(254 202 202);
+}
+
+.dark .Toastify__toast--error {
+  background-color: rgb(30 41 59);
+  border-color: rgb(153 27 27);
+}
+
+.Toastify__toast--info {
+  background-color: white;
+  border-color: rgb(191 219 254);
+}
+
+.dark .Toastify__toast--info {
+  background-color: rgb(30 41 59);
+  border-color: rgb(30 64 175);
+}
+
+.Toastify__toast--warning {
+  background-color: white;
+  border-color: rgb(254 243 199);
+}
+
+.dark .Toastify__toast--warning {
+  background-color: rgb(30 41 59);
+  border-color: rgb(146 64 14);
+}
+
+.Toastify__toast-body {
+  color: rgb(15 23 42);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.dark .Toastify__toast-body {
+  color: rgb(241 245 249);
+}
+
+.Toastify__progress-bar--success {
+  background-color: rgb(34 197 94);
+}
+
+.Toastify__progress-bar--error {
+  background-color: rgb(239 68 68);
+}
+
+.Toastify__progress-bar--info {
+  background-color: rgb(59 130 246);
+}
+
+.Toastify__progress-bar--warning {
+  background-color: rgb(245 158 11);
+}
+
+.Toastify__close-button {
+  color: rgb(148 163 184);
+}
+
+.Toastify__close-button:hover {
+  color: rgb(71 85 105);
+}
+
+.dark .Toastify__close-button:hover {
+  color: rgb(203 213 225);
 }

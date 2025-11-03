@@ -12,7 +12,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { useState, FormEvent, MouseEvent, useMemo } from 'react';
 import { type SharedData } from '@/types';
 import { useCart } from '@/hooks/use-cart';
-import { toast } from 'sonner';
+import { toast } from 'react-toastify';
 
 interface ProductsProps extends ProductsPageData {
   search?: string;
@@ -39,10 +39,17 @@ export default function Products({ products: productsData, pagination: paginatio
     e.preventDefault();
     e.stopPropagation();
 
-    toast.promise(addToCart(productId, 1), {
-      loading: 'Đang thêm vào giỏ hàng...',
-      success: 'Đã thêm sản phẩm vào giỏ hàng!',
-      error: (err) => err.message || 'Đã xảy ra lỗi.',
+    const promise = addToCart(productId, 1);
+
+    toast.promise(promise, {
+      pending: 'Đang thêm vào giỏ hàng...',
+      success: 'Đã thêm sản phẩm vào giỏ hàng! 🎉',
+      error: {
+        render({ data }: { data: Error | unknown }) {
+          const error = data as Error;
+          return error?.message || 'Đã xảy ra lỗi khi thêm vào giỏ hàng';
+        }
+      }
     });
   };
 

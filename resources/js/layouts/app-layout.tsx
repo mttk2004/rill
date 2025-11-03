@@ -3,7 +3,6 @@ import Footer from '@/components/Footer'; // Import the new Footer component
 import { type BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
-import { Toaster } from 'sonner';
 import { type SharedData } from '@/types';
 
 interface AppLayoutProps {
@@ -21,7 +20,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {children}
       </main>
       <Footer />
-      <Toaster richColors position="top-right" />
     </div>
   );
 }
