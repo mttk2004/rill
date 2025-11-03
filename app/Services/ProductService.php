@@ -25,7 +25,7 @@ class ProductService
         $this->applySorting($query, $filters['sort'] ?? 'featured');
 
         // Get paginated results
-        $perPage = 12; // 12 products per page
+        $perPage = 20; // 20 products per page (5 columns × 4 rows)
         $products = $query->paginate($perPage);
 
         // Transform products for frontend
