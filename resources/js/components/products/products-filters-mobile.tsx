@@ -1,0 +1,87 @@
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { SlidersHorizontal } from "lucide-react";
+
+interface SortOption {
+  value: string;
+  label: string;
+}
+
+interface ProductsFiltersMobileProps {
+  currentGenre?: string;
+  currentLabel?: string;
+  currentSort?: string;
+  genres: string[];
+  labels: string[];
+  sortOptions: SortOption[];
+  onFilterChange: (key: string, value: string) => void;
+}
+
+export function ProductsFiltersMobile({
+  currentGenre = 'all',
+  currentLabel = 'all',
+  currentSort = 'featured',
+  genres,
+  labels,
+  sortOptions,
+  onFilterChange,
+}: ProductsFiltersMobileProps) {
+  return (
+    <div className="md:hidden flex items-center justify-between w-full">
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline" className="w-full">
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            Lọc & Sắp xếp
+          </Button>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Bộ lọc</SheetTitle>
+          </SheetHeader>
+          <div className="py-4 space-y-4">
+            <Select value={currentGenre} onValueChange={(value) => onFilterChange('genre', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Thể loại" />
+              </SelectTrigger>
+              <SelectContent>
+                {genres.map((genre) => (
+                  <SelectItem key={genre} value={genre === "Tất cả" ? "all" : genre}>
+                    {genre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={currentLabel} onValueChange={(value) => onFilterChange('label', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Hãng đĩa" />
+              </SelectTrigger>
+              <SelectContent>
+                {labels.map((label) => (
+                  <SelectItem key={label} value={label === "Tất cả" ? "all" : label}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={currentSort} onValueChange={(value) => onFilterChange('sort', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sắp xếp" />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
