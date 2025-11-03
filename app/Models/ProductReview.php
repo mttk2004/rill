@@ -21,8 +21,6 @@ class ProductReview extends Model
         'order_item_id',
         'rating',
         'comment',
-        'status',
-        'rejection_reason',
     ];
 
     public function product(): BelongsTo

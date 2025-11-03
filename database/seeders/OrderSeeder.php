@@ -84,7 +84,6 @@ class OrderSeeder extends Seeder
                             'user_id' => $userId,
                             'product_id' => $productId,
                             'order_item_id' => $orderItemId,
-                            'status' => 'approved',
                         ]);
                     }
                 }

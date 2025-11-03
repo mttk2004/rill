@@ -17,9 +17,7 @@ return new class extends Migration
             $table->string('user_id', 19);
             $table->string('order_item_id', 19)->nullable();
             $table->tinyInteger('rating');
-            $table->text('comment')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->text('rejection_reason')->nullable();
+            $table->text('comment');
             $table->timestamps();
             $table->softDeletes();
 

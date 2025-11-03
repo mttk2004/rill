@@ -52,9 +52,8 @@ class ProductController extends Controller
             $query->orderByPivot('sort_order');
         }]);
 
-        // Get approved reviews
+        // Get all reviews (auto-approved, no status filter needed)
         $reviews = $product->reviews()
-            ->where('status', 'approved')
             ->with('user:id,name')
             ->latest()
             ->get()
@@ -97,7 +96,6 @@ class ProductController extends Controller
                     'id' => $existingReview->id,
                     'rating' => $existingReview->rating,
                     'comment' => $existingReview->comment,
-                    'status' => $existingReview->status,
                 ];
             }
         }

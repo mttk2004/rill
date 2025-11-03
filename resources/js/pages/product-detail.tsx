@@ -247,20 +247,29 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
                       </div>
                       <div>
                         <label htmlFor="comment" className="block text-sm font-semibold mb-2 text-amber-900 dark:text-amber-100">
-                          Nhận xét của bạn
+                          Nhận xét của bạn <span className="text-red-500">*</span>
                         </label>
                         <Textarea
                           id="comment"
                           ref={reviewFormRef}
                           value={data.comment}
                           onChange={(e) => setData('comment', e.target.value)}
-                          placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
+                          placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này (tối thiểu 50 ký tự)..."
                           className="min-h-[120px] resize-none border-amber-200 dark:border-amber-800 focus:border-amber-500 focus:ring-amber-500"
                           required
+                          minLength={50}
+                          maxLength={1000}
                         />
-                        {errors.comment && (
-                          <p className="text-red-500 text-sm mt-1">{errors.comment}</p>
-                        )}
+                        <div className="flex justify-between items-center mt-1">
+                          <div>
+                            {errors.comment && (
+                              <p className="text-red-500 text-sm">{errors.comment}</p>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {data.comment.length}/1000 ký tự {data.comment.length < 50 && `(còn ${50 - data.comment.length} ký tự)`}
+                          </p>
+                        </div>
                       </div>
                       <Button
                         type="submit"
