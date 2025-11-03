@@ -11,11 +11,12 @@ import {
 import { Navigation } from "@/components/navigation";
 import { Package, Truck, CheckCircle, Clock, Eye, X, Disc3, MessageSquareQuote } from "lucide-react";
 import { Link, Head, usePage, router } from "@inertiajs/react";
-import { type SharedData, type Paginator } from '@/types';
+import { type SharedData, type Paginator, type PaginationLink } from '@/types';
 
 // Define TypeScript interfaces for props
 interface Product {
   name: string;
+  slug: string;
 }
 
 interface OrderItem {
@@ -75,7 +76,7 @@ const getStatusVariant = (status: string) => {
 
 const Pagination = ({ links }: { links: Paginator<Order>['links'] }) => (
   <div className="flex justify-center items-center space-x-2 mt-8">
-    {links.map((link: any, index: number) => {
+    {links.map((link: PaginationLink, index: number) => {
       if (!link.url) {
         return <span key={index} className="px-4 py-2 text-slate-400" dangerouslySetInnerHTML={{ __html: link.label }} />;
       }
@@ -199,17 +200,18 @@ export default function Orders() {
                                             Xem chi tiết
                                           </Link>
                                         </Button>
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          disabled={order.status !== 'delivered'}
-                                          asChild
-                                        >
-                                          <Link href="#" className={order.status !== 'delivered' ? 'pointer-events-none' : ''}>
-                                            <MessageSquareQuote className="h-4 w-4 mr-2" />
-                                            Đánh giá
-                                          </Link>
-                                        </Button>
+                                        {order.status === 'delivered' && order.items.length > 0 && (
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            asChild
+                                          >
+                                            <Link href={`/products/${order.items[0].product.slug}?review=true`}>
+                                              <MessageSquareQuote className="h-4 w-4 mr-2" />
+                                              Đánh giá
+                                            </Link>
+                                          </Button>
+                                        )}
                                       </div>
                                     </div>
                                   </div>

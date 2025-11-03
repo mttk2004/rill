@@ -20,7 +20,6 @@ class ProductReview extends Model
         'user_id',
         'order_item_id',
         'rating',
-        'title',
         'comment',
         'status',
         'rejection_reason',

@@ -23,7 +23,6 @@ class ProductReviewFactory extends Factory
             'product_id' => Product::factory(),
             'user_id' => User::factory(),
             'rating' => $this->faker->numberBetween(1, 5),
-            'title' => $this->faker->sentence,
             'comment' => $this->faker->paragraph,
             'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
         ];

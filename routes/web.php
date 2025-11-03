@@ -15,6 +15,11 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
+// Product reviews (authenticated users only)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/products/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('products.reviews.store');
+});
+
 // Cart routes accessible to both guests and authenticated users
 Route::get('/cart/summary', [App\Http\Controllers\CartController::class, 'summary'])->name('cart.summary');
 Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add.public');

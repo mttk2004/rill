@@ -52,6 +52,56 @@ class ProductController extends Controller
             $query->orderByPivot('sort_order');
         }]);
 
+        // Get approved reviews
+        $reviews = $product->reviews()
+            ->where('status', 'approved')
+            ->with('user:id,name')
+            ->latest()
+            ->get()
+            ->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'rating' => $review->rating,
+                    'comment' => $review->comment,
+                    'created_at' => $review->created_at->format('d/m/Y'),
+                    'user' => [
+                        'name' => $review->user->name,
+                    ],
+                ];
+            });
+
+        // Calculate review statistics
+        $reviewsCount = $reviews->count();
+        $averageRating = $reviewsCount > 0 ? round($reviews->avg('rating'), 1) : 0;
+
+        // Check if the authenticated user can review this product
+        $userCanReview = false;
+        $userReview = null;
+
+        if (auth()->check()) {
+            // Check if user has a delivered order containing this product
+            $userCanReview = \App\Models\Order::where('user_id', auth()->id())
+                ->where('status', 'delivered')
+                ->whereHas('items', function ($query) use ($product) {
+                    $query->where('product_id', $product->id);
+                })
+                ->exists();
+
+            // Get user's existing review if any
+            $existingReview = $product->reviews()
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if ($existingReview) {
+                $userReview = [
+                    'id' => $existingReview->id,
+                    'rating' => $existingReview->rating,
+                    'comment' => $existingReview->comment,
+                    'status' => $existingReview->status,
+                ];
+            }
+        }
+
         return Inertia::render('product-detail', [
             'product' => [
                 'id' => $product->id,
@@ -80,6 +130,11 @@ class ProductController extends Controller
                 'featured_artists' => $product->artists->where('pivot.role', 'featured')->values(),
                 'in_stock' => $product->isInStock(),
                 'low_stock' => $product->isLowStock(),
+                'reviews' => $reviews,
+                'reviews_count' => $reviewsCount,
+                'average_rating' => $averageRating,
+                'user_can_review' => $userCanReview,
+                'user_review' => $userReview,
             ],
         ]);
     }
