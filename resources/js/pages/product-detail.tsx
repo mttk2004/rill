@@ -100,9 +100,9 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
   return (
     <AppLayout>
       <Head title={`${product.name} - Rill`} />
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-2 mb-6 text-sm">
+      <main className="container mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-2 mb-4 text-sm">
             <Link href="/" className="text-muted-foreground hover:text-foreground">Trang chủ</Link>
             <span className="text-muted-foreground">/</span>
             <Link href="/products" className="text-muted-foreground hover:text-foreground">Sản phẩm</Link>
@@ -110,53 +110,69 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
             <span className="text-foreground">{product.name}</span>
           </div>
 
-          <Link href="/products" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6">
+          <Link href="/products" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
             <ArrowLeft className="h-4 w-4" />
             Quay lại danh sách sản phẩm
           </Link>
 
-          <div className="grid md:grid-cols-5 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Image Gallery */}
-            <div className="md:col-span-2 lg:col-span-1">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Image Gallery - Takes 1 column */}
+            <div className="lg:col-span-1">
               <ProductImageGallery product={product} />
             </div>
 
-            {/* Product Info */}
-            <div className="md:col-span-3 lg:col-span-1 space-y-4">
+            {/* Product Info - Takes 2 columns on large screens */}
+            <div className="lg:col-span-2 space-y-6">
               <ProductInfoHeader product={product} />
-              <ProductPriceCard product={product} />
-              <ProductActions
-                product={product}
-                quantity={quantity}
-                isInCart={isInCart}
-                isWishlisted={isWishlisted}
-                onQuantityChange={setQuantity}
-                onAddToCart={handleAddToCart}
-                onWishlist={handleWishlist}
-              />
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <ProductPriceCard product={product} />
+                <ProductActions
+                  product={product}
+                  quantity={quantity}
+                  isInCart={isInCart}
+                  isWishlisted={isWishlisted}
+                  onQuantityChange={setQuantity}
+                  onAddToCart={handleAddToCart}
+                  onWishlist={handleWishlist}
+                />
+              </div>
             </div>
           </div>
 
           {/* Description and other details in Tabs */}
-          <div className="mt-12" ref={tabsRef}>
+          <div className="mt-8" ref={tabsRef}>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="justify-start bg-transparent p-0 rounded-none">
-                <TabsTrigger value="description" className="text-lg font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Mô tả chi tiết</TabsTrigger>
-                <TabsTrigger value="reviews" className="text-lg font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">
+              <TabsList className="justify-start bg-transparent p-0 rounded-none border-b w-full">
+                <TabsTrigger
+                  value="description"
+                  className="text-base font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none px-4 py-2"
+                >
+                  Mô tả chi tiết
+                </TabsTrigger>
+                <TabsTrigger
+                  value="reviews"
+                  className="text-base font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none px-4 py-2"
+                >
                   Đánh giá ({reviewCount})
                 </TabsTrigger>
-                <TabsTrigger value="shipping" className="text-lg font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none">Vận chuyển & Đổi trả</TabsTrigger>
+                <TabsTrigger
+                  value="shipping"
+                  className="text-base font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none px-4 py-2"
+                >
+                  Vận chuyển & Đổi trả
+                </TabsTrigger>
               </TabsList>
-              <TabsContent value="description" className="py-6">
+              <TabsContent value="description" className="py-4">
                 <div className="prose dark:prose-invert max-w-none">
                   <p>{product.detailed_description || product.description}</p>
                 </div>
               </TabsContent>
-              <TabsContent value="reviews" className="py-6">
+              <TabsContent value="reviews" className="py-4">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Left Sidebar: Review Overview (1/3) */}
                   <div className="lg:col-span-1">
-                    <div className="lg:sticky lg:top-4 space-y-6">
+                    <div className="lg:sticky lg:top-4 space-y-4">
                       <ReviewOverview
                         averageRating={averageRating}
                         reviewCount={reviewCount}
@@ -192,13 +208,15 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
                   </div>
                 </div>
               </TabsContent>
-              <TabsContent value="shipping" className="py-6">
-                <h3 className="text-xl font-bold mb-4">Thông tin Vận chuyển & Đổi trả</h3>
-                <ul className="list-disc list-inside space-y-2">
-                  <li>Miễn phí vận chuyển cho đơn hàng từ 500,000₫.</li>
-                  <li>Giao hàng trong 2-5 ngày làm việc.</li>
-                  <li>Đổi trả miễn phí trong vòng 7 ngày nếu có lỗi từ nhà sản xuất.</li>
-                </ul>
+              <TabsContent value="shipping" className="py-4">
+                <div className="prose dark:prose-invert max-w-none">
+                  <h3 className="text-lg font-bold mb-3">Thông tin Vận chuyển & Đổi trả</h3>
+                  <ul className="list-disc list-inside space-y-2 text-sm">
+                    <li>Miễn phí vận chuyển cho đơn hàng từ 500,000₫.</li>
+                    <li>Giao hàng trong 2-5 ngày làm việc.</li>
+                    <li>Đổi trả miễn phí trong vòng 7 ngày nếu có lỗi từ nhà sản xuất.</li>
+                  </ul>
+                </div>
               </TabsContent>
             </Tabs>
           </div>

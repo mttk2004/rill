@@ -14,14 +14,14 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
   const reviewCount = product.reviews_count || 0;
 
   return (
-    <div>
-      <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
+    <div className="space-y-3">
+      <h1 className="text-2xl lg:text-3xl font-bold text-foreground leading-tight">
         {product.name}
       </h1>
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2">
         {product.artists?.map((artist, index) => (
           <span key={artist.id}>
-            <span className="text-xl text-accent hover:underline cursor-pointer">
+            <span className="text-lg text-accent hover:underline cursor-pointer">
               {artist.name}
             </span>
             {index < product.artists.length - 1 && (
@@ -30,25 +30,25 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
           </span>
         ))}
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-0.5">
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
-              className={`h-5 w-5 ${i < Math.floor(averageRating)
-                  ? 'fill-accent text-accent'
-                  : 'text-muted-foreground/30'
+              className={`h-4 w-4 ${i < Math.floor(averageRating)
+                ? 'fill-accent text-accent'
+                : 'text-muted-foreground/30'
                 }`}
             />
           ))}
         </div>
         <span className="text-sm text-muted-foreground">
-          {averageRating.toFixed(1)} ({reviewCount} đánh giá)
+          {averageRating.toFixed(1)} ({reviewCount})
         </span>
-      </div>
-      <div className="flex items-center gap-2 mt-4">
-        <Badge variant="outline">{product.genre}</Badge>
-        <Badge variant="outline">{product.label}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-xs">{product.genre}</Badge>
+          <Badge variant="outline" className="text-xs">{product.label}</Badge>
+        </div>
       </div>
     </div>
   );

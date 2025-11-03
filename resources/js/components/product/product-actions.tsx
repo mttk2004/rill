@@ -23,41 +23,43 @@ export function ProductActions({
   onWishlist,
 }: ProductActionsProps) {
   return (
-    <div className="space-y-4 pt-6 border-t">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center border rounded-lg">
+    <div className="p-4 bg-muted/50 rounded-lg border space-y-3">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center border rounded-lg bg-background">
           <Button
             variant="ghost"
-            size="lg"
+            size="sm"
             onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
             disabled={quantity <= 1}
+            className="h-9 px-3"
           >
             -
           </Button>
-          <span className="px-6 py-2 text-center font-bold text-lg">{quantity}</span>
+          <span className="px-4 py-2 text-center font-semibold min-w-[3rem]">{quantity}</span>
           <Button
             variant="ghost"
-            size="lg"
+            size="sm"
             onClick={() => onQuantityChange(Math.min(product.stock_quantity, quantity + 1))}
             disabled={quantity >= product.stock_quantity}
+            className="h-9 px-3"
           >
             +
           </Button>
         </div>
         <Button
-          size="lg"
-          className="flex-1"
+          size="sm"
+          className="flex-1 h-9"
           onClick={onAddToCart}
           disabled={!product.in_stock || isInCart}
         >
-          <ShoppingCart className="h-5 w-5 mr-2" />
+          <ShoppingCart className="h-4 w-4 mr-2" />
           {isInCart
-            ? 'Đã có trong giỏ'
-            : (product.in_stock ? 'Thêm vào giỏ hàng' : 'Hết hàng')
+            ? 'Đã trong giỏ'
+            : (product.in_stock ? 'Thêm vào giỏ' : 'Hết hàng')
           }
         </Button>
-        <Button variant="outline" size="lg" onClick={onWishlist}>
-          <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+        <Button variant="outline" size="sm" onClick={onWishlist} className="h-9 px-3">
+          <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
       </div>
     </div>
