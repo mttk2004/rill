@@ -3,15 +3,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/product-card";
 import { Play, Star, ShoppingBag, Truck, Award, Users, Disc3 } from "lucide-react";
-import { type Product } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { type ReactNode } from "react";
+import { type Product, type SharedData } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { type ReactNode, MouseEvent, useMemo } from "react";
+import { useCart } from '@/hooks/use-cart';
+import { toast } from 'sonner';
 
 interface WelcomeProps {
   featuredProducts: Product[];
 }
 
 const Welcome = ({ featuredProducts }: WelcomeProps) => {
+  const { cart } = usePage<SharedData>().props;
+  const { addToCart } = useCart();
+
+  const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
+
+  const handleAddToCart = (e: MouseEvent<HTMLButtonElement>, productId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    toast.promise(addToCart(productId, 1), {
+      loading: 'Đang thêm vào giỏ hàng...',
+      success: 'Đã thêm sản phẩm vào giỏ hàng!',
+      error: (err) => err.message || 'Đã xảy ra lỗi.',
+    });
+  };
+
   const features = [
     {
       icon: Award,
@@ -142,7 +160,9 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
                   key={product.id}
                   product={product}
                   index={index}
-                  showActions={false}
+                  showActions={true}
+                  onAddToCart={handleAddToCart}
+                  isInCart={cartItemProductIds.has(product.id)}
                 />
               ))}
             </div>
