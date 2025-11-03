@@ -35,10 +35,10 @@ export function ProductCard({
       <CardContent className={`p-0 relative z-10 ${viewMode === "list" ? "flex" : ""}`}>
         <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
           <Link href={`/products/${product.slug}`}>
-            <div className={`relative w-full bg-gradient-to-br from-slate-100 to-accent/10 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-500 ${viewMode === "list" ? "h-32" : "aspect-square"
+            <div className={`relative w-full bg-gradient-to-br from-slate-100 to-accent/10 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-500 ${viewMode === "list" ? "h-32" : "aspect-[3/2]"
               } ${viewMode === "list" ? "rounded-l-xl" : "rounded-t-xl"
               }`}>
-              <Disc3 className="h-12 w-12 text-accent/40 animate-spin-slow group-hover:scale-110 transition-transform duration-500" />
+              <Disc3 className="h-10 w-10 text-accent/40 animate-spin-slow group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </Link>
@@ -109,12 +109,12 @@ export function ProductCard({
           </Link>
 
           {showActions && (
-            <div className="flex gap-1.5">
+            <div className="space-y-1.5">
               {product.status === 'out_of_stock' ? (
                 <Button
                   size="sm"
                   variant="outline"
-                  className="flex-1 h-7 text-[10px] px-2"
+                  className="w-full h-8 text-xs px-2"
                   disabled
                 >
                   Hết hàng
@@ -123,7 +123,7 @@ export function ProductCard({
                 <Button
                   size="sm"
                   variant="default"
-                  className="bg-accent hover:bg-accent/90 shadow-sm flex-1 h-7 text-[10px] px-2"
+                  className="bg-accent hover:bg-accent/90 shadow-sm w-full h-8 text-xs px-2"
                   onClick={(e) => {
                     if (onAddToCart) {
                       onAddToCart(e, product.id);
@@ -131,18 +131,18 @@ export function ProductCard({
                   }}
                   disabled={isInCart}
                 >
-                  <ShoppingCart className="w-3 h-3 mr-1" />
-                  {isInCart ? 'Đã thêm' : 'Thêm'}
+                  <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
+                  {isInCart ? 'Đã thêm' : 'Thêm vào giỏ'}
                 </Button>
               )}
               <Button
                 size="sm"
                 variant="outline"
-                className="flex-1 border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm h-7 text-[10px] px-2"
+                className="w-full border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm h-8 text-xs px-2"
                 asChild
               >
                 <Link href={`/products/${product.slug}`}>
-                  Chi tiết
+                  Xem chi tiết
                 </Link>
               </Button>
             </div>
