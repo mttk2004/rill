@@ -153,37 +153,43 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
                 </div>
               </TabsContent>
               <TabsContent value="reviews" className="py-6">
-                <div className="space-y-6">
-                  {/* Review Overview Section */}
-                  <ReviewOverview
-                    averageRating={averageRating}
-                    reviewCount={reviewCount}
-                    reviews={product.reviews || []}
-                    selectedRatingFilter={selectedRatingFilter}
-                    onFilterChange={setSelectedRatingFilter}
-                  />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Left Sidebar: Review Overview (1/3) */}
+                  <div className="lg:col-span-1">
+                    <div className="lg:sticky lg:top-4 space-y-6">
+                      <ReviewOverview
+                        averageRating={averageRating}
+                        reviewCount={reviewCount}
+                        reviews={product.reviews || []}
+                        selectedRatingFilter={selectedRatingFilter}
+                        onFilterChange={setSelectedRatingFilter}
+                      />
 
-                  {/* Review Form - Only show if user can review */}
-                  {product.user_can_review && (
-                    <ReviewForm
-                      userReview={product.user_review}
-                      rating={data.rating}
-                      comment={data.comment}
-                      processing={processing}
-                      errors={errors}
-                      formRef={reviewFormRef}
-                      onRatingChange={(rating) => setData('rating', rating)}
-                      onCommentChange={(comment) => setData('comment', comment)}
-                      onSubmit={handleSubmitReview}
+                      {/* Review Form - Only show if user can review */}
+                      {product.user_can_review && (
+                        <ReviewForm
+                          userReview={product.user_review}
+                          rating={data.rating}
+                          comment={data.comment}
+                          processing={processing}
+                          errors={errors}
+                          formRef={reviewFormRef}
+                          onRatingChange={(rating) => setData('rating', rating)}
+                          onCommentChange={(comment) => setData('comment', comment)}
+                          onSubmit={handleSubmitReview}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right Content: Reviews List (2/3) */}
+                  <div className="lg:col-span-2">
+                    <ReviewList
+                      reviews={product.reviews || []}
+                      selectedRatingFilter={selectedRatingFilter}
+                      onClearFilter={() => setSelectedRatingFilter(null)}
                     />
-                  )}
-
-                  {/* Reviews List */}
-                  <ReviewList
-                    reviews={product.reviews || []}
-                    selectedRatingFilter={selectedRatingFilter}
-                    onClearFilter={() => setSelectedRatingFilter(null)}
-                  />
+                  </div>
                 </div>
               </TabsContent>
               <TabsContent value="shipping" className="py-6">
