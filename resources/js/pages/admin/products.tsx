@@ -235,7 +235,7 @@ const AdminProducts = () => {
           {/* Products Table */}
           <ProductTable
             products={products}
-            loading={isLoadingProduct}
+            loading={false}
             onViewDetails={fetchProductDetails}
             onDelete={handleDelete}
             onRestore={handleRestore}

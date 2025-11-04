@@ -60,40 +60,47 @@ class ProductController extends Controller
         }
 
         // Stock filter
-        if ($stock === 'low') {
+        if ($stock === 'low_stock') {
+            // Sắp hết: tồn kho <= mức tối thiểu và > 0
             $query->whereColumn('stock_quantity', '<=', 'min_stock_level')
                   ->where('stock_quantity', '>', 0);
-        } elseif ($stock === 'out') {
+        } elseif ($stock === 'out_of_stock') {
+            // Hết hàng: tồn kho = 0
             $query->where('stock_quantity', 0);
+        } elseif ($stock === 'in_stock') {
+            // Còn hàng: tồn kho > mức tối thiểu (không bao gồm sắp hết)
+            $query->whereColumn('stock_quantity', '>', 'min_stock_level');
         }
 
         // Sorting
         switch ($sort) {
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'name-asc':
+            case 'name_asc':
                 $query->orderBy('name', 'asc');
                 break;
-            case 'name-desc':
+            case 'name_desc':
                 $query->orderBy('name', 'desc');
                 break;
-            case 'price-high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'price-low':
+            case 'price_asc':
                 $query->orderBy('price', 'asc');
                 break;
-            case 'stock-low':
+            case 'price_desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'stock_asc':
                 $query->orderBy('stock_quantity', 'asc');
                 break;
-            case 'best-selling':
+            case 'stock_desc':
+                $query->orderBy('stock_quantity', 'desc');
+                break;
+            case 'sold_desc':
                 $query->withCount('orderItems')
                       ->orderBy('order_items_count', 'desc');
                 break;
-            case 'newest':
-            default:
+            case 'created_desc':
                 $query->orderBy('created_at', 'desc');
+                break;
+            default:
+                $query->orderBy('name', 'asc');
                 break;
         }
 
