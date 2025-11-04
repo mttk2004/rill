@@ -103,6 +103,10 @@ class CustomerController extends Controller
             ->withCount('orders')
             ->findOrFail($id);
 
+        // Calculate total spent
+        $totalSpent = $customer->orders()->sum('total_amount');
+        $customer->total_spent = $totalSpent;
+
         return Inertia::render('admin/customer-detail', [
             'customer' => $customer,
         ]);

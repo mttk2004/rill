@@ -17,7 +17,8 @@ import {
   XCircle,
   TrendingUp,
   Package,
-  Calendar
+  Calendar,
+  DollarSign
 } from "lucide-react";
 import { Head, Link, usePage, router } from "@inertiajs/react";
 import { toast } from 'react-toastify';
@@ -32,6 +33,7 @@ const AdminCustomers = () => {
     date_of_birth?: string | null;
     is_active?: boolean;
     orders_count?: number;
+    total_spent?: number;
     orders?: Array<{
       id: string;
       order_number: string;
@@ -65,9 +67,26 @@ const AdminCustomers = () => {
   // Dialog state
   const [selectedCustomer, setSelectedCustomer] = useState<AdminCustomer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
 
   // Debounce timer ref
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch full customer details with orders
+  const fetchCustomerDetails = async (customerId: string) => {
+    setIsLoadingCustomer(true);
+    try {
+      const response = await fetch(`/admin/customers/${customerId}`);
+      const data = await response.json();
+      setSelectedCustomer(data.props.customer);
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching customer details:', error);
+      toast.error('Không thể tải thông tin khách hàng');
+    } finally {
+      setIsLoadingCustomer(false);
+    }
+  };
 
   // Handle filter changes
   const handleFilterChange = useCallback((key: string, value: string | undefined) => {
@@ -177,74 +196,87 @@ const AdminCustomers = () => {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-                    <Users className="h-6 w-6 text-white" />
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <Card className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
+              <CardContent className="p-6 relative z-10">
+                <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <p className="text-sm font-medium text-blue-100 mb-1">
                       Tổng khách hàng
                     </p>
-                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                    <p className="text-4xl font-bold text-white">
                       {stats.total.toLocaleString()}
                     </p>
                   </div>
+                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Users className="h-8 w-8 text-white" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-lg">
-                    <CheckCircle className="h-6 w-6 text-white" />
-                  </div>
+            <Card className="relative overflow-hidden bg-gradient-to-br from-green-500 to-green-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
+              <CardContent className="p-6 relative z-10">
+                <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                      Hoạt động
+                    <p className="text-sm font-medium text-green-100 mb-1">
+                      Đang hoạt động
                     </p>
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-4xl font-bold text-white">
                       {stats.active.toLocaleString()}
                     </p>
+                    <p className="text-xs text-green-100 mt-1">
+                      {((stats.active / stats.total) * 100).toFixed(1)}% tổng số
+                    </p>
+                  </div>
+                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <CheckCircle className="h-8 w-8 text-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg">
-                    <Mail className="h-6 w-6 text-white" />
-                  </div>
+            <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
+              <CardContent className="p-6 relative z-10">
+                <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <p className="text-sm font-medium text-purple-100 mb-1">
                       Đã xác thực email
                     </p>
-                    <p className="text-2xl font-bold text-purple-600">
+                    <p className="text-4xl font-bold text-white">
                       {stats.verified.toLocaleString()}
                     </p>
+                    <p className="text-xs text-purple-100 mt-1">
+                      {((stats.verified / stats.total) * 100).toFixed(1)}% tổng số
+                    </p>
+                  </div>
+                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <Mail className="h-8 w-8 text-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
-                    <TrendingUp className="h-6 w-6 text-white" />
-                  </div>
+            <Card className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
+              <CardContent className="p-6 relative z-10">
+                <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <p className="text-sm font-medium text-amber-100 mb-1">
                       Mới tháng này
                     </p>
-                    <p className="text-2xl font-bold text-amber-600">
-                      {stats.new_this_month}
+                    <p className="text-4xl font-bold text-white">
+                      {stats.new_this_month.toLocaleString()}
                     </p>
+                    <p className="text-xs text-amber-100 mt-1">
+                      {((stats.new_this_month / stats.total) * 100).toFixed(1)}% tổng số
+                    </p>
+                  </div>
+                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <TrendingUp className="h-8 w-8 text-white" />
                   </div>
                 </div>
               </CardContent>
@@ -430,13 +462,11 @@ const AdminCustomers = () => {
                       variant="outline"
                       size="sm"
                       className="flex-1 border-slate-200 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700"
-                      onClick={() => {
-                        setSelectedCustomer(customer);
-                        setIsDialogOpen(true);
-                      }}
+                      onClick={() => fetchCustomerDetails(customer.id)}
+                      disabled={isLoadingCustomer}
                     >
                       <Eye className="h-3.5 w-3.5 mr-1.5" />
-                      Xem chi tiết
+                      {isLoadingCustomer ? 'Đang tải...' : 'Xem chi tiết'}
                     </Button>
 
                     <Button
@@ -605,6 +635,20 @@ const AdminCustomers = () => {
                           <p className="text-xs text-slate-500 dark:text-slate-400">Tổng đơn hàng</p>
                           <p className="text-lg font-bold text-amber-600">
                             {selectedCustomer.orders_count || 0}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <DollarSign className="h-5 w-5 text-green-600" />
+                        <div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Tổng chi tiêu</p>
+                          <p className="text-lg font-bold text-green-600">
+                            {selectedCustomer.total_spent ? `${selectedCustomer.total_spent.toLocaleString('vi-VN')}₫` : '0₫'}
                           </p>
                         </div>
                       </div>
