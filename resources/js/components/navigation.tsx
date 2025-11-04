@@ -35,9 +35,17 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import { useCart } from "@/hooks/use-cart";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input"; // Import Input
+import { ProductsFlyoutMenu } from "@/components/products-flyout-menu";
 
 interface NavigationProps {
   user?: {
@@ -47,9 +55,22 @@ interface NavigationProps {
   } | null;
 }
 
-const NavLink = ({ href, children }: { href: string; children: React.ReactNode }) => {
+const NavLink = ({
+  href,
+  children,
+  hasDropdown = false
+}: {
+  href: string;
+  children: React.ReactNode;
+  hasDropdown?: boolean;
+}) => {
   const { url } = usePage();
   const isActive = href === "/" ? url === "/" : url.startsWith(href);
+
+  if (hasDropdown) {
+    return null; // Will be handled by NavigationMenu
+  }
+
   return (
     <Link
       href={href}
@@ -116,13 +137,30 @@ export const Navigation = ({ user }: NavigationProps) => {
 
           {/* Desktop Navigation */}
           {!showSearchInput && ( // Conditionally render desktop nav
-            <nav className="hidden md:flex items-center space-x-6">
-              {navItems.map((item) => (
-                <NavLink key={item.path} href={item.path}>
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList className="gap-8">
+                <NavigationMenuItem>
+                  <NavLink href="/">Trang chủ</NavLink>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="h-auto bg-transparent px-0 py-0 text-sm font-medium transition-colors hover:bg-transparent hover:text-amber-500 focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-amber-500 relative after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-amber-500 after:scale-x-0 after:origin-left after:transition-transform data-[state=open]:after:scale-x-100">
+                    Sản phẩm
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ProductsFlyoutMenu />
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavLink href="/about">Về chúng tôi</NavLink>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavLink href="/support">Hỗ trợ</NavLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           )}
 
           {/* Search Input Field */}
