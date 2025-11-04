@@ -66,7 +66,7 @@ export const ProductsFlyoutMenu = () => {
           {activeItems.map((item) => (
             <Link
               key={item.slug}
-              href={`/products?${activeSection === "genres" ? "genre" : "label"}=${item.slug}`}
+              href={`/products?${activeSection === "genres" ? "genre" : "label"}=${item.name}`}
               className="group block"
             >
               <div className="py-2 px-3 rounded-md transition-all hover:bg-accent">
