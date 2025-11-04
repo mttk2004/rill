@@ -6,18 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Search,
-  Plus,
-  Edit,
   Eye,
   Users,
   Filter,
-  Download,
-  Upload,
   Mail,
   Phone,
   CheckCircle,
   XCircle,
-  TrendingUp
+  TrendingUp,
+  Package,
+  Calendar
 } from "lucide-react";
 import { Head, Link, usePage, router } from "@inertiajs/react";
 import { toast } from 'react-toastify';
@@ -121,11 +119,6 @@ const AdminCustomers = () => {
     }
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString('vi-VN');
-  };
-
   const getGenderIcon = (gender?: string | null) => {
     switch (gender) {
       case 'male': return '👨';
@@ -166,20 +159,6 @@ const AdminCustomers = () => {
               <p className="text-slate-600 dark:text-slate-400 mt-2 ml-12">
                 Quản lý thông tin khách hàng và lịch sử mua hàng
               </p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50">
-                <Upload className="h-4 w-4 mr-2" />
-                Import
-              </Button>
-              <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">
-                <Plus className="h-4 w-4 mr-2" />
-                Thêm khách hàng
-              </Button>
             </div>
           </div>
 
@@ -331,18 +310,18 @@ const AdminCustomers = () => {
             </Select>
           </div>
 
-          {/* Customers List */}
-          <div className="space-y-4">
+          {/* Customers Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {customers.map((customer, index) => (
               <Card
                 key={customer.id}
-                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    {/* Customer Avatar */}
-                    <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 relative">
+                  {/* Avatar & Name */}
+                  <div className="flex flex-col items-center text-center mb-4">
+                    <div className="w-20 h-20 rounded-full overflow-hidden mb-3 relative ring-4 ring-slate-100 dark:ring-slate-700 group-hover:ring-amber-200 dark:group-hover:ring-amber-900 transition-all">
                       {customer.avatar ? (
                         <img
                           src={customer.avatar}
@@ -350,113 +329,88 @@ const AdminCustomers = () => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-300">
+                        <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-2xl font-bold text-slate-600 dark:text-slate-300">
                           {customer.name.charAt(0).toUpperCase()}
                         </div>
                       )}
                       {customer.email_verified_at && (
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                          <CheckCircle className="w-3 h-3 text-white" />
+                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 text-white" />
                         </div>
                       )}
                     </div>
 
-                    {/* Customer Info */}
-                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-6 gap-4">
-                      <div className="lg:col-span-2">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-lg text-slate-900 dark:text-white">{customer.name}</h3>
-                          {getStatusBadge(customer.is_active)}
-                          {!customer.email_verified_at && (
-                            <Badge className="bg-yellow-100 text-yellow-800 text-xs border-0">
-                              Chưa xác thực
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
-                          <div className="flex items-center gap-1">
-                            <Mail className="h-3 w-3" />
-                            {customer.email}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Phone className="h-3 w-3" />
-                            {customer.phone}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            {getGenderIcon(customer.gender)} {customer.date_of_birth ? `${calculateAge(customer.date_of_birth)} tuổi` : '—'}
-                          </div>
-                        </div>
-                      </div>
+                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2 line-clamp-1">
+                      {customer.name}
+                    </h3>
 
-                      <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Vai trò</p>
-                        <p className="font-bold text-lg text-slate-900 dark:text-white">
-                          Khách hàng
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Tham gia: {formatDate(customer.created_at)}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Xác thực email</p>
-                        <div className="flex items-center gap-1">
-                          {customer.email_verified_at ? (
-                            <>
-                              <CheckCircle className="h-4 w-4 text-green-600" />
-                              <span className="font-bold text-lg text-green-600">Đã xác thực</span>
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="h-4 w-4 text-red-600" />
-                              <span className="font-bold text-lg text-red-600">Chưa xác thực</span>
-                            </>
-                          )}
-                        </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {customer.email_verified_at
-                            ? `Xác thực: ${formatDate(customer.email_verified_at)}`
-                            : 'Chưa xác thực email'}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Đơn hàng</p>
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="h-4 w-4 text-amber-600" />
-                          <span className="font-bold text-amber-600 text-lg">
-                            {customer.orders_count || 0}
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {customer.orders_count ? `Đã đặt ${customer.orders_count} đơn` : 'Chưa có đơn hàng'}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Link href={`/admin/customers/${customer.id}`}>
-                          <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </Link>
-
-                        <Link href={`/admin/customers/${customer.id}/edit`}>
-                          <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </Link>
-
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover:bg-slate-100 dark:hover:bg-slate-700"
-                          onClick={() => toast.info('Send email placeholder - functionality not implemented yet')}
-                        >
-                          <Mail className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    <div className="flex items-center gap-2 mb-3 flex-wrap justify-center">
+                      {getStatusBadge(customer.is_active)}
+                      {!customer.email_verified_at && (
+                        <Badge className="bg-yellow-100 text-yellow-800 text-xs border-0">
+                          Chưa xác thực
+                        </Badge>
+                      )}
                     </div>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span className="truncate">{customer.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <Phone className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span>{customer.phone || '—'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                      <Users className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span>
+                        {getGenderIcon(customer.gender)} {customer.date_of_birth ? `${calculateAge(customer.date_of_birth)} tuổi` : 'Chưa cập nhật'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-3 mb-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Package className="h-3.5 w-3.5 text-amber-600" />
+                        <span className="text-lg font-bold text-amber-600">
+                          {customer.orders_count || 0}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Đơn hàng</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1 mt-1">
+                        <Calendar className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+                        <span className="text-sm font-medium text-slate-900 dark:text-white">
+                          {new Date(customer.created_at).toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Tham gia</p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    <Link href={`/admin/customers/${customer.id}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full border-slate-200 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700">
+                        <Eye className="h-3.5 w-3.5 mr-1.5" />
+                        Xem chi tiết
+                      </Button>
+                    </Link>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:bg-slate-100 dark:hover:bg-slate-700"
+                      onClick={() => toast.info('Tính năng gửi email đang được phát triển')}
+                    >
+                      <Mail className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
