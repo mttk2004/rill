@@ -148,9 +148,8 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             ]);
         })->name('admin.orders.show');
 
-        Route::get('/customers', function () {
-            return Inertia::render('admin/customers');
-        })->name('admin.customers');
+        Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('admin.customers');
+        Route::get('/customers/{id}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])->name('admin.customers.show');
 
         Route::get('/products', function () {
             return Inertia::render('admin/products');

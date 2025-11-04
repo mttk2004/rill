@@ -19,84 +19,91 @@ import {
   XCircle,
   TrendingUp
 } from "lucide-react";
-import { Head } from "@inertiajs/react";
+import { Head, Link, usePage, router } from "@inertiajs/react";
+import { toast } from 'react-toastify';
+import type { Paginator, User, PaginationLink } from '@/types';
+import { useRef, useCallback } from 'react';
 
 const AdminCustomers = () => {
 
-  const customers = [
-    {
-      id: 1,
-      name: "Nguyễn Văn Anh",
-      email: "nguyen.van.anh@email.com",
-      email_verified_at: "2023-05-15T10:30:00Z",
-      role: "customer" as const,
-      phone: "0901234567",
-      gender: "male" as const,
-      date_of_birth: "1990-03-15",
-      avatar: "/placeholder-vinyl.jpg",
-      is_active: true,
-      created_at: "2023-05-15T09:00:00Z",
-      updated_at: "2024-01-20T14:30:00Z"
-    },
-    {
-      id: 2,
-      name: "Trần Thị Bình",
-      email: "tran.thi.binh@email.com",
-      email_verified_at: "2023-08-22T11:15:00Z",
-      role: "customer" as const,
-      phone: "0987654321",
-      gender: "female" as const,
-      date_of_birth: "1985-07-22",
-      avatar: null,
-      is_active: true,
-      created_at: "2023-08-22T10:00:00Z",
-      updated_at: "2024-01-18T16:45:00Z"
-    },
-    {
-      id: 3,
-      name: "Lê Hoàng Cường",
-      email: "le.hoang.cuong@email.com",
-      email_verified_at: "2022-12-10T14:20:00Z",
-      role: "customer" as const,
-      phone: "0912345678",
-      gender: "male" as const,
-      date_of_birth: "1988-12-10",
-      avatar: "/placeholder-vinyl.jpg",
-      is_active: true,
-      created_at: "2022-12-10T08:30:00Z",
-      updated_at: "2024-01-19T12:20:00Z"
-    },
-    {
-      id: 4,
-      name: "Phạm Thị Dung",
-      email: "pham.thi.dung@email.com",
-      email_verified_at: null,
-      role: "customer" as const,
-      phone: "0898765432",
-      gender: "female" as const,
-      date_of_birth: "1995-01-08",
-      avatar: null,
-      is_active: true,
-      created_at: "2024-01-01T12:00:00Z",
-      updated_at: "2024-01-15T18:30:00Z"
-    },
-    {
-      id: 5,
-      name: "Võ Minh Hiếu",
-      email: "vo.minh.hieu@email.com",
-      email_verified_at: "2023-11-20T09:45:00Z",
-      role: "customer" as const,
-      phone: "0976543210",
-      gender: "other" as const,
-      date_of_birth: "1992-11-01",
-      avatar: "/placeholder-vinyl.jpg",
-      is_active: false,
-      created_at: "2023-11-20T08:15:00Z",
-      updated_at: "2023-12-15T10:00:00Z"
-    }
-  ];
+  type AdminCustomer = User & {
+    phone?: string;
+    gender?: string | null;
+    date_of_birth?: string | null;
+    is_active?: boolean;
+    orders_count?: number;
+    // note: avatar and email_verified_at already exist on User type
+  };
 
-  const getStatusBadge = (is_active: boolean) => {
+  interface PageProps {
+    users: Paginator<AdminCustomer>;
+    stats: {
+      total: number;
+      active: number;
+      verified: number;
+      new_this_month: number;
+    };
+    filters?: Record<string, unknown>;
+    [key: string]: unknown;
+  }
+
+  const page = usePage<PageProps>().props;
+  const usersPaginator = (page.users as Paginator<AdminCustomer>) || { data: [], links: [], current_page: 1, last_page: 1, per_page: 20, total: 0, from: null, to: null } as Paginator<AdminCustomer>;
+  const stats = (page.stats as PageProps['stats']) || { total: 0, active: 0, verified: 0, new_this_month: 0 };
+  const filters = (page.filters as Record<string, unknown>) || {};
+
+  const customers = usersPaginator.data;
+
+  // Debounce timer ref
+  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Handle filter changes
+  const handleFilterChange = useCallback((key: string, value: string | undefined) => {
+    const currentParams = new URLSearchParams(window.location.search);
+
+    if (value && value !== 'all' && !value.startsWith('all-')) {
+      currentParams.set(key, value);
+    } else {
+      currentParams.delete(key);
+    }
+
+    // Reset to page 1 when filters change
+    currentParams.delete('page');
+
+    const queryString = currentParams.toString();
+    router.get(`/admin/customers${queryString ? '?' + queryString : ''}`, {}, {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  }, []);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+
+    // Clear previous timer
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
+    // Set new timer
+    searchTimerRef.current = setTimeout(() => {
+      handleFilterChange('search', searchTerm || undefined);
+    }, 500);
+  }, [handleFilterChange]);
+
+  const handleStatusChange = useCallback((value: string) => {
+    handleFilterChange('status', value === 'all-status' ? undefined : value);
+  }, [handleFilterChange]);
+
+  const handleVerifiedChange = useCallback((value: string) => {
+    handleFilterChange('verified', value === 'all-verified' ? undefined : value);
+  }, [handleFilterChange]);
+
+  const handleSortChange = useCallback((value: string) => {
+    handleFilterChange('sort', value === 'newest' ? undefined : value);
+  }, [handleFilterChange]);
+
+  const getStatusBadge = (is_active?: boolean) => {
     if (is_active) {
       return (
         <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0">
@@ -115,11 +122,11 @@ const AdminCustomers = () => {
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Chưa có đơn hàng";
+    if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString('vi-VN');
   };
 
-  const getGenderIcon = (gender: string) => {
+  const getGenderIcon = (gender?: string | null) => {
     switch (gender) {
       case 'male': return '👨';
       case 'female': return '👩';
@@ -189,7 +196,7 @@ const AdminCustomers = () => {
                       Tổng khách hàng
                     </p>
                     <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                      2,547
+                      {stats.total.toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -207,7 +214,7 @@ const AdminCustomers = () => {
                       Hoạt động
                     </p>
                     <p className="text-2xl font-bold text-green-600">
-                      1,892
+                      {stats.active.toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -225,7 +232,7 @@ const AdminCustomers = () => {
                       Đã xác thực email
                     </p>
                     <p className="text-2xl font-bold text-purple-600">
-                      1,734
+                      {stats.verified.toLocaleString()}
                     </p>
                   </div>
                 </div>
@@ -243,7 +250,7 @@ const AdminCustomers = () => {
                       Mới tháng này
                     </p>
                     <p className="text-2xl font-bold text-amber-600">
-                      127
+                      {stats.new_this_month}
                     </p>
                   </div>
                 </div>
@@ -259,11 +266,16 @@ const AdminCustomers = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     placeholder="Tìm theo tên, email, số điện thoại..."
+                    defaultValue={typeof filters.search === 'string' ? filters.search : ''}
+                    onChange={handleSearchChange}
                     className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
                   />
                 </div>
 
-                <Select defaultValue="all-status">
+                <Select
+                  defaultValue={(filters.status as string) || "all-status"}
+                  onValueChange={handleStatusChange}
+                >
                   <SelectTrigger className="w-48 border-slate-200">
                     <SelectValue placeholder="Trạng thái" />
                   </SelectTrigger>
@@ -274,7 +286,10 @@ const AdminCustomers = () => {
                   </SelectContent>
                 </Select>
 
-                <Select defaultValue="all-verified">
+                <Select
+                  defaultValue={(filters.verified as string) || "all-verified"}
+                  onValueChange={handleVerifiedChange}
+                >
                   <SelectTrigger className="w-48 border-slate-200">
                     <SelectValue placeholder="Xác thực" />
                   </SelectTrigger>
@@ -296,9 +311,12 @@ const AdminCustomers = () => {
           {/* Results Info */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-slate-600 dark:text-slate-400">
-              Hiển thị <span className="font-medium text-slate-900 dark:text-white">1-5</span> trong <span className="font-medium text-slate-900 dark:text-white">2,547</span> khách hàng
+              Hiển thị <span className="font-medium text-slate-900 dark:text-white">{customers.length}</span> trong <span className="font-medium text-slate-900 dark:text-white">{usersPaginator.total.toLocaleString()}</span> khách hàng
             </p>
-            <Select defaultValue="newest">
+            <Select
+              defaultValue={(filters.sort as string) || "newest"}
+              onValueChange={handleSortChange}
+            >
               <SelectTrigger className="w-48 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
@@ -366,7 +384,7 @@ const AdminCustomers = () => {
                           </div>
                           <div className="flex items-center gap-1">
                             <Users className="h-3 w-3" />
-                            {getGenderIcon(customer.gender)} {calculateAge(customer.date_of_birth)} tuổi
+                            {getGenderIcon(customer.gender)} {customer.date_of_birth ? `${calculateAge(customer.date_of_birth)} tuổi` : '—'}
                           </div>
                         </div>
                       </div>
@@ -404,26 +422,37 @@ const AdminCustomers = () => {
                       </div>
 
                       <div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400">Cập nhật cuối</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Đơn hàng</p>
                         <div className="flex items-center gap-1">
                           <TrendingUp className="h-4 w-4 text-amber-600" />
                           <span className="font-bold text-amber-600 text-lg">
-                            {formatDate(customer.updated_at)}
+                            {customer.orders_count || 0}
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Trạng thái: {customer.is_active ? 'Hoạt động' : 'Không hoạt động'}
+                          {customer.orders_count ? `Đã đặt ${customer.orders_count} đơn` : 'Chưa có đơn hàng'}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <Link href={`/admin/customers/${customer.id}`}>
+                          <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+
+                        <Link href={`/admin/customers/${customer.id}/edit`}>
+                          <Button variant="ghost" size="sm" className="hover:bg-slate-100 dark:hover:bg-slate-700">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-slate-100 dark:hover:bg-slate-700"
+                          onClick={() => toast.info('Send email placeholder - functionality not implemented yet')}
+                        >
                           <Mail className="h-4 w-4" />
                         </Button>
                       </div>
@@ -435,15 +464,23 @@ const AdminCustomers = () => {
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-center mt-8">
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" disabled className="border-slate-200">Trước</Button>
-              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">1</Button>
-              <Button variant="outline" size="sm" className="border-slate-200">2</Button>
-              <Button variant="outline" size="sm" className="border-slate-200">3</Button>
-              <span className="px-2 text-slate-500 dark:text-slate-400">...</span>
-              <Button variant="outline" size="sm" className="border-slate-200">255</Button>
-              <Button variant="outline" size="sm" className="border-slate-200">Sau</Button>
+          <div className="mt-8">
+            <div className="flex justify-center">
+              <div className="flex items-center space-x-2">
+                {usersPaginator.links && usersPaginator.links.map((link: PaginationLink, idx: number) => {
+                  if (!link.url) {
+                    return <span key={idx} className="px-3 py-1 text-slate-500" dangerouslySetInnerHTML={{ __html: link.label }} />;
+                  }
+                  return (
+                    <Link
+                      key={idx}
+                      href={link.url}
+                      className={`px-3 py-1 rounded-md ${link.active ? 'bg-amber-500 text-white' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-amber-100'}`}
+                      dangerouslySetInnerHTML={{ __html: link.label }}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
