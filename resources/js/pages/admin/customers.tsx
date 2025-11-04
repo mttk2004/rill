@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
 import {
   Search,
   Eye,
   Users,
-  Filter,
   Mail,
   Phone,
   CheckCircle,
@@ -20,7 +22,7 @@ import {
 import { Head, Link, usePage, router } from "@inertiajs/react";
 import { toast } from 'react-toastify';
 import type { Paginator, User, PaginationLink } from '@/types';
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState } from 'react';
 
 const AdminCustomers = () => {
 
@@ -30,6 +32,14 @@ const AdminCustomers = () => {
     date_of_birth?: string | null;
     is_active?: boolean;
     orders_count?: number;
+    orders?: Array<{
+      id: string;
+      order_number: string;
+      status: string;
+      total_amount: number;
+      placed_at: string;
+      items_count: number;
+    }>;
     // note: avatar and email_verified_at already exist on User type
   };
 
@@ -51,6 +61,10 @@ const AdminCustomers = () => {
   const filters = (page.filters as Record<string, unknown>) || {};
 
   const customers = usersPaginator.data;
+
+  // Dialog state
+  const [selectedCustomer, setSelectedCustomer] = useState<AdminCustomer | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Debounce timer ref
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -240,74 +254,90 @@ const AdminCustomers = () => {
           {/* Filters */}
           <Card className="mb-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
             <CardContent className="p-6">
-              <div className="flex flex-col lg:flex-row gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder="Tìm theo tên, email, số điện thoại..."
-                    defaultValue={typeof filters.search === 'string' ? filters.search : ''}
-                    onChange={handleSearchChange}
-                    className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
-                  />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Tìm kiếm
+                  </Label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      placeholder="Tên, email, số điện thoại..."
+                      defaultValue={typeof filters.search === 'string' ? filters.search : ''}
+                      onChange={handleSearchChange}
+                      className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
+                    />
+                  </div>
                 </div>
 
-                <Select
-                  defaultValue={(filters.status as string) || "all-status"}
-                  onValueChange={handleStatusChange}
-                >
-                  <SelectTrigger className="w-48 border-slate-200">
-                    <SelectValue placeholder="Trạng thái" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-status">Tất cả trạng thái</SelectItem>
-                    <SelectItem value="active">Hoạt động</SelectItem>
-                    <SelectItem value="inactive">Không hoạt động</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Trạng thái
+                  </Label>
+                  <Select
+                    defaultValue={(filters.status as string) || "all-status"}
+                    onValueChange={handleStatusChange}
+                  >
+                    <SelectTrigger className="border-slate-200">
+                      <SelectValue placeholder="Chọn trạng thái" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-status">Tất cả trạng thái</SelectItem>
+                      <SelectItem value="active">Hoạt động</SelectItem>
+                      <SelectItem value="inactive">Không hoạt động</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <Select
-                  defaultValue={(filters.verified as string) || "all-verified"}
-                  onValueChange={handleVerifiedChange}
-                >
-                  <SelectTrigger className="w-48 border-slate-200">
-                    <SelectValue placeholder="Xác thực" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-verified">Tất cả</SelectItem>
-                    <SelectItem value="verified">Đã xác thực</SelectItem>
-                    <SelectItem value="unverified">Chưa xác thực</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Xác thực email
+                  </Label>
+                  <Select
+                    defaultValue={(filters.verified as string) || "all-verified"}
+                    onValueChange={handleVerifiedChange}
+                  >
+                    <SelectTrigger className="border-slate-200">
+                      <SelectValue placeholder="Chọn xác thực" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-verified">Tất cả</SelectItem>
+                      <SelectItem value="verified">Đã xác thực</SelectItem>
+                      <SelectItem value="unverified">Chưa xác thực</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <Button variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-50">
-                  <Filter className="h-4 w-4 mr-2" />
-                  Bộ lọc
-                </Button>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Sắp xếp
+                  </Label>
+                  <Select
+                    defaultValue={(filters.sort as string) || "newest"}
+                    onValueChange={handleSortChange}
+                  >
+                    <SelectTrigger className="border-slate-200">
+                      <SelectValue placeholder="Chọn sắp xếp" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Mới gia nhập</SelectItem>
+                      <SelectItem value="name-asc">Tên A-Z</SelectItem>
+                      <SelectItem value="name-desc">Tên Z-A</SelectItem>
+                      <SelectItem value="orders-desc">Nhiều đơn hàng nhất</SelectItem>
+                      <SelectItem value="spent-desc">Chi tiêu cao nhất</SelectItem>
+                      <SelectItem value="recent-order">Mua hàng gần đây</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Results Info */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6">
             <p className="text-slate-600 dark:text-slate-400">
               Hiển thị <span className="font-medium text-slate-900 dark:text-white">{customers.length}</span> trong <span className="font-medium text-slate-900 dark:text-white">{usersPaginator.total.toLocaleString()}</span> khách hàng
             </p>
-            <Select
-              defaultValue={(filters.sort as string) || "newest"}
-              onValueChange={handleSortChange}
-            >
-              <SelectTrigger className="w-48 border-slate-200">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Mới gia nhập</SelectItem>
-                <SelectItem value="name-asc">Tên A-Z</SelectItem>
-                <SelectItem value="name-desc">Tên Z-A</SelectItem>
-                <SelectItem value="orders-desc">Nhiều đơn hàng nhất</SelectItem>
-                <SelectItem value="spent-desc">Chi tiêu cao nhất</SelectItem>
-                <SelectItem value="recent-order">Mua hàng gần đây</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Customers Grid */}
@@ -396,12 +426,18 @@ const AdminCustomers = () => {
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
-                    <Link href={`/admin/customers/${customer.id}`} className="flex-1">
-                      <Button variant="outline" size="sm" className="w-full border-slate-200 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700">
-                        <Eye className="h-3.5 w-3.5 mr-1.5" />
-                        Xem chi tiết
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 border-slate-200 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700"
+                      onClick={() => {
+                        setSelectedCustomer(customer);
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      <Eye className="h-3.5 w-3.5 mr-1.5" />
+                      Xem chi tiết
+                    </Button>
 
                     <Button
                       variant="ghost"
@@ -439,6 +475,208 @@ const AdminCustomers = () => {
           </div>
         </div>
       </div>
+
+      {/* Customer Detail Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              Chi tiết Khách hàng
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedCustomer && (
+            <Tabs defaultValue="info" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="info">Thông tin</TabsTrigger>
+                <TabsTrigger value="orders">Lịch sử đơn hàng</TabsTrigger>
+              </TabsList>
+
+              {/* Tab Thông tin */}
+              <TabsContent value="info" className="space-y-4">
+                <div className="flex items-start gap-6">
+                  {/* Avatar */}
+                  <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 relative ring-4 ring-slate-100 dark:ring-slate-700">
+                    {selectedCustomer.avatar ? (
+                      <img
+                        src={selectedCustomer.avatar}
+                        alt={selectedCustomer.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-3xl font-bold text-slate-600 dark:text-slate-300">
+                        {selectedCustomer.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    {selectedCustomer.email_verified_at && (
+                      <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-green-500 rounded-full border-3 border-white flex items-center justify-center">
+                        <CheckCircle className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Basic Info */}
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                      {selectedCustomer.name}
+                    </h3>
+                    <div className="flex items-center gap-2 mb-4 flex-wrap">
+                      {getStatusBadge(selectedCustomer.is_active)}
+                      {selectedCustomer.email_verified_at ? (
+                        <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Đã xác thực
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-yellow-100 text-yellow-800 border-0">
+                          Chưa xác thực
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                        <div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Email</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            {selectedCustomer.email}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                        <div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Số điện thoại</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            {selectedCustomer.phone || '—'}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                        <div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Giới tính</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            {getGenderIcon(selectedCustomer.gender)} {selectedCustomer.gender === 'male' ? 'Nam' : selectedCustomer.gender === 'female' ? 'Nữ' : selectedCustomer.gender === 'other' ? 'Khác' : 'Không xác định'}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                        <div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Tuổi</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            {selectedCustomer.date_of_birth ? `${calculateAge(selectedCustomer.date_of_birth)} tuổi` : 'Chưa cập nhật'}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Package className="h-5 w-5 text-amber-600" />
+                        <div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Tổng đơn hàng</p>
+                          <p className="text-lg font-bold text-amber-600">
+                            {selectedCustomer.orders_count || 0}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                        <div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Ngày tham gia</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            {new Date(selectedCustomer.created_at).toLocaleDateString('vi-VN')}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              {/* Tab Lịch sử đơn hàng */}
+              <TabsContent value="orders">
+                {!selectedCustomer.orders || selectedCustomer.orders.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Package className="h-16 w-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                    <p className="text-slate-500 dark:text-slate-400 text-lg">
+                      Khách hàng chưa có đơn hàng nào
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {selectedCustomer.orders?.map((order) => (
+                      <Card key={order.id} className="bg-slate-50 dark:bg-slate-800/50 border-0 hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-3">
+                              <span className="font-bold text-amber-600">#{order.order_number}</span>
+                              <Badge className="bg-blue-500 text-white border-0">
+                                {order.status}
+                              </Badge>
+                            </div>
+                            <Link href={`/admin/orders/${order.id}`}>
+                              <Button variant="ghost" size="sm">
+                                <Eye className="h-4 w-4 mr-1" />
+                                Xem
+                              </Button>
+                            </Link>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <div className="text-slate-600 dark:text-slate-400">
+                              <Calendar className="h-3 w-3 inline mr-1" />
+                              {new Date(order.placed_at).toLocaleDateString('vi-VN')}
+                              <span className="mx-2">•</span>
+                              <Package className="h-3 w-3 inline mr-1" />
+                              {order.items_count} sản phẩm
+                            </div>
+                            <div className="font-bold text-lg text-slate-900 dark:text-white">
+                              {order.total_amount.toLocaleString('vi-VN')}₫
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
