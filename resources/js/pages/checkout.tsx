@@ -178,9 +178,9 @@ export default function Checkout() {
                         <div key={item.id} className="flex items-center gap-4">
                           <div className="relative w-16 h-16 rounded-full bg-slate-800 flex-shrink-0">
                             {item.product.image_url ? (
-                                <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover rounded-full" />
+                              <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover rounded-full" />
                             ) : (
-                                <Disc3 className="w-10 h-10 text-amber-500 m-auto" />
+                              <Disc3 className="w-10 h-10 text-amber-500 m-auto" />
                             )}
                             <Badge className="absolute -top-1 -right-1 text-xs rounded-full h-5 w-5 flex items-center justify-center">{item.quantity}</Badge>
                           </div>
