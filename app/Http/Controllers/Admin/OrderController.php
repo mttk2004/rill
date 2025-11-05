@@ -43,7 +43,7 @@ class OrderController extends Controller
         // Payment status filter
         if ($payment_status && $payment_status !== 'all') {
             $query->whereHas('payment', function ($q) use ($payment_status) {
-                $q->where('status', $payment_status);
+                $q->where('payment_status', $payment_status);
             });
         }
 

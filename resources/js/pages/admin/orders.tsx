@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { AdminNavigation } from '@/components/admin-navigation';
 import {
   AdminTable,
