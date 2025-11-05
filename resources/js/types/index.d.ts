@@ -19,6 +19,9 @@ declare global {
   interface Window {
     Ziggy: ZiggyConfig;
   }
+
+  // Ziggy route helper function
+  function route(name: string, params?: unknown): string;
 }
 
 export interface Auth {

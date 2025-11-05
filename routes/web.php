@@ -73,80 +73,11 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
             return Inertia::render('admin/statistics');
         })->name('admin.statistics');
 
-        Route::get('/orders', function () {
-            return Inertia::render('admin/orders');
-        })->name('admin.orders');
-
-        Route::get('/orders/{order}', function ($orderId) {
-            // Mock data for testing - in real app this would come from database
-            $mockOrder = [
-                'id' => (int)$orderId,
-                'order_number' => "RL-00{$orderId}234",
-                'user' => [
-                    'id' => 1,
-                    'name' => 'Nguyễn Văn A',
-                    'email' => 'nguyenvana@example.com',
-                    'phone' => '0901234567'
-                ],
-                'status' => 'delivered',
-                'total_amount' => 1540000,
-                'subtotal' => 1590000,
-                'discount_amount' => 50000,
-                'placed_at' => '2024-01-20T10:30:00Z',
-                'updated_at' => '2024-01-24T16:30:00Z',
-                'notes' => 'Gọi trước khi giao hàng',
-                'shipping_address' => [
-                    'full_name' => 'Nguyễn Văn A',
-                    'phone' => '0901234567',
-                    'address_line_1' => '123 Nguyễn Văn A',
-                    'ward' => 'Phường Bến Nghé',
-                    'district' => 'Quận 1',
-                    'city' => 'TP.HCM'
-                ],
-                'payment' => [
-                    'payment_method' => 'cod',
-                    'payment_status' => 'completed',
-                    'processed_at' => '2024-01-24T16:30:00Z',
-                    'amount' => 1540000
-                ],
-                'items' => [
-                    [
-                        'id' => 1,
-                        'product_id' => 1,
-                        'product_name' => 'Rumours',
-                        'product_sku' => 'FL-RUM-001',
-                        'artist_name' => 'Fleetwood Mac',
-                        'quantity' => 1,
-                        'unit_price' => 490000,
-                        'total_price' => 490000
-                    ],
-                    [
-                        'id' => 2,
-                        'product_id' => 2,
-                        'product_name' => 'Hotel California',
-                        'product_sku' => 'EG-HOT-001',
-                        'artist_name' => 'Eagles',
-                        'quantity' => 1,
-                        'unit_price' => 420000,
-                        'total_price' => 420000
-                    ],
-                    [
-                        'id' => 3,
-                        'product_id' => 3,
-                        'product_name' => 'The Wall',
-                        'product_sku' => 'PF-WAL-001',
-                        'artist_name' => 'Pink Floyd',
-                        'quantity' => 1,
-                        'unit_price' => 680000,
-                        'total_price' => 680000
-                    ]
-                ]
-            ];
-
-            return Inertia::render('admin/order-detail', [
-                'order' => $mockOrder
-            ]);
-        })->name('admin.orders.show');
+        Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders');
+        Route::get('/orders/{id}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
+        Route::delete('/orders/{id}', [App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('admin.orders.destroy');
+        Route::post('/orders/{id}/restore', [App\Http\Controllers\Admin\OrderController::class, 'restore'])->name('admin.orders.restore');
+        Route::patch('/orders/{id}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
 
         Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('admin.customers');
         Route::get('/customers/{id}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])->name('admin.customers.show');
@@ -156,9 +87,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::delete('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::post('/products/{id}/restore', [App\Http\Controllers\Admin\ProductController::class, 'restore'])->name('admin.products.restore');
 
-        Route::get('/artists', function () {
-            return Inertia::render('admin/artists');
-        })->name('admin.artists');
+        Route::get('/artists', [App\Http\Controllers\Admin\ArtistController::class, 'index'])->name('admin.artists');
+        Route::get('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'show'])->name('admin.artists.show');
+        Route::delete('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'destroy'])->name('admin.artists.destroy');
+        Route::post('/artists/{id}/restore', [App\Http\Controllers\Admin\ArtistController::class, 'restore'])->name('admin.artists.restore');
 
         Route::get('/vouchers', function () {
             return Inertia::render('admin/vouchers');

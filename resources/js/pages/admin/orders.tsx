@@ -1,659 +1,524 @@
-import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useState, useRef, useEffect } from 'react';
+import { Head, router } from '@inertiajs/react';
 import { AdminNavigation } from '@/components/admin-navigation';
-import { Package, Search, Eye, Filter, ShoppingCart, Clock, CheckCircle, Truck, Package2, XCircle, DollarSign, MapPin, Phone } from 'lucide-react';
+import {
+  AdminTable,
+  AdminFilters,
+  AdminStatsCards,
+  AdminPagination,
+  type AdminTableColumn,
+  type FilterField,
+  type StatCardData,
+} from '@/components/admin/common';
+import {
+  type AdminOrder,
+  getOrderStatusBadge,
+  getPaymentStatusBadge,
+  formatCurrency,
+  formatDateTime,
+} from '@/lib/order-helpers';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import {
+  ShoppingCart,
+  Clock,
+  Package,
+  Truck,
+  PackageCheck,
+  XCircle,
+  Eye,
+  User,
+  CreditCard,
+  MapPin,
+} from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'sonner';
 
-const orders = [
-  {
-    id: 1,
-    order_number: "RL-001234",
-    user_id: 1,
-    status: "delivered",
-    subtotal: 1590000,
-    discount_amount: 50000,
-    total_amount: 1540000,
-    currency: "VND",
-    shipping_address: {
-      full_name: "Nguyễn Văn A",
-      phone: "0901234567",
-      address_line_1: "123 Nguyễn Văn A",
-      district: "Quận 1",
-      city: "TP.HCM",
-      ward: "Phường Bến Nghé"
+interface OrdersPageProps {
+  orders: {
+    data: AdminOrder[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number;
+    to: number;
+    links: Array<{ url: string | null; label: string; active: boolean }>;
+  };
+  filters: {
+    search: string;
+    status: string;
+    payment_status: string;
+    sort: string;
+  };
+  stats: {
+    total: number;
+    pending: number;
+    processing: number;
+    shipped: number;
+    delivered: number;
+    cancelled: number;
+  };
+}
+
+export default function Orders({ orders, filters, stats }: OrdersPageProps) {
+  const [currentFilters, setCurrentFilters] = useState(filters);
+  const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Stats cards configuration
+  const statsCards: StatCardData[] = [
+    {
+      title: 'Tổng đơn hàng',
+      value: stats.total.toLocaleString(),
+      subtitle: 'Tất cả đơn hàng',
+      icon: ShoppingCart,
+      gradient: 'from-blue-500 to-cyan-500',
     },
-    billing_address: null,
-    notes: "Gọi trước khi giao hàng",
-    placed_at: "2024-01-20T10:30:00Z",
-    created_at: "2024-01-20T10:30:00Z",
-    updated_at: "2024-01-24T16:30:00Z",
-    user: {
-      id: 1,
-      name: "Nguyễn Văn A",
-      email: "nguyenvana@example.com"
+    {
+      title: 'Chờ xử lý',
+      value: stats.pending.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.pending / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: Clock,
+      gradient: 'from-amber-500 to-orange-500',
     },
-    items: [
-      {
-        id: 1,
-        product_id: 1,
-        product_name: "Rumours",
-        product_sku: "FL-RUM-001",
-        artist_name: "Fleetwood Mac",
-        quantity: 1,
-        unit_price: 490000,
-        total_price: 490000
-      },
-      {
-        id: 2,
-        product_id: 2,
-        product_name: "Hotel California",
-        product_sku: "EG-HOT-001",
-        artist_name: "Eagles",
-        quantity: 1,
-        unit_price: 420000,
-        total_price: 420000
-      },
-      {
-        id: 3,
-        product_id: 3,
-        product_name: "The Wall",
-        product_sku: "PF-WAL-001",
-        artist_name: "Pink Floyd",
-        quantity: 1,
-        unit_price: 680000,
-        total_price: 680000
+    {
+      title: 'Đang xử lý',
+      value: stats.processing.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.processing / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: Package,
+      gradient: 'from-purple-500 to-pink-500',
+    },
+    {
+      title: 'Đang giao',
+      value: stats.shipped.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.shipped / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: Truck,
+      gradient: 'from-indigo-500 to-blue-500',
+    },
+    {
+      title: 'Đã giao',
+      value: stats.delivered.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.delivered / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: PackageCheck,
+      gradient: 'from-green-500 to-emerald-500',
+    },
+    {
+      title: 'Đã hủy',
+      value: stats.cancelled.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.cancelled / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: XCircle,
+      gradient: 'from-red-500 to-rose-500',
+    },
+  ];
+
+  // Filter fields configuration
+  const filterFields: FilterField[] = [
+    {
+      name: 'search',
+      label: 'Tìm kiếm',
+      type: 'search',
+      value: currentFilters.search,
+      onChange: (value) => handleFilterChange('search', value),
+      placeholder: 'Tìm theo mã đơn, tên khách hàng, email...',
+      className: 'md:col-span-2',
+    },
+    {
+      name: 'status',
+      label: 'Trạng thái đơn hàng',
+      type: 'select',
+      value: currentFilters.status,
+      onChange: (value) => handleFilterChange('status', value),
+      options: [
+        { label: 'Tất cả trạng thái', value: 'all' },
+        { label: 'Chờ xử lý', value: 'pending' },
+        { label: 'Đang xử lý', value: 'processing' },
+        { label: 'Đang giao', value: 'shipped' },
+        { label: 'Đã giao', value: 'delivered' },
+        { label: 'Đã hủy', value: 'cancelled' },
+      ],
+    },
+    {
+      name: 'payment_status',
+      label: 'Trạng thái thanh toán',
+      type: 'select',
+      value: currentFilters.payment_status,
+      onChange: (value) => handleFilterChange('payment_status', value),
+      options: [
+        { label: 'Tất cả', value: 'all' },
+        { label: 'Chờ thanh toán', value: 'pending' },
+        { label: 'Đã thanh toán', value: 'paid' },
+        { label: 'Thất bại', value: 'failed' },
+        { label: 'Hoàn tiền', value: 'refunded' },
+      ],
+    },
+    {
+      name: 'sort',
+      label: 'Sắp xếp',
+      type: 'select',
+      value: currentFilters.sort,
+      onChange: (value) => handleFilterChange('sort', value),
+      options: [
+        { label: 'Mới nhất', value: 'newest' },
+        { label: 'Cũ nhất', value: 'oldest' },
+        { label: 'Giá trị cao nhất', value: 'total_desc' },
+        { label: 'Giá trị thấp nhất', value: 'total_asc' },
+      ],
+    },
+  ];
+
+  // Table columns configuration
+  const columns: AdminTableColumn<AdminOrder>[] = [
+    {
+      header: 'Mã đơn hàng',
+      accessor: 'order_number',
+      render: (order) => (
+        <div className="font-medium text-blue-600">#{order.order_number}</div>
+      ),
+    },
+    {
+      header: 'Khách hàng',
+      accessor: 'customer',
+      render: (order) => (
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-muted-foreground" />
+          <div>
+            <div className="font-medium">{order.customer?.name || 'N/A'}</div>
+            <div className="text-sm text-muted-foreground">{order.customer?.email || ''}</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: 'Sản phẩm',
+      accessor: 'order_items_count',
+      className: 'text-center',
+      render: (order) => (
+        <div className="text-center">
+          <span className="font-medium">{order.order_items_count}</span>
+          <span className="text-sm text-muted-foreground ml-1">sản phẩm</span>
+        </div>
+      ),
+    },
+    {
+      header: 'Tổng tiền',
+      accessor: 'total_amount',
+      render: (order) => (
+        <div className="font-medium text-green-600">{formatCurrency(order.total_amount)}</div>
+      ),
+    },
+    {
+      header: 'Trạng thái',
+      accessor: 'status',
+      render: (order) => getOrderStatusBadge(order.status, order.deleted_at),
+    },
+    {
+      header: 'Thanh toán',
+      accessor: 'payment_status',
+      render: (order) => getPaymentStatusBadge(order.payment_status),
+    },
+    {
+      header: 'Ngày đặt',
+      accessor: 'placed_at',
+      render: (order) => (
+        <div className="text-sm">{formatDateTime(order.placed_at)}</div>
+      ),
+    },
+    {
+      header: 'Thao tác',
+      accessor: 'id',
+      className: 'text-right',
+      render: (order) => (
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleViewDetails(order.id)}
+            className="gap-2"
+          >
+            <Eye className="h-4 w-4" />
+            Xem
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  // Handlers
+  const handleFilterChange = (name: string, value: string) => {
+    const newFilters = { ...currentFilters, [name]: value };
+
+    if (name === 'search') {
+      // Debounce search
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
       }
-    ],
-    payment: {
-      payment_method: "cod",
-      payment_status: "completed",
-      amount: 1540000,
-      processed_at: "2024-01-24T16:30:00Z"
+      searchTimerRef.current = setTimeout(() => {
+        setCurrentFilters(newFilters);
+        router.get(route('admin.orders'), newFilters, { preserveState: true });
+      }, 500);
+    } else {
+      setCurrentFilters(newFilters);
+      router.get(route('admin.orders'), newFilters, { preserveState: true });
     }
-  },
-  {
-    id: 2,
-    order_number: "RL-001233",
-    user_id: 2,
-    status: "shipped",
-    subtotal: 920000,
-    discount_amount: 0,
-    total_amount: 920000,
-    currency: "VND",
-    shipping_address: {
-      full_name: "Trần Thị B",
-      phone: "0902345678",
-      address_line_1: "456 Trần Hưng Đạo",
-      district: "Quận 5",
-      city: "TP.HCM",
-      ward: "Phường 14"
-    },
-    billing_address: null,
-    notes: null,
-    placed_at: "2024-01-18T09:15:00Z",
-    created_at: "2024-01-18T09:15:00Z",
-    updated_at: "2024-01-22T09:00:00Z",
-    user: {
-      id: 2,
-      name: "Trần Thị B",
-      email: "tranthib@example.com"
-    },
-    items: [
-      {
-        id: 4,
-        product_id: 4,
-        product_name: "Back in Black",
-        product_sku: "AC-BIB-001",
-        artist_name: "AC/DC",
-        quantity: 1,
-        unit_price: 400000,
-        total_price: 400000
-      },
-      {
-        id: 5,
-        product_id: 5,
-        product_name: "Bohemian Rhapsody",
-        product_sku: "QU-BRH-001",
-        artist_name: "Queen",
-        quantity: 1,
-        unit_price: 520000,
-        total_price: 520000
-      }
-    ],
-    payment: {
-      payment_method: "cod",
-      payment_status: "pending",
-      amount: 920000,
-      processed_at: null
-    }
-  },
-  {
-    id: 3,
-    order_number: "RL-001232",
-    user_id: 3,
-    status: "pending",
-    subtotal: 460000,
-    discount_amount: 0,
-    total_amount: 460000,
-    currency: "VND",
-    shipping_address: {
-      full_name: "Lê Văn C",
-      phone: "0903456789",
-      address_line_1: "789 Lê Văn Việt",
-      district: "Quận 7",
-      city: "TP.HCM",
-      ward: "Phường Tân Phú"
-    },
-    billing_address: null,
-    notes: "Giao hàng giờ hành chính",
-    placed_at: "2024-01-15T14:20:00Z",
-    created_at: "2024-01-15T14:20:00Z",
-    updated_at: "2024-01-15T14:20:00Z",
-    user: {
-      id: 3,
-      name: "Lê Văn C",
-      email: "levanc@example.com"
-    },
-    items: [
-      {
-        id: 6,
-        product_id: 6,
-        product_name: "Thriller",
-        product_sku: "MJ-THR-001",
-        artist_name: "Michael Jackson",
-        quantity: 1,
-        unit_price: 460000,
-        total_price: 460000
-      }
-    ],
-    payment: {
-      payment_method: "cod",
-      payment_status: "pending",
-      amount: 460000,
-      processed_at: null
-    }
-  },
-  {
-    id: 4,
-    order_number: "RL-001231",
-    user_id: 4,
-    status: "cancelled",
-    subtotal: 840000,
-    discount_amount: 84000,
-    total_amount: 756000,
-    currency: "VND",
-    shipping_address: {
-      full_name: "Phạm Thị D",
-      phone: "0904567890",
-      address_line_1: "321 Võ Văn Tần",
-      district: "Quận 3",
-      city: "TP.HCM",
-      ward: "Phường 6"
-    },
-    billing_address: null,
-    notes: "Khách hàng hủy do thay đổi ý định",
-    placed_at: "2024-01-12T16:45:00Z",
-    created_at: "2024-01-12T16:45:00Z",
-    updated_at: "2024-01-13T10:20:00Z",
-    user: {
-      id: 4,
-      name: "Phạm Thị D",
-      email: "phamthid@example.com"
-    },
-    items: [
-      {
-        id: 7,
-        product_id: 7,
-        product_name: "Abbey Road",
-        product_sku: "BT-ABR-001",
-        artist_name: "The Beatles",
-        quantity: 2,
-        unit_price: 420000,
-        total_price: 840000
-      }
-    ],
-    payment: {
-      payment_method: "cod",
-      payment_status: "cancelled",
-      amount: 756000,
-      processed_at: null
-    }
-  },
-  {
-    id: 5,
-    order_number: "RL-001230",
-    user_id: 5,
-    status: "confirmed",
-    subtotal: 1200000,
-    discount_amount: 120000,
-    total_amount: 1080000,
-    currency: "VND",
-    shipping_address: {
-      full_name: "Hoàng Văn E",
-      phone: "0905678901",
-      address_line_1: "654 Điện Biên Phủ",
-      district: "Quận Bình Thạnh",
-      city: "TP.HCM",
-      ward: "Phường 25"
-    },
-    billing_address: null,
-    notes: null,
-    placed_at: "2024-01-10T11:30:00Z",
-    created_at: "2024-01-10T11:30:00Z",
-    updated_at: "2024-01-10T15:45:00Z",
-    user: {
-      id: 5,
-      name: "Hoàng Văn E",
-      email: "hoangvane@example.com"
-    },
-    items: [
-      {
-        id: 8,
-        product_id: 8,
-        product_name: "Dark Side of the Moon",
-        product_sku: "PF-DSM-001",
-        artist_name: "Pink Floyd",
-        quantity: 1,
-        unit_price: 650000,
-        total_price: 650000
-      },
-      {
-        id: 9,
-        product_id: 9,
-        product_name: "Led Zeppelin IV",
-        product_sku: "LZ-IV-001",
-        artist_name: "Led Zeppelin",
-        quantity: 1,
-        unit_price: 550000,
-        total_price: 550000
-      }
-    ],
-    payment: {
-      payment_method: "cod",
-      payment_status: "pending",
-      amount: 1080000,
-      processed_at: null
-    }
-  }
-];
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'pending': return <Clock className="h-4 w-4" />;
-    case 'confirmed': return <CheckCircle className="h-4 w-4" />;
-    case 'shipped': return <Truck className="h-4 w-4" />;
-    case 'delivered': return <Package2 className="h-4 w-4" />;
-    case 'cancelled': return <XCircle className="h-4 w-4" />;
-    default: return <Package className="h-4 w-4" />;
-  }
-};
-
-const getStatusLabel = (status: string) => {
-  switch (status) {
-    case 'pending': return 'Chờ xác nhận';
-    case 'confirmed': return 'Đã xác nhận';
-    case 'shipped': return 'Đang giao';
-    case 'delivered': return 'Đã giao';
-    case 'cancelled': return 'Đã hủy';
-    default: return status;
-  }
-};
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'pending': return 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white';
-    case 'confirmed': return 'bg-gradient-to-r from-amber-500 to-amber-600 text-white';
-    case 'shipped': return 'bg-gradient-to-r from-blue-500 to-blue-600 text-white';
-    case 'delivered': return 'bg-gradient-to-r from-green-500 to-green-600 text-white';
-    case 'cancelled': return 'bg-gradient-to-r from-red-500 to-red-600 text-white';
-    default: return 'bg-gray-500 text-white';
-  }
-};
-
-const AdminOrders = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalOrders = orders.length;
-  const totalRevenue = orders.filter(order => order.status !== 'cancelled').reduce((sum, order) => sum + order.total_amount, 0);
-  const processingOrders = orders.filter(order => order.status === "pending").length;
-  const deliveredOrders = orders.filter(order => order.status === "delivered").length;
-
-  const formatAddress = (address: { address_line_1: string; ward: string; district: string; city: string }) => {
-    return `${address.address_line_1}, ${address.ward}, ${address.district}, ${address.city}`;
   };
 
+  const handleViewDetails = async (orderId: number) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(route('admin.orders.show', orderId), {
+        headers: { Accept: 'application/json' },
+      });
+      setSelectedOrder(response.data);
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      toast.error('Không thể tải thông tin đơn hàng');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <Head title="Quản lý đơn hàng" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <Head title="Quản lý đơn hàng" />
       <AdminNavigation />
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg">
-                <ShoppingCart className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-                  Quản lý đơn hàng
-                </h1>
-                <p className="text-slate-600 dark:text-slate-400 mt-1">
-                  Theo dõi và xử lý các đơn hàng của khách hàng
-                </p>
-              </div>
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold">Quản lý đơn hàng</h1>
+              <p className="text-muted-foreground mt-2">
+                Quản lý và theo dõi đơn hàng của khách hàng
+              </p>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-                      <Package className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Tổng đơn hàng
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {totalOrders}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <AdminStatsCards stats={statsCards} />
 
-              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
-                      <DollarSign className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Doanh thu
-                      </p>
-                      <p className="text-xl font-bold text-slate-900 dark:text-white">
-                        {totalRevenue.toLocaleString('vi-VN')}₫
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <AdminFilters fields={filterFields} />
 
-              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg">
-                      <Clock className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Chờ xử lý
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {processingOrders}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <Card className="p-6">
+              <AdminTable
+                data={orders.data}
+                columns={columns}
+                loading={isLoading}
+                emptyMessage="Không tìm thấy đơn hàng nào"
+                getRowKey={(order) => order.id.toString()}
+              />
 
-              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-lg">
-                      <CheckCircle className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Đã giao
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {deliveredOrders}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Search and Filter */}
-            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                    <Input
-                      placeholder="Tìm theo số đơn hàng, tên khách hàng hoặc email..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700"
-                    />
-                  </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full sm:w-48 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue placeholder="Lọc theo trạng thái" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                      <SelectItem value="pending">Chờ xác nhận</SelectItem>
-                      <SelectItem value="confirmed">Đã xác nhận</SelectItem>
-                      <SelectItem value="shipped">Đang giao</SelectItem>
-                      <SelectItem value="delivered">Đã giao</SelectItem>
-                      <SelectItem value="cancelled">Đã hủy</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
+              <div className="mt-6">
+                <AdminPagination
+                  pagination={{
+                    current_page: orders.current_page,
+                    last_page: orders.last_page,
+                    from: orders.from,
+                    to: orders.to,
+                    total: orders.total,
+                    links: orders.links,
+                  }}
+                  itemName="đơn hàng"
+                />
+              </div>
             </Card>
           </div>
 
-          {/* Orders List - Compact View */}
-          <div className="space-y-3">
-            {filteredOrders.length === 0 ? (
-              <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardContent className="p-12 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
-                    <Package className="h-8 w-8 text-slate-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    Không tìm thấy đơn hàng nào
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              filteredOrders.map((order) => (
-                <Card key={order.id} className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      {/* Left Side - Order Info */}
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex-shrink-0">
-                          <Package className="h-4 w-4 text-white" />
-                        </div>
+          {/* Order Detail Dialog */}
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Chi tiết đơn hàng</DialogTitle>
+              </DialogHeader>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <h3 className="font-semibold text-slate-900 dark:text-white cursor-help hover:text-amber-600 transition-colors">
-                                  #{order.order_number}
-                                </h3>
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-sm p-0 border-0 bg-transparent shadow-none">
-                                <Card className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border shadow-xl">
-                                  <CardContent className="p-4 space-y-3">
-                                    {/* Order Header */}
-                                    <div className="flex items-center gap-2 pb-2 border-b border-slate-200 dark:border-slate-600">
-                                      <Package className="h-4 w-4 text-amber-600" />
-                                      <span className="font-semibold text-slate-900 dark:text-white">
-                                        Đơn hàng #{order.order_number}
-                                      </span>
-                                    </div>
-
-                                    {/* Items Preview */}
-                                    <div className="space-y-1">
-                                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                                        Sản phẩm ({order.items.length})
-                                      </p>
-                                      <div className="space-y-1">
-                                        {order.items.slice(0, 2).map((item, index) => (
-                                          <div key={index} className="flex justify-between text-xs">
-                                            <span className="text-slate-700 dark:text-slate-300 truncate pr-2">
-                                              {item.product_name} - {item.artist_name}
-                                            </span>
-                                            <span className="text-slate-600 dark:text-slate-400">
-                                              x{item.quantity}
-                                            </span>
-                                          </div>
-                                        ))}
-                                        {order.items.length > 2 && (
-                                          <p className="text-xs text-slate-500 italic">
-                                            +{order.items.length - 2} sản phẩm khác
-                                          </p>
-                                        )}
-                                      </div>
-                                    </div>
-
-                                    {/* Shipping Address */}
-                                    <div className="space-y-1">
-                                      <p className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                                        <MapPin className="h-3 w-3" />
-                                        Địa chỉ giao hàng
-                                      </p>
-                                      <div className="text-xs text-slate-700 dark:text-slate-300">
-                                        <p className="font-medium">{order.shipping_address.full_name}</p>
-                                        <p className="flex items-center gap-1">
-                                          <Phone className="h-3 w-3" />
-                                          {order.shipping_address.phone}
-                                        </p>
-                                        <p className="text-slate-600 dark:text-slate-400">
-                                          {formatAddress(order.shipping_address)}
-                                        </p>
-                                      </div>
-                                    </div>
-
-                                    {/* Payment Status */}
-                                    <div className="flex items-center justify-between pt-1 border-t border-slate-200 dark:border-slate-600">
-                                      <div className="flex items-center gap-2">
-                                        <DollarSign className="h-3 w-3 text-amber-600" />
-                                        <span className="text-xs text-slate-600 dark:text-slate-400">
-                                          {order.payment.payment_method === 'cod' ? 'Tiền mặt' :
-                                           order.payment.payment_method === 'bank_transfer' ? 'Chuyển khoản' : 'Thẻ'}
-                                        </span>
-                                      </div>
-                                      <Badge className={order.payment.payment_status === 'completed'
-                                        ? 'bg-green-500 text-white text-xs'
-                                        : order.payment.payment_status === 'pending'
-                                        ? 'bg-yellow-500 text-white text-xs'
-                                        : 'bg-red-500 text-white text-xs'
-                                      }>
-                                        {order.payment.payment_status === 'completed' ? 'Đã thanh toán' :
-                                         order.payment.payment_status === 'pending' ? 'Chờ thanh toán' : 'Thất bại'}
-                                      </Badge>
-                                    </div>
-
-                                    {/* Notes */}
-                                    {order.notes && (
-                                      <div className="bg-amber-50 dark:bg-amber-900/20 p-2 rounded text-xs">
-                                        <p className="text-slate-600 dark:text-slate-400 font-medium mb-1">Ghi chú:</p>
-                                        <p className="text-slate-700 dark:text-slate-300">{order.notes}</p>
-                                      </div>
-                                    )}
-                                  </CardContent>
-                                </Card>
-                              </TooltipContent>
-                            </Tooltip>
-                            <Badge className={`${getStatusColor(order.status)} border-0 flex items-center gap-1 text-xs px-2 py-1`}>
-                              {getStatusIcon(order.status)}
-                              {getStatusLabel(order.status)}
-                            </Badge>
-                          </div>
-
-                          <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
-                            <span className="truncate">{order.user.name}</span>
-                            <span className="hidden sm:inline">•</span>
-                            <span className="hidden md:inline truncate">{order.user.email}</span>
-                            <span className="hidden sm:inline">•</span>
-                            <span>{order.items.length} sản phẩm</span>
-                            <span className="hidden lg:inline">•</span>
-                            <span className="hidden lg:inline">{new Date(order.placed_at).toLocaleDateString('vi-VN')}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Right Side - Price & Actions */}
-                      <div className="flex items-center gap-4 flex-shrink-0">
-                        <div className="text-right">
-                          <p className="font-bold text-lg text-amber-600">
-                            {order.total_amount.toLocaleString('vi-VN')}₫
-                          </p>
-                          <p className="text-xs text-slate-500 uppercase">
-                            {order.payment.payment_method}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <Link href={`/admin/orders/${order.id}`}>
-                            <Button size="sm" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">
-                              <Eye className="h-4 w-4 mr-1" />
-                              Chi tiết
-                            </Button>
-                          </Link>
-
-                          {/* Quick Actions */}
-                          {order.status === 'pending' && (
-                            <Button size="sm" variant="outline" className="border-green-200 text-green-600 hover:bg-green-50 px-2">
-                              <CheckCircle className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {order.status === 'confirmed' && (
-                            <Button size="sm" variant="outline" className="border-blue-200 text-blue-600 hover:bg-blue-50 px-2">
-                              <Truck className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
+              {selectedOrder && (
+                <div className="space-y-6">
+                  {/* Order Header */}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold mb-2">
+                        Đơn hàng #{selectedOrder.order_number}
+                      </h2>
+                      <div className="flex items-center gap-3">
+                        {getOrderStatusBadge(selectedOrder.status, selectedOrder.deleted_at)}
+                        {getPaymentStatusBadge(selectedOrder.payment_status)}
                       </div>
                     </div>
+                    <div className="text-right">
+                      <div className="text-sm text-muted-foreground">Tổng tiền</div>
+                      <div className="text-2xl font-bold text-green-600">
+                        {formatCurrency(selectedOrder.total_amount)}
+                      </div>
+                    </div>
+                  </div>
 
-                    {/* Notes preview */}
-                    {order.notes && (
-                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-600">
-                        <p className="text-xs text-slate-500 italic truncate">
-                          📝 {order.notes}
+                  {/* Customer Info */}
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <User className="h-5 w-5" />
+                      <h3 className="font-semibold">Thông tin khách hàng</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Tên:</span>
+                        <span className="ml-2 font-medium">{selectedOrder.customer?.name || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Email:</span>
+                        <span className="ml-2 font-medium">{selectedOrder.customer?.email || 'N/A'}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Số điện thoại:</span>
+                        <span className="ml-2 font-medium">{selectedOrder.customer?.phone || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Shipping Address */}
+                  {selectedOrder.shipping_address && (
+                    <Card className="p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MapPin className="h-5 w-5" />
+                        <h3 className="font-semibold">Địa chỉ giao hàng</h3>
+                      </div>
+                      <div className="text-sm space-y-1">
+                        <p className="font-medium">{selectedOrder.shipping_address.full_name}</p>
+                        <p>{selectedOrder.shipping_address.phone}</p>
+                        <p className="text-muted-foreground">
+                          {selectedOrder.shipping_address.address_line_1}
+                          {selectedOrder.shipping_address.address_line_2 && `, ${selectedOrder.shipping_address.address_line_2}`}
+                        </p>
+                        <p className="text-muted-foreground">
+                          {selectedOrder.shipping_address.ward && `${selectedOrder.shipping_address.ward}, `}
+                          {selectedOrder.shipping_address.district && `${selectedOrder.shipping_address.district}, `}
+                          {selectedOrder.shipping_address.city}
                         </p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                    </Card>
+                  )}
+
+                  {/* Payment Info */}
+                  {selectedOrder.payment && (
+                    <Card className="p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CreditCard className="h-5 w-5" />
+                        <h3 className="font-semibold">Thông tin thanh toán</h3>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Phương thức:</span>
+                          <span className="ml-2 font-medium">{selectedOrder.payment.payment_method}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Trạng thái:</span>
+                          <span className="ml-2">{getPaymentStatusBadge(selectedOrder.payment.payment_status)}</span>
+                        </div>
+                        {selectedOrder.payment.processed_at && (
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground">Ngày xử lý:</span>
+                            <span className="ml-2 font-medium">{formatDateTime(selectedOrder.payment.processed_at)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Order Items */}
+                  {selectedOrder.order_items && selectedOrder.order_items.length > 0 && (
+                    <Card className="p-4">
+                      <h3 className="font-semibold mb-3">
+                        Sản phẩm ({selectedOrder.order_items.length})
+                      </h3>
+                      <div className="space-y-3">
+                        {selectedOrder.order_items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between p-3 border rounded-lg"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div>
+                                <div className="font-medium">{item.product?.name || 'N/A'}</div>
+                                <div className="text-sm text-muted-foreground">
+                                  SKU: {item.product?.sku || 'N/A'}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {formatCurrency(item.unit_price)} x {item.quantity}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-medium text-green-600">
+                                {formatCurrency(item.total_price)}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Order Summary */}
+                      <div className="mt-4 pt-4 border-t space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Tổng sản phẩm:</span>
+                          <span className="font-medium">{formatCurrency(selectedOrder.subtotal)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Giảm giá:</span>
+                          <span className="font-medium text-red-600">-{formatCurrency(selectedOrder.discount_amount || 0)}</span>
+                        </div>
+                        <div className="flex justify-between text-base font-bold pt-2 border-t">
+                          <span>Tổng cộng:</span>
+                          <span className="text-green-600">{formatCurrency(selectedOrder.total_amount)}</span>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Order Notes */}
+                  {selectedOrder.notes && (
+                    <Card className="p-4">
+                      <h3 className="font-semibold mb-2">Ghi chú</h3>
+                      <p className="text-sm text-muted-foreground whitespace-pre-line">
+                        {selectedOrder.notes}
+                      </p>
+                    </Card>
+                  )}
+
+                  {/* Metadata */}
+                  <Card className="p-4">
+                    <h3 className="font-semibold mb-2">Thông tin hệ thống</h3>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Ngày đặt:</span>
+                        <span className="ml-2">{formatDateTime(selectedOrder.placed_at)}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Cập nhật:</span>
+                        <span className="ml-2">{formatDateTime(selectedOrder.updated_at)}</span>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
-      </div>
-    </TooltipProvider>
+    </div>
   );
-};export default AdminOrders;
+}
