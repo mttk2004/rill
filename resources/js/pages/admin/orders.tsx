@@ -18,12 +18,6 @@ import {
   formatCurrency,
   formatDateTime,
 } from '@/lib/order-helpers';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -35,11 +29,7 @@ import {
   XCircle,
   Eye,
   User,
-  CreditCard,
-  MapPin,
 } from 'lucide-react';
-import axios from 'axios';
-import { toast } from 'sonner';
 
 interface OrdersPageProps {
   orders: {
@@ -70,9 +60,6 @@ interface OrdersPageProps {
 
 export default function Orders({ orders, filters, stats }: OrdersPageProps) {
   const [currentFilters, setCurrentFilters] = useState(filters);
-  const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Stats cards configuration
@@ -272,20 +259,8 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
     }
   };
 
-  const handleViewDetails = async (orderId: number) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(route('admin.orders.show', orderId), {
-        headers: { Accept: 'application/json' },
-      });
-      setSelectedOrder(response.data);
-      setIsDialogOpen(true);
-    } catch (error) {
-      console.error('Error fetching order details:', error);
-      toast.error('Không thể tải thông tin đơn hàng');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleViewDetails = (orderId: number) => {
+    router.visit(route('admin.orders.show', orderId));
   };
 
   // Cleanup timer on unmount
@@ -320,7 +295,6 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
               <AdminTable
                 data={orders.data}
                 columns={columns}
-                loading={isLoading}
                 emptyMessage="Không tìm thấy đơn hàng nào"
                 getRowKey={(order) => order.id.toString()}
               />
@@ -340,184 +314,6 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
               </div>
             </Card>
           </div>
-
-          {/* Order Detail Dialog */}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Chi tiết đơn hàng</DialogTitle>
-              </DialogHeader>
-
-              {selectedOrder && (
-                <div className="space-y-6">
-                  {/* Order Header */}
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h2 className="text-2xl font-bold mb-2">
-                        Đơn hàng #{selectedOrder.order_number}
-                      </h2>
-                      <div className="flex items-center gap-3">
-                        {getOrderStatusBadge(selectedOrder.status, selectedOrder.deleted_at)}
-                        {getPaymentStatusBadge(selectedOrder.payment_status)}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-muted-foreground">Tổng tiền</div>
-                      <div className="text-2xl font-bold text-green-600">
-                        {formatCurrency(selectedOrder.total_amount)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Customer Info */}
-                  <Card className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <User className="h-5 w-5" />
-                      <h3 className="font-semibold">Thông tin khách hàng</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Tên:</span>
-                        <span className="ml-2 font-medium">{selectedOrder.customer?.name || 'N/A'}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Email:</span>
-                        <span className="ml-2 font-medium">{selectedOrder.customer?.email || 'N/A'}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Số điện thoại:</span>
-                        <span className="ml-2 font-medium">{selectedOrder.customer?.phone || 'N/A'}</span>
-                      </div>
-                    </div>
-                  </Card>
-
-                  {/* Shipping Address */}
-                  {selectedOrder.shipping_address && (
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <MapPin className="h-5 w-5" />
-                        <h3 className="font-semibold">Địa chỉ giao hàng</h3>
-                      </div>
-                      <div className="text-sm space-y-1">
-                        <p className="font-medium">{selectedOrder.shipping_address.full_name}</p>
-                        <p>{selectedOrder.shipping_address.phone}</p>
-                        <p className="text-muted-foreground">
-                          {selectedOrder.shipping_address.address_line_1}
-                          {selectedOrder.shipping_address.address_line_2 && `, ${selectedOrder.shipping_address.address_line_2}`}
-                        </p>
-                        <p className="text-muted-foreground">
-                          {selectedOrder.shipping_address.ward && `${selectedOrder.shipping_address.ward}, `}
-                          {selectedOrder.shipping_address.district && `${selectedOrder.shipping_address.district}, `}
-                          {selectedOrder.shipping_address.city}
-                        </p>
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Payment Info */}
-                  {selectedOrder.payment && (
-                    <Card className="p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <CreditCard className="h-5 w-5" />
-                        <h3 className="font-semibold">Thông tin thanh toán</h3>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Phương thức:</span>
-                          <span className="ml-2 font-medium">{selectedOrder.payment.payment_method}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Trạng thái:</span>
-                          <span className="ml-2">{getPaymentStatusBadge(selectedOrder.payment.payment_status)}</span>
-                        </div>
-                        {selectedOrder.payment.processed_at && (
-                          <div className="col-span-2">
-                            <span className="text-muted-foreground">Ngày xử lý:</span>
-                            <span className="ml-2 font-medium">{formatDateTime(selectedOrder.payment.processed_at)}</span>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Order Items */}
-                  {selectedOrder.order_items && selectedOrder.order_items.length > 0 && (
-                    <Card className="p-4">
-                      <h3 className="font-semibold mb-3">
-                        Sản phẩm ({selectedOrder.order_items.length})
-                      </h3>
-                      <div className="space-y-3">
-                        {selectedOrder.order_items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between p-3 border rounded-lg"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div>
-                                <div className="font-medium">{item.product?.name || 'N/A'}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  SKU: {item.product?.sku || 'N/A'}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {formatCurrency(item.unit_price)} x {item.quantity}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-medium text-green-600">
-                                {formatCurrency(item.total_price)}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Order Summary */}
-                      <div className="mt-4 pt-4 border-t space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Tổng sản phẩm:</span>
-                          <span className="font-medium">{formatCurrency(selectedOrder.subtotal)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Giảm giá:</span>
-                          <span className="font-medium text-red-600">-{formatCurrency(selectedOrder.discount_amount || 0)}</span>
-                        </div>
-                        <div className="flex justify-between text-base font-bold pt-2 border-t">
-                          <span>Tổng cộng:</span>
-                          <span className="text-green-600">{formatCurrency(selectedOrder.total_amount)}</span>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Order Notes */}
-                  {selectedOrder.notes && (
-                    <Card className="p-4">
-                      <h3 className="font-semibold mb-2">Ghi chú</h3>
-                      <p className="text-sm text-muted-foreground whitespace-pre-line">
-                        {selectedOrder.notes}
-                      </p>
-                    </Card>
-                  )}
-
-                  {/* Metadata */}
-                  <Card className="p-4">
-                    <h3 className="font-semibold mb-2">Thông tin hệ thống</h3>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Ngày đặt:</span>
-                        <span className="ml-2">{formatDateTime(selectedOrder.placed_at)}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Cập nhật:</span>
-                        <span className="ml-2">{formatDateTime(selectedOrder.updated_at)}</span>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
     </div>

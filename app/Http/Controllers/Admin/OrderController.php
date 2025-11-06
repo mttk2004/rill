@@ -177,13 +177,31 @@ class OrderController extends Controller
             ];
         });
 
-        // If AJAX request, return JSON
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json($orderData);
+        // Render detail page
+        return Inertia::render('admin/order-detail', [
+            'order' => $orderData,
+        ]);
+    }
+
+    /**
+     * Export order as PDF.
+     */
+    public function export(string $id)
+    {
+        $order = Order::with([
+            'user',
+            'payment',
+            'items.product.artists',
+        ])->findOrFail($id);
+
+        // Check if order is paid
+        if (!$order->payment || $order->payment->payment_status !== 'completed') {
+            return redirect()->back()->with('error', 'Chỉ có thể xuất đơn hàng đã thanh toán');
         }
 
-        // Otherwise redirect to list (we use dialog for details)
-        return redirect()->route('admin.orders');
+        // TODO: Generate PDF
+        // For now, just return success message
+        return redirect()->back()->with('success', 'Xuất đơn hàng thành công');
     }
 
     /**

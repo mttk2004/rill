@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::delete('/orders/{id}', [App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('admin.orders.destroy');
         Route::post('/orders/{id}/restore', [App\Http\Controllers\Admin\OrderController::class, 'restore'])->name('admin.orders.restore');
         Route::patch('/orders/{id}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('admin.orders.update-status');
+        Route::get('/orders/{id}/export', [App\Http\Controllers\Admin\OrderController::class, 'export'])->name('admin.orders.export');
 
         Route::get('/customers', [App\Http\Controllers\Admin\CustomerController::class, 'index'])->name('admin.customers');
         Route::get('/customers/{id}', [App\Http\Controllers\Admin\CustomerController::class, 'show'])->name('admin.customers.show');
