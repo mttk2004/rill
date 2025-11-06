@@ -143,7 +143,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
       options: [
         { label: 'Tất cả', value: 'all' },
         { label: 'Chờ thanh toán', value: 'pending' },
-        { label: 'Đã thanh toán', value: 'paid' },
+        { label: 'Đã thanh toán', value: 'completed' },
         { label: 'Thất bại', value: 'failed' },
         { label: 'Hoàn tiền', value: 'refunded' },
       ],

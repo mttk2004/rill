@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('id', 19)->primary();
             $table->string('order_id', 19);
             $table->enum('payment_method', ['cod']);
-            $table->enum('payment_status', ['pending', 'completed', 'failed', 'cancelled'])->default('pending');
+            $table->enum('payment_status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
             $table->decimal('amount', 12, 2);
             $table->string('currency', 3)->default('VND');
             $table->string('transaction_id')->nullable();

@@ -42,9 +42,19 @@ class OrderController extends Controller
 
         // Payment status filter
         if ($payment_status && $payment_status !== 'all') {
-            $query->whereHas('payment', function ($q) use ($payment_status) {
-                $q->where('payment_status', $payment_status);
-            });
+            if ($payment_status === 'pending') {
+                // For pending: include orders with pending payment OR without payment record
+                $query->where(function ($q) use ($payment_status) {
+                    $q->whereHas('payment', function ($subQ) use ($payment_status) {
+                        $subQ->where('payment_status', $payment_status);
+                    })->orWhereDoesntHave('payment');
+                });
+            } else {
+                // For other statuses: only include orders with that specific payment status
+                $query->whereHas('payment', function ($q) use ($payment_status) {
+                    $q->where('payment_status', $payment_status);
+                });
+            }
         }
 
         // Sorting
