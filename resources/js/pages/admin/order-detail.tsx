@@ -12,13 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import {
   ArrowLeft,
@@ -28,44 +21,50 @@ import {
   Package,
   FileText,
   Download,
-  Save,
-  Clock,
   XCircle,
   Truck,
   PackageCheck,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
+import type { LucideIcon } from 'lucide-react';
 
 interface OrderDetailProps {
   order: AdminOrder;
 }
 
+// Status transition map
+const statusTransitions: Record<string, Array<{ status: string; label: string; icon: LucideIcon; variant: 'default' | 'destructive' | 'outline' }>> = {
+  pending: [
+    { status: 'processing', label: 'Xác nhận đơn', icon: Package, variant: 'default' },
+    { status: 'cancelled', label: 'Hủy đơn', icon: XCircle, variant: 'destructive' },
+  ],
+  processing: [
+    { status: 'shipped', label: 'Giao hàng', icon: Truck, variant: 'default' },
+    { status: 'cancelled', label: 'Hủy đơn', icon: XCircle, variant: 'destructive' },
+  ],
+  shipped: [
+    { status: 'delivered', label: 'Đã giao', icon: PackageCheck, variant: 'default' },
+  ],
+  delivered: [],
+  cancelled: [],
+};
+
 export default function OrderDetail({ order }: OrderDetailProps) {
-  const [status, setStatus] = useState(order.status);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleStatusChange = (value: string) => {
-    setStatus(value as typeof order.status);
-  };
-
-  const handleUpdateStatus = async () => {
-    if (status === order.status) {
-      toast.info('Trạng thái không thay đổi');
-      return;
-    }
-
+  const handleUpdateStatus = async (newStatus: string) => {
     setIsUpdating(true);
     try {
       await axios.patch(route('admin.orders.update-status', order.id), {
-        status,
+        status: newStatus,
       });
       toast.success('Cập nhật trạng thái thành công');
       router.reload();
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Không thể cập nhật trạng thái');
-      setStatus(order.status);
     } finally {
       setIsUpdating(false);
     }
@@ -109,32 +108,32 @@ export default function OrderDetail({ order }: OrderDetailProps) {
           </div>
 
           {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Left Column - Order Details (2/3 width) */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4">
               {/* Order Items */}
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-muted-foreground" />
-                    <CardTitle>Sản phẩm ({order.order_items_count})</CardTitle>
+                    <CardTitle className="text-base">Sản phẩm ({order.order_items_count})</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-3">
                   {order.order_items && order.order_items.length > 0 ? (
                     <>
                       {order.order_items.map((item) => (
                         <div
                           key={item.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                          className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
                         >
                           <div className="flex-1">
-                            <h3 className="font-medium">{item.product?.name || 'N/A'}</h3>
-                            <p className="text-sm text-muted-foreground">
+                            <h3 className="font-medium text-sm">{item.product?.name || 'N/A'}</h3>
+                            <p className="text-xs text-muted-foreground">
                               SKU: {item.product?.sku || 'N/A'}
                             </p>
                             {item.product?.artists && item.product.artists.length > 0 && (
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-xs text-muted-foreground">
                                 Nghệ sĩ: {item.product.artists.map(a => a.name).join(', ')}
                               </p>
                             )}
@@ -143,7 +142,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-bold text-green-600">
+                            <p className="text-base font-bold text-green-600">
                               {formatCurrency(item.total_price)}
                             </p>
                           </div>
@@ -169,14 +168,14 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                         <Separator />
                         <div className="flex justify-between text-base font-bold">
                           <span>Tổng cộng:</span>
-                          <span className="text-green-600 text-xl">
+                          <span className="text-green-600 text-lg">
                             {formatCurrency(order.total_amount)}
                           </span>
                         </div>
                       </div>
                     </>
                   ) : (
-                    <p className="text-center text-muted-foreground py-8">
+                    <p className="text-center text-muted-foreground py-4 text-sm">
                       Không có sản phẩm nào
                     </p>
                   )}
@@ -185,32 +184,32 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
               {/* Customer Info */}
               <Card>
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
                     <User className="h-5 w-5 text-muted-foreground" />
-                    <CardTitle>Thông tin khách hàng</CardTitle>
+                    <CardTitle className="text-base">Thông tin khách hàng</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
                   {order.customer ? (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-muted-foreground">Tên khách hàng</Label>
-                        <p className="font-medium mt-1">{order.customer.name}</p>
+                        <Label className="text-muted-foreground text-xs">Tên khách hàng</Label>
+                        <p className="font-medium mt-1 text-sm">{order.customer.name}</p>
                       </div>
                       <div>
-                        <Label className="text-muted-foreground">Email</Label>
-                        <p className="font-medium mt-1">{order.customer.email}</p>
+                        <Label className="text-muted-foreground text-xs">Email</Label>
+                        <p className="font-medium mt-1 text-sm">{order.customer.email}</p>
                       </div>
                       {order.customer.phone && (
                         <div>
-                          <Label className="text-muted-foreground">Số điện thoại</Label>
-                          <p className="font-medium mt-1">{order.customer.phone}</p>
+                          <Label className="text-muted-foreground text-xs">Số điện thoại</Label>
+                          <p className="font-medium mt-1 text-sm">{order.customer.phone}</p>
                         </div>
                       )}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground">Không có thông tin khách hàng</p>
+                    <p className="text-muted-foreground text-sm">Không có thông tin khách hàng</p>
                   )}
                 </CardContent>
               </Card>
@@ -218,22 +217,22 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               {/* Shipping Address */}
               {order.shipping_address && (
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-5 w-5 text-muted-foreground" />
-                      <CardTitle>Địa chỉ giao hàng</CardTitle>
+                      <CardTitle className="text-base">Địa chỉ giao hàng</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <p className="font-medium text-lg">{order.shipping_address.full_name}</p>
-                      <p className="text-muted-foreground">{order.shipping_address.phone}</p>
-                      <div className="pt-2">
-                        <p>{order.shipping_address.address_line_1}</p>
+                      <p className="font-medium">{order.shipping_address.full_name}</p>
+                      <p className="text-muted-foreground text-sm">{order.shipping_address.phone}</p>
+                      <div className="pt-1">
+                        <p className="text-sm">{order.shipping_address.address_line_1}</p>
                         {order.shipping_address.address_line_2 && (
-                          <p>{order.shipping_address.address_line_2}</p>
+                          <p className="text-sm">{order.shipping_address.address_line_2}</p>
                         )}
-                        <p className="text-muted-foreground">
+                        <p className="text-muted-foreground text-sm">
                           {[
                             order.shipping_address.ward,
                             order.shipping_address.district,
@@ -243,7 +242,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                             .join(', ')}
                         </p>
                         {order.shipping_address.postal_code && (
-                          <p className="text-muted-foreground">
+                          <p className="text-muted-foreground text-xs">
                             Mã bưu điện: {order.shipping_address.postal_code}
                           </p>
                         )}
@@ -256,34 +255,34 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               {/* Payment Info */}
               {order.payment && (
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
                       <CreditCard className="h-5 w-5 text-muted-foreground" />
-                      <CardTitle>Thông tin thanh toán</CardTitle>
+                      <CardTitle className="text-base">Thông tin thanh toán</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-muted-foreground">Phương thức</Label>
-                        <p className="font-medium mt-1">{order.payment.payment_method}</p>
+                        <Label className="text-muted-foreground text-xs">Phương thức</Label>
+                        <p className="font-medium mt-1 text-sm">{order.payment.payment_method}</p>
                       </div>
                       <div>
-                        <Label className="text-muted-foreground">Trạng thái</Label>
+                        <Label className="text-muted-foreground text-xs">Trạng thái</Label>
                         <div className="mt-1">
                           {getPaymentStatusBadge(order.payment.payment_status)}
                         </div>
                       </div>
                       <div>
-                        <Label className="text-muted-foreground">Số tiền</Label>
-                        <p className="font-medium mt-1 text-green-600">
+                        <Label className="text-muted-foreground text-xs">Số tiền</Label>
+                        <p className="font-medium mt-1 text-green-600 text-sm">
                           {formatCurrency(order.payment.amount)}
                         </p>
                       </div>
                       {order.payment.processed_at && (
                         <div>
-                          <Label className="text-muted-foreground">Ngày xử lý</Label>
-                          <p className="font-medium mt-1">
+                          <Label className="text-muted-foreground text-xs">Ngày xử lý</Label>
+                          <p className="font-medium mt-1 text-sm">
                             {formatDateTime(order.payment.processed_at)}
                           </p>
                         </div>
@@ -296,88 +295,70 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               {/* Notes */}
               {order.notes && (
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
                       <FileText className="h-5 w-5 text-muted-foreground" />
-                      <CardTitle>Ghi chú</CardTitle>
+                      <CardTitle className="text-base">Ghi chú</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="whitespace-pre-line text-muted-foreground">{order.notes}</p>
+                    <p className="whitespace-pre-line text-muted-foreground text-sm">{order.notes}</p>
                   </CardContent>
                 </Card>
               )}
             </div>
 
             {/* Right Column - Actions (1/3 width) */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Update Status Card */}
               <Card className="sticky top-4">
-                <CardHeader>
-                  <CardTitle>Cập nhật trạng thái</CardTitle>
-                  <CardDescription>
-                    Thay đổi trạng thái đơn hàng
-                  </CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Trạng thái đơn hàng</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="status">Trạng thái đơn hàng</Label>
-                    <Select value={status} onValueChange={handleStatusChange}>
-                      <SelectTrigger id="status">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">
-                          <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-amber-500" />
-                            Chờ xác nhận
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="processing">
-                          <div className="flex items-center gap-2">
-                            <Package className="h-4 w-4 text-blue-500" />
-                            Đang xử lý
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="shipped">
-                          <div className="flex items-center gap-2">
-                            <Truck className="h-4 w-4 text-purple-500" />
-                            Đang giao
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="delivered">
-                          <div className="flex items-center gap-2">
-                            <PackageCheck className="h-4 w-4 text-green-500" />
-                            Đã giao
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="cancelled">
-                          <div className="flex items-center gap-2">
-                            <XCircle className="h-4 w-4 text-red-500" />
-                            Đã hủy
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Hiện tại:</span>
+                    {getOrderStatusBadge(order.status, order.deleted_at)}
                   </div>
 
-                  <Button
-                    onClick={handleUpdateStatus}
-                    disabled={isUpdating || status === order.status}
-                    className="w-full"
-                    size="lg"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    {isUpdating ? 'Đang cập nhật...' : 'Lưu thay đổi'}
-                  </Button>
+                  {statusTransitions[order.status]?.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-2">
+                        <span className="text-sm font-medium">Thao tác:</span>
+                        {statusTransitions[order.status].map((transition) => {
+                          const Icon = transition.icon;
+                          return (
+                            <Button
+                              key={transition.status}
+                              variant={transition.variant}
+                              className="w-full justify-start"
+                              onClick={() => handleUpdateStatus(transition.status)}
+                              disabled={isUpdating}
+                            >
+                              <Icon className="h-4 w-4 mr-2" />
+                              {transition.label}
+                              <ChevronRight className="h-4 w-4 ml-auto" />
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  {statusTransitions[order.status]?.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      {order.status === 'delivered' ? '✓ Đơn hàng đã hoàn thành' : '✗ Đơn hàng đã hủy'}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
 
               {/* Export Card */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Xuất đơn hàng</CardTitle>
-                  <CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Xuất đơn hàng</CardTitle>
+                  <CardDescription className="text-xs">
                     {canExport
                       ? 'Tải xuống hóa đơn PDF'
                       : 'Chỉ có thể xuất đơn đã thanh toán'}
@@ -389,7 +370,6 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     disabled={!canExport}
                     variant={canExport ? 'default' : 'outline'}
                     className="w-full"
-                    size="lg"
                   >
                     <Download className="h-4 w-4 mr-2" />
                     Xuất PDF
@@ -399,22 +379,22 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
               {/* Order Timeline */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Thông tin hệ thống</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Thông tin hệ thống</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm">
+                <CardContent className="space-y-2 text-sm">
                   <div>
-                    <Label className="text-muted-foreground">Ngày đặt hàng</Label>
-                    <p className="font-medium mt-1">{formatDateTime(order.placed_at)}</p>
+                    <Label className="text-muted-foreground text-xs">Ngày đặt hàng</Label>
+                    <p className="font-medium mt-1 text-sm">{formatDateTime(order.placed_at)}</p>
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Cập nhật lần cuối</Label>
-                    <p className="font-medium mt-1">{formatDateTime(order.updated_at)}</p>
+                    <Label className="text-muted-foreground text-xs">Cập nhật lần cuối</Label>
+                    <p className="font-medium mt-1 text-sm">{formatDateTime(order.updated_at)}</p>
                   </div>
                   {order.deleted_at && (
                     <div>
-                      <Label className="text-muted-foreground">Ngày hủy</Label>
-                      <p className="font-medium mt-1 text-red-600">
+                      <Label className="text-muted-foreground text-xs">Ngày hủy</Label>
+                      <p className="font-medium mt-1 text-red-600 text-sm">
                         {formatDateTime(order.deleted_at)}
                       </p>
                     </div>
