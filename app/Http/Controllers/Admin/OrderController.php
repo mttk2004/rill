@@ -201,7 +201,7 @@ class OrderController extends Controller
         $order = Order::with([
             'user',
             'payment',
-            'items.product.artists',
+            'items.product',
         ])->findOrFail($id);
 
         // Check if order is paid
@@ -209,9 +209,10 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Chỉ có thể xuất đơn hàng đã thanh toán');
         }
 
-        // TODO: Generate PDF
-        // For now, just return success message
-        return redirect()->back()->with('success', 'Xuất đơn hàng thành công');
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('invoices.order', compact('order'));
+
+        return $pdf->download('hoadon_' . $order->order_number . '.pdf');
     }
 
     /**
