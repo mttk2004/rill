@@ -10,8 +10,7 @@ import {
   formatDateTime,
 } from '@/lib/order-helpers';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
   ArrowLeft,
@@ -74,142 +73,162 @@ export default function OrderDetail({ order }: OrderDetailProps) {
     window.location.href = route('admin.orders.export', order.id);
   };
 
-  const canExport = order.payment && order.payment.payment_status === 'completed';
+  const canExport = order.payment?.payment_status === 'completed';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <>
       <Head title={`Đơn hàng #${order.order_number}`} />
       <AdminNavigation />
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="mb-6">
-            <Link
-              href={route('admin.orders')}
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Quay lại danh sách đơn hàng
-            </Link>
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        {/* Header Section */}
+        <div className="mb-6">
+          <Link
+            href={route('admin.orders')}
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Quay lại danh sách đơn hàng
+          </Link>
 
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold">Đơn hàng #{order.order_number}</h1>
-                <p className="text-muted-foreground mt-1">
-                  Đặt lúc {formatDateTime(order.placed_at)}
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                {getOrderStatusBadge(order.status, order.deleted_at)}
-                {getPaymentStatusBadge(order.payment_status)}
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Đơn hàng #{order.order_number}</h1>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <span>Đặt lúc {formatDateTime(order.placed_at)}</span>
+                <span>•</span>
+                <div className="flex items-center gap-2">
+                  {getOrderStatusBadge(order.status, order.deleted_at)}
+                  {getPaymentStatusBadge(order.payment?.payment_status || 'pending')}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Two Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Left Column - Order Details (2/3 width) */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Order Items */}
-              <Card>
-                <CardHeader className="pb-3">
+            <div className="flex gap-2">
+              <Button
+                onClick={handleExport}
+                disabled={!canExport}
+                variant="outline"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Xuất PDF
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content - Single Column with Sidebar Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main Content - 8 columns */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Order Items */}
+            <Card>
+              <CardHeader className="border-b bg-muted/30">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-muted-foreground" />
-                    <CardTitle className="text-base">Sản phẩm ({order.order_items_count})</CardTitle>
+                    <CardTitle>Sản phẩm ({order.order_items_count})</CardTitle>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {order.order_items && order.order_items.length > 0 ? (
-                    <>
-                      {order.order_items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                        >
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-green-600">
+                      {formatCurrency(order.total_amount)}
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {order.order_items && order.order_items.length > 0 ? (
+                  <div className="divide-y">
+                    {order.order_items.map((item) => (
+                      <div key={item.id} className="p-4 hover:bg-muted/50 transition-colors">
+                        <div className="flex gap-4">
                           <div className="flex-1">
-                            <h3 className="font-medium text-sm">{item.product?.name || 'N/A'}</h3>
-                            <p className="text-xs text-muted-foreground">
-                              SKU: {item.product?.sku || 'N/A'}
-                            </p>
-                            {item.product?.artists && item.product.artists.length > 0 && (
-                              <p className="text-xs text-muted-foreground">
-                                Nghệ sĩ: {item.product.artists.map(a => a.name).join(', ')}
-                              </p>
-                            )}
-                            <p className="text-sm font-medium mt-1">
-                              {formatCurrency(item.unit_price)} × {item.quantity}
-                            </p>
+                            <h3 className="font-semibold mb-1">{item.product?.name || 'N/A'}</h3>
+                            <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                              <span>SKU: {item.product?.sku || 'N/A'}</span>
+                              {item.product?.artists && item.product.artists.length > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span>{item.product.artists.map(a => a.name).join(', ')}</span>
+                                </>
+                              )}
+                            </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-base font-bold text-green-600">
+                            <div className="text-sm text-muted-foreground mb-1">
+                              {formatCurrency(item.unit_price)} × {item.quantity}
+                            </div>
+                            <div className="text-lg font-semibold">
                               {formatCurrency(item.total_price)}
-                            </p>
+                            </div>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                    ))}
 
-                      <Separator />
-
-                      {/* Order Summary */}
-                      <div className="space-y-2 pt-2">
+                    {/* Order Summary */}
+                    <div className="p-4 bg-muted/30 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Tổng sản phẩm</span>
+                        <span className="font-medium">{formatCurrency(order.subtotal)}</span>
+                      </div>
+                      {order.discount_amount > 0 && (
                         <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">Tổng sản phẩm:</span>
-                          <span className="font-medium">{formatCurrency(order.subtotal)}</span>
-                        </div>
-                        {order.discount_amount > 0 && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Giảm giá:</span>
-                            <span className="font-medium text-red-600">
-                              -{formatCurrency(order.discount_amount)}
-                            </span>
-                          </div>
-                        )}
-                        <Separator />
-                        <div className="flex justify-between text-base font-bold">
-                          <span>Tổng cộng:</span>
-                          <span className="text-green-600 text-lg">
-                            {formatCurrency(order.total_amount)}
+                          <span className="text-muted-foreground">Giảm giá</span>
+                          <span className="font-medium text-red-600">
+                            -{formatCurrency(order.discount_amount)}
                           </span>
                         </div>
+                      )}
+                      <Separator />
+                      <div className="flex justify-between items-center pt-2">
+                        <span className="font-semibold">Tổng cộng</span>
+                        <span className="text-2xl font-bold text-green-600">
+                          {formatCurrency(order.total_amount)}
+                        </span>
                       </div>
-                    </>
-                  ) : (
-                    <p className="text-center text-muted-foreground py-4 text-sm">
-                      Không có sản phẩm nào
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-muted-foreground">
+                    Không có sản phẩm nào
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
+            {/* Customer & Shipping Info - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Customer Info */}
               <Card>
-                <CardHeader className="pb-3">
+                <CardHeader className="border-b bg-muted/30">
                   <div className="flex items-center gap-2">
                     <User className="h-5 w-5 text-muted-foreground" />
-                    <CardTitle className="text-base">Thông tin khách hàng</CardTitle>
+                    <CardTitle>Khách hàng</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4">
                   {order.customer ? (
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-3">
                       <div>
-                        <Label className="text-muted-foreground text-xs">Tên khách hàng</Label>
-                        <p className="font-medium mt-1 text-sm">{order.customer.name}</p>
+                        <div className="font-semibold text-base">{order.customer.name}</div>
                       </div>
-                      <div>
-                        <Label className="text-muted-foreground text-xs">Email</Label>
-                        <p className="font-medium mt-1 text-sm">{order.customer.email}</p>
-                      </div>
-                      {order.customer.phone && (
-                        <div>
-                          <Label className="text-muted-foreground text-xs">Số điện thoại</Label>
-                          <p className="font-medium mt-1 text-sm">{order.customer.phone}</p>
+                      <Separator />
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <span>Email:</span>
+                          <span className="text-foreground">{order.customer.email}</span>
                         </div>
-                      )}
+                        {order.customer.phone && (
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <span>SĐT:</span>
+                            <span className="text-foreground">{order.customer.phone}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : (
-                    <p className="text-muted-foreground text-sm">Không có thông tin khách hàng</p>
+                    <p className="text-muted-foreground text-sm">Không có thông tin</p>
                   )}
                 </CardContent>
               </Card>
@@ -217,22 +236,25 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               {/* Shipping Address */}
               {order.shipping_address && (
                 <Card>
-                  <CardHeader className="pb-3">
+                  <CardHeader className="border-b bg-muted/30">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-5 w-5 text-muted-foreground" />
-                      <CardTitle className="text-base">Địa chỉ giao hàng</CardTitle>
+                      <CardTitle>Địa chỉ giao hàng</CardTitle>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <p className="font-medium">{order.shipping_address.full_name}</p>
-                      <p className="text-muted-foreground text-sm">{order.shipping_address.phone}</p>
-                      <div className="pt-1">
-                        <p className="text-sm">{order.shipping_address.address_line_1}</p>
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div>
+                        <div className="font-semibold text-base">{order.shipping_address.full_name}</div>
+                        <div className="text-sm text-muted-foreground mt-1">{order.shipping_address.phone}</div>
+                      </div>
+                      <Separator />
+                      <div className="text-sm space-y-1">
+                        <p>{order.shipping_address.address_line_1}</p>
                         {order.shipping_address.address_line_2 && (
-                          <p className="text-sm">{order.shipping_address.address_line_2}</p>
+                          <p>{order.shipping_address.address_line_2}</p>
                         )}
-                        <p className="text-muted-foreground text-sm">
+                        <p className="text-muted-foreground">
                           {[
                             order.shipping_address.ward,
                             order.shipping_address.district,
@@ -241,170 +263,158 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                             .filter(Boolean)
                             .join(', ')}
                         </p>
-                        {order.shipping_address.postal_code && (
-                          <p className="text-muted-foreground text-xs">
-                            Mã bưu điện: {order.shipping_address.postal_code}
-                          </p>
-                        )}
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Payment Info */}
-              {order.payment && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5 text-muted-foreground" />
-                      <CardTitle className="text-base">Thông tin thanh toán</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-muted-foreground text-xs">Phương thức</Label>
-                        <p className="font-medium mt-1 text-sm">{order.payment.payment_method}</p>
-                      </div>
-                      <div>
-                        <Label className="text-muted-foreground text-xs">Trạng thái</Label>
-                        <div className="mt-1">
-                          {getPaymentStatusBadge(order.payment.payment_status)}
-                        </div>
-                      </div>
-                      <div>
-                        <Label className="text-muted-foreground text-xs">Số tiền</Label>
-                        <p className="font-medium mt-1 text-green-600 text-sm">
-                          {formatCurrency(order.payment.amount)}
-                        </p>
-                      </div>
-                      {order.payment.processed_at && (
-                        <div>
-                          <Label className="text-muted-foreground text-xs">Ngày xử lý</Label>
-                          <p className="font-medium mt-1 text-sm">
-                            {formatDateTime(order.payment.processed_at)}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Notes */}
-              {order.notes && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-muted-foreground" />
-                      <CardTitle className="text-base">Ghi chú</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="whitespace-pre-line text-muted-foreground text-sm">{order.notes}</p>
                   </CardContent>
                 </Card>
               )}
             </div>
 
-            {/* Right Column - Actions (1/3 width) */}
-            <div className="space-y-4">
-              {/* Update Status Card */}
-              <Card className="sticky top-4">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Trạng thái đơn hàng</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Hiện tại:</span>
-                    {getOrderStatusBadge(order.status, order.deleted_at)}
-                  </div>
-
-                  {statusTransitions[order.status]?.length > 0 && (
-                    <>
-                      <Separator />
-                      <div className="space-y-2">
-                        <span className="text-sm font-medium">Thao tác:</span>
-                        {statusTransitions[order.status].map((transition) => {
-                          const Icon = transition.icon;
-                          return (
-                            <Button
-                              key={transition.status}
-                              variant={transition.variant}
-                              className="w-full justify-start"
-                              onClick={() => handleUpdateStatus(transition.status)}
-                              disabled={isUpdating}
-                            >
-                              <Icon className="h-4 w-4 mr-2" />
-                              {transition.label}
-                              <ChevronRight className="h-4 w-4 ml-auto" />
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-
-                  {statusTransitions[order.status]?.length === 0 && (
-                    <p className="text-sm text-muted-foreground">
-                      {order.status === 'delivered' ? '✓ Đơn hàng đã hoàn thành' : '✗ Đơn hàng đã hủy'}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Export Card */}
+            {/* Payment Info */}
+            {order.payment && (
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Xuất đơn hàng</CardTitle>
-                  <CardDescription className="text-xs">
-                    {canExport
-                      ? 'Tải xuống hóa đơn PDF'
-                      : 'Chỉ có thể xuất đơn đã thanh toán'}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button
-                    onClick={handleExport}
-                    disabled={!canExport}
-                    variant={canExport ? 'default' : 'outline'}
-                    className="w-full"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Xuất PDF
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Order Timeline */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Thông tin hệ thống</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div>
-                    <Label className="text-muted-foreground text-xs">Ngày đặt hàng</Label>
-                    <p className="font-medium mt-1 text-sm">{formatDateTime(order.placed_at)}</p>
+                <CardHeader className="border-b bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-muted-foreground" />
+                    <CardTitle>Thanh toán</CardTitle>
                   </div>
-                  <div>
-                    <Label className="text-muted-foreground text-xs">Cập nhật lần cuối</Label>
-                    <p className="font-medium mt-1 text-sm">{formatDateTime(order.updated_at)}</p>
-                  </div>
-                  {order.deleted_at && (
+                </CardHeader>
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <Label className="text-muted-foreground text-xs">Ngày hủy</Label>
-                      <p className="font-medium mt-1 text-red-600 text-sm">
-                        {formatDateTime(order.deleted_at)}
-                      </p>
+                      <div className="text-xs text-muted-foreground mb-1">Phương thức</div>
+                      <div className="font-medium">{order.payment.payment_method}</div>
                     </div>
-                  )}
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">Trạng thái</div>
+                      <div>{getPaymentStatusBadge(order.payment.payment_status)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1">Số tiền</div>
+                      <div className="font-semibold text-green-600">
+                        {formatCurrency(order.payment.amount)}
+                      </div>
+                    </div>
+                    {order.payment.processed_at && (
+                      <div>
+                        <div className="text-xs text-muted-foreground mb-1">Ngày xử lý</div>
+                        <div className="font-medium text-sm">
+                          {formatDateTime(order.payment.processed_at)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
-            </div>
+            )}
+
+            {/* Notes */}
+            {order.notes && (
+              <Card>
+                <CardHeader className="border-b bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-muted-foreground" />
+                    <CardTitle>Ghi chú</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4">
+                  <p className="whitespace-pre-line text-sm text-muted-foreground">{order.notes}</p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Sidebar - 4 columns */}
+          <div className="lg:col-span-4 space-y-4">
+            {/* Status Actions Card - Sticky */}
+            <Card className="sticky top-4 border-2">
+              <CardHeader className="border-b bg-muted/50 pb-4">
+                <CardTitle className="text-lg">Trạng thái đơn hàng</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <span className="text-sm font-medium">Hiện tại:</span>
+                  {getOrderStatusBadge(order.status, order.deleted_at)}
+                </div>
+
+                {statusTransitions[order.status]?.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium text-muted-foreground mb-3">
+                        Hành động có thể thực hiện:
+                      </div>
+                      {statusTransitions[order.status].map((transition) => {
+                        const Icon = transition.icon;
+                        return (
+                          <Button
+                            key={transition.status}
+                            variant={transition.variant}
+                            className="w-full justify-start h-auto py-3"
+                            onClick={() => handleUpdateStatus(transition.status)}
+                            disabled={isUpdating}
+                          >
+                            <Icon className="h-5 w-5 mr-3" />
+                            <span className="flex-1 text-left">{transition.label}</span>
+                            <ChevronRight className="h-5 w-5 ml-2" />
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                {statusTransitions[order.status]?.length === 0 && (
+                  <div className="text-center py-4">
+                    <div className="text-4xl mb-2">
+                      {order.status === 'delivered' ? '✓' : '✗'}
+                    </div>
+                    <p className="text-sm font-medium">
+                      {order.status === 'delivered'
+                        ? 'Đơn hàng đã hoàn thành'
+                        : 'Đơn hàng đã bị hủy'}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Order Timeline */}
+            <Card>
+              <CardHeader className="border-b bg-muted/30">
+                <CardTitle>Thông tin đơn hàng</CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
+                  <div className="flex-1">
+                    <div className="text-xs text-muted-foreground">Ngày đặt hàng</div>
+                    <div className="font-medium text-sm mt-0.5">{formatDateTime(order.placed_at)}</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
+                  <div className="flex-1">
+                    <div className="text-xs text-muted-foreground">Cập nhật lần cuối</div>
+                    <div className="font-medium text-sm mt-0.5">{formatDateTime(order.updated_at)}</div>
+                  </div>
+                </div>
+                {order.deleted_at && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5" />
+                    <div className="flex-1">
+                      <div className="text-xs text-muted-foreground">Ngày hủy</div>
+                      <div className="font-medium text-sm text-red-600 mt-0.5">
+                        {formatDateTime(order.deleted_at)}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
