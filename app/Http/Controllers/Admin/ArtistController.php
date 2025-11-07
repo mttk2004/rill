@@ -128,7 +128,10 @@ class ArtistController extends Controller
         $artist = Artist::findOrFail($id);
         $artist->delete();
 
-        return redirect()->back()->with('success', 'Nghệ sĩ đã được xóa');
+        return response()->json([
+            'success' => true,
+            'message' => 'Nghệ sĩ đã được xóa thành công',
+        ]);
     }
 
     /**
@@ -139,6 +142,9 @@ class ArtistController extends Controller
         $artist = Artist::withTrashed()->findOrFail($id);
         $artist->restore();
 
-        return redirect()->back()->with('success', 'Nghệ sĩ đã được khôi phục');
+        return response()->json([
+            'success' => true,
+            'message' => 'Nghệ sĩ đã được khôi phục thành công',
+        ]);
     }
 }

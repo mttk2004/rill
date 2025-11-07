@@ -261,9 +261,12 @@ export default function Artists({
     if (!confirm('Bạn có chắc chắn muốn xóa nghệ sĩ này?')) return;
 
     try {
-      await axios.delete(route('admin.artists.destroy', artistId));
-      toast.success('Đã xóa nghệ sĩ thành công');
-      router.reload();
+      const response = await axios.delete(route('admin.artists.destroy', artistId));
+
+      if (response.data.success) {
+        toast.success(response.data.message || 'Đã xóa nghệ sĩ thành công');
+        router.reload();
+      }
     } catch (error) {
       console.error('Error deleting artist:', error);
       toast.error('Không thể xóa nghệ sĩ');
@@ -272,9 +275,12 @@ export default function Artists({
 
   const handleRestore = async (artistId: number) => {
     try {
-      await axios.post(route('admin.artists.restore', artistId));
-      toast.success('Đã khôi phục nghệ sĩ thành công');
-      router.reload();
+      const response = await axios.post(route('admin.artists.restore', artistId));
+
+      if (response.data.success) {
+        toast.success(response.data.message || 'Đã khôi phục nghệ sĩ thành công');
+        router.reload();
+      }
     } catch (error) {
       console.error('Error restoring artist:', error);
       toast.error('Không thể khôi phục nghệ sĩ');
