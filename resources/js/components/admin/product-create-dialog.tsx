@@ -1,6 +1,6 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import { Save, Loader2, X } from 'lucide-react';
+import { Save, Loader2, X, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -55,9 +55,22 @@ export const ProductCreateDialog = ({
   onClose,
   genres,
 }: ProductCreateDialogProps) => {
+  // Function to generate SKU in format VINYL-{3 letters}{3 digits}
+  const generateSKU = () => {
+    // Generate 3 random uppercase letters
+    const letters = Array.from({ length: 3 }, () =>
+      String.fromCharCode(65 + Math.floor(Math.random() * 26))
+    ).join('');
+
+    // Generate 3 random digits
+    const digits = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+
+    return `VINYL-${letters}${digits}`;
+  };
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
-    sku: '',
+    sku: generateSKU(),
     genre: '',
     description: '',
     price: '',
@@ -72,6 +85,13 @@ export const ProductCreateDialog = ({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSaving, setIsSaving] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Generate new SKU when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(prev => ({ ...prev, sku: generateSKU() }));
+    }
+  }, [isOpen]);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -129,7 +149,7 @@ export const ProductCreateDialog = ({
   const resetForm = () => {
     setFormData({
       name: '',
-      sku: '',
+      sku: generateSKU(),
       genre: '',
       description: '',
       price: '',
@@ -279,15 +299,29 @@ export const ProductCreateDialog = ({
               <Label htmlFor="sku">
                 SKU <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="sku"
-                name="sku"
-                value={formData.sku}
-                onChange={handleInputChange}
-                className={errors.sku ? 'border-red-500' : ''}
-                placeholder="VD: VINYL-001"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="sku"
+                  name="sku"
+                  value={formData.sku}
+                  onChange={handleInputChange}
+                  className={errors.sku ? 'border-red-500' : ''}
+                  placeholder="VD: VINYL-001"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setFormData(prev => ({ ...prev, sku: generateSKU() }))}
+                  title="Tạo SKU mới"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
               {errors.sku && <p className="text-sm text-red-500">{errors.sku}</p>}
+              <p className="text-sm text-muted-foreground">
+                SKU được tạo tự động. Bạn có thể chỉnh sửa hoặc tạo mã mới.
+              </p>
             </div>
 
             {/* Genre */}
