@@ -139,10 +139,18 @@ class ProductController extends Controller
             ->orderBy('genre')
             ->pluck('genre');
 
+        // Get unique labels for form dropdown
+        $labels = Product::select('label')
+            ->distinct()
+            ->whereNotNull('label')
+            ->orderBy('label')
+            ->pluck('label');
+
         return Inertia::render('admin/products', [
             'products' => $products,
             'stats' => $stats,
             'genres' => $genres,
+            'labels' => $labels,
             'filters' => [
                 'search' => $search,
                 'status' => $status,
@@ -168,6 +176,7 @@ class ProductController extends Controller
             'stock_quantity' => 'required|integer|min:0',
             'min_stock_level' => 'required|integer|min:0',
             'genre' => 'nullable|string|max:100',
+            'label' => 'required|string|max:100',
             'status' => 'required|in:active,inactive,out_of_stock',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
@@ -264,6 +273,7 @@ class ProductController extends Controller
             'cost_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'genre' => 'nullable|string|max:100',
+            'label' => 'required|string|max:100',
             'status' => 'required|in:active,inactive,out_of_stock',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',

@@ -23,12 +23,14 @@ interface ProductEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
   genres: string[];
+  labels: string[];
 }
 
 interface FormData {
   name: string;
   sku: string;
   genre: string;
+  label: string;
   description: string;
   price: string;
   cost_price: string;
@@ -42,6 +44,7 @@ interface FormErrors {
   name?: string;
   sku?: string;
   genre?: string;
+  label?: string;
   description?: string;
   price?: string;
   cost_price?: string;
@@ -55,11 +58,13 @@ export const ProductEditDialog = ({
   isOpen,
   onClose,
   genres,
+  labels,
 }: ProductEditDialogProps) => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
     sku: '',
     genre: '',
+    label: '',
     description: '',
     price: '',
     cost_price: '',
@@ -80,6 +85,7 @@ export const ProductEditDialog = ({
         name: product.name,
         sku: product.sku,
         genre: product.genre || '',
+        label: product.label || '',
         description: product.description || '',
         price: product.price.toString(),
         cost_price: product.cost_price ? product.cost_price.toString() : '',
@@ -158,6 +164,7 @@ export const ProductEditDialog = ({
       submitData.append('name', formData.name);
       submitData.append('sku', formData.sku);
       submitData.append('genre', formData.genre);
+      submitData.append('label', formData.label);
       submitData.append('description', formData.description);
       submitData.append('price', formData.price);
       submitData.append('cost_price', formData.cost_price);
@@ -313,6 +320,44 @@ export const ProductEditDialog = ({
               {errors.genre && (
                 <p className="text-sm text-red-500">{errors.genre}</p>
               )}
+            </div>
+
+            {/* Label */}
+            <div className="space-y-2">
+              <Label htmlFor="label">
+                Nhãn <span className="text-red-500">*</span>
+              </Label>
+              <div className="flex flex-col gap-2">
+                <Select
+                  value={labels.includes(formData.label) ? formData.label : undefined}
+                  onValueChange={(value) => handleSelectChange('label', value)}
+                >
+                  <SelectTrigger className={errors.label ? 'border-red-500' : ''}>
+                    <SelectValue placeholder="Chọn nhãn có sẵn" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {labels.map((label) => (
+                      <SelectItem key={label} value={label}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  id="label"
+                  name="label"
+                  value={formData.label}
+                  onChange={handleInputChange}
+                  className={errors.label ? 'border-red-500' : ''}
+                  placeholder="Hoặc nhập nhãn mới"
+                />
+              </div>
+              {errors.label && (
+                <p className="text-sm text-red-500">{errors.label}</p>
+              )}
+              <p className="text-sm text-muted-foreground">
+                Chọn từ danh sách bên trên hoặc nhập nhãn mới ở ô dưới.
+              </p>
             </div>
 
             {/* Price */}

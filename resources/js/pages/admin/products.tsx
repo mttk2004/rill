@@ -24,6 +24,7 @@ const AdminProducts = () => {
       featured: number;
     };
     genres: string[];
+    labels: string[];
     filters?: Record<string, unknown>;
     [key: string]: unknown;
   }
@@ -49,6 +50,7 @@ const AdminProducts = () => {
   };
 
   const genres = (page.genres as string[]) || [];
+  const labels = (page.labels as string[]) || [];
   const filters = (page.filters as Record<string, unknown>) || {};
   const products = productsPaginator.data;
 
@@ -321,6 +323,7 @@ const AdminProducts = () => {
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         genres={genres}
+        labels={labels}
       />
 
       {/* Product Create Dialog */}
@@ -328,6 +331,7 @@ const AdminProducts = () => {
         isOpen={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         genres={genres}
+        labels={labels}
       />
     </div>
   );
