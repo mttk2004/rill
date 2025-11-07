@@ -103,10 +103,12 @@ export default function ArtistDetail({ artist }: ArtistDetailProps) {
                   </Button>
                 ) : (
                   <>
-                    <Button variant="outline" className="gap-2">
-                      <Edit className="h-4 w-4" />
-                      Chỉnh sửa
-                    </Button>
+                    <Link href={route('admin.artists.edit', artist.id)}>
+                      <Button variant="outline" className="gap-2">
+                        <Edit className="h-4 w-4" />
+                        Chỉnh sửa
+                      </Button>
+                    </Link>
                     <Button
                       variant="destructive"
                       onClick={handleDelete}

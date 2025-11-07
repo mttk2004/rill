@@ -121,6 +121,67 @@ class ArtistController extends Controller
     }
 
     /**
+     * Show the form for editing the specified artist.
+     */
+    public function edit(string $id)
+    {
+        $artist = Artist::withTrashed()->findOrFail($id);
+
+        // Get unique countries for dropdown
+        $countries = Artist::whereNotNull('country')
+            ->distinct()
+            ->pluck('country')
+            ->filter()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        return Inertia::render('admin/artist-edit', [
+            'artist' => $artist,
+            'countries' => $countries,
+        ]);
+    }
+
+    /**
+     * Update the specified artist in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $artist = Artist::withTrashed()->findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'country' => 'nullable|string|max:100',
+            'is_active' => 'boolean',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($artist->image && !filter_var($artist->image, FILTER_VALIDATE_URL)) {
+                $oldImagePath = storage_path('app/public/' . $artist->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            // Store new image
+            $path = $request->file('image')->store('artists', 'public');
+            $validated['image'] = $path;
+        }
+
+        $artist->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật nghệ sĩ thành công',
+            'artist' => $artist->fresh(),
+        ]);
+    }
+
+    /**
      * Remove the specified artist (soft delete).
      */
     public function destroy(string $id)

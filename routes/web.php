@@ -89,7 +89,9 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::post('/products/{id}/restore', [App\Http\Controllers\Admin\ProductController::class, 'restore'])->name('admin.products.restore');
 
         Route::get('/artists', [App\Http\Controllers\Admin\ArtistController::class, 'index'])->name('admin.artists');
+        Route::get('/artists/{id}/edit', [App\Http\Controllers\Admin\ArtistController::class, 'edit'])->name('admin.artists.edit');
         Route::get('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'show'])->name('admin.artists.show');
+        Route::put('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'update'])->name('admin.artists.update');
         Route::delete('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'destroy'])->name('admin.artists.destroy');
         Route::post('/artists/{id}/restore', [App\Http\Controllers\Admin\ArtistController::class, 'restore'])->name('admin.artists.restore');
 
