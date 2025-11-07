@@ -36,18 +36,25 @@ class Artist extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     */
+    protected $appends = [
+        'image_url',
+    ];
+
+    /**
      * Boot the model.
      */
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($artist) {
             if (empty($artist->slug)) {
                 $artist->slug = Str::slug($artist->name);
             }
         });
-        
+
         static::updating(function ($artist) {
             if ($artist->isDirty('name') && empty($artist->getOriginal('slug'))) {
                 $artist->slug = Str::slug($artist->name);
@@ -96,5 +103,23 @@ class Artist extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    /**
+     * Get the artist's image URL.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        // If it's already a full URL, return it
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        // Otherwise, prepend the storage path
+        return asset('storage/' . $this->image);
     }
 }

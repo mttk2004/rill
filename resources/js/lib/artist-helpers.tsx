@@ -8,6 +8,7 @@ export interface AdminArtist {
   description: string | null;
   image_url: string | null;
   country: string;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -23,13 +24,22 @@ export interface AdminArtist {
   }>;
 }
 
-// Artist status badge (active/deleted)
-export const getArtistStatusBadge = (deleted_at: string | null) => {
+// Artist status badge (active/inactive/deleted)
+export const getArtistStatusBadge = (is_active: boolean, deleted_at: string | null) => {
   if (deleted_at) {
     return (
       <Badge variant="outline" className="gap-1.5 text-red-600 border-red-300">
         <XCircle className="h-3.5 w-3.5" />
         Đã xóa
+      </Badge>
+    );
+  }
+
+  if (!is_active) {
+    return (
+      <Badge variant="outline" className="gap-1.5 text-amber-600 border-amber-300 bg-amber-50">
+        <XCircle className="h-3.5 w-3.5" />
+        Không hoạt động
       </Badge>
     );
   }

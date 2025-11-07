@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import { AdminNavigation } from '@/components/admin-navigation';
 import {
   AdminTable,
@@ -53,6 +54,7 @@ interface ArtistsPageProps {
   filters: {
     search: string;
     country: string;
+    status: string;
     sort: string;
   };
   stats: {
@@ -123,7 +125,7 @@ export default function Artists({
       name: 'country',
       label: 'Quốc gia',
       type: 'select',
-      value: currentFilters.country,
+      value: currentFilters.country || 'all',
       onChange: (value) => handleFilterChange('country', value),
       options: [
         { label: 'Tất cả quốc gia', value: 'all' },
@@ -131,10 +133,23 @@ export default function Artists({
       ],
     },
     {
+      name: 'status',
+      label: 'Trạng thái',
+      type: 'select',
+      value: currentFilters.status || 'all',
+      onChange: (value) => handleFilterChange('status', value),
+      options: [
+        { label: 'Tất cả trạng thái', value: 'all' },
+        { label: 'Hoạt động', value: 'active' },
+        { label: 'Không hoạt động', value: 'inactive' },
+        { label: 'Đã xóa', value: 'deleted' },
+      ],
+    },
+    {
       name: 'sort',
       label: 'Sắp xếp',
       type: 'select',
-      value: currentFilters.sort,
+      value: currentFilters.sort || 'name_asc',
       onChange: (value) => handleFilterChange('sort', value),
       options: [
         { label: 'Tên A-Z', value: 'name_asc' },
@@ -184,7 +199,7 @@ export default function Artists({
     {
       header: 'Trạng thái',
       accessor: 'deleted_at',
-      render: (artist) => getArtistStatusBadge(artist.deleted_at),
+      render: (artist) => getArtistStatusBadge(artist.is_active, artist.deleted_at),
     },
     {
       header: 'Ngày tạo',
@@ -370,7 +385,7 @@ export default function Artists({
                     <div className="flex-1">
                       <h2 className="text-2xl font-bold mb-2">{selectedArtist.name}</h2>
                       <div className="flex items-center gap-3 mb-4">
-                        {getArtistStatusBadge(selectedArtist.deleted_at)}
+                        {getArtistStatusBadge(selectedArtist.is_active, selectedArtist.deleted_at)}
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 text-sm">

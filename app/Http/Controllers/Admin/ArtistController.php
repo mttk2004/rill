@@ -17,7 +17,8 @@ class ArtistController extends Controller
     {
         $perPage = (int) $request->get('per_page', 20);
         $search = trim((string) $request->get('search', ''));
-        $country = $request->get('country');
+        $country = $request->get('country', 'all');
+        $status = $request->get('status', 'all');
         $sort = $request->get('sort', 'name_asc');
 
         $query = Artist::query()->withTrashed();
@@ -34,6 +35,17 @@ class ArtistController extends Controller
         // Country filter
         if ($country && $country !== 'all') {
             $query->where('country', $country);
+        }
+
+        // Status filter
+        if ($status && $status !== 'all') {
+            if ($status === 'active') {
+                $query->whereNull('deleted_at')->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->whereNull('deleted_at')->where('is_active', false);
+            } elseif ($status === 'deleted') {
+                $query->whereNotNull('deleted_at');
+            }
         }
 
         // Sorting
@@ -85,7 +97,7 @@ class ArtistController extends Controller
             'artists' => $artists,
             'stats' => $stats,
             'countries' => $countries,
-            'filters' => $request->only(['search', 'country', 'sort']),
+            'filters' => $request->only(['search', 'country', 'status', 'sort']),
         ]);
     }
 
