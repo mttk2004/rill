@@ -11,7 +11,7 @@ import { type SharedData } from '@/types';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 // Define TypeScript interfaces for props
 interface CartItem {

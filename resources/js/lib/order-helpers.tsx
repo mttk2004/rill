@@ -13,7 +13,7 @@ export interface AdminOrder {
   id: number;
   order_number: string;
   user_id: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
   payment_status: 'pending' | 'completed' | 'failed' | 'refunded';
   subtotal: number;
   discount_amount: number;
@@ -85,7 +85,7 @@ export const getOrderStatusBadge = (
       icon: Clock,
       className: 'gap-1.5 bg-amber-100 text-amber-700 border-amber-300',
     },
-    processing: {
+    confirmed: {
       label: 'Đang xử lý',
       icon: Package,
       className: 'gap-1.5 bg-blue-100 text-blue-700 border-blue-300',

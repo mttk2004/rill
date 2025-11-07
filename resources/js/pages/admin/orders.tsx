@@ -51,7 +51,7 @@ interface OrdersPageProps {
   stats: {
     total: number;
     pending: number;
-    processing: number;
+    confirmed: number;
     shipped: number;
     delivered: number;
     cancelled: number;
@@ -80,8 +80,8 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
     },
     {
       title: 'Đang xử lý',
-      value: stats.processing.toLocaleString(),
-      subtitle: `${stats.total > 0 ? ((stats.processing / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      value: stats.confirmed.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.confirmed / stats.total) * 100).toFixed(1) : 0}% tổng số`,
       icon: Package,
       gradient: 'from-purple-500 to-pink-500',
     },
@@ -128,7 +128,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
       options: [
         { label: 'Tất cả trạng thái', value: 'all' },
         { label: 'Chờ xử lý', value: 'pending' },
-        { label: 'Đang xử lý', value: 'processing' },
+        { label: 'Đang xử lý', value: 'confirmed' },
         { label: 'Đang giao', value: 'shipped' },
         { label: 'Đã giao', value: 'delivered' },
         { label: 'Đã hủy', value: 'cancelled' },

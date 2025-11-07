@@ -24,8 +24,9 @@ import {
   Truck,
   PackageCheck,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from 'react-toastify';
 import axios from 'axios';
 import type { LucideIcon } from 'lucide-react';
 
@@ -36,10 +37,10 @@ interface OrderDetailProps {
 // Status transition map
 const statusTransitions: Record<string, Array<{ status: string; label: string; icon: LucideIcon; variant: 'default' | 'destructive' | 'outline' }>> = {
   pending: [
-    { status: 'processing', label: 'Xác nhận đơn', icon: Package, variant: 'default' },
+    { status: 'confirmed', label: 'Xác nhận đơn', icon: Package, variant: 'default' },
     { status: 'cancelled', label: 'Hủy đơn', icon: XCircle, variant: 'destructive' },
   ],
-  processing: [
+  confirmed: [
     { status: 'shipped', label: 'Giao hàng', icon: Truck, variant: 'default' },
     { status: 'cancelled', label: 'Hủy đơn', icon: XCircle, variant: 'destructive' },
   ],
@@ -54,16 +55,34 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleUpdateStatus = async (newStatus: string) => {
+    // Confirm for critical actions
+    if (newStatus === 'cancelled') {
+      if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+        return;
+      }
+    }
+
     setIsUpdating(true);
     try {
-      await axios.patch(route('admin.orders.update-status', order.id), {
+      const response = await axios.patch(route('admin.orders.update-status', order.id), {
         status: newStatus,
       });
-      toast.success('Cập nhật trạng thái thành công');
-      router.reload();
-    } catch (error) {
+
+      if (response.data.success) {
+        toast.success(response.data.message || 'Cập nhật trạng thái thành công');
+        router.reload();
+      } else {
+        toast.error('Không thể cập nhật trạng thái');
+      }
+    } catch (error: unknown) {
       console.error('Error updating status:', error);
-      toast.error('Không thể cập nhật trạng thái');
+      const errorMessage =
+        error && typeof error === 'object' && 'response' in error &&
+          error.response && typeof error.response === 'object' && 'data' in error.response &&
+          error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data
+          ? String(error.response.data.message)
+          : 'Không thể cập nhật trạng thái';
+      toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -354,9 +373,13 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                             onClick={() => handleUpdateStatus(transition.status)}
                             disabled={isUpdating}
                           >
-                            <Icon className="h-5 w-5 mr-3" />
+                            {isUpdating ? (
+                              <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+                            ) : (
+                              <Icon className="h-5 w-5 mr-3" />
+                            )}
                             <span className="flex-1 text-left">{transition.label}</span>
-                            <ChevronRight className="h-5 w-5 ml-2" />
+                            {!isUpdating && <ChevronRight className="h-5 w-5 ml-2" />}
                           </Button>
                         );
                       })}

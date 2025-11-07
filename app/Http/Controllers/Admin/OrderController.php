@@ -105,7 +105,7 @@ class OrderController extends Controller
         $stats = [
             'total' => Order::count(),
             'pending' => Order::where('status', 'pending')->count(),
-            'processing' => Order::where('status', 'processing')->count(),
+            'confirmed' => Order::where('status', 'confirmed')->count(),
             'shipped' => Order::where('status', 'shipped')->count(),
             'delivered' => Order::where('status', 'delivered')->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
@@ -249,12 +249,40 @@ class OrderController extends Controller
     public function updateStatus(Request $request, string $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled',
         ]);
 
-        $order = Order::findOrFail($id);
-        $order->update(['status' => $request->status]);
+        $order = Order::withTrashed()->findOrFail($id);
+        $oldStatus = $order->status;
+        $newStatus = $request->status;
 
-        return redirect()->back()->with('success', 'Trạng thái đơn hàng đã được cập nhật');
+        // Business rules validation
+        if ($oldStatus === 'delivered' && $newStatus !== 'cancelled') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không thể thay đổi trạng thái của đơn hàng đã giao',
+            ], 422);
+        }
+
+        if ($oldStatus === 'cancelled' && $newStatus !== 'cancelled') {
+            // Restore cancelled order
+            if ($order->trashed()) {
+                $order->restore();
+            }
+        }
+
+        // Update status
+        $order->update(['status' => $newStatus]);
+
+        // If status is cancelled, soft delete the order
+        if ($newStatus === 'cancelled' && !$order->trashed()) {
+            $order->delete();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Trạng thái đơn hàng đã được cập nhật thành công',
+            'order' => $order->fresh(),
+        ]);
     }
 }
