@@ -14,17 +14,9 @@ import {
 import {
   type AdminArtist,
   getArtistStatusBadge,
-  formatProductCount,
   formatDate,
-  formatPrice,
   truncateBio,
 } from '@/lib/artist-helpers';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -73,9 +65,6 @@ export default function Artists({
   countries,
 }: ArtistsPageProps) {
   const [currentFilters, setCurrentFilters] = useState(filters);
-  const [selectedArtist, setSelectedArtist] = useState<AdminArtist | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Stats cards configuration
@@ -217,7 +206,7 @@ export default function Artists({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => handleViewDetails(artist.id)}
+            onClick={() => router.visit(route('admin.artists.show', artist.id))}
             className="gap-2"
           >
             <Eye className="h-4 w-4" />
@@ -265,22 +254,6 @@ export default function Artists({
     } else {
       setCurrentFilters(newFilters);
       router.get(route('admin.artists'), newFilters, { preserveState: true });
-    }
-  };
-
-  const handleViewDetails = async (artistId: number) => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(route('admin.artists.show', artistId), {
-        headers: { Accept: 'application/json' },
-      });
-      setSelectedArtist(response.data);
-      setIsDialogOpen(true);
-    } catch (error) {
-      console.error('Error fetching artist details:', error);
-      toast.error('Không thể tải thông tin nghệ sĩ');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -340,7 +313,6 @@ export default function Artists({
               <AdminTable
                 data={artists.data}
                 columns={columns}
-                loading={isLoading}
                 emptyMessage="Không tìm thấy nghệ sĩ nào"
                 getRowKey={(artist) => artist.id.toString()}
               />
@@ -360,126 +332,6 @@ export default function Artists({
               </div>
             </Card>
           </div>
-
-          {/* Artist Detail Dialog */}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Chi tiết nghệ sĩ</DialogTitle>
-              </DialogHeader>
-
-              {selectedArtist && (
-                <div className="space-y-6">
-                  {/* Artist Profile */}
-                  <div className="flex items-start gap-6">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage
-                        src={selectedArtist.image_url || undefined}
-                        alt={selectedArtist.name}
-                      />
-                      <AvatarFallback className="text-2xl">
-                        {selectedArtist.name.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex-1">
-                      <h2 className="text-2xl font-bold mb-2">{selectedArtist.name}</h2>
-                      <div className="flex items-center gap-3 mb-4">
-                        {getArtistStatusBadge(selectedArtist.is_active, selectedArtist.deleted_at)}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Quốc gia:</span>
-                          <span className="ml-2 font-medium">{selectedArtist.country}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Số sản phẩm:</span>
-                          <span className="ml-2 font-medium">
-                            {formatProductCount(selectedArtist.products_count)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  {selectedArtist.description && (
-                    <Card className="p-4">
-                      <h3 className="font-semibold mb-2">Mô tả</h3>
-                      <p className="text-sm text-muted-foreground whitespace-pre-line">
-                        {selectedArtist.description}
-                      </p>
-                    </Card>
-                  )}
-
-                  {/* Products */}
-                  {selectedArtist.products && selectedArtist.products.length > 0 && (
-                    <Card className="p-4">
-                      <h3 className="font-semibold mb-3">
-                        Sản phẩm ({selectedArtist.products.length})
-                      </h3>
-                      <div className="space-y-3">
-                        {selectedArtist.products.map((product) => (
-                          <div
-                            key={product.id}
-                            className="flex items-center justify-between p-3 border rounded-lg"
-                          >
-                            <div className="flex items-center gap-3">
-                              {product.image_url && (
-                                <img
-                                  src={product.image_url}
-                                  alt={product.name}
-                                  className="h-12 w-12 object-cover rounded"
-                                />
-                              )}
-                              <div>
-                                <div className="font-medium">{product.name}</div>
-                                <div className="text-sm text-muted-foreground">
-                                  SKU: {product.sku} • Đã bán: {product.order_items_count}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-medium text-green-600">
-                                {formatPrice(product.price)}
-                              </div>
-                              <div className="text-sm text-muted-foreground">
-                                Tồn kho: {product.stock_quantity}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Metadata */}
-                  <Card className="p-4">
-                    <h3 className="font-semibold mb-2">Thông tin hệ thống</h3>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Ngày tạo:</span>
-                        <span className="ml-2">{formatDate(selectedArtist.created_at)}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Cập nhật:</span>
-                        <span className="ml-2">{formatDate(selectedArtist.updated_at)}</span>
-                      </div>
-                      {selectedArtist.deleted_at && (
-                        <div className="col-span-2">
-                          <span className="text-muted-foreground">Ngày xóa:</span>
-                          <span className="ml-2 text-red-600">
-                            {formatDate(selectedArtist.deleted_at)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
     </div>

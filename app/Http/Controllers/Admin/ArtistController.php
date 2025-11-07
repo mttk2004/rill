@@ -109,23 +109,15 @@ class ArtistController extends Controller
         $artist = Artist::with([
             'products' => function ($query) {
                 $query->withCount('orderItems')
-                      ->orderBy('created_at', 'desc')
-                      ->limit(10);
+                      ->orderBy('created_at', 'desc');
             },
         ])->withCount('products')
+          ->withTrashed()
           ->findOrFail($id);
 
-        // If AJAX request, return JSON
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json([
-                'props' => [
-                    'artist' => $artist,
-                ],
-            ]);
-        }
-
-        // Otherwise redirect to list (we use dialog for details)
-        return redirect()->route('admin.artists');
+        return Inertia::render('admin/artist-detail', [
+            'artist' => $artist,
+        ]);
     }
 
     /**
