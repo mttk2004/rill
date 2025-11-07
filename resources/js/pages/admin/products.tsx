@@ -10,6 +10,7 @@ import { ProductFilters } from "@/components/admin/product-filters";
 import { ProductTable } from "@/components/admin/product-table";
 import { ProductDetailDialog } from "@/components/admin/product-detail-dialog";
 import { ProductEditDialog } from "@/components/admin/product-edit-dialog";
+import { ProductCreateDialog } from "@/components/admin/product-create-dialog";
 import { AdminProduct } from "@/lib/product-helpers";
 
 const AdminProducts = () => {
@@ -57,6 +58,7 @@ const AdminProducts = () => {
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<AdminProduct | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   // Debounce timer ref
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -248,7 +250,10 @@ const AdminProducts = () => {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0">
+              <Button
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Thêm sản phẩm
               </Button>
@@ -315,6 +320,13 @@ const AdminProducts = () => {
         product={productToEdit}
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
+        genres={genres}
+      />
+
+      {/* Product Create Dialog */}
+      <ProductCreateDialog
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
         genres={genres}
       />
     </div>

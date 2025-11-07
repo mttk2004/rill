@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -150,6 +151,45 @@ class ProductController extends Controller
                 'stock' => $stock,
                 'sort' => $sort,
             ],
+        ]);
+    }
+
+    /**
+     * Store a newly created product.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string|max:100|unique:products,sku',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
+            'stock_quantity' => 'required|integer|min:0',
+            'min_stock_level' => 'required|integer|min:0',
+            'genre' => 'nullable|string|max:100',
+            'status' => 'required|in:active,inactive,out_of_stock',
+            'is_featured' => 'boolean',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+        ]);
+
+        // Generate slug
+        $validated['slug'] = Str::slug($validated['name']);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images/products'), $imageName);
+            $validated['image'] = '/images/products/' . $imageName;
+        }
+
+        $product = Product::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tạo sản phẩm mới thành công',
+            'product' => $product,
         ]);
     }
 
