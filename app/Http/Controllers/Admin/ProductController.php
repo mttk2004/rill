@@ -210,6 +210,48 @@ class ProductController extends Controller
     }
 
     /**
+     * Update the specified product.
+     */
+    public function update(Request $request, string $id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
+            'stock_quantity' => 'required|integer|min:0',
+            'genre' => 'nullable|string|max:100',
+            'status' => 'required|in:active,inactive,out_of_stock',
+            'is_featured' => 'boolean',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images/products'), $imageName);
+            $validated['image'] = '/images/products/' . $imageName;
+
+            // Delete old image if exists
+            if ($product->image && file_exists(public_path($product->image))) {
+                @unlink(public_path($product->image));
+            }
+        }
+
+        $product->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật sản phẩm thành công',
+            'product' => $product,
+        ]);
+    }
+
+    /**
      * Remove the specified product from storage (soft delete).
      */
     public function destroy(string $id)

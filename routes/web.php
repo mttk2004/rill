@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
         Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index'])->name('admin.products');
         Route::get('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'show'])->name('admin.products.show');
+        Route::put('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'update'])->name('admin.products.update');
         Route::delete('/products/{id}', [App\Http\Controllers\Admin\ProductController::class, 'destroy'])->name('admin.products.destroy');
         Route::post('/products/{id}/restore', [App\Http\Controllers\Admin\ProductController::class, 'restore'])->name('admin.products.restore');
 

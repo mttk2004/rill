@@ -1,4 +1,3 @@
-import { Link } from "@inertiajs/react";
 import { Eye, Edit, Trash2, RotateCcw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +14,7 @@ interface ProductTableProps {
   products: AdminProduct[];
   loading: boolean;
   onViewDetails: (id: string) => void;
+  onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void;
   onRestore: (id: string, name: string) => void;
 }
@@ -23,6 +23,7 @@ export const ProductTable = ({
   products,
   loading,
   onViewDetails,
+  onEdit,
   onDelete,
   onRestore,
 }: ProductTableProps) => {
@@ -115,10 +116,12 @@ export const ProductTable = ({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/admin/products/${product.id}/edit`}>
-                        <Edit className="h-4 w-4" />
-                      </Link>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(product.id)}
+                    >
+                      <Edit className="h-4 w-4" />
                     </Button>
                     {product.deleted_at ? (
                       <Button

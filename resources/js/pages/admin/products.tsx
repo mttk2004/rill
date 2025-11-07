@@ -9,6 +9,7 @@ import { ProductStatsCards } from "@/components/admin/product-stats-cards";
 import { ProductFilters } from "@/components/admin/product-filters";
 import { ProductTable } from "@/components/admin/product-table";
 import { ProductDetailDialog } from "@/components/admin/product-detail-dialog";
+import { ProductEditDialog } from "@/components/admin/product-edit-dialog";
 import { AdminProduct } from "@/lib/product-helpers";
 
 const AdminProducts = () => {
@@ -54,6 +55,8 @@ const AdminProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<AdminProduct | null>(null);
 
   // Debounce timer ref
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -87,6 +90,40 @@ const AdminProducts = () => {
         const data = await response.json();
         setSelectedProduct(data.props.product);
         setIsDialogOpen(true);
+      } else {
+        const text = await response.text();
+        console.error('Expected JSON but received:', text);
+        toast.error('Server trả về dữ liệu không hợp lệ');
+        return;
+      }
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+      toast.error('Không thể tải thông tin sản phẩm');
+    } finally {
+      setIsLoadingProduct(false);
+    }
+  };
+
+  // Handle edit
+  const handleEdit = async (productId: string) => {
+    setIsLoadingProduct(true);
+    try {
+      const response = await fetch(`/admin/products/${productId}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        setProductToEdit(data.props.product);
+        setIsEditDialogOpen(true);
       } else {
         const text = await response.text();
         console.error('Expected JSON but received:', text);
@@ -237,6 +274,7 @@ const AdminProducts = () => {
             products={products}
             loading={false}
             onViewDetails={fetchProductDetails}
+            onEdit={handleEdit}
             onDelete={handleDelete}
             onRestore={handleRestore}
           />
@@ -270,6 +308,14 @@ const AdminProducts = () => {
         product={selectedProduct}
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
+      />
+
+      {/* Product Edit Dialog */}
+      <ProductEditDialog
+        product={productToEdit}
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        genres={genres}
       />
     </div>
   );
