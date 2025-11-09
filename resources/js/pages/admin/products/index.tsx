@@ -9,7 +9,6 @@ import { ProductStatsCards } from "@/components/admin/product-stats-cards";
 import { ProductFilters } from "@/components/admin/product-filters";
 import { ProductTable } from "@/components/admin/product-table";
 import { ProductDetailDialog } from "@/components/admin/product-detail-dialog";
-import { ProductCreateDialog } from "@/components/admin/product-create-dialog";
 import { AdminProduct } from "@/lib/product-helpers";
 
 const AdminProducts = () => {
@@ -53,15 +52,12 @@ const AdminProducts = () => {
   };
 
   const genres = (page.genres as string[]) || [];
-  const labels = (page.labels as string[]) || [];
-  const artists = (page.artists as PageProps['artists']) || [];
   const filters = (page.filters as Record<string, unknown>) || {};
   const products = productsPaginator.data;
 
   // Dialog state
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   // Debounce timer ref
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -279,15 +275,6 @@ const AdminProducts = () => {
         product={selectedProduct}
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-      />
-
-      {/* Product Create Dialog */}
-      <ProductCreateDialog
-        isOpen={isCreateDialogOpen}
-        onClose={() => setIsCreateDialogOpen(false)}
-        genres={genres}
-        labels={labels}
-        artists={artists}
       />
     </div>
   );
