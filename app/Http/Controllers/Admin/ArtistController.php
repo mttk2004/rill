@@ -93,7 +93,7 @@ class ArtistController extends Controller
             'total_products' => DB::table('artist_product')->count(),
         ];
 
-        return Inertia::render('admin/artists', [
+        return Inertia::render('admin/artists/index', [
             'artists' => $artists,
             'stats' => $stats,
             'countries' => $countries,
@@ -102,7 +102,54 @@ class ArtistController extends Controller
     }
 
     /**
-     * Display the specified artist.
+     * Show the form for creating a new artist.
+     */
+    public function create()
+    {
+        // Get unique countries for dropdown
+        $countries = Artist::whereNotNull('country')
+            ->distinct()
+            ->pluck('country')
+            ->filter()
+            ->sort()
+            ->values()
+            ->toArray();
+
+        return Inertia::render('admin/artists/create', [
+            'countries' => $countries,
+        ]);
+    }
+
+    /**
+     * Store a newly created artist in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'country' => 'nullable|string|max:100',
+            'is_active' => 'boolean',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('artists', 'public');
+            $validated['image'] = $path;
+        }
+
+        $artist = Artist::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Nghệ sĩ đã được tạo thành công',
+            'artist' => $artist->fresh(),
+        ]);
+    }
+
+    /**
+     * Display the specified artist (for AJAX requests).
      */
     public function show(Request $request, string $id)
     {
@@ -115,7 +162,13 @@ class ArtistController extends Controller
           ->withTrashed()
           ->findOrFail($id);
 
-        return Inertia::render('admin/artist-detail', [
+        // Return JSON for AJAX requests
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json($artist);
+        }
+
+        // Fallback to Inertia render (though this shouldn't be used anymore)
+        return Inertia::render('admin/artists/show', [
             'artist' => $artist,
         ]);
     }
@@ -136,7 +189,7 @@ class ArtistController extends Controller
             ->values()
             ->toArray();
 
-        return Inertia::render('admin/artist-edit', [
+        return Inertia::render('admin/artists/edit', [
             'artist' => $artist,
             'countries' => $countries,
         ]);

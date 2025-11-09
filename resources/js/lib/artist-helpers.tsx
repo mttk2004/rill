@@ -5,9 +5,10 @@ import { Music2, XCircle } from 'lucide-react';
 export interface AdminArtist {
   id: number;
   name: string;
+  slug: string;
   description: string | null;
   image_url: string | null;
-  country: string;
+  country: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -21,10 +22,12 @@ export interface AdminArtist {
     stock_quantity: number;
     image_url: string | null;
     order_items_count: number;
+    pivot?: {
+      role: 'main' | 'featured' | 'composer' | 'producer';
+      sort_order: number;
+    };
   }>;
-}
-
-// Artist status badge (active/inactive/deleted)
+}// Artist status badge (active/inactive/deleted)
 export const getArtistStatusBadge = (is_active: boolean, deleted_at: string | null) => {
   if (deleted_at) {
     return (

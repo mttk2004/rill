@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import { AdminNavigation } from '@/components/admin-navigation';
+import { ArtistDetailDialog } from '@/components/admin/artist-detail-dialog';
 import {
   AdminTable,
   AdminFilters,
@@ -27,6 +28,7 @@ import {
   Eye,
   RotateCcw,
   Trash2,
+  Pencil,
   Package,
 } from 'lucide-react';
 import axios from 'axios';
@@ -66,6 +68,19 @@ export default function Artists({
 }: ArtistsPageProps) {
   const [currentFilters, setCurrentFilters] = useState(filters);
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [selectedArtist, setSelectedArtist] = useState<AdminArtist | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const fetchArtistDetails = async (artistId: number) => {
+    try {
+      const response = await axios.get(route('admin.artists.show', artistId));
+      setSelectedArtist(response.data);
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching artist details:', error);
+      toast.error('Không thể tải thông tin nghệ sĩ');
+    }
+  };
 
   // Stats cards configuration
   const statsCards: StatCardData[] = [
@@ -206,12 +221,21 @@ export default function Artists({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.visit(route('admin.artists.show', artist.id))}
+            onClick={() => fetchArtistDetails(artist.id)}
             className="gap-2"
           >
             <Eye className="h-4 w-4" />
             Xem
           </Button>
+          {!artist.deleted_at && (
+            <Link
+              href={route('admin.artists.edit', artist.id)}
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+            >
+              <Pencil className="h-4 w-4" />
+              Sửa
+            </Link>
+          )}
           {artist.deleted_at ? (
             <Button
               variant="ghost"
@@ -304,11 +328,16 @@ export default function Artists({
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold">Quản lý nghệ sĩ</h1>
-              <p className="text-muted-foreground mt-2">
-                Quản lý thông tin nghệ sĩ và sản phẩm của họ
-              </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold">Quản lý nghệ sĩ</h1>
+                <p className="text-muted-foreground mt-2">
+                  Quản lý thông tin nghệ sĩ và sản phẩm của họ
+                </p>
+              </div>
+              <Button onClick={() => router.visit(route('admin.artists.create'))}>
+                Thêm nghệ sĩ
+              </Button>
             </div>
 
             <AdminStatsCards stats={statsCards} />
@@ -340,6 +369,15 @@ export default function Artists({
           </div>
         </div>
       </div>
+
+      <ArtistDetailDialog
+        artist={selectedArtist}
+        isOpen={isDialogOpen}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setSelectedArtist(null);
+        }}
+      />
     </div>
   );
 }
