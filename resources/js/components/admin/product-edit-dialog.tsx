@@ -24,6 +24,10 @@ interface ProductEditDialogProps {
   onClose: () => void;
   genres: string[];
   labels: string[];
+  artists: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 interface FormData {
@@ -59,6 +63,7 @@ export const ProductEditDialog = ({
   onClose,
   genres,
   labels,
+  artists,
 }: ProductEditDialogProps) => {
   const [formData, setFormData] = useState<FormData>({
     name: '',

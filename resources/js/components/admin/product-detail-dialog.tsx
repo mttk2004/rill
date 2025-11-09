@@ -160,21 +160,19 @@ export const ProductDetailDialog = ({
                 </CardContent>
               </Card>
 
-              {product.total_revenue && (
-                <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <DollarSign className="h-5 w-5 text-green-600" />
-                      <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">Doanh thu</p>
-                        <p className="text-lg font-bold text-green-600">
-                          {formatPrice(product.total_revenue)}
-                        </p>
-                      </div>
+              <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Doanh thu</p>
+                      <p className="text-lg font-bold text-green-600">
+                        {formatPrice(product.total_revenue || 0)}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                  </div>
+                </CardContent>
+              </Card>
 
               <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
                 <CardContent className="p-4">
@@ -190,31 +188,27 @@ export const ProductDetailDialog = ({
                 </CardContent>
               </Card>
 
-              {product.genre && (
-                <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                  <CardContent className="p-4">
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Thể loại</p>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">
-                        {product.genre}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                <CardContent className="p-4">
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Thể loại</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      {product.genre || '—'}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
 
-              {product.label && (
-                <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                  <CardContent className="p-4">
-                    <div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Nhãn hiệu</p>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">
-                        {product.label}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                <CardContent className="p-4">
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Nhãn hiệu</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      {product.label || '—'}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Artists */}

@@ -118,10 +118,13 @@ class ProductController extends Controller
             $product->total_sold = DB::table('order_items')
                 ->where('product_id', $product->id)
                 ->sum('quantity');
-            return $product;
-        });
 
-        // Stats
+            $product->total_revenue = DB::table('order_items')
+                ->where('product_id', $product->id)
+                ->sum(DB::raw('quantity * unit_price'));
+
+            return $product;
+        });        // Stats
         $stats = [
             'total' => Product::count(),
             'active' => Product::where('status', 'active')->count(),
@@ -146,11 +149,18 @@ class ProductController extends Controller
             ->orderBy('label')
             ->pluck('label');
 
+        // Get all artists for form dropdown
+        $artists = \App\Models\Artist::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
         return Inertia::render('admin/products', [
             'products' => $products,
             'stats' => $stats,
             'genres' => $genres,
             'labels' => $labels,
+            'artists' => $artists,
             'filters' => [
                 'search' => $search,
                 'status' => $status,
@@ -159,6 +169,35 @@ class ProductController extends Controller
                 'stock' => $stock,
                 'sort' => $sort,
             ],
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new product.
+     */
+    public function create()
+    {
+        $genres = Product::select('genre')
+            ->distinct()
+            ->whereNotNull('genre')
+            ->orderBy('genre')
+            ->pluck('genre');
+
+        $labels = Product::select('label')
+            ->distinct()
+            ->whereNotNull('label')
+            ->orderBy('label')
+            ->pluck('label');
+
+        $artists = \App\Models\Artist::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('admin/products/create', [
+            'genres' => $genres,
+            'labels' => $labels,
+            'artists' => $artists,
         ]);
     }
 
@@ -180,6 +219,9 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive,out_of_stock',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'artists' => 'nullable|array',
+            'artists.*.artist_id' => 'required_with:artists|exists:artists,id',
+            'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
         ]);
 
         // Generate slug
@@ -194,6 +236,16 @@ class ProductController extends Controller
         }
 
         $product = Product::create($validated);
+
+        // Attach artists if provided
+        if (isset($validated['artists']) && is_array($validated['artists'])) {
+            foreach ($validated['artists'] as $index => $artistData) {
+                $product->artists()->attach($artistData['artist_id'], [
+                    'role' => $artistData['role'],
+                    'sort_order' => $index,
+                ]);
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -259,6 +311,42 @@ class ProductController extends Controller
     }
 
     /**
+     * Show the form for editing the specified product.
+     */
+    public function edit(string $id)
+    {
+        $product = Product::with([
+            'artists' => function ($query) {
+                $query->orderByPivot('sort_order');
+            },
+        ])->findOrFail($id);
+
+        $genres = Product::select('genre')
+            ->distinct()
+            ->whereNotNull('genre')
+            ->orderBy('genre')
+            ->pluck('genre');
+
+        $labels = Product::select('label')
+            ->distinct()
+            ->whereNotNull('label')
+            ->orderBy('label')
+            ->pluck('label');
+
+        $artists = \App\Models\Artist::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return Inertia::render('admin/products/edit', [
+            'product' => $product,
+            'genres' => $genres,
+            'labels' => $labels,
+            'artists' => $artists,
+        ]);
+    }
+
+    /**
      * Update the specified product.
      */
     public function update(Request $request, string $id)
@@ -277,6 +365,9 @@ class ProductController extends Controller
             'status' => 'required|in:active,inactive,out_of_stock',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'artists' => 'nullable|array',
+            'artists.*.artist_id' => 'required_with:artists|exists:artists,id',
+            'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
         ]);
 
         // Handle image upload
@@ -293,6 +384,21 @@ class ProductController extends Controller
         }
 
         $product->update($validated);
+
+        // Sync artists if provided
+        if (isset($validated['artists']) && is_array($validated['artists'])) {
+            $artistsData = [];
+            foreach ($validated['artists'] as $index => $artistData) {
+                $artistsData[$artistData['artist_id']] = [
+                    'role' => $artistData['role'],
+                    'sort_order' => $index,
+                ];
+            }
+            $product->artists()->sync($artistsData);
+        } else {
+            // If no artists provided, detach all
+            $product->artists()->detach();
+        }
 
         return response()->json([
             'success' => true,

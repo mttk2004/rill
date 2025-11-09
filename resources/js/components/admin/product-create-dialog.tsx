@@ -1,6 +1,6 @@
 import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import { Save, Loader2, X, RefreshCw } from 'lucide-react';
+import { Save, Loader2, X, RefreshCw, Plus, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +22,10 @@ interface ProductCreateDialogProps {
   onClose: () => void;
   genres: string[];
   labels: string[];
+  artists: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 interface FormData {
@@ -37,6 +41,10 @@ interface FormData {
   is_featured: boolean;
   status: 'active' | 'inactive' | 'out_of_stock';
   image: File | null;
+  artists: Array<{
+    artist_id: string;
+    role: 'main' | 'featured' | 'composer' | 'producer';
+  }>;
 }
 
 interface FormErrors {
@@ -58,6 +66,7 @@ export const ProductCreateDialog = ({
   onClose,
   genres,
   labels,
+  artists,
 }: ProductCreateDialogProps) => {
   // Function to generate SKU in format VINYL-{3 letters}{3 digits}
   const generateSKU = () => {
@@ -85,6 +94,7 @@ export const ProductCreateDialog = ({
     is_featured: false,
     status: 'active',
     image: null,
+    artists: [],
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -165,9 +175,33 @@ export const ProductCreateDialog = ({
       is_featured: false,
       status: 'active',
       image: null,
+      artists: [],
     });
     setImagePreview(null);
     setErrors({});
+  };
+
+  const addArtist = () => {
+    setFormData(prev => ({
+      ...prev,
+      artists: [...prev.artists, { artist_id: '', role: 'main' }]
+    }));
+  };
+
+  const removeArtist = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      artists: prev.artists.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateArtist = (index: number, field: 'artist_id' | 'role', value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      artists: prev.artists.map((artist, i) =>
+        i === index ? { ...artist, [field]: value } : artist
+      )
+    }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -189,6 +223,12 @@ export const ProductCreateDialog = ({
       submitData.append('min_stock_level', formData.min_stock_level);
       submitData.append('is_featured', formData.is_featured ? '1' : '0');
       submitData.append('status', formData.status);
+
+      // Add artists data
+      formData.artists.forEach((artist, index) => {
+        submitData.append(`artists[${index}][artist_id]`, artist.artist_id);
+        submitData.append(`artists[${index}][role]`, artist.role);
+      });
 
       if (formData.image) {
         submitData.append('image', formData.image);
@@ -390,6 +430,77 @@ export const ProductCreateDialog = ({
               <p className="text-sm text-muted-foreground">
                 Chọn từ danh sách bên trên hoặc nhập nhãn mới ở ô dưới.
               </p>
+            </div>
+
+            {/* Artists */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Nghệ sĩ</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addArtist}
+                  className="flex items-center gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                  Thêm nghệ sĩ
+                </Button>
+              </div>
+
+              {formData.artists.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Chưa có nghệ sĩ nào được chọn.
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {formData.artists.map((artistData, index) => (
+                    <div key={index} className="flex gap-2 p-3 border rounded-lg">
+                      <div className="flex-1">
+                        <Select
+                          value={artistData.artist_id || undefined}
+                          onValueChange={(value) => updateArtist(index, 'artist_id', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Chọn nghệ sĩ" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {artists.map((artist) => (
+                              <SelectItem key={artist.id} value={artist.id}>
+                                {artist.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="w-32">
+                        <Select
+                          value={artistData.role}
+                          onValueChange={(value) => updateArtist(index, 'role', value as 'main' | 'featured' | 'composer' | 'producer')}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="main">Chính</SelectItem>
+                            <SelectItem value="featured">Khách mời</SelectItem>
+                            <SelectItem value="composer">Sáng tác</SelectItem>
+                            <SelectItem value="producer">Sản xuất</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeArtist(index)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Price */}

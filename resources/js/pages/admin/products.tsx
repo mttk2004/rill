@@ -9,7 +9,6 @@ import { ProductStatsCards } from "@/components/admin/product-stats-cards";
 import { ProductFilters } from "@/components/admin/product-filters";
 import { ProductTable } from "@/components/admin/product-table";
 import { ProductDetailDialog } from "@/components/admin/product-detail-dialog";
-import { ProductEditDialog } from "@/components/admin/product-edit-dialog";
 import { ProductCreateDialog } from "@/components/admin/product-create-dialog";
 import { AdminProduct } from "@/lib/product-helpers";
 
@@ -25,6 +24,10 @@ const AdminProducts = () => {
     };
     genres: string[];
     labels: string[];
+    artists: Array<{
+      id: string;
+      name: string;
+    }>;
     filters?: Record<string, unknown>;
     [key: string]: unknown;
   }
@@ -51,15 +54,13 @@ const AdminProducts = () => {
 
   const genres = (page.genres as string[]) || [];
   const labels = (page.labels as string[]) || [];
+  const artists = (page.artists as PageProps['artists']) || [];
   const filters = (page.filters as Record<string, unknown>) || {};
   const products = productsPaginator.data;
 
   // Dialog state
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [productToEdit, setProductToEdit] = useState<AdminProduct | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   // Debounce timer ref
@@ -76,7 +77,6 @@ const AdminProducts = () => {
 
   // Fetch full product details
   const fetchProductDetails = async (productId: string) => {
-    setIsLoadingProduct(true);
     try {
       const response = await fetch(`/admin/products/${productId}`, {
         headers: {
@@ -103,42 +103,6 @@ const AdminProducts = () => {
     } catch (error) {
       console.error('Error fetching product details:', error);
       toast.error('Không thể tải thông tin sản phẩm');
-    } finally {
-      setIsLoadingProduct(false);
-    }
-  };
-
-  // Handle edit
-  const handleEdit = async (productId: string) => {
-    setIsLoadingProduct(true);
-    try {
-      const response = await fetch(`/admin/products/${productId}`, {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('application/json')) {
-        const data = await response.json();
-        setProductToEdit(data.props.product);
-        setIsEditDialogOpen(true);
-      } else {
-        const text = await response.text();
-        console.error('Expected JSON but received:', text);
-        toast.error('Server trả về dữ liệu không hợp lệ');
-        return;
-      }
-    } catch (error) {
-      console.error('Error fetching product details:', error);
-      toast.error('Không thể tải thông tin sản phẩm');
-    } finally {
-      setIsLoadingProduct(false);
     }
   };
 
@@ -252,13 +216,14 @@ const AdminProducts = () => {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Button
-                onClick={() => setIsCreateDialogOpen(true)}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Thêm sản phẩm
-              </Button>
+              <Link href="/admin/products/create">
+                <Button
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Thêm sản phẩm
+                </Button>
+              </Link>
             </div>
           </div>
 
@@ -281,7 +246,6 @@ const AdminProducts = () => {
             products={products}
             loading={false}
             onViewDetails={fetchProductDetails}
-            onEdit={handleEdit}
             onDelete={handleDelete}
             onRestore={handleRestore}
           />
@@ -317,21 +281,13 @@ const AdminProducts = () => {
         onClose={() => setIsDialogOpen(false)}
       />
 
-      {/* Product Edit Dialog */}
-      <ProductEditDialog
-        product={productToEdit}
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        genres={genres}
-        labels={labels}
-      />
-
       {/* Product Create Dialog */}
       <ProductCreateDialog
         isOpen={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         genres={genres}
         labels={labels}
+        artists={artists}
       />
     </div>
   );

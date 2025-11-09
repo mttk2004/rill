@@ -9,12 +9,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, formatPrice, isLowStock } from "@/lib/product-helpers";
+import { Link } from "@inertiajs/react";
 
 interface ProductTableProps {
   products: AdminProduct[];
   loading: boolean;
   onViewDetails: (id: string) => void;
-  onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void;
   onRestore: (id: string, name: string) => void;
 }
@@ -23,7 +23,6 @@ export const ProductTable = ({
   products,
   loading,
   onViewDetails,
-  onEdit,
   onDelete,
   onRestore,
 }: ProductTableProps) => {
@@ -35,6 +34,7 @@ export const ProductTable = ({
             <TableHead className="w-[350px]">Sản phẩm</TableHead>
             <TableHead>SKU</TableHead>
             <TableHead>Thể loại</TableHead>
+            <TableHead>Nhãn</TableHead>
             <TableHead>Giá bán</TableHead>
             <TableHead>Tồn kho</TableHead>
             <TableHead>Đã bán</TableHead>
@@ -45,14 +45,14 @@ export const ProductTable = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8">
+              <TableCell colSpan={9} className="text-center py-8">
                 Đang tải...
               </TableCell>
             </TableRow>
           ) : products.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8">
-                Không tìm thấy sản phẩm nào
+              <TableCell colSpan={9} className="text-center py-8">
+                Không có sản phẩm nào
               </TableCell>
             </TableRow>
           ) : (
@@ -79,7 +79,10 @@ export const ProductTable = ({
                   </code>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{product.genre}</span>
+                  <span className="text-sm">{product.genre || '—'}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{product.label || '—'}</span>
                 </TableCell>
                 <TableCell>
                   <div>
@@ -116,13 +119,14 @@ export const ProductTable = ({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(product.id)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <Link href={`/admin/products/${product.id}/edit`}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </Link>
                     {product.deleted_at ? (
                       <Button
                         variant="ghost"
