@@ -7,12 +7,14 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Music2,
   Globe,
   Package,
   Calendar,
   AlertTriangle,
+  Info,
 } from 'lucide-react';
 import { AdminArtist, getArtistStatusBadge, formatDate } from '@/lib/artist-helpers';
 
@@ -54,89 +56,100 @@ export const ArtistDetailDialog = ({
 
           <Separator />
 
-          {/* Artist Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3">
-              <Globe className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Quốc gia</p>
-                <p className="text-sm text-muted-foreground">
-                  {artist.country || '—'}
-                </p>
-              </div>
-            </div>
+          {/* Tabs */}
+          <Tabs defaultValue="info" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="info" className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                Thông tin
+              </TabsTrigger>
+              <TabsTrigger value="products" className="flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                Sản phẩm ({artist.products_count || 0})
+              </TabsTrigger>
+            </TabsList>
 
-            <div className="flex items-start gap-3">
-              <Package className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Số sản phẩm</p>
-                <p className="text-sm text-muted-foreground">
-                  {artist.products_count || 0} sản phẩm
-                </p>
-              </div>
-            </div>
+            {/* Info Tab */}
+            <TabsContent value="info" className="space-y-4 mt-4">
+              {/* Artist Info Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3">
+                  <Globe className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">Quốc gia</p>
+                    <p className="text-sm text-muted-foreground">
+                      {artist.country || '—'}
+                    </p>
+                  </div>
+                </div>
 
-            <div className="flex items-start gap-3">
-              <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Ngày tạo</p>
-                <p className="text-sm text-muted-foreground">
-                  {formatDate(artist.created_at)}
-                </p>
-              </div>
-            </div>
+                <div className="flex items-start gap-3">
+                  <Package className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">Số sản phẩm</p>
+                    <p className="text-sm text-muted-foreground">
+                      {artist.products_count || 0} sản phẩm
+                    </p>
+                  </div>
+                </div>
 
-            <div className="flex items-start gap-3">
-              <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Cập nhật lần cuối</p>
-                <p className="text-sm text-muted-foreground">
-                  {formatDate(artist.updated_at)}
-                </p>
-              </div>
-            </div>
-          </div>
+                <div className="flex items-start gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">Ngày tạo</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(artist.created_at)}
+                    </p>
+                  </div>
+                </div>
 
-          {artist.deleted_at && (
-            <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-              <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-red-900 dark:text-red-200">
-                  Đã xóa
-                </p>
-                <p className="text-sm text-red-700 dark:text-red-300">
-                  {formatDate(artist.deleted_at)}
-                </p>
+                <div className="flex items-start gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">Cập nhật lần cuối</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(artist.updated_at)}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* Description */}
-          {artist.description && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold mb-2 flex items-center gap-2">
-                  <Music2 className="h-4 w-4" />
-                  Mô tả
-                </h3>
-                <p className="text-sm text-muted-foreground whitespace-pre-line">
-                  {artist.description}
-                </p>
-              </div>
-            </>
-          )}
+              {/* Deleted Warning */}
+              {artist.deleted_at && (
+                <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-red-900 dark:text-red-200">
+                      Đã xóa
+                    </p>
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      {formatDate(artist.deleted_at)}
+                    </p>
+                  </div>
+                </div>
+              )}
 
-          {/* Products */}
-          {artist.products && artist.products.length > 0 && (
-            <>
-              <Separator />
-              <div>
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  <Package className="h-4 w-4" />
-                  Sản phẩm ({artist.products.length})
-                </h3>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
+              {/* Description */}
+              {artist.description && (
+                <>
+                  <Separator />
+                  <div>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2">
+                      <Music2 className="h-4 w-4" />
+                      Mô tả
+                    </h3>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
+                      {artist.description}
+                    </p>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+
+            {/* Products Tab */}
+            <TabsContent value="products" className="space-y-4 mt-4">
+              {artist.products && artist.products.length > 0 ? (
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                   {artist.products.map((product) => (
                     <div
                       key={product.id}
@@ -164,9 +177,15 @@ export const ArtistDetailDialog = ({
                     </div>
                   ))}
                 </div>
-              </div>
-            </>
-          )}
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="font-medium">Nghệ sĩ chưa tham gia sản phẩm nào</p>
+                  <p className="text-sm mt-1">Sản phẩm sẽ hiển thị ở đây khi được thêm</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </DialogContent>
     </Dialog>
