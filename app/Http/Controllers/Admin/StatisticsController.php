@@ -111,7 +111,7 @@ class StatisticsController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'date' => Carbon::parse($item->date)->format('d/m'),
+                    'date' => $item->date, // Keep ISO format Y-m-d for JavaScript parsing
                     'revenue' => (float) $item->revenue,
                     'orders' => (int) $item->orders,
                 ];
