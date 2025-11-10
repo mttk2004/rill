@@ -340,7 +340,7 @@ export default function Artists({
               </Button>
             </div>
 
-            <AdminStatsCards stats={statsCards} />
+            <AdminStatsCards stats={statsCards} cols={{ default: 1, md: 2, xl: 4 }} />
 
             <AdminFilters fields={filterFields} />
 

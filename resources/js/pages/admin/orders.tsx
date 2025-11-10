@@ -287,7 +287,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
               </p>
             </div>
 
-            <AdminStatsCards stats={statsCards} />
+            <AdminStatsCards stats={statsCards} cols={{ default: 2, md: 3, xl: 6 }} />
 
             <AdminFilters fields={filterFields} />
 

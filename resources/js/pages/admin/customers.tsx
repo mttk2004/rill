@@ -1,4 +1,5 @@
 import { AdminNavigation } from "@/components/admin-navigation";
+import { AdminStatsCards, StatCardData } from "@/components/admin/common/admin-stats-cards";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -192,6 +193,38 @@ const AdminCustomers = () => {
     return age;
   };
 
+  // Stats cards configuration
+  const statsCards: StatCardData[] = [
+    {
+      title: 'Tổng khách hàng',
+      value: stats.total.toLocaleString(),
+      subtitle: 'Tất cả khách hàng',
+      icon: Users,
+      gradient: 'from-blue-500 to-cyan-500',
+    },
+    {
+      title: 'Đang hoạt động',
+      value: stats.active.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.active / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: CheckCircle,
+      gradient: 'from-green-500 to-emerald-500',
+    },
+    {
+      title: 'Đã xác thực email',
+      value: stats.verified.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.verified / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: Mail,
+      gradient: 'from-purple-500 to-pink-500',
+    },
+    {
+      title: 'Mới tháng này',
+      value: stats.new_this_month.toLocaleString(),
+      subtitle: `${stats.total > 0 ? ((stats.new_this_month / stats.total) * 100).toFixed(1) : 0}% tổng số`,
+      icon: TrendingUp,
+      gradient: 'from-amber-500 to-orange-500',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <Head title="Quản lý khách hàng" />
@@ -199,547 +232,457 @@ const AdminCustomers = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="space-y-6">
+            {/* Header */}
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                Quản lý Khách hàng
-              </h1>
-              <p className="text-slate-600 dark:text-slate-400 mt-2 ml-12">
+              <h1 className="text-3xl font-bold">Quản lý Khách hàng</h1>
+              <p className="text-muted-foreground mt-2">
                 Quản lý thông tin khách hàng và lịch sử mua hàng
               </p>
             </div>
-          </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-            <Card className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-blue-100 mb-1">
-                      Tổng khách hàng
-                    </p>
-                    <p className="text-4xl font-bold text-white">
-                      {stats.total.toLocaleString()}
-                    </p>
+            {/* Stats Cards */}
+            <AdminStatsCards stats={statsCards} cols={{ default: 1, md: 2, xl: 4 }} />
+
+            {/* Filters */}
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Tìm kiếm
+                    </Label>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Input
+                        placeholder="Tên, email, số điện thoại..."
+                        defaultValue={typeof filters.search === 'string' ? filters.search : ''}
+                        onChange={handleSearchChange}
+                        className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
+                      />
+                    </div>
                   </div>
-                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <Users className="h-8 w-8 text-white" />
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Trạng thái
+                    </Label>
+                    <Select
+                      defaultValue={(filters.status as string) || "all-status"}
+                      onValueChange={handleStatusChange}
+                    >
+                      <SelectTrigger className="border-slate-200">
+                        <SelectValue placeholder="Chọn trạng thái" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all-status">Tất cả trạng thái</SelectItem>
+                        <SelectItem value="active">Hoạt động</SelectItem>
+                        <SelectItem value="inactive">Không hoạt động</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Xác thực email
+                    </Label>
+                    <Select
+                      defaultValue={(filters.verified as string) || "all-verified"}
+                      onValueChange={handleVerifiedChange}
+                    >
+                      <SelectTrigger className="border-slate-200">
+                        <SelectValue placeholder="Chọn xác thực" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all-verified">Tất cả</SelectItem>
+                        <SelectItem value="verified">Đã xác thực</SelectItem>
+                        <SelectItem value="unverified">Chưa xác thực</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Sắp xếp
+                    </Label>
+                    <Select
+                      defaultValue={(filters.sort as string) || "newest"}
+                      onValueChange={handleSortChange}
+                    >
+                      <SelectTrigger className="border-slate-200">
+                        <SelectValue placeholder="Chọn sắp xếp" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">Mới gia nhập</SelectItem>
+                        <SelectItem value="name-asc">Tên A-Z</SelectItem>
+                        <SelectItem value="name-desc">Tên Z-A</SelectItem>
+                        <SelectItem value="orders-desc">Nhiều đơn hàng nhất</SelectItem>
+                        <SelectItem value="spent-desc">Chi tiêu cao nhất</SelectItem>
+                        <SelectItem value="recent-order">Mua hàng gần đây</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="relative overflow-hidden bg-gradient-to-br from-green-500 to-green-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-green-100 mb-1">
-                      Đang hoạt động
-                    </p>
-                    <p className="text-4xl font-bold text-white">
-                      {stats.active.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-green-100 mt-1">
-                      {((stats.active / stats.total) * 100).toFixed(1)}% tổng số
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <CheckCircle className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Results Info */}
+            <div className="mb-6">
+              <p className="text-slate-600 dark:text-slate-400">
+                Hiển thị <span className="font-medium text-slate-900 dark:text-white">{customers.length}</span> trong <span className="font-medium text-slate-900 dark:text-white">{usersPaginator.total.toLocaleString()}</span> khách hàng
+              </p>
+            </div>
 
-            <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-purple-100 mb-1">
-                      Đã xác thực email
-                    </p>
-                    <p className="text-4xl font-bold text-white">
-                      {stats.verified.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-purple-100 mt-1">
-                      {((stats.verified / stats.total) * 100).toFixed(1)}% tổng số
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <Mail className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Customers Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              {customers.map((customer, index) => (
+                <Card
+                  key={customer.id}
+                  className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <CardContent className="p-6">
+                    {/* Avatar & Name */}
+                    <div className="flex flex-col items-center text-center mb-4">
+                      <div className="w-20 h-20 rounded-full overflow-hidden mb-3 relative ring-4 ring-slate-100 dark:ring-slate-700 group-hover:ring-amber-200 dark:group-hover:ring-amber-900 transition-all">
+                        {customer.avatar ? (
+                          <img
+                            src={customer.avatar}
+                            alt={customer.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-2xl font-bold text-slate-600 dark:text-slate-300">
+                            {customer.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        {customer.email_verified_at && (
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </div>
 
-            <Card className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition-transform duration-500"></div>
-              <CardContent className="p-6 relative z-10">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-amber-100 mb-1">
-                      Mới tháng này
-                    </p>
-                    <p className="text-4xl font-bold text-white">
-                      {stats.new_this_month.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-amber-100 mt-1">
-                      {((stats.new_this_month / stats.total) * 100).toFixed(1)}% tổng số
-                    </p>
-                  </div>
-                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
-                    <TrendingUp className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                      <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2 line-clamp-1">
+                        {customer.name}
+                      </h3>
 
-          {/* Filters */}
-          <Card className="mb-6 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl">
-            <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Tìm kiếm
-                  </Label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input
-                      placeholder="Tên, email, số điện thoại..."
-                      defaultValue={typeof filters.search === 'string' ? filters.search : ''}
-                      onChange={handleSearchChange}
-                      className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Trạng thái
-                  </Label>
-                  <Select
-                    defaultValue={(filters.status as string) || "all-status"}
-                    onValueChange={handleStatusChange}
-                  >
-                    <SelectTrigger className="border-slate-200">
-                      <SelectValue placeholder="Chọn trạng thái" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all-status">Tất cả trạng thái</SelectItem>
-                      <SelectItem value="active">Hoạt động</SelectItem>
-                      <SelectItem value="inactive">Không hoạt động</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Xác thực email
-                  </Label>
-                  <Select
-                    defaultValue={(filters.verified as string) || "all-verified"}
-                    onValueChange={handleVerifiedChange}
-                  >
-                    <SelectTrigger className="border-slate-200">
-                      <SelectValue placeholder="Chọn xác thực" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all-verified">Tất cả</SelectItem>
-                      <SelectItem value="verified">Đã xác thực</SelectItem>
-                      <SelectItem value="unverified">Chưa xác thực</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Sắp xếp
-                  </Label>
-                  <Select
-                    defaultValue={(filters.sort as string) || "newest"}
-                    onValueChange={handleSortChange}
-                  >
-                    <SelectTrigger className="border-slate-200">
-                      <SelectValue placeholder="Chọn sắp xếp" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">Mới gia nhập</SelectItem>
-                      <SelectItem value="name-asc">Tên A-Z</SelectItem>
-                      <SelectItem value="name-desc">Tên Z-A</SelectItem>
-                      <SelectItem value="orders-desc">Nhiều đơn hàng nhất</SelectItem>
-                      <SelectItem value="spent-desc">Chi tiêu cao nhất</SelectItem>
-                      <SelectItem value="recent-order">Mua hàng gần đây</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Results Info */}
-          <div className="mb-6">
-            <p className="text-slate-600 dark:text-slate-400">
-              Hiển thị <span className="font-medium text-slate-900 dark:text-white">{customers.length}</span> trong <span className="font-medium text-slate-900 dark:text-white">{usersPaginator.total.toLocaleString()}</span> khách hàng
-            </p>
-          </div>
-
-          {/* Customers Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {customers.map((customer, index) => (
-              <Card
-                key={customer.id}
-                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <CardContent className="p-6">
-                  {/* Avatar & Name */}
-                  <div className="flex flex-col items-center text-center mb-4">
-                    <div className="w-20 h-20 rounded-full overflow-hidden mb-3 relative ring-4 ring-slate-100 dark:ring-slate-700 group-hover:ring-amber-200 dark:group-hover:ring-amber-900 transition-all">
-                      {customer.avatar ? (
-                        <img
-                          src={customer.avatar}
-                          alt={customer.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-2xl font-bold text-slate-600 dark:text-slate-300">
-                          {customer.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      {customer.email_verified_at && (
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                          <CheckCircle className="w-4 h-4 text-white" />
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 mb-3 flex-wrap justify-center">
+                        {getStatusBadge(customer.is_active)}
+                        {!customer.email_verified_at && (
+                          <Badge className="bg-yellow-100 text-yellow-800 text-xs border-0">
+                            Chưa xác thực
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
-                    <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2 line-clamp-1">
-                      {customer.name}
-                    </h3>
-
-                    <div className="flex items-center gap-2 mb-3 flex-wrap justify-center">
-                      {getStatusBadge(customer.is_active)}
-                      {!customer.email_verified_at && (
-                        <Badge className="bg-yellow-100 text-yellow-800 text-xs border-0">
-                          Chưa xác thực
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Contact Info */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                      <Mail className="h-3.5 w-3.5 flex-shrink-0" />
-                      <span className="truncate">{customer.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                      <Phone className="h-3.5 w-3.5 flex-shrink-0" />
-                      <span>{customer.phone || '—'}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                      <Users className="h-3.5 w-3.5 flex-shrink-0" />
-                      <span>
-                        {getGenderIcon(customer.gender)} {customer.date_of_birth ? `${calculateAge(customer.date_of_birth)} tuổi` : 'Chưa cập nhật'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-3 mb-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Package className="h-3.5 w-3.5 text-amber-600" />
-                        <span className="text-lg font-bold text-amber-600">
-                          {customer.orders_count || 0}
+                    {/* Contact Info */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                        <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="truncate">{customer.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                        <Phone className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span>{customer.phone || '—'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                        <Users className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span>
+                          {getGenderIcon(customer.gender)} {customer.date_of_birth ? `${calculateAge(customer.date_of_birth)} tuổi` : 'Chưa cập nhật'}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Đơn hàng</p>
                     </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1 mt-1">
-                        <Calendar className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
-                        <span className="text-sm font-medium text-slate-900 dark:text-white">
-                          {new Date(customer.created_at).toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' })}
-                        </span>
+
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-3 mb-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <Package className="h-3.5 w-3.5 text-amber-600" />
+                          <span className="text-lg font-bold text-amber-600">
+                            {customer.orders_count || 0}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Đơn hàng</p>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">Tham gia</p>
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-1 mt-1">
+                          <Calendar className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
+                          <span className="text-sm font-medium text-slate-900 dark:text-white">
+                            {new Date(customer.created_at).toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' })}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Tham gia</p>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 border-slate-200 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700"
-                      onClick={() => fetchCustomerDetails(customer.id)}
-                      disabled={isLoadingCustomer}
-                    >
-                      <Eye className="h-3.5 w-3.5 mr-1.5" />
-                      {isLoadingCustomer ? 'Đang tải...' : 'Xem chi tiết'}
-                    </Button>
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 border-slate-200 hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700"
+                        onClick={() => fetchCustomerDetails(customer.id)}
+                        disabled={isLoadingCustomer}
+                      >
+                        <Eye className="h-3.5 w-3.5 mr-1.5" />
+                        {isLoadingCustomer ? 'Đang tải...' : 'Xem chi tiết'}
+                      </Button>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-slate-100 dark:hover:bg-slate-700"
-                      onClick={() => toast.info('Tính năng gửi email đang được phát triển')}
-                    >
-                      <Mail className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="hover:bg-slate-100 dark:hover:bg-slate-700"
+                        onClick={() => toast.info('Tính năng gửi email đang được phát triển')}
+                      >
+                        <Mail className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-          {/* Pagination */}
-          <div className="mt-8">
-            <div className="flex justify-center">
-              <div className="flex items-center space-x-2">
-                {usersPaginator.links && usersPaginator.links.map((link: PaginationLink, idx: number) => {
-                  if (!link.url) {
-                    return <span key={idx} className="px-3 py-1 text-slate-500" dangerouslySetInnerHTML={{ __html: link.label }} />;
-                  }
-                  return (
-                    <Link
-                      key={idx}
-                      href={link.url}
-                      className={`px-3 py-1 rounded-md ${link.active ? 'bg-amber-500 text-white' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-amber-100'}`}
-                      dangerouslySetInnerHTML={{ __html: link.label }}
-                    />
-                  );
-                })}
+            {/* Pagination */}
+            <div className="mt-8">
+              <div className="flex justify-center">
+                <div className="flex items-center space-x-2">
+                  {usersPaginator.links && usersPaginator.links.map((link: PaginationLink, idx: number) => {
+                    if (!link.url) {
+                      return <span key={idx} className="px-3 py-1 text-slate-500" dangerouslySetInnerHTML={{ __html: link.label }} />;
+                    }
+                    return (
+                      <Link
+                        key={idx}
+                        href={link.url}
+                        className={`px-3 py-1 rounded-md ${link.active ? 'bg-amber-500 text-white' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-amber-100'}`}
+                        dangerouslySetInnerHTML={{ __html: link.label }}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Customer Detail Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
-                <Users className="h-5 w-5 text-white" />
-              </div>
-              Chi tiết Khách hàng
-            </DialogTitle>
-          </DialogHeader>
+        {/* Customer Detail Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+                Chi tiết Khách hàng
+              </DialogTitle>
+            </DialogHeader>
 
-          {selectedCustomer && (
-            <Tabs defaultValue="info" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-4">
-                <TabsTrigger value="info">Thông tin</TabsTrigger>
-                <TabsTrigger value="orders">Lịch sử đơn hàng</TabsTrigger>
-              </TabsList>
+            {selectedCustomer && (
+              <Tabs defaultValue="info" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="info">Thông tin</TabsTrigger>
+                  <TabsTrigger value="orders">Lịch sử đơn hàng</TabsTrigger>
+                </TabsList>
 
-              {/* Tab Thông tin */}
-              <TabsContent value="info" className="space-y-4">
-                <div className="flex items-start gap-6">
-                  {/* Avatar */}
-                  <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 relative ring-4 ring-slate-100 dark:ring-slate-700">
-                    {selectedCustomer.avatar ? (
-                      <img
-                        src={selectedCustomer.avatar}
-                        alt={selectedCustomer.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-3xl font-bold text-slate-600 dark:text-slate-300">
-                        {selectedCustomer.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    {selectedCustomer.email_verified_at && (
-                      <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-green-500 rounded-full border-3 border-white flex items-center justify-center">
-                        <CheckCircle className="w-5 h-5 text-white" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Basic Info */}
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                      {selectedCustomer.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mb-4 flex-wrap">
-                      {getStatusBadge(selectedCustomer.is_active)}
-                      {selectedCustomer.email_verified_at ? (
-                        <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Đã xác thực
-                        </Badge>
+                {/* Tab Thông tin */}
+                <TabsContent value="info" className="space-y-4">
+                  <div className="flex items-start gap-6">
+                    {/* Avatar */}
+                    <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 relative ring-4 ring-slate-100 dark:ring-slate-700">
+                      {selectedCustomer.avatar ? (
+                        <img
+                          src={selectedCustomer.avatar}
+                          alt={selectedCustomer.name}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
-                        <Badge className="bg-yellow-100 text-yellow-800 border-0">
-                          Chưa xác thực
-                        </Badge>
+                        <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center text-3xl font-bold text-slate-600 dark:text-slate-300">
+                          {selectedCustomer.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      {selectedCustomer.email_verified_at && (
+                        <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-green-500 rounded-full border-3 border-white flex items-center justify-center">
+                          <CheckCircle className="w-5 h-5 text-white" />
+                        </div>
                       )}
                     </div>
+
+                    {/* Basic Info */}
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                        {selectedCustomer.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mb-4 flex-wrap">
+                        {getStatusBadge(selectedCustomer.is_active)}
+                        {selectedCustomer.email_verified_at ? (
+                          <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Đã xác thực
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-yellow-100 text-yellow-800 border-0">
+                            Chưa xác thực
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                {/* Contact Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Mail className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                        <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Email</p>
-                          <p className="text-sm font-medium text-slate-900 dark:text-white">
-                            {selectedCustomer.email}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Phone className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                        <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Số điện thoại</p>
-                          <p className="text-sm font-medium text-slate-900 dark:text-white">
-                            {selectedCustomer.phone || '—'}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Users className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                        <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Giới tính</p>
-                          <p className="text-sm font-medium text-slate-900 dark:text-white">
-                            {getGenderIcon(selectedCustomer.gender)} {selectedCustomer.gender === 'male' ? 'Nam' : selectedCustomer.gender === 'female' ? 'Nữ' : selectedCustomer.gender === 'other' ? 'Khác' : 'Không xác định'}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                        <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Tuổi</p>
-                          <p className="text-sm font-medium text-slate-900 dark:text-white">
-                            {selectedCustomer.date_of_birth ? `${calculateAge(selectedCustomer.date_of_birth)} tuổi` : 'Chưa cập nhật'}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Package className="h-5 w-5 text-amber-600" />
-                        <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Tổng đơn hàng</p>
-                          <p className="text-lg font-bold text-amber-600">
-                            {selectedCustomer.orders_count || 0}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <DollarSign className="h-5 w-5 text-green-600" />
-                        <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Tổng chi tiêu</p>
-                          <p className="text-lg font-bold text-green-600">
-                            {selectedCustomer.total_spent ? `${selectedCustomer.total_spent.toLocaleString('vi-VN')}₫` : '0₫'}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                        <div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">Ngày tham gia</p>
-                          <p className="text-sm font-medium text-slate-900 dark:text-white">
-                            {new Date(selectedCustomer.created_at).toLocaleDateString('vi-VN')}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              {/* Tab Lịch sử đơn hàng */}
-              <TabsContent value="orders">
-                {!selectedCustomer.orders || selectedCustomer.orders.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Package className="h-16 w-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-                    <p className="text-slate-500 dark:text-slate-400 text-lg">
-                      Khách hàng chưa có đơn hàng nào
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {selectedCustomer.orders?.map((order) => (
-                      <Card key={order.id} className="bg-slate-50 dark:bg-slate-800/50 border-0 hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                              <span className="font-bold text-amber-600">#{order.order_number}</span>
-                              <Badge className="bg-blue-500 text-white border-0">
-                                {order.status}
-                              </Badge>
-                            </div>
-                            <Link href={`/admin/orders/${order.id}`}>
-                              <Button variant="ghost" size="sm">
-                                <Eye className="h-4 w-4 mr-1" />
-                                Xem
-                              </Button>
-                            </Link>
+                  {/* Contact Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Mail className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Email</p>
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                              {selectedCustomer.email}
+                            </p>
                           </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <div className="text-slate-600 dark:text-slate-400">
-                              <Calendar className="h-3 w-3 inline mr-1" />
-                              {new Date(order.placed_at).toLocaleDateString('vi-VN')}
-                              <span className="mx-2">•</span>
-                              <Package className="h-3 w-3 inline mr-1" />
-                              {order.items_count} sản phẩm
-                            </div>
-                            <div className="font-bold text-lg text-slate-900 dark:text-white">
-                              {order.total_amount.toLocaleString('vi-VN')}₫
-                            </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Phone className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Số điện thoại</p>
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                              {selectedCustomer.phone || '—'}
+                            </p>
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Users className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Giới tính</p>
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                              {getGenderIcon(selectedCustomer.gender)} {selectedCustomer.gender === 'male' ? 'Nam' : selectedCustomer.gender === 'female' ? 'Nữ' : selectedCustomer.gender === 'other' ? 'Khác' : 'Không xác định'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Calendar className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Tuổi</p>
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                              {selectedCustomer.date_of_birth ? `${calculateAge(selectedCustomer.date_of_birth)} tuổi` : 'Chưa cập nhật'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Package className="h-5 w-5 text-amber-600" />
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Tổng đơn hàng</p>
+                            <p className="text-lg font-bold text-amber-600">
+                              {selectedCustomer.orders_count || 0}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <DollarSign className="h-5 w-5 text-green-600" />
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Tổng chi tiêu</p>
+                            <p className="text-lg font-bold text-green-600">
+                              {selectedCustomer.total_spent ? `${selectedCustomer.total_spent.toLocaleString('vi-VN')}₫` : '0₫'}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-slate-50 dark:bg-slate-800/50 border-0">
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Calendar className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                          <div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Ngày tham gia</p>
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                              {new Date(selectedCustomer.created_at).toLocaleDateString('vi-VN')}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          )}
-        </DialogContent>
-      </Dialog>
+                </TabsContent>
+
+                {/* Tab Lịch sử đơn hàng */}
+                <TabsContent value="orders">
+                  {!selectedCustomer.orders || selectedCustomer.orders.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Package className="h-16 w-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+                      <p className="text-slate-500 dark:text-slate-400 text-lg">
+                        Khách hàng chưa có đơn hàng nào
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {selectedCustomer.orders?.map((order) => (
+                        <Card key={order.id} className="bg-slate-50 dark:bg-slate-800/50 border-0 hover:shadow-md transition-shadow">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-amber-600">#{order.order_number}</span>
+                                <Badge className="bg-blue-500 text-white border-0">
+                                  {order.status}
+                                </Badge>
+                              </div>
+                              <Link href={`/admin/orders/${order.id}`}>
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Xem
+                                </Button>
+                              </Link>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <div className="text-slate-600 dark:text-slate-400">
+                                <Calendar className="h-3 w-3 inline mr-1" />
+                                {new Date(order.placed_at).toLocaleDateString('vi-VN')}
+                                <span className="mx-2">•</span>
+                                <Package className="h-3 w-3 inline mr-1" />
+                                {order.items_count} sản phẩm
+                              </div>
+                              <div className="font-bold text-lg text-slate-900 dark:text-white">
+                                {order.total_amount.toLocaleString('vi-VN')}₫
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 };

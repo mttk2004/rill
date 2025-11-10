@@ -1,4 +1,5 @@
 import { AdminNavigation } from '@/components/admin-navigation';
+import { AdminStatsCards, StatCardData } from '@/components/admin/common/admin-stats-cards';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -183,6 +184,38 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
     return sum + (voucher.value * voucher.used_count);
   }, 0);
 
+  // Stats cards configuration
+  const statsCards: StatCardData[] = [
+    {
+      title: 'Đang hoạt động',
+      value: stats.active,
+      subtitle: 'Voucher có hiệu lực',
+      icon: CheckCircle,
+      gradient: 'from-green-500 to-emerald-500',
+    },
+    {
+      title: 'Tổng voucher',
+      value: stats.total,
+      subtitle: 'Tất cả voucher',
+      icon: Ticket,
+      gradient: 'from-blue-500 to-cyan-500',
+    },
+    {
+      title: 'Lượt sử dụng',
+      value: stats.total_used,
+      subtitle: 'Tổng số lần dùng',
+      icon: Users,
+      gradient: 'from-purple-500 to-pink-500',
+    },
+    {
+      title: 'Tiết kiệm cho KH',
+      value: formatCurrency(totalDiscount).replace('₫', '').trim(),
+      subtitle: 'Tổng giảm giá',
+      icon: TrendingUp,
+      gradient: 'from-amber-500 to-orange-500',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Head title="Quản lý Voucher - Admin" />
@@ -208,67 +241,7 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="bg-gradient-to-br from-green-500 to-emerald-500 p-6 text-white">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-white/90">Đang hoạt động</p>
-                        <p className="text-3xl font-bold mt-2">{stats.active}</p>
-                        <p className="text-xs text-white/80 mt-1">Voucher có hiệu lực</p>
-                      </div>
-                      <CheckCircle className="h-12 w-12 text-white/80" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-6 text-white">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-white/90">Tổng voucher</p>
-                        <p className="text-3xl font-bold mt-2">{stats.total}</p>
-                        <p className="text-xs text-white/80 mt-1">Tất cả voucher</p>
-                      </div>
-                      <Ticket className="h-12 w-12 text-white/80" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-white">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-white/90">Lượt sử dụng</p>
-                        <p className="text-3xl font-bold mt-2">{stats.total_used}</p>
-                        <p className="text-xs text-white/80 mt-1">Tổng số lần dùng</p>
-                      </div>
-                      <Users className="h-12 w-12 text-white/80" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="bg-gradient-to-br from-amber-500 to-orange-500 p-6 text-white">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-white/90">Tiết kiệm cho KH</p>
-                        <p className="text-3xl font-bold mt-2">{formatCurrency(totalDiscount).replace('₫', '')}</p>
-                        <p className="text-xs text-white/80 mt-1">Tổng giảm giá</p>
-                      </div>
-                      <TrendingUp className="h-12 w-12 text-white/80" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <AdminStatsCards stats={statsCards} cols={{ default: 1, md: 2, xl: 4 }} />
 
             {/* Search and Filters */}
             <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
