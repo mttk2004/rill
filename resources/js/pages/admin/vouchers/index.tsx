@@ -16,9 +16,20 @@ import {
   DollarSign,
   Clock,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  ArrowUpDown
 } from 'lucide-react';
 import { useState } from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Voucher {
   id: string;
@@ -78,6 +89,17 @@ export default function AdminVouchers({ vouchers, stats, filters }: Props) {
     });
   };
 
+  const handleFilterChange = (key: string, value: string) => {
+    router.get('/admin/vouchers', {
+      ...filters,
+      [key]: value === 'all' ? undefined : value,
+      page: undefined, // Reset to page 1 when filter changes
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -120,6 +142,14 @@ export default function AdminVouchers({ vouchers, stats, filters }: Props) {
   const getUsagePercentage = (voucher: Voucher) => {
     if (!voucher.usage_limit) return 0;
     return (voucher.used_count / voucher.usage_limit) * 100;
+  };
+
+  const isVoucherEditable = (voucher: Voucher) => {
+    const now = new Date();
+    const validTo = new Date(voucher.valid_to);
+
+    // Không cho edit nếu đã được sử dụng hoặc đã hết hạn
+    return voucher.used_count === 0 && now <= validTo;
   };
 
   const handleDeleteVoucher = (voucherId: string) => {
@@ -215,23 +245,158 @@ export default function AdminVouchers({ vouchers, stats, filters }: Props) {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-6">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <Input
-              placeholder="Tìm kiếm theo mã hoặc tên voucher..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10"
-            />
+        <div className="space-y-4 mb-6">
+          {/* Search and Create Button Row */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+              <Input
+                placeholder="Tìm kiếm theo mã hoặc tên voucher..."
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            <Link href="/admin/vouchers/create">
+              <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                Tạo voucher mới
+              </Button>
+            </Link>
           </div>
 
-          <Link href="/admin/vouchers/create">
-            <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              Tạo voucher mới
-            </Button>
-          </Link>
+          {/* Filters Row */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-slate-600" />
+              <span className="text-sm font-medium text-slate-700">Lọc:</span>
+            </div>
+
+            {/* Status Filter */}
+            <Select
+              value={filters.status || 'all'}
+              onValueChange={(value) => handleFilterChange('status', value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="active">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    Đang hoạt động
+                  </div>
+                </SelectItem>
+                <SelectItem value="inactive">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+                    Tạm dừng
+                  </div>
+                </SelectItem>
+                <SelectItem value="expired">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                    Hết hạn
+                  </div>
+                </SelectItem>
+                <SelectItem value="upcoming">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                    Chưa bắt đầu
+                  </div>
+                </SelectItem>
+                <SelectItem value="exhausted">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                    Hết lượt
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="h-4 w-4 text-slate-600" />
+              <span className="text-sm font-medium text-slate-700">Sắp xếp:</span>
+            </div>
+
+            {/* Sort Filter */}
+            <Select
+              value={filters.sort || 'created_desc'}
+              onValueChange={(value) => handleFilterChange('sort', value)}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Sắp xếp theo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="created_desc">Mới nhất</SelectItem>
+                <SelectItem value="created_asc">Cũ nhất</SelectItem>
+                <SelectItem value="code_asc">Mã A-Z</SelectItem>
+                <SelectItem value="code_desc">Mã Z-A</SelectItem>
+                <SelectItem value="value_desc">Giá trị giảm (Cao → Thấp)</SelectItem>
+                <SelectItem value="value_asc">Giá trị giảm (Thấp → Cao)</SelectItem>
+                <SelectItem value="usage_desc">Tiến độ sử dụng (Cao → Thấp)</SelectItem>
+                <SelectItem value="valid_to_asc">Sắp hết hạn</SelectItem>
+                <SelectItem value="valid_from_desc">Mới bắt đầu</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Clear Filters */}
+            {(filters.status || filters.sort !== 'created_desc') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  router.get('/admin/vouchers', {}, {
+                    preserveState: true,
+                    preserveScroll: true,
+                  });
+                }}
+                className="text-slate-600 hover:text-slate-900"
+              >
+                Xóa bộ lọc
+              </Button>
+            )}
+          </div>
+
+          {/* Active Filters Display */}
+          {(filters.search || filters.status || filters.sort !== 'created_desc') && (
+            <div className="flex flex-wrap gap-2 items-center text-sm">
+              <span className="text-slate-600">Đang lọc:</span>
+              {filters.search && (
+                <Badge variant="secondary" className="gap-1">
+                  Tìm kiếm: "{filters.search}"
+                </Badge>
+              )}
+              {filters.status && (
+                <Badge variant="secondary" className="gap-1">
+                  Trạng thái: {
+                    filters.status === 'active' ? 'Đang hoạt động' :
+                      filters.status === 'inactive' ? 'Tạm dừng' :
+                        filters.status === 'expired' ? 'Hết hạn' :
+                          filters.status === 'upcoming' ? 'Chưa bắt đầu' :
+                            filters.status === 'exhausted' ? 'Hết lượt' : ''
+                  }
+                </Badge>
+              )}
+              {filters.sort && filters.sort !== 'created_desc' && (
+                <Badge variant="secondary" className="gap-1">
+                  Sắp xếp: {
+                    filters.sort === 'created_asc' ? 'Cũ nhất' :
+                      filters.sort === 'code_asc' ? 'Mã A-Z' :
+                        filters.sort === 'code_desc' ? 'Mã Z-A' :
+                          filters.sort === 'value_desc' ? 'Giá trị cao' :
+                            filters.sort === 'value_asc' ? 'Giá trị thấp' :
+                              filters.sort === 'usage_desc' ? 'Tiến độ cao' :
+                                filters.sort === 'valid_to_asc' ? 'Sắp hết hạn' :
+                                  filters.sort === 'valid_from_desc' ? 'Mới bắt đầu' : ''
+                  }
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Vouchers List */}
@@ -315,11 +480,22 @@ export default function AdminVouchers({ vouchers, stats, filters }: Props) {
                   </div>
 
                   <div className="flex items-center gap-2 ml-4">
-                    <Link href={`/admin/vouchers/${voucher.id}/edit`}>
-                      <Button variant="outline" size="sm">
+                    {isVoucherEditable(voucher) ? (
+                      <Link href={`/admin/vouchers/${voucher.id}/edit`}>
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled
+                        title="Không thể chỉnh sửa voucher đã được sử dụng hoặc đã hết hạn"
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                    </Link>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -359,6 +535,85 @@ export default function AdminVouchers({ vouchers, stats, filters }: Props) {
               )}
             </CardContent>
           </Card>
+        )}
+
+        {/* Pagination */}
+        {vouchers.last_page > 1 && (
+          <div className="mt-8 flex items-center justify-between">
+            <div className="text-sm text-slate-600">
+              Hiển thị {vouchers.data.length > 0 ? ((vouchers.current_page - 1) * vouchers.per_page + 1) : 0} - {Math.min(vouchers.current_page * vouchers.per_page, vouchers.total)} trong tổng số {vouchers.total} voucher
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.get('/admin/vouchers', {
+                  ...filters,
+                  page: vouchers.current_page - 1
+                }, {
+                  preserveState: true,
+                  preserveScroll: true,
+                })}
+                disabled={vouchers.current_page === 1}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Trước
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: vouchers.last_page }, (_, i) => i + 1)
+                  .filter(page => {
+                    // Show first page, last page, current page, and pages around current
+                    return page === 1 ||
+                      page === vouchers.last_page ||
+                      (page >= vouchers.current_page - 1 && page <= vouchers.current_page + 1);
+                  })
+                  .map((page, index, array) => {
+                    // Add ellipsis if there's a gap
+                    const showEllipsisBefore = index > 0 && page - array[index - 1] > 1;
+
+                    return (
+                      <div key={page} className="flex items-center gap-1">
+                        {showEllipsisBefore && (
+                          <span className="px-2 text-slate-400">...</span>
+                        )}
+                        <Button
+                          variant={page === vouchers.current_page ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => router.get('/admin/vouchers', {
+                            ...filters,
+                            page
+                          }, {
+                            preserveState: true,
+                            preserveScroll: true,
+                          })}
+                          className={page === vouchers.current_page ? "bg-amber-500 hover:bg-amber-600" : ""}
+                        >
+                          {page}
+                        </Button>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.get('/admin/vouchers', {
+                  ...filters,
+                  page: vouchers.current_page + 1
+                }, {
+                  preserveState: true,
+                  preserveScroll: true,
+                })}
+                disabled={vouchers.current_page === vouchers.last_page}
+              >
+                Sau
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>

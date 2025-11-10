@@ -315,7 +315,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                 />
                 <div className="flex justify-between text-xs text-slate-500">
                   <span>Mô tả sẽ hiển thị trong danh sách voucher</span>
-                  <span>{data.description.length}/500</span>
+                  <span>{data.description?.length ?? 0}/500</span>
                 </div>
               </div>
             </CardContent>

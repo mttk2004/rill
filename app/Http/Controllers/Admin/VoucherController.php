@@ -21,7 +21,7 @@ class VoucherController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = (int) $request->get('per_page', 20);
+        $perPage = (int) $request->get('per_page', 10);
         $search = trim((string) $request->get('search', ''));
         $status = $request->get('status', 'all');
         $sort = $request->get('sort', 'created_desc');
