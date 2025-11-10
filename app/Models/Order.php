@@ -66,4 +66,9 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
+
+    public function voucherUsages(): HasMany
+    {
+        return $this->hasMany(VoucherUsage::class);
+    }
 }

@@ -1,0 +1,175 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Order;
+use App\Models\User;
+use App\Models\Voucher;
+use App\Models\VoucherUsage;
+use Illuminate\Support\Facades\DB;
+
+class VoucherService
+{
+    /**
+     * Validate if a voucher can be used by a user for a given order total.
+     */
+    public function validateVoucher(string $code, float $orderTotal, ?int $userId = null): array
+    {
+        $voucher = Voucher::where('code', $code)->first();
+
+        if (!$voucher) {
+            return [
+                'valid' => false,
+                'message' => 'Mã voucher không tồn tại',
+            ];
+        }
+
+        if (!$voucher->is_active) {
+            return [
+                'valid' => false,
+                'message' => 'Mã voucher không còn hoạt động',
+            ];
+        }
+
+        $now = now();
+        if ($voucher->valid_from > $now) {
+            return [
+                'valid' => false,
+                'message' => 'Mã voucher chưa có hiệu lực',
+            ];
+        }
+
+        if ($voucher->valid_to < $now) {
+            return [
+                'valid' => false,
+                'message' => 'Mã voucher đã hết hạn',
+            ];
+        }
+
+        if ($voucher->usage_limit !== null && $voucher->used_count >= $voucher->usage_limit) {
+            return [
+                'valid' => false,
+                'message' => 'Mã voucher đã hết lượt sử dụng',
+            ];
+        }
+
+        if ($voucher->minimum_amount !== null && $orderTotal < $voucher->minimum_amount) {
+            return [
+                'valid' => false,
+                'message' => 'Đơn hàng chưa đạt giá trị tối thiểu ' . number_format((float) $voucher->minimum_amount) . '₫',
+            ];
+        }
+
+        if ($userId && $voucher->usage_limit_per_user !== null) {
+            $userUsageCount = VoucherUsage::where('voucher_id', $voucher->id)
+                ->where('user_id', $userId)
+                ->count();
+
+            if ($userUsageCount >= $voucher->usage_limit_per_user) {
+                return [
+                    'valid' => false,
+                    'message' => 'Bạn đã sử dụng hết lượt cho mã voucher này',
+                ];
+            }
+        }
+
+        $discountAmount = $voucher->calculateDiscount($orderTotal);
+
+        return [
+            'valid' => true,
+            'voucher' => $voucher,
+            'discount_amount' => $discountAmount,
+            'message' => 'Mã voucher hợp lệ',
+        ];
+    }
+
+    /**
+     * Apply voucher to an order.
+     */
+    public function applyVoucher(Voucher $voucher, Order $order, User $user): VoucherUsage
+    {
+        return DB::transaction(function () use ($voucher, $order, $user) {
+            // Create voucher usage record
+            $voucherUsage = VoucherUsage::create([
+                'voucher_id' => $voucher->id,
+                'user_id' => $user->id,
+                'order_id' => $order->id,
+                'discount_amount' => $order->discount_amount,
+                'used_at' => now(),
+            ]);
+
+            // Increment voucher used count
+            $voucher->incrementUsedCount();
+
+            return $voucherUsage;
+        });
+    }
+
+    /**
+     * Get available vouchers for a user and order total.
+     */
+    public function getAvailableVouchers(?int $userId = null, ?float $orderTotal = null)
+    {
+        $query = Voucher::active()
+            ->currentlyValid()
+            ->available();
+
+        if ($orderTotal !== null) {
+            $query->where(function ($q) use ($orderTotal) {
+                $q->whereNull('minimum_amount')
+                    ->orWhere('minimum_amount', '<=', $orderTotal);
+            });
+        }
+
+        if ($userId !== null) {
+            // Exclude vouchers that user has reached usage limit
+            $query->where(function ($q) use ($userId) {
+                $q->whereNull('usage_limit_per_user')
+                    ->orWhereDoesntHave('usages', function ($subQ) use ($userId) {
+                        $subQ->where('user_id', $userId)
+                            ->havingRaw('COUNT(*) >= vouchers.usage_limit_per_user');
+                    });
+            });
+        }
+
+        return $query->orderBy('value', 'desc')->get();
+    }
+
+    /**
+     * Get voucher usage statistics.
+     */
+    public function getVoucherStatistics(int $voucherId): array
+    {
+        $voucher = Voucher::with(['usages'])->findOrFail($voucherId);
+
+        $totalDiscount = $voucher->usages()->sum('discount_amount');
+        $uniqueUsers = $voucher->usages()->distinct('user_id')->count('user_id');
+        $averageDiscount = $voucher->used_count > 0 ? $totalDiscount / $voucher->used_count : 0;
+
+        return [
+            'total_used' => $voucher->used_count,
+            'total_discount_amount' => $totalDiscount,
+            'unique_users' => $uniqueUsers,
+            'average_discount' => $averageDiscount,
+            'usage_rate' => $voucher->usage_limit ? ($voucher->used_count / $voucher->usage_limit) * 100 : null,
+        ];
+    }
+
+    /**
+     * Cancel voucher usage (when order is cancelled).
+     */
+    public function cancelVoucherUsage(Order $order): void
+    {
+        DB::transaction(function () use ($order) {
+            $voucherUsages = VoucherUsage::where('order_id', $order->id)->get();
+
+            foreach ($voucherUsages as $usage) {
+                // Decrement voucher used count
+                $usage->voucher->decrement('used_count');
+
+                // Delete usage record
+                $usage->delete();
+            }
+        });
+    }
+}

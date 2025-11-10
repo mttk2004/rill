@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ValidateVoucherRequest;
+use App\Services\VoucherService;
+use Illuminate\Http\Request;
+
+class VoucherController extends Controller
+{
+    public function __construct(
+        protected VoucherService $voucherService
+    ) {}
+
+    /**
+     * Validate a voucher code.
+     */
+    public function validate(ValidateVoucherRequest $request)
+    {
+        $validated = $request->validated();
+
+        $userId = auth()->id();
+
+        $result = $this->voucherService->validateVoucher(
+            $validated['code'],
+            $validated['order_total'],
+            $userId
+        );
+
+        if (!$result['valid']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['message'],
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $result['message'],
+            'voucher' => [
+                'code' => $result['voucher']->code,
+                'name' => $result['voucher']->name,
+                'discount_amount' => $result['discount_amount'],
+            ],
+        ]);
+    }
+
+    /**
+     * Get available vouchers for current user.
+     */
+    public function available(Request $request)
+    {
+        $orderTotal = $request->get('order_total');
+        $userId = auth()->id();
+
+        $vouchers = $this->voucherService->getAvailableVouchers($userId, $orderTotal);
+
+        return response()->json([
+            'success' => true,
+            'vouchers' => $vouchers->map(function ($voucher) use ($orderTotal) {
+                return [
+                    'id' => $voucher->id,
+                    'code' => $voucher->code,
+                    'name' => $voucher->name,
+                    'description' => $voucher->description,
+                    'value' => $voucher->value,
+                    'minimum_amount' => $voucher->minimum_amount,
+                    'maximum_discount' => $voucher->maximum_discount,
+                    'valid_from' => $voucher->valid_from,
+                    'valid_to' => $voucher->valid_to,
+                    'discount_amount' => $orderTotal ? $voucher->calculateDiscount($orderTotal) : null,
+                ];
+            }),
+        ]);
+    }
+}

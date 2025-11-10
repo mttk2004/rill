@@ -122,4 +122,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProductReview::class);
     }
+
+    /**
+     * Get the voucher usages for the user.
+     */
+    public function voucherUsages()
+    {
+        return $this->hasMany(VoucherUsage::class);
+    }
 }
