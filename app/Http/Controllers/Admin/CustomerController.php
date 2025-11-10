@@ -74,7 +74,7 @@ class CustomerController extends Controller
         $verifiedCount = User::where('role', 'customer')->whereNotNull('email_verified_at')->count();
         $newThisMonth = User::where('role', 'customer')->where('created_at', '>=', now()->subMonth())->count();
 
-        return Inertia::render('admin/customers', [
+        return Inertia::render('admin/customers/index', [
             'users' => $users,
             'stats' => [
                 'total' => $total,
@@ -118,7 +118,7 @@ class CustomerController extends Controller
             ]);
         }
 
-        return Inertia::render('admin/customer-detail', [
+        return Inertia::render('admin/customers/edit', [
             'customer' => $customer,
         ]);
     }

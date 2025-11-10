@@ -260,7 +260,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
   };
 
   const handleViewDetails = (orderId: number) => {
-    router.visit(route('admin.orders.show', orderId));
+    router.visit(route('admin.orders.edit', orderId));
   };
 
   // Cleanup timer on unmount

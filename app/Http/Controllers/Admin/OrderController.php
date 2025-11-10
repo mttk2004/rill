@@ -111,7 +111,7 @@ class OrderController extends Controller
             'cancelled' => Order::where('status', 'cancelled')->count(),
         ];
 
-        return Inertia::render('admin/orders', [
+        return Inertia::render('admin/orders/index', [
             'orders' => $orders,
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'payment_status', 'sort']) + [
@@ -188,7 +188,7 @@ class OrderController extends Controller
         });
 
         // Render detail page
-        return Inertia::render('admin/order-detail', [
+        return Inertia::render('admin/orders/edit', [
             'order' => $orderData,
         ]);
     }
