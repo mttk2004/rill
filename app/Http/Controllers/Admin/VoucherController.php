@@ -135,11 +135,8 @@ class VoucherController extends Controller
 
         $voucher = Voucher::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Voucher đã được tạo thành công',
-            'voucher' => $voucher,
-        ]);
+        return redirect()->route('admin.vouchers')
+            ->with('success', 'Voucher đã được tạo thành công');
     }
 
     /**
@@ -191,11 +188,8 @@ class VoucherController extends Controller
 
         $voucher->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Voucher đã được cập nhật thành công',
-            'voucher' => $voucher->fresh(),
-        ]);
+        return redirect()->route('admin.vouchers')
+            ->with('success', 'Voucher đã được cập nhật thành công');
     }
 
     /**
@@ -207,18 +201,14 @@ class VoucherController extends Controller
 
         // Check if voucher has been used
         if ($voucher->used_count > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không thể xóa voucher đã được sử dụng',
-            ], 422);
+            return redirect()->back()
+                ->with('error', 'Không thể xóa voucher đã được sử dụng');
         }
 
         $voucher->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Voucher đã được xóa thành công',
-        ]);
+        return redirect()->route('admin.vouchers')
+            ->with('success', 'Voucher đã được xóa thành công');
     }
 
     /**
@@ -232,12 +222,9 @@ class VoucherController extends Controller
             'is_active' => !$voucher->is_active,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => $voucher->is_active
+        return redirect()->back()
+            ->with('success', $voucher->is_active
                 ? 'Voucher đã được kích hoạt'
-                : 'Voucher đã được vô hiệu hóa',
-            'voucher' => $voucher,
-        ]);
+                : 'Voucher đã được vô hiệu hóa');
     }
 }
