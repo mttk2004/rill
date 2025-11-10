@@ -30,6 +30,8 @@ import {
   Eye,
   User,
 } from 'lucide-react';
+import { OrderDetailDialog } from '@/components/admin/order-detail-dialog';
+import axios from 'axios';
 
 interface OrdersPageProps {
   orders: {
@@ -58,9 +60,53 @@ interface OrdersPageProps {
   };
 }
 
+interface OrderDetail {
+  id: string;
+  order_number: string;
+  status: string;
+  total_amount: number;
+  placed_at: string;
+  customer?: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+  };
+  shipping_address?: {
+    full_name: string;
+    phone: string;
+    address_line_1: string;
+    address_line_2?: string;
+    ward: string;
+    district: string;
+    city: string;
+    postal_code?: string;
+  };
+  payment?: {
+    payment_method: string;
+    payment_status: string;
+    amount: number;
+    processed_at?: string;
+  };
+  order_items: Array<{
+    id: string;
+    product: {
+      id: string;
+      name: string;
+      sku: string;
+      artists: Array<{ id: number; name: string }>;
+    };
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+  }>;
+}
+
 export default function Orders({ orders, filters, stats }: OrdersPageProps) {
   const [currentFilters, setCurrentFilters] = useState(filters);
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Stats cards configuration
   const statsCards: StatCardData[] = [
@@ -259,8 +305,21 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
     }
   };
 
-  const handleViewDetails = (orderId: number) => {
-    router.visit(route('admin.orders.edit', orderId));
+  const handleViewDetails = async (orderId: number) => {
+    setIsDialogOpen(true);
+
+    try {
+      const response = await axios.get(route('admin.orders.show', orderId));
+      setSelectedOrder(response.data);
+    } catch (error) {
+      console.error('Failed to fetch order details:', error);
+      setIsDialogOpen(false);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedOrder(null);
   };
 
   // Cleanup timer on unmount
@@ -316,6 +375,12 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
           </div>
         </div>
       </div>
+
+      <OrderDetailDialog
+        order={selectedOrder}
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+      />
     </div>
   );
 }

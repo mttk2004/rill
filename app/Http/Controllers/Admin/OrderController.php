@@ -187,6 +187,11 @@ class OrderController extends Controller
             ];
         });
 
+        // Return JSON for API requests, Inertia page for browser
+        if ($request->wantsJson()) {
+            return response()->json($orderData);
+        }
+
         // Render detail page
         return Inertia::render('admin/orders/edit', [
             'order' => $orderData,
