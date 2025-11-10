@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
   Ticket,
   Plus,
@@ -20,68 +20,63 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-// Mock data - trong thực tế sẽ từ server via Inertia props
-const mockVouchers = [
-  {
-    id: 1,
-    code: 'VINYL50K',
-    name: 'Giảm 50K cho đơn hàng đầu tiên',
-    description: 'Voucher chào mừng khách hàng mới, giảm 50,000 VND cho đơn hàng từ 300,000 VND',
-    type: 'fixed',
-    value: 50000,
-    minimum_amount: 300000,
-    maximum_discount: null,
-    usage_limit: 100,
-    used_count: 23,
-    usage_limit_per_user: 1,
-    valid_from: '2025-01-01T00:00:00Z',
-    valid_to: '2025-12-31T23:59:59Z',
-    is_active: true,
-    created_at: '2025-01-01T00:00:00Z'
-  },
-  {
-    id: 2,
-    code: 'NEWYEAR2025',
-    name: 'Chào năm mới 2025',
-    description: 'Ưu đãi đặc biệt năm mới, giảm 100,000 VND cho đơn hàng từ 500,000 VND',
-    type: 'fixed',
-    value: 100000,
-    minimum_amount: 500000,
-    maximum_discount: null,
-    usage_limit: 50,
-    used_count: 47,
-    usage_limit_per_user: 1,
-    valid_from: '2025-01-01T00:00:00Z',
-    valid_to: '2025-01-31T23:59:59Z',
-    is_active: true,
-    created_at: '2025-01-01T00:00:00Z'
-  },
-  {
-    id: 3,
-    code: 'OLDSCHOOL',
-    name: 'Vinyl cổ điển',
-    description: 'Giảm 30,000 VND cho các album cổ điển',
-    type: 'fixed',
-    value: 30000,
-    minimum_amount: 200000,
-    maximum_discount: null,
-    usage_limit: 200,
-    used_count: 156,
-    usage_limit_per_user: 2,
-    valid_from: '2024-12-01T00:00:00Z',
-    valid_to: '2025-02-28T23:59:59Z',
-    is_active: false,
-    created_at: '2024-12-01T00:00:00Z'
-  }
-];
+interface Voucher {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  type: string;
+  value: number;
+  minimum_amount: number | null;
+  maximum_discount: number | null;
+  usage_limit: number | null;
+  used_count: number;
+  usage_limit_per_user: number | null;
+  valid_from: string;
+  valid_to: string;
+  is_active: boolean;
+  created_at: string;
+  usages_count?: number;
+}
 
-export default function AdminVouchers() {
-  const [searchTerm, setSearchTerm] = useState('');
+interface Stats {
+  total: number;
+  active: number;
+  expired: number;
+  total_used: number;
+}
 
-  const filteredVouchers = mockVouchers.filter(voucher =>
-    voucher.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    voucher.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+interface Filters {
+  search?: string;
+  status?: string;
+  sort?: string;
+}
+
+interface Props {
+  vouchers: {
+    data: Voucher[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+  stats: Stats;
+  filters: Filters;
+}
+
+export default function AdminVouchers({ vouchers, stats, filters }: Props) {
+  const [searchTerm, setSearchTerm] = useState(filters.search || '');
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    router.get('/admin/vouchers', {
+      ...filters,
+      search: value || undefined,
+    }, {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -98,7 +93,7 @@ export default function AdminVouchers() {
     });
   };
 
-  const getStatusBadge = (voucher: typeof mockVouchers[0]) => {
+  const getStatusBadge = (voucher: Voucher) => {
     const now = new Date();
     const validFrom = new Date(voucher.valid_from);
     const validTo = new Date(voucher.valid_to);
@@ -122,15 +117,16 @@ export default function AdminVouchers() {
     return <Badge variant="default" className="bg-green-100 text-green-700">Đang hoạt động</Badge>;
   };
 
-  const getUsagePercentage = (voucher: typeof mockVouchers[0]) => {
+  const getUsagePercentage = (voucher: Voucher) => {
     if (!voucher.usage_limit) return 0;
     return (voucher.used_count / voucher.usage_limit) * 100;
   };
 
-  const handleDeleteVoucher = (voucherId: number) => {
+  const handleDeleteVoucher = (voucherId: string) => {
     if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
-      // TODO: Implement delete with Inertia router.delete()
-      console.log('Deleting voucher:', voucherId);
+      router.delete(`/admin/vouchers/${voucherId}`, {
+        preserveScroll: true,
+      });
     }
   };
 
@@ -138,6 +134,11 @@ export default function AdminVouchers() {
     navigator.clipboard.writeText(code);
     // TODO: Show toast notification
   };
+
+  // Calculate total discount given to customers
+  const totalDiscount = vouchers.data.reduce((sum, voucher) => {
+    return sum + (voucher.value * voucher.used_count);
+  }, 0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -168,7 +169,7 @@ export default function AdminVouchers() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Đang hoạt động</p>
-                    <p className="text-2xl font-bold text-slate-900">2</p>
+                    <p className="text-2xl font-bold text-slate-900">{stats.active}</p>
                   </div>
                   <CheckCircle className="h-8 w-8 text-green-500" />
                 </div>
@@ -180,7 +181,7 @@ export default function AdminVouchers() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Tổng voucher</p>
-                    <p className="text-2xl font-bold text-slate-900">3</p>
+                    <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
                   </div>
                   <Ticket className="h-8 w-8 text-blue-500" />
                 </div>
@@ -192,7 +193,7 @@ export default function AdminVouchers() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Lượt sử dụng</p>
-                    <p className="text-2xl font-bold text-slate-900">226</p>
+                    <p className="text-2xl font-bold text-slate-900">{stats.total_used}</p>
                   </div>
                   <Users className="h-8 w-8 text-purple-500" />
                 </div>
@@ -204,7 +205,7 @@ export default function AdminVouchers() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Tiết kiệm cho KH</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatCurrency(1830000)}</p>
+                    <p className="text-2xl font-bold text-slate-900">{formatCurrency(totalDiscount)}</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-orange-500" />
                 </div>
@@ -220,7 +221,7 @@ export default function AdminVouchers() {
             <Input
               placeholder="Tìm kiếm theo mã hoặc tên voucher..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -235,7 +236,7 @@ export default function AdminVouchers() {
 
         {/* Vouchers List */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredVouchers.map((voucher) => (
+          {vouchers.data.map((voucher) => (
             <Card key={voucher.id} className="hover:shadow-md transition-shadow duration-200">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
@@ -335,7 +336,7 @@ export default function AdminVouchers() {
         </div>
 
         {/* Empty State */}
-        {filteredVouchers.length === 0 && (
+        {vouchers.data.length === 0 && (
           <Card className="text-center py-12">
             <CardContent>
               <Ticket className="h-12 w-12 text-slate-400 mx-auto mb-4" />

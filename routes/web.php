@@ -101,18 +101,14 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::delete('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'destroy'])->name('admin.artists.destroy');
         Route::post('/artists/{id}/restore', [App\Http\Controllers\Admin\ArtistController::class, 'restore'])->name('admin.artists.restore');
 
-        Route::get('/vouchers', function () {
-            return Inertia::render('admin/vouchers');
-        })->name('admin.vouchers');
-
-        Route::get('/vouchers/create', function () {
-            return Inertia::render('admin/vouchers/create');
-        })->name('admin.vouchers.create');
-
-        Route::get('/vouchers/{voucher}/edit', function () {
-            // Mock data - thực tế sẽ load voucher từ database
-            return Inertia::render('admin/vouchers/edit');
-        })->name('admin.vouchers.edit');
+        Route::get('/vouchers', [App\Http\Controllers\Admin\VoucherController::class, 'index'])->name('admin.vouchers');
+        Route::get('/vouchers/create', [App\Http\Controllers\Admin\VoucherController::class, 'create'])->name('admin.vouchers.create');
+        Route::post('/vouchers', [App\Http\Controllers\Admin\VoucherController::class, 'store'])->name('admin.vouchers.store');
+        Route::get('/vouchers/{id}', [App\Http\Controllers\Admin\VoucherController::class, 'show'])->name('admin.vouchers.show');
+        Route::get('/vouchers/{id}/edit', [App\Http\Controllers\Admin\VoucherController::class, 'edit'])->name('admin.vouchers.edit');
+        Route::put('/vouchers/{id}', [App\Http\Controllers\Admin\VoucherController::class, 'update'])->name('admin.vouchers.update');
+        Route::delete('/vouchers/{id}', [App\Http\Controllers\Admin\VoucherController::class, 'destroy'])->name('admin.vouchers.destroy');
+        Route::post('/vouchers/{id}/toggle-status', [App\Http\Controllers\Admin\VoucherController::class, 'toggleStatus'])->name('admin.vouchers.toggle-status');
     });
 });
 
