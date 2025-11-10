@@ -11,117 +11,159 @@ import {
   TrendingDown,
   Calendar,
   Download,
-  BarChart3
+  BarChart3,
+  CreditCard
 } from "lucide-react";
 import { Head } from "@inertiajs/react";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
-const AdminStatistics = () => {
+interface StatData {
+  revenue: { value: number; change: number; trend: string };
+  orders: { value: number; change: number; trend: string };
+  customers: { value: number; change: number; trend: string };
+  products: { value: number; change: number; trend: string };
+}
 
-  const stats = [
+interface DailyRevenue {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+interface OrderByStatus {
+  status: string;
+  count: number;
+}
+
+interface TopProduct {
+  id: number;
+  name: string;
+  sku: string;
+  sales: number;
+  revenue: number;
+}
+
+interface RecentOrder {
+  id: number;
+  order_number: string;
+  customer: string;
+  items_count: number;
+  total_amount: number;
+  status: string;
+  payment_status: string;
+  placed_at: string;
+}
+
+interface RevenueByPaymentMethod {
+  method: string;
+  total: number;
+  count: number;
+}
+
+interface PageProps {
+  stats: StatData;
+  dailyRevenue: DailyRevenue[];
+  ordersByStatus: OrderByStatus[];
+  topProducts: TopProduct[];
+  recentOrders: RecentOrder[];
+  revenueByPaymentMethod: RevenueByPaymentMethod[];
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+const AdminStatistics = ({
+  stats,
+  dailyRevenue,
+  ordersByStatus,
+  topProducts,
+  recentOrders,
+  revenueByPaymentMethod,
+  dateRange
+}: PageProps) => {
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(value);
+  };
+
+  const statsCards = [
     {
       title: "Doanh thu tháng này",
-      value: "156.780.000đ",
-      change: "+12.5%",
-      trend: "up",
+      value: formatCurrency(stats.revenue.value),
+      change: `${stats.revenue.change > 0 ? '+' : ''}${stats.revenue.change.toFixed(1)}%`,
+      trend: stats.revenue.trend,
       icon: DollarSign,
       color: "text-green-600"
     },
     {
       title: "Đơn hàng mới",
-      value: "384",
-      change: "+8.2%",
-      trend: "up",
+      value: stats.orders.value.toString(),
+      change: `${stats.orders.change > 0 ? '+' : ''}${stats.orders.change.toFixed(1)}%`,
+      trend: stats.orders.trend,
       icon: ShoppingBag,
       color: "text-blue-600"
     },
     {
       title: "Khách hàng mới",
-      value: "127",
-      change: "-3.1%",
-      trend: "down",
+      value: stats.customers.value.toString(),
+      change: `${stats.customers.change > 0 ? '+' : ''}${stats.customers.change.toFixed(1)}%`,
+      trend: stats.customers.trend,
       icon: Users,
       color: "text-purple-600"
     },
     {
       title: "Sản phẩm bán chạy",
-      value: "89",
-      change: "+15.7%",
-      trend: "up",
+      value: stats.products.value.toString(),
+      change: `${stats.products.change > 0 ? '+' : ''}${stats.products.change.toFixed(1)}%`,
+      trend: stats.products.trend,
       icon: Package,
       color: "text-orange-600"
     }
   ];
 
-  const recentOrders = [
-    {
-      id: "#RL-2024-001",
-      customer: "Nguyễn Văn A",
-      product: "Abbey Road - The Beatles",
-      amount: "1.250.000đ",
-      status: "confirmed",
-      date: "2024-01-15"
-    },
-    {
-      id: "#RL-2024-002",
-      customer: "Trần Thị B",
-      product: "Dark Side of the Moon",
-      amount: "980.000đ",
-      status: "shipped",
-      date: "2024-01-14"
-    },
-    {
-      id: "#RL-2024-003",
-      customer: "Lê Hoàng C",
-      product: "Thriller - Michael Jackson",
-      amount: "1.100.000đ",
-      status: "delivered",
-      date: "2024-01-13"
-    },
-    {
-      id: "#RL-2024-004",
-      customer: "Phạm Thị D",
-      product: "Hotel California - Eagles",
-      amount: "1.350.000đ",
-      status: "pending",
-      date: "2024-01-12"
-    }
-  ];
 
-  const topProducts = [
-    {
-      name: "Abbey Road - The Beatles",
-      sales: 45,
-      revenue: "56.250.000đ",
-      trend: "+5"
-    },
-    {
-      name: "Dark Side of the Moon",
-      sales: 38,
-      revenue: "37.240.000đ",
-      trend: "+12"
-    },
-    {
-      name: "Thriller - Michael Jackson",
-      sales: 32,
-      revenue: "35.200.000đ",
-      trend: "-2"
-    },
-    {
-      name: "Hotel California - Eagles",
-      sales: 28,
-      revenue: "37.800.000đ",
-      trend: "+8"
-    }
-  ];
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  };
 
   const getStatusBadge = (status: string) => {
     const variants = {
       pending: { variant: "secondary" as const, label: "Chờ xác nhận" },
       confirmed: { variant: "default" as const, label: "Đã xác nhận" },
       shipped: { variant: "secondary" as const, label: "Đang giao" },
-      delivered: { variant: "default" as const, label: "Đã giao" }
+      delivered: { variant: "default" as const, label: "Đã giao" },
+      cancelled: { variant: "destructive" as const, label: "Đã hủy" }
     };
+    const config = variants[status as keyof typeof variants] || variants.pending;
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
 
+  const getPaymentStatusBadge = (status: string) => {
+    const variants = {
+      pending: { variant: "secondary" as const, label: "Chờ thanh toán" },
+      paid: { variant: "default" as const, label: "Đã thanh toán" },
+      failed: { variant: "destructive" as const, label: "Thất bại" }
+    };
     const config = variants[status as keyof typeof variants] || variants.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
@@ -137,7 +179,7 @@ const AdminStatistics = () => {
           <div>
             <h1 className="text-3xl font-bold">Dashboard Thống kê</h1>
             <p className="text-muted-foreground mt-2">
-              Tổng quan hoạt động kinh doanh tháng {new Date().getMonth() + 1}/{new Date().getFullYear()}
+              Tổng quan hoạt động kinh doanh từ {formatDate(dateRange.start)} đến {formatDate(dateRange.end)}
             </p>
           </div>
           <div className="flex gap-2">
@@ -154,7 +196,7 @@ const AdminStatistics = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+          {statsCards.map((stat, index) => (
             <Card
               key={stat.title}
               className="shadow-vinyl animate-fade-in"
@@ -167,15 +209,14 @@ const AdminStatistics = () => {
                       {stat.title}
                     </p>
                     <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className={`text-xs flex items-center mt-1 ${
-                      stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                    <p className={`text-xs flex items-center mt-1 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                      }`}>
                       {stat.trend === 'up' ? (
                         <TrendingUp className="h-3 w-3 mr-1" />
                       ) : (
                         <TrendingDown className="h-3 w-3 mr-1" />
                       )}
-                      {stat.change} từ tháng trước
+                      {stat.change} từ kỳ trước
                     </p>
                   </div>
                   <div className={`p-3 rounded-full bg-muted/50 ${stat.color}`}>
@@ -185,6 +226,116 @@ const AdminStatistics = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Biểu đồ doanh thu theo ngày */}
+        <Card className="shadow-vinyl mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Doanh thu 30 ngày gần nhất
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={dailyRevenue}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" tickFormatter={formatDate} />
+                <YAxis tickFormatter={(value) => {
+                  if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}B`;
+                  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                  if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+                  return value.toString();
+                }} />
+                <Tooltip
+                  formatter={(value: number) => formatCurrency(value)}
+                  labelFormatter={(label) => `Ngày: ${formatDate(label)}`}
+                />
+                <Legend />
+                <Line type="monotone" dataKey="revenue" stroke="#2563eb" strokeWidth={2} name="Doanh thu" dot={false} />
+                <Line type="monotone" dataKey="orders" stroke="#10b981" strokeWidth={2} name="Số đơn hàng" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Biểu đồ tròn và cột */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <Card className="shadow-vinyl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5" />
+                Phân bố trạng thái đơn hàng
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={ordersByStatus.map(item => ({ name: item.status, value: item.count }))}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {ordersByStatus.map((entry, index) => {
+                      const colors: Record<string, string> = {
+                        pending: '#f59e0b',
+                        confirmed: '#2563eb',
+                        shipped: '#8b5cf6',
+                        delivered: '#10b981',
+                        cancelled: '#ef4444'
+                      };
+                      return <Cell key={`cell-${index}`} fill={colors[entry.status] || '#6b7280'} />;
+                    })}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-vinyl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Doanh thu theo phương thức thanh toán
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={revenueByPaymentMethod.map(item => ({
+                  method: item.method === 'cash_on_delivery' ? 'COD' :
+                    item.method === 'bank_transfer' ? 'Chuyển khoản' :
+                      item.method === 'credit_card' ? 'Thẻ tín dụng' : item.method,
+                  total: item.total,
+                  count: item.count
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="method" />
+                  <YAxis tickFormatter={(value) => {
+                    if (value >= 1000000000) return `${(value / 1000000000).toFixed(1)}B`;
+                    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                    if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+                    return value.toString();
+                  }} />
+                  <Tooltip
+                    formatter={(value: number, name: string) => [
+                      name === 'total' ? formatCurrency(value) : value,
+                      name === 'total' ? 'Doanh thu' : 'Số đơn'
+                    ]}
+                  />
+                  <Legend />
+                  <Bar dataKey="total" fill="#2563eb" name="Doanh thu" />
+                  <Bar dataKey="count" fill="#10b981" name="Số đơn" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -202,15 +353,16 @@ const AdminStatistics = () => {
                   <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium">{order.id}</span>
+                        <span className="font-medium">{order.order_number}</span>
                         {getStatusBadge(order.status)}
+                        {getPaymentStatusBadge(order.payment_status)}
                       </div>
                       <p className="text-sm text-muted-foreground">{order.customer}</p>
-                      <p className="text-sm font-medium">{order.product}</p>
+                      <p className="text-sm">Số sản phẩm: {order.items_count}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-accent">{order.amount}</p>
-                      <p className="text-xs text-muted-foreground">{order.date}</p>
+                      <p className="font-semibold text-accent">{formatCurrency(order.total_amount)}</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(order.placed_at)}</p>
                     </div>
                   </div>
                 ))}
@@ -232,28 +384,18 @@ const AdminStatistics = () => {
             <CardContent>
               <div className="space-y-4">
                 {topProducts.map((product, index) => (
-                  <div key={product.name} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={product.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-accent/10 text-accent font-bold flex items-center justify-center text-sm">
                         {index + 1}
                       </div>
                       <div>
                         <p className="font-medium line-clamp-1">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">{product.sales} bản</p>
+                        <p className="text-sm text-muted-foreground">{product.sales} bản • SKU: {product.sku}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-accent">{product.revenue}</p>
-                      <p className={`text-xs flex items-center ${
-                        product.trend.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {product.trend.startsWith('+') ? (
-                          <TrendingUp className="h-3 w-3 mr-1" />
-                        ) : (
-                          <TrendingDown className="h-3 w-3 mr-1" />
-                        )}
-                        {product.trend}
-                      </p>
+                      <p className="font-semibold text-accent">{formatCurrency(product.revenue)}</p>
                     </div>
                   </div>
                 ))}

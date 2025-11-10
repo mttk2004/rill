@@ -69,9 +69,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     // Admin management routes
     Route::prefix('admin')->group(function () {
-        Route::get('/statistics', function () {
-            return Inertia::render('admin/statistics');
-        })->name('admin.statistics');
+        Route::get('/statistics', [App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('admin.statistics');
 
         Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders');
         Route::get('/orders/{id}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
