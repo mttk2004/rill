@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -106,10 +105,8 @@ export default function Orders() {
   const pageProps = usePage<OrdersPageProps>().props;
   const { auth, orders, filters } = pageProps;
 
-  const handleTabChange = (status: string) => {
-    console.log('Tab changed to:', status);
+  const handleStatusFilter = (status: string) => {
     const newStatus = status === 'all' ? undefined : status;
-
     router.get(
       '/orders',
       { status: newStatus },
@@ -119,6 +116,8 @@ export default function Orders() {
       }
     );
   };
+
+  const currentStatus = filters.status || 'all';
 
   return (
     <>
@@ -133,7 +132,6 @@ export default function Orders() {
 
           <div className="relative container mx-auto px-4 py-12">
             <h1 className="text-4xl font-bold text-white drop-shadow-lg flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg"><Package className="h-8 w-8" /></div>
               Đơn hàng của tôi
             </h1>
             <p className="text-slate-200 drop-shadow">Theo dõi và quản lý các đơn hàng của bạn.</p>
@@ -141,105 +139,143 @@ export default function Orders() {
         </div>
 
         <main className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Tabs value={filters.status || 'all'} onValueChange={handleTabChange} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-4">
-                {orderStatuses.map((status) => (
-                  <TabsTrigger key={status.value} value={status.value}>
-                    {status.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Sidebar - Vertical Tabs */}
+              <aside className="lg:w-64 flex-shrink-0">
+                <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm sticky top-4">
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-sm text-slate-600 dark:text-slate-400 mb-3 px-2">Trạng thái đơn hàng</h3>
+                    <nav className="space-y-1">
+                      {orderStatuses.map((status) => (
+                        <button
+                          key={status.value}
+                          onClick={() => handleStatusFilter(status.value)}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center gap-3 ${currentStatus === status.value
+                            ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md shadow-amber-500/30'
+                            : 'hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300'
+                            }`}
+                        >
+                          {status.value !== 'all' && getStatusIcon(status.value)}
+                          <span className={currentStatus === status.value ? 'font-semibold' : ''}>{status.label}</span>
+                        </button>
+                      ))}
+                    </nav>
+                  </CardContent>
+                </Card>
+              </aside>
 
-              {orderStatuses.map((status) => (
-                <TabsContent key={status.value} value={status.value}>
-                  {orders.data.length === 0 ? (
-                    <Card className="text-center py-16 border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                      <CardContent>
-                        <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
-                          <Package className="h-10 w-10 text-slate-500" />
-                        </div>
-                        <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Không tìm thấy đơn hàng</h3>
-                        <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">Không có đơn hàng nào khớp với bộ lọc hiện tại.</p>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                      <CardContent className="p-0">
-                        <TooltipProvider delayDuration={100}>
-                          <div className="divide-y divide-slate-200 dark:divide-slate-700">
-                            {orders.data.map((order: Order) => (
-                              <Tooltip key={order.id}>
-                                <TooltipTrigger asChild>
-                                  <div className="py-4 flex items-center justify-between transition-all duration-300 hover:shadow-md hover:bg-slate-50/80 dark:hover:bg-slate-800/50 px-6 group">
-                                    <div className="flex items-center gap-6">
-                                      <div className="space-y-1 w-32">
-                                        <p className="font-bold text-amber-600 transition-colors group-hover:text-amber-500">#{order.order_number}</p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">
-                                          {new Date(order.placed_at).toLocaleDateString('vi-VN')}
-                                        </p>
-                                      </div>
-                                      <div>
-                                        <Badge className={`text-white border-0 ${getStatusVariant(order.status)}`}>
-                                          {getStatusIcon(order.status)}
-                                          {getStatusLabel(order.status)}
-                                        </Badge>
-                                      </div>
+              {/* Main Content */}
+              <div className="flex-1">
+                {orders.data.length === 0 ? (
+                  <Card className="text-center py-16 border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                    <CardContent>
+                      <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
+                        <Package className="h-10 w-10 text-slate-500" />
+                      </div>
+                      <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Không tìm thấy đơn hàng</h3>
+                      <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">Không có đơn hàng nào khớp với bộ lọc hiện tại.</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+                    <CardContent className="p-0">
+                      <TooltipProvider delayDuration={100}>
+                        <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                          {orders.data.map((order: Order) => (
+                            <div key={order.id} className="p-6 transition-all duration-200 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 hover:shadow-sm group">
+                              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                                {/* Order Number & Date */}
+                                <div className="lg:col-span-2">
+                                  <Link href={`/orders/${order.id}`} className="block">
+                                    <p className="font-bold text-amber-600 transition-colors group-hover:text-amber-500">
+                                      #{order.order_number}
+                                    </p>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                                      {new Date(order.placed_at).toLocaleDateString('vi-VN')}
+                                    </p>
+                                  </Link>
+                                </div>
+
+                                {/* Products Info with Tooltip */}
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="lg:col-span-3 cursor-help">
+                                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                                        {order.items.length > 0 && order.items[0].product.name}
+                                      </p>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {order.items_count > 1 ? `và ${order.items_count - 1} sản phẩm khác` : `${order.items_count} sản phẩm`}
+                                      </p>
                                     </div>
-                                    <div className="flex items-center gap-6">
-                                      <div className="text-right w-36">
-                                        <p className="font-bold text-lg text-slate-900 dark:text-white">
-                                          {order.total_amount.toLocaleString('vi-VN')}₫
-                                        </p>
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">{order.items_count} sản phẩm</p>
-                                      </div>
-                                      <div className="space-x-2 flex items-center">
-                                        <Button variant="outline" size="sm" asChild>
-                                          <Link href={`/orders/${order.id}`}>
-                                            <Eye className="h-4 w-4 mr-2" />
-                                            Xem chi tiết
-                                          </Link>
-                                        </Button>
-                                        {order.status === 'delivered' && order.items.length > 0 && (
-                                          <Button
-                                            variant="outline"
-                                            size="sm"
-                                            asChild
-                                          >
-                                            <Link href={`/products/${order.items[0].product.slug}?review=true`}>
-                                              <MessageSquareQuote className="h-4 w-4 mr-2" />
-                                              Đánh giá
-                                            </Link>
-                                          </Button>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="top" align="start">
-                                  <p className="font-bold mb-1">Gồm:</p>
-                                  <ul className="list-disc list-inside text-slate-600 dark:text-slate-300">
-                                    {order.items.slice(0, 2).map((item: OrderItem, index: number) => (
-                                      <li key={index}>{item.product.name}</li>
-                                    ))}
-                                  </ul>
-                                  {order.items_count > 2 && (
-                                    <p className="mt-1 text-slate-500 dark:text-slate-400">... và {order.items_count - 2} sản phẩm khác.</p>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" align="start" className="max-w-sm bg-slate-900 dark:bg-slate-800 border-slate-700">
+                                    <p className="font-bold mb-2 text-white">Sản phẩm trong đơn:</p>
+                                    <ul className="list-disc list-inside text-slate-100 dark:text-slate-200 space-y-1">
+                                      {order.items.map((item: OrderItem, index: number) => (
+                                        <li key={index} className="text-sm">{item.product.name}</li>
+                                      ))}
+                                    </ul>
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                {/* Status Badge */}
+                                <div className="lg:col-span-2">
+                                  <Badge className={`text-white border-0 ${getStatusVariant(order.status)}`}>
+                                    {getStatusIcon(order.status)}
+                                    {getStatusLabel(order.status)}
+                                  </Badge>
+                                </div>
+
+                                {/* Total Amount */}
+                                <div className="lg:col-span-2 text-left lg:text-right">
+                                  <p className="font-bold text-lg text-slate-900 dark:text-white">
+                                    {order.total_amount.toLocaleString('vi-VN')}₫
+                                  </p>
+                                </div>
+
+                                {/* Actions - Fixed width for perfect balance */}
+                                <div className="lg:col-span-3 grid grid-cols-2 gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                                    asChild
+                                  >
+                                    <Link href={`/orders/${order.id}`}>
+                                      <Eye className="h-4 w-4 mr-1/2 translate-y-[1px]" />
+                                      <span>Chi tiết</span>
+                                    </Link>
+                                  </Button>
+                                  {order.status === 'delivered' ? (
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
+                                      asChild
+                                    >
+                                      <Link href={`/orders/${order.id}?review=true`}>
+                                        <MessageSquareQuote className="h-4 w-4 mr-1/2 translate-y-[2px]" />
+                                        <span>Đánh giá</span>
+                                      </Link>
+                                    </Button>
+                                  ) : (
+                                    <div className="w-full" />
                                   )}
-                                </TooltipContent>
-                              </Tooltip>
-                            ))}
-                          </div>
-                        </TooltipProvider>
-                        <div className="p-6">
-                          <Pagination links={orders.links} />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </TabsContent>
-              ))}
-            </Tabs>
+                      </TooltipProvider>
+                      <div className="p-6">
+                        <Pagination links={orders.links} />
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
           </div>
         </main>
       </div>

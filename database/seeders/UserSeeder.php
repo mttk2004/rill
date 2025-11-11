@@ -21,15 +21,6 @@ class UserSeeder extends Seeder
             'date_of_birth' => '1990-01-01',
         ]);
 
-        // Create additional admin for testing
-        User::factory()->admin()->create([
-            'name' => 'Quản Trị Viên',
-            'email' => 'manager@rill.local',
-            'phone' => '0901234568',
-            'gender' => 'female',
-            'date_of_birth' => '1985-05-15',
-        ]);
-
         // Create 10 realistic customers with detailed information
         $customers = [
             [
