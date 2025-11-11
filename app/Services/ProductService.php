@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\Artist;
 use App\Models\User;
-use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -243,13 +242,8 @@ class ProductService
         $userReview = null;
 
         if ($user) {
-            // Check if user has a delivered order containing this product
-            $userCanReview = Order::where('user_id', $user->id)
-                ->where('status', 'delivered')
-                ->whereHas('items', function ($query) use ($product) {
-                    $query->where('product_id', $product->id);
-                })
-                ->exists();
+            // Use policy to check if user can review this product
+            $userCanReview = $user->can('review', $product);
 
             // Get user's existing review if any
             $existingReview = $product->reviews()
