@@ -144,7 +144,10 @@ export const Navigation = ({ user }: NavigationProps) => {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="h-auto bg-transparent px-0 py-0 text-sm font-medium transition-colors hover:bg-transparent hover:text-amber-500 focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-amber-500 relative after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-amber-500 after:scale-x-0 after:origin-left after:transition-transform data-[state=open]:after:scale-x-100">
+                  <NavigationMenuTrigger
+                    onClick={() => router.visit('/products')}
+                    className="h-auto bg-transparent px-0 py-0 text-sm font-medium transition-colors hover:bg-transparent hover:text-amber-500 focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-amber-500 relative after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-amber-500 after:scale-x-0 after:origin-left after:transition-transform data-[state=open]:after:scale-x-100 cursor-pointer"
+                  >
                     Sản phẩm
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
