@@ -33,21 +33,120 @@ class ArtistProductSeeder extends Seeder
             return;
         }
 
-        // Define specific artist-album relationships for famous albums
+        // Định nghĩa các mối quan hệ nghệ sĩ-album thật, không còn random
         $artistAlbumMappings = [
-            'The Beatles' => ['Abbey Road'],
-            'Pink Floyd' => ['The Dark Side of the Moon'],
-            'Led Zeppelin' => ['Led Zeppelin IV'],
-            'Miles Davis' => ['Kind of Blue'],
-            'Radiohead' => ['OK Computer'],
-            'Kraftwerk' => ['Trans-Europe Express'],
-            'Daft Punk' => ['Discovery'],
-            'Nirvana' => ['Nevermind'],
+            // Nhạc Vàng Việt Nam
+            'Khánh Ly' => ['Diễm Xưa'],
+            'Trịnh Công Sơn' => ['Diễm Xưa'],
+            'Lam Trường' => ['Tôi Sẽ Quay Về'],
+            'Đàm Vĩnh Hưng' => ['Đàm Vĩnh Hưng & Những Tình Khúc Bất Hủ'],
+            'Phạm Duy' => ['Tình Ca Phạm Duy'],
+
+            // The Beatles
+            'The Beatles' => [
+                'Abbey Road',
+                'Sgt. Pepper\'s Lonely Hearts Club Band',
+                'Revolver',
+                'The Beatles (White Album)',
+            ],
+
+            // Pink Floyd
+            'Pink Floyd' => [
+                'The Dark Side of the Moon',
+                'The Wall',
+                'Wish You Were Here',
+            ],
+
+            // Led Zeppelin
+            'Led Zeppelin' => [
+                'Led Zeppelin IV',
+                'Physical Graffiti',
+                'Led Zeppelin II',
+            ],
+
+            // Queen
+            'Queen' => [
+                'A Night at the Opera',
+                'News of the World',
+                'The Game',
+            ],
+
+            // Miles Davis
+            'Miles Davis' => [
+                'Kind of Blue',
+                'Sketches of Spain',
+                'Bitches Brew',
+            ],
+
+            // John Coltrane
+            'John Coltrane' => [
+                'A Love Supreme',
+                'Blue Train',
+                'Kind of Blue', // Collaboration with Miles Davis
+            ],
+
+            // Ella Fitzgerald
+            'Ella Fitzgerald' => [
+                'Ella Fitzgerald Sings the Cole Porter Song Book',
+                'Ella and Louis',
+            ],
+
+            // Louis Armstrong
+            'Louis Armstrong' => [
+                'Hello, Dolly!',
+                'Ella and Louis',
+            ],
+
+            // Nirvana
+            'Nirvana' => [
+                'Nevermind',
+                'In Utero',
+            ],
+
+            // Radiohead
+            'Radiohead' => [
+                'OK Computer',
+                'Kid A',
+                'In Rainbows',
+            ],
+
+            // Kraftwerk
+            'Kraftwerk' => [
+                'Trans-Europe Express',
+                'The Man-Machine',
+                'Autobahn',
+            ],
+
+            // Daft Punk
+            'Daft Punk' => [
+                'Discovery',
+                'Random Access Memories',
+                'Homework',
+            ],
+
+            // The Chemical Brothers
+            'The Chemical Brothers' => [
+                'Dig Your Own Hole',
+                'Surrender',
+            ],
+
+            // Marvin Gaye
+            'Marvin Gaye' => [
+                'What\'s Going On',
+                'Let\'s Get It On',
+            ],
+
+            // Stevie Wonder
+            'Stevie Wonder' => [
+                'Songs in the Key of Life',
+                'Innervisions',
+                'Talking Book',
+            ],
         ];
 
         $assignedCount = 0;
 
-        // Create the specific mappings first
+        // Tạo các mối quan hệ thật giữa nghệ sĩ và album
         foreach ($artistAlbumMappings as $artistName => $albumNames) {
             $artist = $allArtists->where('slug', Str::slug($artistName))->first();
             if (!$artist) {
@@ -71,71 +170,18 @@ class ArtistProductSeeder extends Seeder
                         'updated_at' => now(),
                     ]);
                     $assignedCount++;
-                    $this->command->info("Assigned {$artist->name} to {$product->name}");
+                    $this->command->info("✓ Assigned {$artist->name} to {$product->name}");
                 }
             }
         }
 
-        // For ALL remaining products, ensure they have at least one main artist
+        // Kiểm tra các sản phẩm còn thiếu nghệ sĩ (nếu có)
         $productsWithoutArtists = Product::whereDoesntHave('artists')->get();
-        $this->command->info("Found {$productsWithoutArtists->count()} products without artists");
 
-        foreach ($productsWithoutArtists as $product) {
-            // Each product MUST have at least one main artist
-            $mainArtist = $allArtists->random();
-            $product->artists()->attach($mainArtist->id, [
-                'role' => 'main',
-                'sort_order' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            $assignedCount++;
-            $this->command->info("Assigned {$mainArtist->name} as main artist to {$product->name}");
-
-            // 30% chance of having a featured artist
-            $availableForFeatured = $allArtists->where('id', '!=', $mainArtist->id);
-            if (fake()->boolean(30) && $availableForFeatured->isNotEmpty()) {
-                $featuredArtist = $availableForFeatured->random();
-                $product->artists()->attach($featuredArtist->id, [
-                    'role' => 'featured',
-                    'sort_order' => 2,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-                $assignedCount++;
-                $this->command->info("Assigned {$featuredArtist->name} as featured artist to {$product->name}");
-            }
-
-            // 20% chance of having a composer (for jazz/classical)
-            if (fake()->boolean(20) && in_array($product->genre, ['Jazz', 'Classical'])) {
-                $availableForComposer = $allArtists->whereNotIn('id', $product->artists->pluck('id'));
-                if ($availableForComposer->isNotEmpty()) {
-                    $composer = $availableForComposer->random();
-                    $product->artists()->attach($composer->id, [
-                        'role' => 'composer',
-                        'sort_order' => 3,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                    $assignedCount++;
-                    $this->command->info("Assigned {$composer->name} as composer to {$product->name}");
-                }
-            }
-
-            // 15% chance of having a producer
-            if (fake()->boolean(15)) {
-                $availableForProducer = $allArtists->whereNotIn('id', $product->artists->pluck('id'));
-                if ($availableForProducer->isNotEmpty()) {
-                    $producer = $availableForProducer->random();
-                    $product->artists()->attach($producer->id, [
-                        'role' => 'producer',
-                        'sort_order' => 4,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                    $assignedCount++;
-                    $this->command->info("Assigned {$producer->name} as producer to {$product->name}");
-                }
+        if ($productsWithoutArtists->count() > 0) {
+            $this->command->warn("Found {$productsWithoutArtists->count()} products without artists:");
+            foreach ($productsWithoutArtists as $product) {
+                $this->command->warn("  - {$product->name}");
             }
         }
 
@@ -143,15 +189,15 @@ class ArtistProductSeeder extends Seeder
         $productsStillWithoutArtists = Product::whereDoesntHave('artists')->count();
         $totalArtistProductRelations = \DB::table('artist_product')->count();
 
-        $this->command->info("Seeding completed!");
+        $this->command->info("\n========== Seeding Summary ==========");
         $this->command->info("Total artist-product relationships created: {$assignedCount}");
-        $this->command->info("Total artist-product relationships in database: {$totalArtistProductRelations}");
-        $this->command->info("Products still without artists: {$productsStillWithoutArtists}");
+        $this->command->info("Total relationships in database: {$totalArtistProductRelations}");
+        $this->command->info("Products without artists: {$productsStillWithoutArtists}");
 
         if ($productsStillWithoutArtists > 0) {
-            $this->command->error("WARNING: {$productsStillWithoutArtists} products still have no artists!");
+            $this->command->error("⚠ WARNING: {$productsStillWithoutArtists} products still have no artists!");
         } else {
-            $this->command->info("SUCCESS: All products now have at least one artist!");
+            $this->command->info("✓ SUCCESS: All products have at least one artist!");
         }
     }
 }

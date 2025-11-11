@@ -111,10 +111,5 @@ class VoucherSeeder extends Seeder
             'valid_to' => now()->addMonth(),
             'is_active' => true,
         ]);
-
-        // Create additional random vouchers
-        // Voucher::factory()->count(10)->active()->create();
-        // Voucher::factory()->count(3)->expired()->create();
-        // Voucher::factory()->count(2)->inactive()->create();
     }
 }
