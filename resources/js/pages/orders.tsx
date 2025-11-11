@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -8,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
-import { Package, Truck, CheckCircle, Clock, Eye, X, Disc3, MessageSquareQuote } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, X, Disc3 } from "lucide-react";
 import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData, type Paginator, type PaginationLink } from '@/types';
 import { formatVND } from "@/lib/utils";
@@ -184,24 +183,25 @@ export default function Orders() {
                       <TooltipProvider delayDuration={100}>
                         <div className="divide-y divide-slate-200 dark:divide-slate-700">
                           {orders.data.map((order: Order) => (
-                            <div key={order.id} className="p-6 transition-all duration-200 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 hover:shadow-sm group">
+                            <Link
+                              href={`/orders/${order.id}`}
+                              className="block p-6 transition-all duration-200 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 hover:shadow-sm group"
+                            >
                               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                                 {/* Order Number & Date */}
                                 <div className="lg:col-span-2">
-                                  <Link href={`/orders/${order.id}`} className="block">
-                                    <p className="font-bold text-amber-600 transition-colors group-hover:text-amber-500">
-                                      #{order.order_number}
-                                    </p>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                                      {new Date(order.placed_at).toLocaleDateString('vi-VN')}
-                                    </p>
-                                  </Link>
+                                  <p className="font-bold text-amber-600 transition-colors group-hover:text-amber-500">
+                                    #{order.order_number}
+                                  </p>
+                                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    {new Date(order.placed_at).toLocaleDateString('vi-VN')}
+                                  </p>
                                 </div>
 
                                 {/* Products Info with Tooltip */}
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <div className="lg:col-span-3 cursor-help">
+                                    <div className="lg:col-span-4 cursor-help">
                                       <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                                         {order.items.length > 0 && order.items[0].product.name}
                                       </p>
@@ -221,7 +221,7 @@ export default function Orders() {
                                 </Tooltip>
 
                                 {/* Status Badge */}
-                                <div className="lg:col-span-2">
+                                <div className="lg:col-span-3">
                                   <Badge className={`text-white border-0 ${getStatusVariant(order.status)}`}>
                                     {getStatusIcon(order.status)}
                                     {getStatusLabel(order.status)}
@@ -229,43 +229,16 @@ export default function Orders() {
                                 </div>
 
                                 {/* Total Amount */}
-                                <div className="lg:col-span-2 text-left lg:text-right">
-                                  <p className="font-bold text-lg text-slate-900 dark:text-white">
+                                <div className="lg:col-span-3 text-left lg:text-right">
+                                  <p className="font-bold text-xl text-slate-900 dark:text-white">
                                     {formatVND(order.total_amount)}
                                   </p>
-                                </div>
-
-                                {/* Actions - Fixed width for perfect balance */}
-                                <div className="lg:col-span-3 grid grid-cols-2 gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="w-full transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                                    asChild
-                                  >
-                                    <Link href={`/orders/${order.id}`}>
-                                      <Eye className="h-4 w-4 mr-1/2 translate-y-[1px]" />
-                                      <span>Chi tiết</span>
-                                    </Link>
-                                  </Button>
-                                  {order.status === 'delivered' ? (
-                                    <Button
-                                      variant="default"
-                                      size="sm"
-                                      className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
-                                      asChild
-                                    >
-                                      <Link href={`/orders/${order.id}?review=true`}>
-                                        <MessageSquareQuote className="h-4 w-4 mr-1/2 translate-y-[2px]" />
-                                        <span>Đánh giá</span>
-                                      </Link>
-                                    </Button>
-                                  ) : (
-                                    <div className="w-full" />
-                                  )}
+                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Tổng thanh toán
+                                  </p>
                                 </div>
                               </div>
-                            </div>
+                            </Link>
                           ))}
                         </div>
                       </TooltipProvider>
