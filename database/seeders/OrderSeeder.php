@@ -176,6 +176,11 @@ class OrderSeeder extends Seeder
     /**
      * Tạo payment với trạng thái hợp lý theo order status
      * Tất cả đơn hàng đều dùng COD (thanh toán khi nhận hàng)
+     *
+     * Logic COD hợp lý:
+     * - pending: chưa thanh toán (chờ xác nhận)
+     * - confirmed/shipped/delivered: đã thanh toán (đã thu tiền hoặc sẽ thu khi giao)
+     * - cancelled: thất bại
      */
     private function createPaymentForOrder(Order $order, string $orderStatus, $placedAt): void
     {
@@ -183,25 +188,40 @@ class OrderSeeder extends Seeder
         $paymentMethod = 'cod';
 
         // Logic trạng thái payment dựa trên order status
-        // COD: Thanh toán khi nhận hàng, nên chỉ completed khi delivered
         switch ($orderStatus) {
             case 'pending':
-            case 'confirmed':
-            case 'shipped':
-                // Đơn chưa giao: payment pending
+                // Đơn pending: payment pending (chờ xác nhận đơn hàng)
                 $paymentStatus = 'pending';
                 $processedAt = null;
                 $transactionId = null;
                 $gatewayResponse = null;
                 break;
 
-            case 'delivered':
-                // Đơn đã giao: payment completed (đã thu tiền)
+            case 'confirmed':
+                // Đơn đã xác nhận: payment completed (cam kết sẽ thanh toán khi nhận)
                 $paymentStatus = 'completed';
-                // Thanh toán khi giao hàng (cùng lúc với delivered)
+                // Xử lý thanh toán khi xác nhận đơn (vài giờ sau khi đặt)
+                $processedAt = (clone $placedAt)->addHours(rand(1, 12));
+                $transactionId = 'COD-' . strtoupper(\Str::random(10));
+                $gatewayResponse = ['status' => 'confirmed', 'message' => 'Đơn hàng đã xác nhận, thanh toán COD khi nhận hàng'];
+                break;
+
+            case 'shipped':
+                // Đơn đang giao: payment completed (đã cam kết thanh toán)
+                $paymentStatus = 'completed';
+                // Xử lý khi chuyển sang shipped (vài ngày sau khi đặt)
+                $processedAt = (clone $placedAt)->addDays(rand(1, 3));
+                $transactionId = 'COD-' . strtoupper(\Str::random(10));
+                $gatewayResponse = ['status' => 'confirmed', 'message' => 'Hàng đang giao, thanh toán COD khi nhận'];
+                break;
+
+            case 'delivered':
+                // Đơn đã giao: payment completed (đã thu tiền thành công)
+                $paymentStatus = 'completed';
+                // Thu tiền khi giao hàng thành công
                 $processedAt = (clone $placedAt)->addDays(rand(3, 14));
                 $transactionId = 'COD-' . strtoupper(\Str::random(10));
-                $gatewayResponse = ['status' => 'success', 'message' => 'Đã thu tiền COD'];
+                $gatewayResponse = ['status' => 'success', 'message' => 'Đã thu tiền COD thành công'];
                 break;
 
             case 'cancelled':
@@ -213,10 +233,10 @@ class OrderSeeder extends Seeder
                 break;
 
             default:
-                $paymentStatus = 'pending';
-                $processedAt = null;
-                $transactionId = null;
-                $gatewayResponse = null;
+                $paymentStatus = 'completed';
+                $processedAt = (clone $placedAt)->addHours(rand(1, 24));
+                $transactionId = 'COD-' . strtoupper(\Str::random(10));
+                $gatewayResponse = ['status' => 'confirmed', 'message' => 'Thanh toán COD'];
         }
 
         Payment::create([
