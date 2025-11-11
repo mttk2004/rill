@@ -47,7 +47,13 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
-        $order->load(['items.product.artists', 'payment']);
+        $order->load([
+            'items.product.artists',
+            'items.product.reviews' => function($query) {
+                $query->where('user_id', Auth::id());
+            },
+            'payment'
+        ]);
 
         return Inertia::render('order-detail', [
             'order' => new OrderResource($order),
@@ -87,5 +93,22 @@ class OrderController extends Controller
         $pdf->loadView('invoices.order', compact('order'));
 
         return $pdf->download('hoadon_' . $order->order_number . '.pdf');
+    }
+
+    /**
+     * Cancel the specified order.
+     */
+    public function cancel(Order $order)
+    {
+        Gate::authorize('view', $order);
+
+        // Only pending orders can be cancelled
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Chỉ có thể hủy đơn hàng đang chờ xác nhận.');
+        }
+
+        $order->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
 }

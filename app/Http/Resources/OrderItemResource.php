@@ -23,6 +23,18 @@ class OrderItemResource extends JsonResource
             'image_url' => $this->whenLoaded('product', fn() => $this->product->image, null),
             'quantity' => (int) $this->quantity,
             'sku' => $this->product_sku,
+            'slug' => $this->whenLoaded('product', fn() => $this->product->slug, null),
+            'user_review' => $this->whenLoaded('product', function() use ($request) {
+                $review = $this->product->reviews()
+                    ->where('user_id', $request->user()?->id)
+                    ->first();
+
+                return $review ? [
+                    'id' => $review->id,
+                    'rating' => $review->rating,
+                    'comment' => $review->comment,
+                ] : null;
+            }, null),
         ];
     }
 }
