@@ -35,7 +35,7 @@ class OrderSeeder extends Seeder
             }
 
             // Lấy products
-            $products = Product::where('is_active', true)->get();
+            $products = Product::where('status', 'active')->get();
             if ($products->isEmpty()) {
                 $this->command->error('No products found! Please run ProductSeeder first.');
                 return;
@@ -47,12 +47,12 @@ class OrderSeeder extends Seeder
             $deliveredOrders = [];
 
             // Tạo orders với các trạng thái khác nhau
+            // Chú ý: chỉ dùng status có trong migration enum
             $orderStatuses = [
                 'delivered' => 25,    // 25 đơn đã giao - có thể review
-                'shipped' => 8,       // 8 đơn đang giao
-                'processing' => 6,    // 6 đơn đang xử lý
-                'confirmed' => 5,     // 5 đơn đã xác nhận
-                'pending' => 4,       // 4 đơn chờ xác nhận
+                'shipped' => 10,      // 10 đơn đang giao
+                'confirmed' => 8,     // 8 đơn đã xác nhận
+                'pending' => 5,       // 5 đơn chờ xác nhận
                 'cancelled' => 2,     // 2 đơn đã hủy
             ];
 
@@ -175,41 +175,48 @@ class OrderSeeder extends Seeder
 
     /**
      * Tạo payment với trạng thái hợp lý theo order status
+     * Tất cả đơn hàng đều dùng COD (thanh toán khi nhận hàng)
      */
     private function createPaymentForOrder(Order $order, string $orderStatus, $placedAt): void
     {
-        $paymentMethods = ['bank_transfer', 'credit_card', 'cod'];
-        $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
+        // Tất cả đơn đều dùng COD
+        $paymentMethod = 'cod';
 
         // Logic trạng thái payment dựa trên order status
+        // COD: Thanh toán khi nhận hàng, nên chỉ completed khi delivered
         switch ($orderStatus) {
             case 'pending':
-                // Đơn pending: payment có thể pending hoặc failed
-                $paymentStatus = rand(0, 1) ? 'pending' : 'failed';
+            case 'confirmed':
+            case 'shipped':
+                // Đơn chưa giao: payment pending
+                $paymentStatus = 'pending';
                 $processedAt = null;
+                $transactionId = null;
+                $gatewayResponse = null;
                 break;
 
-            case 'confirmed':
-            case 'processing':
-            case 'shipped':
             case 'delivered':
-                // Các đơn này PHẢI có payment completed
+                // Đơn đã giao: payment completed (đã thu tiền)
                 $paymentStatus = 'completed';
-                // Thanh toán sau khi đặt hàng vài giờ đến 1 ngày
-                $processedAt = (clone $placedAt)->addHours(rand(1, 24));
+                // Thanh toán khi giao hàng (cùng lúc với delivered)
+                $processedAt = (clone $placedAt)->addDays(rand(3, 14));
+                $transactionId = 'COD-' . strtoupper(\Str::random(10));
+                $gatewayResponse = ['status' => 'success', 'message' => 'Đã thu tiền COD'];
                 break;
 
             case 'cancelled':
-                // Đơn hủy: có thể chưa thanh toán hoặc đã refund
-                $paymentStatus = rand(0, 1) ? 'pending' : 'refunded';
-                $processedAt = $paymentStatus === 'refunded'
-                    ? (clone $placedAt)->addHours(rand(2, 48))
-                    : null;
+                // Đơn hủy: payment failed
+                $paymentStatus = 'failed';
+                $processedAt = (clone $placedAt)->addHours(rand(2, 48));
+                $transactionId = null;
+                $gatewayResponse = ['status' => 'cancelled', 'message' => 'Đơn hàng đã bị hủy'];
                 break;
 
             default:
                 $paymentStatus = 'pending';
                 $processedAt = null;
+                $transactionId = null;
+                $gatewayResponse = null;
         }
 
         Payment::create([
@@ -218,12 +225,8 @@ class OrderSeeder extends Seeder
             'payment_status' => $paymentStatus,
             'amount' => $order->total_amount,
             'currency' => 'VND',
-            'transaction_id' => $paymentStatus === 'completed'
-                ? 'TXN-' . strtoupper(\Str::random(12))
-                : null,
-            'gateway_response' => $paymentStatus === 'completed'
-                ? ['status' => 'success', 'code' => '00', 'message' => 'Giao dịch thành công']
-                : null,
+            'transaction_id' => $transactionId,
+            'gateway_response' => $gatewayResponse,
             'processed_at' => $processedAt,
         ]);
     }
@@ -312,19 +315,18 @@ class OrderSeeder extends Seeder
             ],
             'confirmed' => [
                 'Đã xác nhận đơn hàng',
-                'Khách hàng đã thanh toán',
-            ],
-            'processing' => [
                 'Đang chuẩn bị hàng',
                 'Đã đóng gói xong',
             ],
             'shipped' => [
                 'Đã giao cho đơn vị vận chuyển',
                 'Hàng đang trên đường giao',
+                'Đang giao hàng',
             ],
             'delivered' => [
                 'Đã giao hàng thành công',
                 'Khách hàng đã nhận hàng',
+                'Hoàn thành',
             ],
             'cancelled' => [
                 'Khách hàng hủy đơn',

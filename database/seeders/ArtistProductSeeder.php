@@ -36,10 +36,10 @@ class ArtistProductSeeder extends Seeder
         // Định nghĩa các mối quan hệ nghệ sĩ-album thật, không còn random
         $artistAlbumMappings = [
             // Nhạc Vàng Việt Nam
-            'Khánh Ly' => ['Diễm Xưa'],
+            'Khánh Ly' => ['Diễm Xưa', 'Nửa Vầng Trăng'],
             'Trịnh Công Sơn' => ['Diễm Xưa'],
-            'Lam Trường' => ['Tôi Sẽ Quay Về'],
-            'Đàm Vĩnh Hưng' => ['Đàm Vĩnh Hưng & Những Tình Khúc Bất Hủ'],
+            'Lam Trường' => ['Tôi Sẽ Quay Về', 'Nửa Vầng Trăng'],
+            'Đàm Vĩnh Hưng' => ['Đàm Vĩnh Hưng & Những Tình Khúc Bất Hủ', 'Nửa Vầng Trăng'],
             'Phạm Duy' => ['Tình Ca Phạm Duy'],
 
             // The Beatles

@@ -455,7 +455,7 @@ class ProductSeeder extends Seeder
                 'price' => $albumData['price'],
                 'is_featured' => $albumData['is_featured'],
                 'stock_quantity' => $albumData['stock_quantity'],
-                'is_active' => true,
+                'status' => 'active',
             ]);
         }
 
