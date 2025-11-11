@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductReviewRequest;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\Order;
@@ -15,16 +16,10 @@ class ReviewController extends Controller
     /**
      * Store a new product review.
      */
-    public function store(Request $request, Product $product)
+    public function store(StoreProductReviewRequest $request, Product $product)
     {
-        $validated = $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'required|string|min:50|max:1000',
-        ], [
-            'comment.required' => 'Vui lòng nhập nhận xét của bạn.',
-            'comment.min' => 'Nhận xét phải có ít nhất 50 ký tự.',
-            'comment.max' => 'Nhận xét không được vượt quá 1000 ký tự.',
-        ]);
+        // Form Request automatically handles validation and authorization
+        $validated = $request->validated();
 
         // Check for spam/inappropriate content (simple implementation)
         $spamKeywords = ['spam', 'scam', 'fake', 'shit', 'fuck', 'dm', 'đm', 'vcl', 'vãi'];
