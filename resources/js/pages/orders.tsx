@@ -11,6 +11,7 @@ import { Navigation } from "@/components/navigation";
 import { Package, Truck, CheckCircle, Clock, Eye, X, Disc3, MessageSquareQuote } from "lucide-react";
 import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData, type Paginator, type PaginationLink } from '@/types';
+import { formatVND } from "@/lib/utils";
 
 // Define TypeScript interfaces for props
 interface Product {
@@ -230,7 +231,7 @@ export default function Orders() {
                                 {/* Total Amount */}
                                 <div className="lg:col-span-2 text-left lg:text-right">
                                   <p className="font-bold text-lg text-slate-900 dark:text-white">
-                                    {order.total_amount.toLocaleString('vi-VN')}₫
+                                    {formatVND(order.total_amount)}
                                   </p>
                                 </div>
 

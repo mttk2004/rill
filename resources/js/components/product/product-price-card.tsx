@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/types";
+import { formatVND } from "@/lib/utils";
 
 interface ProductPriceCardProps {
   product: Product;
@@ -14,12 +15,12 @@ export function ProductPriceCard({ product }: ProductPriceCardProps) {
     <div className="p-4 bg-muted/50 rounded-lg border space-y-3">
       <div className="flex items-baseline gap-2">
         <span className="text-3xl font-bold text-accent">
-          {product.price.toLocaleString('vi-VN')}₫
+          {formatVND(product.price)}
         </span>
         {product.compare_price && (
           <>
             <span className="text-lg text-muted-foreground line-through">
-              {product.compare_price.toLocaleString('vi-VN')}₫
+              {formatVND(product.compare_price)}
             </span>
             {discountPercentage && (
               <Badge variant="destructive" className="text-xs">

@@ -12,6 +12,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from "react-toastify";
+import { formatVND } from '@/lib/utils';
 
 // Define TypeScript interfaces for props
 interface CartItem {
@@ -188,7 +189,7 @@ export default function Checkout() {
                             <p className="font-semibold truncate">{item.product.name}</p>
                             <p className="text-sm text-slate-500">{item.product.artists.map(a => a.name).join(', ')}</p>
                           </div>
-                          <p className="font-semibold">{item.total_price.toLocaleString('vi-VN')}₫</p>
+                          <p className="font-semibold">{formatVND(item.total_price)}</p>
                         </div>
                       ))}
                     </div>
@@ -196,7 +197,7 @@ export default function Checkout() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span>Tạm tính</span>
-                        <span>{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
+                        <span>{formatVND(cartSummary.total_amount)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Phí vận chuyển</span>
@@ -205,7 +206,7 @@ export default function Checkout() {
                       <Separator className="my-2" />
                       <div className="flex justify-between font-bold text-lg">
                         <span>Tổng cộng</span>
-                        <span className="text-amber-600">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
+                        <span className="text-amber-600">{formatVND(cartSummary.total_amount)}</span>
                       </div>
                     </div>
                     <Button type="submit" disabled={isSubmitting} className="w-full mt-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white" size="lg">

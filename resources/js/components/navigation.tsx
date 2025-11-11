@@ -43,7 +43,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { useCart } from "@/hooks/use-cart";
-import { cn } from "@/lib/utils";
+import { cn, formatVND } from "@/lib/utils";
 import { Input } from "@/components/ui/input"; // Import Input
 import { ProductsFlyoutMenu } from "@/components/products-flyout-menu";
 
@@ -270,7 +270,7 @@ export const Navigation = ({ user }: NavigationProps) => {
                                     <p className="font-medium truncate">{item.product.name}</p>
                                     <p className="text-muted-foreground">SL: {item.quantity}</p>
                                   </div>
-                                  <span className="font-semibold">{item.unit_price.toLocaleString('vi-VN')}₫</span>
+                                  <span className="font-semibold">{formatVND(item.unit_price)}</span>
                                 </div>
                               ))}
                             </div>

@@ -9,6 +9,7 @@ import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData } from '@/types';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { formatVND } from '@/lib/utils';
 
 interface CartItem {
   id: number;
@@ -238,10 +239,10 @@ export default function Cart() {
                                     </div>
                                     <div className="flex-1 text-right">
                                       <p className="text-lg font-bold text-amber-600">
-                                        {item.total_price.toLocaleString('vi-VN')}₫
+                                        {formatVND(item.total_price)}
                                       </p>
                                       <p className="text-xs text-slate-500">
-                                        {item.unit_price.toLocaleString('vi-VN')}₫/cái
+                                        {formatVND(item.unit_price)}/cái
                                       </p>
                                     </div>
                                   </div>
@@ -301,10 +302,10 @@ export default function Cart() {
 
                                 <div className="text-right">
                                   <p className="text-xl font-bold text-amber-600">
-                                    {item.total_price.toLocaleString('vi-VN')}₫
+                                    {formatVND(item.total_price)}
                                   </p>
                                   <p className="text-xs text-slate-500">
-                                    {item.unit_price.toLocaleString('vi-VN')}₫ × {item.quantity}
+                                    {formatVND(item.unit_price)} × {item.quantity}
                                   </p>
                                 </div>
                               </div>
@@ -330,7 +331,7 @@ export default function Cart() {
                     <CardContent className="space-y-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartSummary.total_items} sản phẩm)</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
+                        <span className="font-semibold text-slate-900 dark:text-white">{formatVND(cartSummary.total_amount)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-300">Phí vận chuyển</span>
@@ -339,7 +340,7 @@ export default function Cart() {
                       <Separator />
                       <div className="flex justify-between text-lg font-bold">
                         <span className="text-slate-900 dark:text-white">Tổng cộng</span>
-                        <span className="text-amber-600">{cartSummary.total_amount.toLocaleString('vi-VN')}₫</span>
+                        <span className="text-amber-600">{formatVND(cartSummary.total_amount)}</span>
                       </div>
                       <Button
                         onClick={() => router.get('/checkout')}

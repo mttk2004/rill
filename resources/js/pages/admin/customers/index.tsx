@@ -25,6 +25,7 @@ import { Head, Link, usePage, router } from "@inertiajs/react";
 import { toast } from 'react-toastify';
 import type { Paginator, User, PaginationLink } from '@/types';
 import { useRef, useCallback, useState } from 'react';
+import { formatVND } from "@/lib/utils";
 
 const AdminCustomers = () => {
 
@@ -609,7 +610,7 @@ const AdminCustomers = () => {
                           <div>
                             <p className="text-xs text-slate-500 dark:text-slate-400">Tổng chi tiêu</p>
                             <p className="text-lg font-bold text-green-600">
-                              {selectedCustomer.total_spent ? `${selectedCustomer.total_spent.toLocaleString('vi-VN')}₫` : '0₫'}
+                              {selectedCustomer.total_spent ? formatVND(selectedCustomer.total_spent) : '0₫'}
                             </p>
                           </div>
                         </div>
@@ -669,7 +670,7 @@ const AdminCustomers = () => {
                                 {order.items_count} sản phẩm
                               </div>
                               <div className="font-bold text-lg text-slate-900 dark:text-white">
-                                {order.total_amount.toLocaleString('vi-VN')}₫
+                                {formatVND(order.total_amount)}
                               </div>
                             </div>
                           </CardContent>

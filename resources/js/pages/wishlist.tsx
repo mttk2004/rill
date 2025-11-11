@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { Heart, ShoppingCart, Trash2, Share2, Disc3 } from "lucide-react";
 import { Link, Head, usePage } from "@inertiajs/react";
 import { type SharedData } from '@/types';
+import { formatVND } from "@/lib/utils";
 
 const wishlistItems = [
   {
@@ -223,11 +224,11 @@ export default function Wishlist() {
 
                           <div className="flex items-center gap-2">
                             <span className="text-xl font-bold text-amber-600">
-                              {item.price.toLocaleString('vi-VN')}₫
+                              {formatVND(item.price)}
                             </span>
                             {item.originalPrice && (
                               <span className="text-sm text-slate-500 dark:text-slate-400 line-through">
-                                {item.originalPrice.toLocaleString('vi-VN')}₫
+                                {formatVND(item.originalPrice)}
                               </span>
                             )}
                           </div>
@@ -235,11 +236,10 @@ export default function Wishlist() {
                           <div className="flex gap-2">
                             <Button
                               size="sm"
-                              className={`flex-1 transition-all duration-300 ${
-                                item.inStock
+                              className={`flex-1 transition-all duration-300 ${item.inStock
                                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white border-0 shadow-lg hover:shadow-xl'
                                   : 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                              }`}
+                                }`}
                               disabled={!item.inStock}
                             >
                               <ShoppingCart className="h-4 w-4 mr-2" />

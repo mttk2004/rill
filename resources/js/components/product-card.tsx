@@ -5,6 +5,7 @@ import { Star, Disc3, Heart, ShoppingCart } from "lucide-react";
 import { Link } from '@inertiajs/react';
 import { type Product } from '@/types';
 import { MouseEvent } from 'react';
+import { formatVND } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -101,7 +102,7 @@ export function ProductCard({
               <div className={`flex ${viewMode === "list" ? "flex-col items-end" : "items-center justify-between"}`}>
                 <div className={`flex items-center gap-2 ${viewMode === "list" ? "mb-4" : "mb-2"}`}>
                   <span className="text-lg font-bold bg-gradient-to-r from-accent to-orange-600 bg-clip-text text-transparent">
-                    {product.price?.toLocaleString('vi-VN')}đ
+                    {formatVND(product.price)}
                   </span>
                 </div>
               </div>

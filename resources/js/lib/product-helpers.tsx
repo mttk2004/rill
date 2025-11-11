@@ -83,8 +83,13 @@ export const getMainArtist = (artists?: AdminProduct['artists']) => {
   return mainArtist ? mainArtist.name : artists[0].name;
 };
 
+/**
+ * @deprecated Use formatVND from @/lib/utils instead
+ * This function is kept for backward compatibility
+ */
 export const formatPrice = (price: number) => {
-  return price.toLocaleString('vi-VN') + '₫';
+  // Use space separator for better readability
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₫';
 };
 
 export const isLowStock = (product: AdminProduct) => {

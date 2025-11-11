@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Package, Truck, CheckCircle, Clock, ArrowLeft, X, Download, MessageCircle, Disc3, Music2 } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { route } from 'ziggy-js';
+import { formatVND } from "@/lib/utils";
 
 interface Product {
   id: number;
@@ -284,7 +285,7 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
 
                           <div className="text-right">
                             <p className="font-bold text-xl text-amber-600">
-                              {item.price.toLocaleString('vi-VN')}₫
+                              {formatVND(item.price)}
                             </p>
                           </div>
                         </div>
@@ -316,7 +317,7 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                   <div className="flex justify-between py-2">
                     <span className="text-slate-600 dark:text-slate-300">Tạm tính:</span>
                     <span className="font-semibold text-slate-900 dark:text-white">
-                      {(order.total || 0).toLocaleString('vi-VN')}₫
+                      {formatVND(order.total || 0)}
                     </span>
                   </div>
                   <div className="flex justify-between py-2">
@@ -327,7 +328,7 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                     <div className="flex justify-between">
                       <span className="text-lg font-bold text-slate-900 dark:text-white">Tổng cộng:</span>
                       <span className="text-xl font-bold text-amber-600">
-                        {(order.total || 0).toLocaleString('vi-VN')}₫
+                        {formatVND(order.total || 0)}
                       </span>
                     </div>
                   </div>
