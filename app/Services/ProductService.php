@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\Artist;
+use App\Models\User;
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -202,6 +204,102 @@ class ProductService
             'discount_percentage' => $product->compare_price && $product->compare_price > $product->price
                 ? round((($product->compare_price - $product->price) / $product->compare_price) * 100)
                 : null,
+        ];
+    }
+
+    /**
+     * Get all data needed for the product detail page.
+     */
+    public function getDataForShowPage(Product $product, ?User $user): array
+    {
+        // Load artists relationship
+        $product->load(['artists' => function ($query) {
+            $query->orderByPivot('sort_order');
+        }]);
+
+        // Get all reviews (auto-approved, no status filter needed)
+        $reviews = $product->reviews()
+            ->with('user:id,name')
+            ->latest()
+            ->get()
+            ->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'rating' => $review->rating,
+                    'comment' => $review->comment,
+                    'created_at' => $review->created_at->format('d/m/Y'),
+                    'user' => [
+                        'name' => $review->user->name,
+                    ],
+                ];
+            });
+
+        // Calculate review statistics
+        $reviewsCount = $reviews->count();
+        $averageRating = $reviewsCount > 0 ? round($reviews->avg('rating'), 1) : 0;
+
+        // Check if the authenticated user can review this product
+        $userCanReview = false;
+        $userReview = null;
+
+        if ($user) {
+            // Check if user has a delivered order containing this product
+            $userCanReview = Order::where('user_id', $user->id)
+                ->where('status', 'delivered')
+                ->whereHas('items', function ($query) use ($product) {
+                    $query->where('product_id', $product->id);
+                })
+                ->exists();
+
+            // Get user's existing review if any
+            $existingReview = $product->reviews()
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($existingReview) {
+                $userReview = [
+                    'id' => $existingReview->id,
+                    'rating' => $existingReview->rating,
+                    'comment' => $existingReview->comment,
+                ];
+            }
+        }
+
+        // Transform product data for frontend
+        return [
+            'product' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'detailed_description' => $product->detailed_description,
+                'price' => $product->price,
+                'compare_price' => $product->compare_price,
+                'stock_quantity' => $product->stock_quantity,
+                'genre' => $product->genre,
+                'label' => $product->label,
+                'image' => $product->image,
+                'is_featured' => $product->is_featured,
+                'status' => $product->status,
+                'artists' => $product->artists->map(function ($artist) {
+                    return [
+                        'id' => $artist->id,
+                        'name' => $artist->name,
+                        'slug' => $artist->slug,
+                        'role' => $artist->pivot->role,
+                        'sort_order' => $artist->pivot->sort_order,
+                    ];
+                }),
+                'main_artists' => $product->artists->where('pivot.role', 'main')->values(),
+                'featured_artists' => $product->artists->where('pivot.role', 'featured')->values(),
+                'in_stock' => $product->isInStock(),
+                'low_stock' => $product->isLowStock(),
+                'reviews' => $reviews,
+                'reviews_count' => $reviewsCount,
+                'average_rating' => $averageRating,
+                'user_can_review' => $userCanReview,
+                'user_review' => $userReview,
+            ],
         ];
     }
 }
