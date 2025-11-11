@@ -61,7 +61,16 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/95 to-primary/90">
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-transparent" />
+          {/* Background Image */}
+          <img
+            src="/hero-vinyl.jpg"
+            alt="Vinyl Records"
+            className="w-full h-full object-cover"
+          />
+          {/* Overlay Gradients */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+          {/* Decorative Elements */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 border border-accent/20 rounded-full"></div>
             <div className="absolute top-20 right-20 w-24 h-24 border border-accent/20 rounded-full"></div>
