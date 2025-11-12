@@ -29,6 +29,9 @@ class OrderService
             $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->unit_price);
             $totalAmount = $subtotal; // Assuming no discounts for now
 
+            // Prepare address data
+            $addressData = $shippingAddress->toArray();
+
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_number' => 'RL-' . strtoupper(Str::random(8)),
@@ -36,7 +39,8 @@ class OrderService
                 'subtotal' => $subtotal,
                 'discount_amount' => 0,
                 'total_amount' => $totalAmount,
-                'shipping_address' => $shippingAddress->toArray(),
+                'shipping_address' => $addressData,
+                'billing_address' => $addressData, // Billing same as shipping for simplicity
                 'placed_at' => now(),
             ]);
 

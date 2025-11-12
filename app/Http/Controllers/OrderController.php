@@ -125,6 +125,27 @@ class OrderController extends Controller
                 'transaction_no' => $request->query('vnp_TransactionNo'),
                 'is_success' => $request->query('vnp_ResponseCode') === '00',
             ];
+
+            // Auto-trigger IPN in local environment (since VNPAY can't reach localhost)
+            if (app()->environment('local') && $order->payment->payment_status === 'pending') {
+                \Log::info('Auto-triggering IPN in local environment', ['order_id' => $order->id]);
+
+                try {
+                    // Call IPN handler internally
+                    $vnpayController = app(\App\Http\Controllers\VnpayController::class);
+                    $vnpayController->handleIpn($request, $vnpayService);
+
+                    // Reload payment to get updated status
+                    $order->load('payment');
+
+                    \Log::info('IPN auto-triggered successfully', ['order_id' => $order->id]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to auto-trigger IPN', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
         }
 
         return Inertia::render('orders/thank-you', [
