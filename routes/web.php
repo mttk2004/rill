@@ -36,6 +36,9 @@ Route::get('/support', function () {
     return Inertia::render('support');
 })->name('support');
 
+// VNPAY Return URL - Phải đặt ngoài middleware auth vì VNPAY redirect từ external site
+Route::get('/orders/thank-you', [OrderController::class, 'thankYou'])->name('orders.thank-you.vnpay');
+
 // Customer routes (authenticated only)
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart');
@@ -51,7 +54,10 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'downloadInvoice'])->name('orders.invoice');
+
+    // Thank you page cho COD (có {order})
     Route::get('/orders/{order}/thank-you', [OrderController::class, 'thankYou'])->name('orders.thank-you');
+
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('/wishlist', function () {
         return Inertia::render('wishlist');

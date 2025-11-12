@@ -64,7 +64,7 @@ class VnpayController extends Controller
             ]);
 
             $order->update([
-                'status' => 'processing', // Hoặc 'confirmed' tùy logic của bạn
+                'status' => 'confirmed', // Đơn hàng đã được xác nhận sau khi thanh toán thành công
             ]);
 
             Log::info('VNPAY IPN: Payment successful.', ['order_id' => $order->id]);
@@ -77,7 +77,7 @@ class VnpayController extends Controller
             ]);
 
             $order->update([
-                'status' => 'failed',
+                'status' => 'cancelled', // Đơn hàng bị hủy do thanh toán thất bại
             ]);
 
             Log::warning('VNPAY IPN: Payment failed.', [

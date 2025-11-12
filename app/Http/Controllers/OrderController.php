@@ -63,9 +63,53 @@ class OrderController extends Controller
     /**
      * Display the thank you page for a specific order.
      */
-    public function thankYou(Request $request, Order $order)
+    public function thankYou(Request $request, ?Order $order = null)
     {
-        Gate::authorize('view', $order);
+        \Log::info('Thank You Page Called', [
+            'has_order_param' => !is_null($order),
+            'has_vnp_txnref' => $request->has('vnp_TxnRef'),
+            'vnp_txnref_value' => $request->query('vnp_TxnRef'),
+            'all_params' => $request->all(),
+            'user_id' => Auth::id(),
+            'is_authenticated' => Auth::check(),
+        ]);
+
+        // Nếu không có $order (từ VNPAY return), lấy từ vnp_TxnRef
+        if (!$order && $request->has('vnp_TxnRef')) {
+            $orderId = $request->query('vnp_TxnRef');
+            \Log::info('Looking for order', ['order_id' => $orderId]);
+
+            $order = Order::find($orderId);
+
+            if (!$order) {
+                \Log::error('Order not found', ['order_id' => $orderId]);
+                abort(404, 'Không tìm thấy đơn hàng với ID: ' . $orderId);
+            }
+
+            \Log::info('Order found', [
+                'order_id' => $order->id,
+                'order_user_id' => $order->user_id,
+                'current_user_id' => Auth::id(),
+            ]);
+        }
+
+        if (!$order) {
+            \Log::error('No order parameter provided');
+            abort(404, 'Không tìm thấy đơn hàng.');
+        }
+
+        // Nếu user authenticated, check authorization
+        // Nếu không (từ VNPAY return), cho phép xem để hiển thị kết quả thanh toán
+        if (Auth::check()) {
+            Gate::authorize('view', $order);
+        } else {
+            // User chưa auth (session mất sau VNPAY redirect)
+            // Vẫn cho phép xem trang thank you nhưng sẽ yêu cầu login để xem chi tiết đơn hàng
+            \Log::info('Unauthenticated user viewing thank you page', [
+                'order_id' => $order->id,
+                'has_vnpay_params' => $request->has('vnp_ResponseCode'),
+            ]);
+        }
 
         // Load payment information
         $order->load('payment');
