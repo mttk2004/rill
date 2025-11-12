@@ -22,17 +22,6 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
           </div>
         )}
       </div>
-      {/* Thumbnails - Hidden on mobile, shown on larger screens */}
-      <div className="hidden md:grid grid-cols-4 gap-2 mt-3 max-w-md mx-auto">
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="aspect-square rounded-md border bg-muted/50 flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-accent transition-all"
-          >
-            <Disc3 className="h-5 w-5 text-muted-foreground/50" />
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

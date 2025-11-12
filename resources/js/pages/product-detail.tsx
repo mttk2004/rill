@@ -1,4 +1,3 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { Link, Head, usePage, useForm } from '@inertiajs/react';
 import { useState, MouseEvent, useMemo, useEffect, useRef } from "react";
@@ -40,10 +39,9 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [activeTab, setActiveTab] = useState(openReviewTab ? "reviews" : "description");
   const [selectedRatingFilter, setSelectedRatingFilter] = useState<number | null>(null);
   const reviewFormRef = useRef<HTMLTextAreaElement>(null);
-  const tabsRef = useRef<HTMLDivElement>(null);
+  const reviewsRef = useRef<HTMLDivElement>(null);
 
   const isInCart = useMemo(() => cart.items.some(item => item.product.id === product.id), [cart.items, product.id]);
 
@@ -54,10 +52,9 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
 
   useEffect(() => {
     if (openReviewTab) {
-      setActiveTab("reviews");
-      // Scroll to tabs and focus on review form
+      // Scroll to reviews section and focus on review form
       setTimeout(() => {
-        tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         setTimeout(() => {
           reviewFormRef.current?.focus();
         }, 500);
@@ -145,85 +142,87 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
             </div>
           </div>
 
-          {/* Description and other details in Tabs */}
-          <div className="mt-8" ref={tabsRef}>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="justify-start bg-transparent p-0 rounded-none border-b w-full">
-                <TabsTrigger
-                  value="description"
-                  className="text-base font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none px-4 py-2"
-                >
-                  Mô tả chi tiết
-                </TabsTrigger>
-                <TabsTrigger
-                  value="reviews"
-                  className="text-base font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none px-4 py-2"
-                >
-                  Đánh giá ({reviewCount})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="shipping"
-                  className="text-base font-semibold data-[state=active]:border-b-2 data-[state=active]:border-accent data-[state=active]:shadow-none rounded-none px-4 py-2"
-                >
-                  Vận chuyển & Đổi trả
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="description" className="py-4">
-                <div className="prose dark:prose-invert max-w-none">
-                  <p>{product.detailed_description || product.description}</p>
+          {/* Shipping Info - Compact Card */}
+          <div className="mt-8">
+            <div className="bg-muted/30 rounded-lg border p-4">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 3h5v5"></path>
+                  <path d="M8 3H3v5"></path>
+                  <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"></path>
+                  <path d="m15 9 6-6"></path>
+                  <path d="M21 15v5h-5"></path>
+                  <path d="M3 21h5v-5"></path>
+                </svg>
+                Vận chuyển & Đổi trả
+              </h3>
+              <div className="grid sm:grid-cols-3 gap-3 text-xs text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Miễn phí vận chuyển cho đơn hàng từ 500,000₫</span>
                 </div>
-              </TabsContent>
-              <TabsContent value="reviews" className="py-4">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Sidebar: Review Overview (1/3) */}
-                  <div className="lg:col-span-1">
-                    <div className="lg:sticky lg:top-4 space-y-4">
-                      <ReviewOverview
-                        averageRating={averageRating}
-                        reviewCount={reviewCount}
-                        reviews={product.reviews || []}
-                        selectedRatingFilter={selectedRatingFilter}
-                        onFilterChange={setSelectedRatingFilter}
-                      />
+                <div className="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                  </svg>
+                  <span>Giao hàng trong 2-5 ngày làm việc</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                  <span>Đổi trả miễn phí trong 7 ngày nếu lỗi nhà sản xuất</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-                      {/* Review Form - Only show if user can review */}
-                      {product.user_can_review && (
-                        <ReviewForm
-                          userReview={product.user_review}
-                          rating={data.rating}
-                          comment={data.comment}
-                          processing={processing}
-                          errors={errors}
-                          formRef={reviewFormRef}
-                          onRatingChange={(rating) => setData('rating', rating)}
-                          onCommentChange={(comment) => setData('comment', comment)}
-                          onSubmit={handleSubmitReview}
-                        />
-                      )}
-                    </div>
-                  </div>
+          {/* Reviews Section */}
+          <div className="mt-8" ref={reviewsRef}>
+            <h2 className="text-xl font-bold mb-6">Đánh giá sản phẩm ({reviewCount})</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Sidebar: Review Overview (1/3) */}
+              <div className="lg:col-span-1">
+                <div className="lg:sticky lg:top-4 space-y-4">
+                  <ReviewOverview
+                    averageRating={averageRating}
+                    reviewCount={reviewCount}
+                    reviews={product.reviews || []}
+                    selectedRatingFilter={selectedRatingFilter}
+                    onFilterChange={setSelectedRatingFilter}
+                  />
 
-                  {/* Right Content: Reviews List (2/3) */}
-                  <div className="lg:col-span-2">
-                    <ReviewList
-                      reviews={product.reviews || []}
-                      selectedRatingFilter={selectedRatingFilter}
-                      onClearFilter={() => setSelectedRatingFilter(null)}
+                  {/* Review Form - Only show if user can review */}
+                  {product.user_can_review && (
+                    <ReviewForm
+                      userReview={product.user_review}
+                      rating={data.rating}
+                      comment={data.comment}
+                      processing={processing}
+                      errors={errors}
+                      formRef={reviewFormRef}
+                      onRatingChange={(rating) => setData('rating', rating)}
+                      onCommentChange={(comment) => setData('comment', comment)}
+                      onSubmit={handleSubmitReview}
                     />
-                  </div>
+                  )}
                 </div>
-              </TabsContent>
-              <TabsContent value="shipping" className="py-4">
-                <div className="prose dark:prose-invert max-w-none">
-                  <h3 className="text-lg font-bold mb-3">Thông tin Vận chuyển & Đổi trả</h3>
-                  <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>Miễn phí vận chuyển cho đơn hàng từ 500,000₫.</li>
-                    <li>Giao hàng trong 2-5 ngày làm việc.</li>
-                    <li>Đổi trả miễn phí trong vòng 7 ngày nếu có lỗi từ nhà sản xuất.</li>
-                  </ul>
-                </div>
-              </TabsContent>
-            </Tabs>
+              </div>
+
+              {/* Right Content: Reviews List (2/3) */}
+              <div className="lg:col-span-2">
+                <ReviewList
+                  reviews={product.reviews || []}
+                  selectedRatingFilter={selectedRatingFilter}
+                  onClearFilter={() => setSelectedRatingFilter(null)}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </main>

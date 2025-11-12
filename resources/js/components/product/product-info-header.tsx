@@ -14,7 +14,7 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
   const reviewCount = product.reviews_count || 0;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <h1 className="text-2xl lg:text-3xl font-bold text-foreground leading-tight">
         {product.name}
       </h1>
@@ -30,7 +30,7 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
           </span>
         ))}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-0.5">
           {[...Array(5)].map((_, i) => (
             <Star
@@ -49,6 +49,13 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
           <Badge variant="outline" className="text-xs">{product.genre}</Badge>
           <Badge variant="outline" className="text-xs">{product.label}</Badge>
         </div>
+      </div>
+
+      {/* Description */}
+      <div className="pt-2 border-t">
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {product.detailed_description || product.description}
+        </p>
       </div>
     </div>
   );
