@@ -28,25 +28,23 @@ export function ProductCard({
 }: ProductCardProps) {
   return (
     <Card
-      className={`group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in bg-gradient-to-br from-white to-accent/5 ${viewMode === "list" ? "flex-row" : ""
+      className={`group relative overflow-hidden border shadow-sm hover:shadow-lg transition-all duration-300 animate-fade-in bg-white ${viewMode === "list" ? "flex-row" : ""
         } ${className}`}
       style={{ animationDelay: `${index * 0.1}s` }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-accent/5 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <CardContent className={`p-0 relative z-10 ${viewMode === "list" ? "flex" : ""}`}>
         <div className={`relative ${viewMode === "list" ? "w-48 flex-shrink-0" : ""}`}>
           <Link href={`/products/${product.slug}`}>
-            <div className={`relative w-full bg-gradient-to-br from-slate-100 to-accent/10 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-500 ${viewMode === "list" ? "h-32" : "aspect-[3/2]"
+            <div className={`relative w-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-300 ${viewMode === "list" ? "h-32" : "aspect-[3/2]"
               } ${viewMode === "list" ? "rounded-l-xl" : "rounded-t-xl"
               }`}>
-              <Disc3 className="h-10 w-10 text-accent/40 animate-spin-slow group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Disc3 className="h-10 w-10 text-slate-300 animate-spin-slow group-hover:scale-110 transition-transform duration-300" />
             </div>
           </Link>
           {product.is_featured && (
             <Badge
               variant="secondary"
-              className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg text-[10px] px-1.5 py-0.5 border-0"
+              className="absolute top-2 left-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md text-[10px] px-1.5 py-0.5 border-0"
             >
               Nổi bật
             </Badge>
@@ -57,7 +55,7 @@ export function ProductCard({
           <Link href={`/products/${product.slug}`}>
             <div className={viewMode === "list" ? "flex justify-between items-start" : ""}>
               <div className={viewMode === "list" ? "flex-1" : ""}>
-                <h3 className="font-bold text-base mb-1 line-clamp-1 hover:text-accent transition-colors group-hover:text-accent">
+                <h3 className="font-bold text-base mb-1 line-clamp-1 hover:text-blue-600 transition-colors">
                   {product.name}
                 </h3>
                 <p className="text-slate-600 mb-1.5 text-xs font-medium line-clamp-1">
@@ -67,43 +65,48 @@ export function ProductCard({
                 {viewMode === "list" && (
                   <div className="text-sm text-slate-500 mb-4 space-y-1">
                     <p className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-accent rounded-full" />
+                      <span className="w-2 h-2 bg-slate-400 rounded-full" />
                       Thể loại: {product.genre}
                     </p>
                     <p className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-accent rounded-full" />
+                      <span className="w-2 h-2 bg-slate-400 rounded-full" />
                       Hãng đĩa: {product.label}
                     </p>
                   </div>
                 )}
 
-                {(product.reviews_count ?? 0) > 0 && (
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`h-3 w-3 ${
-                            i < Math.floor(product.average_rating ?? 0)
-                              ? 'fill-amber-400 text-amber-400'
-                              : 'fill-slate-200 text-slate-200'
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-3 w-3 ${i < Math.floor(product.average_rating ?? 0)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'fill-slate-200 text-slate-200'
                           }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[10px] font-semibold text-slate-700">
-                      {(product.average_rating ?? 0).toFixed(1)}
-                    </span>
-                    <span className="text-[10px] text-slate-500">
-                      ({product.reviews_count})
-                    </span>
+                      />
+                    ))}
                   </div>
-                )}
+                  {(product.reviews_count ?? 0) > 0 ? (
+                    <>
+                      <span className="text-[10px] font-semibold text-slate-700">
+                        {(product.average_rating ?? 0).toFixed(1)}
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        ({product.reviews_count})
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-[10px] text-slate-400">
+                      Chưa có đánh giá
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className={`flex ${viewMode === "list" ? "flex-col items-end" : "items-center justify-between"}`}>
                 <div className={`flex items-center gap-2 ${viewMode === "list" ? "mb-4" : "mb-2"}`}>
-                  <span className="text-lg font-bold bg-gradient-to-r from-accent to-orange-600 bg-clip-text text-transparent">
+                  <span className="text-lg font-bold text-slate-900">
                     {formatVND(product.price)}
                   </span>
                 </div>
@@ -141,7 +144,7 @@ export function ProductCard({
               <Button
                 size="sm"
                 variant="outline"
-                className="w-full border-accent/30 text-accent hover:bg-accent hover:text-white transition-all duration-300 shadow-sm h-8 text-xs px-2"
+                className="w-full hover:bg-slate-100 transition-colors h-8 text-xs px-2"
                 asChild
               >
                 <Link href={`/products/${product.slug}`}>
@@ -151,8 +154,6 @@ export function ProductCard({
             </div>
           )}
         </div>
-
-        <div className="absolute bottom-2 right-2 w-2 h-2 bg-accent rounded-full opacity-60 group-hover:animate-pulse" />
       </CardContent>
     </Card>
   );
