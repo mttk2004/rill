@@ -81,8 +81,8 @@ export function ProductCard({
                       <Star
                         key={i}
                         className={`h-3 w-3 ${i < Math.floor(product.average_rating ?? 0)
-                            ? 'fill-amber-400 text-amber-400'
-                            : 'fill-slate-200 text-slate-200'
+                          ? 'fill-amber-400 text-amber-400'
+                          : 'fill-slate-200 text-slate-200'
                           }`}
                       />
                     ))}
