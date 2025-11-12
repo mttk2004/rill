@@ -203,6 +203,8 @@ class ProductService
             'discount_percentage' => $product->compare_price && $product->compare_price > $product->price
                 ? round((($product->compare_price - $product->price) / $product->compare_price) * 100)
                 : null,
+            'reviews_count' => $product->reviews()->count(),
+            'average_rating' => round($product->reviews()->avg('rating') ?? 0, 1),
         ];
     }
 

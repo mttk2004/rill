@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, Disc3, Heart, ShoppingCart } from "lucide-react";
+import { Star, Disc3, ShoppingCart } from "lucide-react";
 import { Link } from '@inertiajs/react';
 import { type Product } from '@/types';
 import { MouseEvent } from 'react';
@@ -46,21 +46,10 @@ export function ProductCard({
           {product.is_featured && (
             <Badge
               variant="secondary"
-              className="absolute top-2 left-2 bg-accent text-white shadow-lg text-[10px] px-1.5 py-0.5"
+              className="absolute top-2 left-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg text-[10px] px-1.5 py-0.5 border-0"
             >
               Nổi bật
             </Badge>
-          )}
-          {showActions && (
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="w-8 h-8 p-0 bg-white/90 hover:bg-accent hover:text-white rounded-full shadow-lg"
-              >
-                <Heart className="w-3.5 h-3.5" />
-              </Button>
-            </div>
           )}
         </div>
 
@@ -88,15 +77,28 @@ export function ProductCard({
                   </div>
                 )}
 
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-3 w-3 fill-accent text-accent" />
-                    ))}
+                {(product.reviews_count ?? 0) > 0 && (
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`h-3 w-3 ${
+                            i < Math.floor(product.average_rating ?? 0)
+                              ? 'fill-amber-400 text-amber-400'
+                              : 'fill-slate-200 text-slate-200'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-semibold text-slate-700">
+                      {(product.average_rating ?? 0).toFixed(1)}
+                    </span>
+                    <span className="text-[10px] text-slate-500">
+                      ({product.reviews_count})
+                    </span>
                   </div>
-                  <span className="text-[10px] font-semibold text-slate-700">4.8</span>
-                  <span className="text-[10px] text-slate-500">(125)</span>
-                </div>
+                )}
               </div>
 
               <div className={`flex ${viewMode === "list" ? "flex-col items-end" : "items-center justify-between"}`}>

@@ -126,6 +126,8 @@ export interface Product {
   in_stock?: boolean;
   low_stock?: boolean;
   discount_percentage?: number;
+  reviews_count?: number;
+  average_rating?: number;
   created_at: string;
   updated_at: string;
   deleted_at?: string;
