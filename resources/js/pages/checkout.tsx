@@ -76,11 +76,15 @@ export default function Checkout() {
     // Nếu là VNPAY, cần xử lý khác
     if (data.payment_method === 'vnpay') {
       try {
-        const response = await fetch(route('orders.store'), {
+        // Lấy CSRF token từ meta tag
+        const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
+
+        const response = await fetch('/orders', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json',
           },
           body: JSON.stringify(data),
         });
@@ -91,11 +95,16 @@ export default function Checkout() {
           // Chuyển hướng đến VNPAY
           window.location.href = result.payment_url;
         } else {
-          toast.error(result.message || "Không thể tạo link thanh toán. Vui lòng thử lại.");
+          // Xử lý lỗi validation hoặc lỗi khác
+          const errorMessage = result.message ||
+            (result.errors ? Object.values(result.errors).flat().join(', ') : null) ||
+            "Không thể tạo link thanh toán. Vui lòng thử lại.";
+          toast.error(errorMessage);
         }
       } catch (error) {
         console.error('Lỗi khi đặt hàng:', error);
-        toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
+        const errorMessage = error instanceof Error ? error.message : "Đã xảy ra lỗi. Vui lòng thử lại.";
+        toast.error(errorMessage);
       }
     } else {
       // COD: Sử dụng Inertia như cũ

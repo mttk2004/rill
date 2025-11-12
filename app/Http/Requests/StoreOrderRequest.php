@@ -28,7 +28,7 @@ class StoreOrderRequest extends FormRequest
                 'string',
                 'exists:shipping_addresses,id,user_id,' . Auth::id(),
             ],
-            'payment_method' => ['required', 'string', 'in:cod'],
+            'payment_method' => ['required', 'string', 'in:cod,vnpay'],
         ];
     }
 
@@ -37,6 +37,8 @@ class StoreOrderRequest extends FormRequest
         return [
             'shipping_address_id.required' => 'Vui lòng chọn một địa chỉ giao hàng.',
             'shipping_address_id.exists' => 'Địa chỉ giao hàng không hợp lệ.',
+            'payment_method.required' => 'Vui lòng chọn phương thức thanh toán.',
+            'payment_method.in' => 'Phương thức thanh toán không hợp lệ.',
         ];
     }
 }
