@@ -492,25 +492,24 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                     <div className="pt-2">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-slate-600 dark:text-slate-400">Trạng thái</span>
-                        <Badge 
+                        <Badge
                           variant="outline"
-                          className={`text-xs ${
-                            order.payment_status === 'completed' 
-                              ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' 
+                          className={`text-xs ${order.payment_status === 'completed'
+                              ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800'
                               : order.payment_status === 'pending'
-                              ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
-                              : order.payment_status === 'failed'
-                              ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
-                              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                          }`}
+                                ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                                : order.payment_status === 'failed'
+                                  ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+                                  : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}
                         >
                           {order.payment_status === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
                           {order.payment_status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
                           {order.payment_status === 'failed' && <X className="h-3 w-3 mr-1" />}
-                          {order.payment_status === 'completed' ? 'Đã thanh toán' 
+                          {order.payment_status === 'completed' ? 'Đã thanh toán'
                             : order.payment_status === 'pending' ? 'Chờ thanh toán'
-                            : order.payment_status === 'failed' ? 'Thất bại'
-                            : order.payment_status}
+                              : order.payment_status === 'failed' ? 'Thất bại'
+                                : order.payment_status}
                         </Badge>
                       </div>
                     </div>
