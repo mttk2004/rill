@@ -52,9 +52,11 @@ class OrderService
                 ]);
             }
 
+            // Tạo payment record với payment method từ request
+            $paymentMethod = $data['payment_method'] ?? 'cod';
             Payment::create([
                 'order_id' => $order->id,
-                'payment_method' => 'cod',
+                'payment_method' => $paymentMethod,
                 'payment_status' => 'pending',
                 'amount' => $totalAmount,
             ]);

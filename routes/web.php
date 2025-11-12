@@ -6,8 +6,12 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\VnpayController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+// VNPAY IPN Handler (phải đặt ngoài middleware auth vì VNPAY server gọi)
+Route::get('/vnpay/ipn', [VnpayController::class, 'handleIpn'])->name('vnpay.ipn');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

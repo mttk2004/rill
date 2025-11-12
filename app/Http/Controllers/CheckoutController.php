@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\ShoppingCartItem;
 use App\Services\OrderService;
+use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -45,13 +46,28 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(StoreOrderRequest $request, OrderService $orderService)
+    public function store(StoreOrderRequest $request, OrderService $orderService, VnpayService $vnpayService)
     {
         $user = Auth::user();
 
         try {
             $order = $orderService->createOrderFromCart($user, $request->validated());
-            // Redirect to a thank you page
+
+            // Kiểm tra payment method
+            $paymentMethod = $request->input('payment_method', 'cod');
+
+            if ($paymentMethod === 'vnpay') {
+                // Tạo URL thanh toán VNPAY
+                $paymentUrl = $vnpayService->createPaymentUrl($order, $request);
+
+                // Trả về JSON chứa payment URL cho frontend
+                return response()->json([
+                    'payment_url' => $paymentUrl,
+                    'order_id' => $order->id,
+                ]);
+            }
+
+            // COD: Redirect đến trang thank you như cũ
             return redirect()->route('orders.thank-you', $order)->with('success', 'Order placed successfully!');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());

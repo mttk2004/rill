@@ -51,10 +51,8 @@ interface CheckoutPageProps extends SharedData {
 
 // Zod schema for form validation
 const checkoutSchema = z.object({
-  shipping_address_id: z.string({
-    required_error: "Vui lòng chọn một địa chỉ giao hàng.",
-  }),
-  payment_method: z.string().default('cod'),
+  shipping_address_id: z.string().min(1, "Vui lòng chọn một địa chỉ giao hàng."),
+  payment_method: z.enum(['cod', 'vnpay']).default('cod'),
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -63,24 +61,54 @@ export default function Checkout() {
   const pageProps = usePage<CheckoutPageProps>().props;
   const { auth, cartItems, cartSummary, shippingAddresses, defaultShippingAddress, errors } = pageProps;
 
-  const { control, handleSubmit, formState: { isSubmitting } } = useForm<CheckoutFormValues>({
+  const form = useForm<CheckoutFormValues>({
+    // @ts-expect-error - Type mismatch between zod .default() and react-hook-form
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       shipping_address_id: defaultShippingAddress?.id,
-      payment_method: 'cod',
+      payment_method: 'cod' as const,
     },
   });
 
-  const onSubmit = (data: CheckoutFormValues) => {
-    router.post('/orders', data, {
-      onSuccess: () => {
-        toast.success("Đặt hàng thành công!");
-      },
-      onError: (serverErrors) => {
-        const firstError = Object.values(serverErrors)[0];
-        toast.error(firstError || "Đã có lỗi xảy ra, vui lòng thử lại.");
+  const { control, handleSubmit, formState: { isSubmitting } } = form;
+
+  const onSubmit = async (data: CheckoutFormValues) => {
+    // Nếu là VNPAY, cần xử lý khác
+    if (data.payment_method === 'vnpay') {
+      try {
+        const response = await fetch(route('orders.store'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '',
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.payment_url) {
+          // Chuyển hướng đến VNPAY
+          window.location.href = result.payment_url;
+        } else {
+          toast.error(result.message || "Không thể tạo link thanh toán. Vui lòng thử lại.");
+        }
+      } catch (error) {
+        console.error('Lỗi khi đặt hàng:', error);
+        toast.error("Đã xảy ra lỗi. Vui lòng thử lại.");
       }
-    });
+    } else {
+      // COD: Sử dụng Inertia như cũ
+      router.post('/orders', data, {
+        onSuccess: () => {
+          toast.success("Đặt hàng thành công!");
+        },
+        onError: (serverErrors) => {
+          const firstError = Object.values(serverErrors)[0];
+          toast.error(firstError || "Đã có lỗi xảy ra, vui lòng thử lại.");
+        }
+      });
+    }
   };
 
   return (
@@ -94,6 +122,7 @@ export default function Checkout() {
             <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">Hoàn tất đơn hàng</h1>
             <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">Kiểm tra thông tin và hoàn tất việc đặt hàng của bạn.</p>
 
+            {/* @ts-expect-error - Type mismatch between zod schema and react-hook-form */}
             <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column: Shipping and Payment */}
               <div className="lg:col-span-2 space-y-8">
@@ -152,12 +181,12 @@ export default function Checkout() {
                               <p className="text-sm text-slate-600 dark:text-slate-300">Trả tiền mặt khi nhân viên giao hàng đến.</p>
                             </div>
                           </Label>
-                          {/* Disabled VNPAY Option */}
-                          <Label htmlFor="vnpay" className="flex items-center p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-50">
-                            <RadioGroupItem value="vnpay" id="vnpay" className="mr-4" disabled />
+                          {/* VNPAY Option - Now Active */}
+                          <Label htmlFor="vnpay" className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${field.value === 'vnpay' ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'border-slate-200 dark:border-slate-700'}`}>
+                            <RadioGroupItem value="vnpay" id="vnpay" className="mr-4" />
                             <div className="flex-1">
                               <p className="font-bold">Thanh toán qua VNPAY</p>
-                              <p className="text-sm text-slate-600 dark:text-slate-300">Chức năng này sẽ sớm được ra mắt.</p>
+                              <p className="text-sm text-slate-600 dark:text-slate-300">Thanh toán trực tuyến qua cổng VNPAY.</p>
                             </div>
                           </Label>
                         </RadioGroup>

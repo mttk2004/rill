@@ -63,12 +63,29 @@ class OrderController extends Controller
     /**
      * Display the thank you page for a specific order.
      */
-    public function thankYou(Order $order)
+    public function thankYou(Request $request, Order $order)
     {
         Gate::authorize('view', $order);
 
+        // Load payment information
+        $order->load('payment');
+
+        // Lấy thông tin từ VNPAY return URL (nếu có)
+        $vnpayResponse = null;
+        if ($request->has('vnp_ResponseCode')) {
+            $vnpayService = app(\App\Services\VnpayService::class);
+
+            $vnpayResponse = [
+                'response_code' => $request->query('vnp_ResponseCode'),
+                'message' => $vnpayService->getResponseMessage($request->query('vnp_ResponseCode')),
+                'transaction_no' => $request->query('vnp_TransactionNo'),
+                'is_success' => $request->query('vnp_ResponseCode') === '00',
+            ];
+        }
+
         return Inertia::render('orders/thank-you', [
             'order' => $order,
+            'vnpayResponse' => $vnpayResponse,
         ]);
     }
 
