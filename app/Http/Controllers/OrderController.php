@@ -193,4 +193,56 @@ class OrderController extends Controller
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
+
+    /**
+     * Retry payment for an order with pending VNPAY payment.
+     */
+    public function retryPayment(Request $request, Order $order)
+    {
+        Gate::authorize('view', $order);
+
+        // Load payment relation
+        $order->load('payment');
+
+        // Validate conditions for retry
+        if (!$order->payment) {
+            return back()->with('error', 'Không tìm thấy thông tin thanh toán.');
+        }
+
+        if ($order->payment->payment_method !== 'vnpay') {
+            return back()->with('error', 'Chỉ có thể thanh toán lại cho đơn hàng VNPAY.');
+        }
+
+        if ($order->payment->payment_status !== 'pending') {
+            return back()->with('error', 'Đơn hàng này đã được thanh toán hoặc đã bị hủy.');
+        }
+
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Chỉ có thể thanh toán lại cho đơn hàng đang chờ xử lý.');
+        }
+
+        try {
+            // Generate new VNPAY payment URL (reuse existing payment record)
+            $vnpayService = app(\App\Services\VnpayService::class);
+            $paymentUrl = $vnpayService->createPaymentUrl($order, $request);
+
+            \Log::info('Retry payment initiated', [
+                'order_id' => $order->id,
+                'payment_id' => $order->payment->id,
+            ]);
+
+            // Return JSON for frontend to handle redirect
+            return response()->json([
+                'payment_url' => $paymentUrl,
+                'order_id' => $order->id,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to retry payment', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return back()->with('error', 'Không thể tạo link thanh toán. Vui lòng thử lại!');
+        }
+    }
 }

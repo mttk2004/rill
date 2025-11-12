@@ -65,6 +65,7 @@ interface Order {
   total: number;
   delivered_date?: string;
   payment_method: string;
+  payment_status?: string | null;
   items: Product[];
   shipping_address: ShippingAddress;
   timeline: TimelineEvent[];
@@ -170,6 +171,42 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
         },
       }
     );
+  };
+
+  // Handle retry payment
+  const handleRetryPayment = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+      const response = await fetch(route('orders.retry-payment', { order: order.order_id }), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken || '',
+          'Accept': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate payment URL');
+      }
+
+      const data = await response.json();
+
+      if (data.payment_url) {
+        // Redirect to VNPAY
+        window.location.href = data.payment_url;
+      } else {
+        toast.error('Không thể tạo link thanh toán. Vui lòng thử lại!');
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      console.error('Retry payment error:', error);
+      toast.error('Có lỗi xảy ra. Vui lòng thử lại!');
+      setIsSubmitting(false);
+    }
   };
 
   // Handle submit review
@@ -451,6 +488,33 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                       </span>
                     </div>
                   </div>
+                  {order.payment_status && (
+                    <div className="pt-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600 dark:text-slate-400">Trạng thái</span>
+                        <Badge 
+                          variant="outline"
+                          className={`text-xs ${
+                            order.payment_status === 'completed' 
+                              ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' 
+                              : order.payment_status === 'pending'
+                              ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                              : order.payment_status === 'failed'
+                              ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
+                              : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                          }`}
+                        >
+                          {order.payment_status === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
+                          {order.payment_status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
+                          {order.payment_status === 'failed' && <X className="h-3 w-3 mr-1" />}
+                          {order.payment_status === 'completed' ? 'Đã thanh toán' 
+                            : order.payment_status === 'pending' ? 'Chờ thanh toán'
+                            : order.payment_status === 'failed' ? 'Thất bại'
+                            : order.payment_status}
+                        </Badge>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -498,6 +562,18 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                         </Button>
                       </a>
                     </>
+                  )}
+                  {order.status === "pending" && order.payment_status === "pending" && order.payment_method === "VNPAY" && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full justify-start bg-blue-600 hover:bg-blue-700"
+                      onClick={handleRetryPayment}
+                      disabled={isSubmitting}
+                    >
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      {isSubmitting ? 'Đang xử lý...' : 'Thanh toán lại'}
+                    </Button>
                   )}
                   {order.status === "pending" && (
                     <Button

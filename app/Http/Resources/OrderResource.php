@@ -27,8 +27,11 @@ class OrderResource extends JsonResource
             'delivered_date' => $this->when($this->status === 'delivered', $this->updated_at),
             'payment_method' => $this->whenLoaded('payment', function() {
                 $method = $this->payment?->payment_method ?? 'N/A';
-                return $method === 'cod' ? 'Thanh toán khi nhận hàng' : $method;
+                return $method === 'cod' ? 'Thanh toán khi nhận hàng' : ($method === 'vnpay' ? 'VNPAY' : $method);
             }, 'N/A'),
+            'payment_status' => $this->whenLoaded('payment', function() {
+                return $this->payment?->payment_status ?? null;
+            }),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'shipping_address' => $this->shipping_address ? [
                 'name' => $this->shipping_address['full_name'] ?? 'N/A',

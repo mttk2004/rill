@@ -59,6 +59,8 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/orders/{order}/thank-you', [OrderController::class, 'thankYou'])->name('orders.thank-you');
 
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');
+
     Route::get('/wishlist', function () {
         return Inertia::render('wishlist');
     })->name('wishlist');
