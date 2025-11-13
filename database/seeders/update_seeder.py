@@ -51,38 +51,38 @@ def add_detailed_description(seeder_content):
     Add detailed_description field to each album in the seeder
     """
     result = seeder_content
-    
+
     for album_name, description in ALBUM_DESCRIPTIONS.items():
         # Escape special characters for regex
         escaped_name = re.escape(album_name)
-        
+
         # Pattern to find the album entry
         # Match from 'name' => to the comma after 'description'
         pattern = rf"('name' => '{escaped_name}',\s*'description' => '[^']*',)"
-        
+
         # Replacement with detailed_description added
         escaped_description = description.replace('\\', '\\\\').replace("'", "\\'")
         replacement = rf"\1\n                'detailed_description' => '{escaped_description}',"
-        
+
         result = re.sub(pattern, replacement, result)
-    
+
     return result
 
 
 def main():
     seeder_file = 'ProductSeeder.php'
-    
+
     # Read the seeder file
     with open(seeder_file, 'r', encoding='utf-8') as f:
         content = f.read()
-    
+
     # Add detailed descriptions
     updated_content = add_detailed_description(content)
-    
+
     # Write back to file
     with open(seeder_file, 'w', encoding='utf-8') as f:
         f.write(updated_content)
-    
+
     print(f"✅ Successfully updated {seeder_file}")
     print(f"📝 Added detailed_description for {len(ALBUM_DESCRIPTIONS)} albums")
 
