@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderStatusHistory;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Models\ProductReview;
@@ -15,392 +16,334 @@ use Illuminate\Support\Facades\DB;
 class OrderSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
-     *
-     * Logic ràng buộc:
-     * 1. Payment status phải phù hợp với order status
-     * 2. Review chỉ từ đơn hàng delivered
-     * 3. Timeline hợp lý: placed_at < paid_at < shipped_at < delivered_at
+     * Tạo 10 đơn hàng chất lượng với status histories chi tiết
+     * Tất cả đơn hàng sử dụng COD (thanh toán khi nhận hàng)
      */
     public function run(): void
     {
         DB::transaction(function () {
-            $this->command->info('Starting Order seeding with strict business rules...');
+            $this->command->info('🚀 Starting quality-focused order seeding...');
 
-            // Lấy customers
+            // Lấy dữ liệu cần thiết
             $customers = User::where('role', 'customer')->get();
-            if ($customers->isEmpty()) {
-                $this->command->error('No customers found! Please run UserSeeder first.');
-                return;
-            }
-
-            // Lấy products
+            $admins = User::where('role', 'admin')->get();
             $products = Product::where('status', 'active')->get();
-            if ($products->isEmpty()) {
-                $this->command->error('No products found! Please run ProductSeeder first.');
+
+            if ($customers->isEmpty() || $products->isEmpty()) {
+                $this->command->error('❌ Missing required data! Run UserSeeder and ProductSeeder first.');
                 return;
             }
 
-            $this->command->info("Found {$customers->count()} customers and {$products->count()} products");
+            $this->command->info("📊 Found {$customers->count()} customers, {$admins->count()} admins, {$products->count()} products");
 
-            // Track delivered orders cho reviews
-            $deliveredOrders = [];
+            // Tạo 10 đơn hàng với các kịch bản khác nhau
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - quy trình hoàn hảo');
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - có đánh giá 5 sao', true);
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - giao nhanh trong ngày');
 
-            // Tạo orders với các trạng thái khác nhau
-            // Chú ý: chỉ dùng status có trong migration enum
-            $orderStatuses = [
-                'delivered' => 25,    // 25 đơn đã giao - có thể review
-                'shipped' => 10,      // 10 đơn đang giao
-                'confirmed' => 8,     // 8 đơn đã xác nhận
-                'pending' => 5,       // 5 đơn chờ xác nhận
-                'cancelled' => 2,     // 2 đơn đã hủy
-            ];
+            $this->createOrderWithStatusHistory('shipped', $customers, $admins, $products, 'Đơn hàng đang giao - đã xuất kho');
+            $this->createOrderWithStatusHistory('shipped', $customers, $admins, $products, 'Đơn hàng đang giao - giao xa');
 
-            $orderCount = 0;
+            $this->createOrderWithStatusHistory('confirmed', $customers, $admins, $products, 'Đơn hàng đã xác nhận - đang chuẩn bị');
+            $this->createOrderWithStatusHistory('confirmed', $customers, $admins, $products, 'Đơn hàng đã xác nhận - chờ đóng gói');
 
-            foreach ($orderStatuses as $status => $count) {
-                for ($i = 0; $i < $count; $i++) {
-                    $customer = $customers->random();
+            $this->createOrderWithStatusHistory('pending', $customers, $admins, $products, 'Đơn hàng mới - chờ xử lý');
+            $this->createOrderWithStatusHistory('pending', $customers, $admins, $products, 'Đơn hàng mới - khách hàng vừa đặt');
 
-                    // Lấy địa chỉ giao hàng của customer
-                    $shippingAddress = ShippingAddress::where('user_id', $customer->id)
-                        ->inRandomOrder()
-                        ->first();
+            $this->createOrderWithStatusHistory('cancelled', $customers, $admins, $products, 'Đơn hàng đã hủy - khách hàng đổi ý');
 
-                    if (!$shippingAddress) {
-                        // Fallback nếu không có địa chỉ
-                        $shippingAddressData = [
-                            'full_name' => $customer->name,
-                            'phone' => '0987654321',
-                            'address_line_1' => 'Địa chỉ mặc định',
-                            'city' => 'Hà Nội',
-                            'district' => 'Hoàn Kiếm',
-                            'ward' => 'Hàng Bài',
-                        ];
-                    } else {
-                        $shippingAddressData = [
-                            'full_name' => $shippingAddress->full_name,
-                            'phone' => $shippingAddress->phone,
-                            'address_line_1' => $shippingAddress->address_line_1,
-                            'address_line_2' => $shippingAddress->address_line_2,
-                            'city' => $shippingAddress->city,
-                            'district' => $shippingAddress->district,
-                            'ward' => $shippingAddress->ward,
-                        ];
-                    }
-
-                    // Thời gian đặt hàng (1-90 ngày trước)
-                    $placedAt = now()->subDays(rand(1, 90))->subHours(rand(0, 23));
-
-                    // Tạo order items
-                    $productCount = rand(1, 4);
-                    $selectedProducts = $products->random(min($productCount, $products->count()));
-
-                    $subtotal = 0;
-                    $orderItemsData = [];
-
-                    foreach ($selectedProducts as $product) {
-                        $quantity = rand(1, 2);
-                        $unitPrice = $product->price;
-                        $totalPrice = $quantity * $unitPrice;
-                        $subtotal += $totalPrice;
-
-                        $orderItemsData[] = [
-                            'product' => $product,
-                            'quantity' => $quantity,
-                            'unit_price' => $unitPrice,
-                            'total_price' => $totalPrice,
-                        ];
-                    }
-
-                    // Discount (0-10% cho một số đơn)
-                    $discountAmount = (rand(0, 10) > 7) ? round($subtotal * 0.05) : 0;
-                    $totalAmount = $subtotal - $discountAmount;
-
-                    // Tạo order với trạng thái phù hợp
-                    $order = Order::create([
-                        'user_id' => $customer->id,
-                        'status' => $status,
-                        'subtotal' => $subtotal,
-                        'discount_amount' => $discountAmount,
-                        'total_amount' => $totalAmount,
-                        'currency' => 'VND',
-                        'shipping_address' => $shippingAddressData,
-                        'billing_address' => $shippingAddressData,
-                        'notes' => $this->getOrderNotes($status),
-                        'placed_at' => $placedAt,
-                    ]);
-
-                    // Tạo order items
-                    foreach ($orderItemsData as $itemData) {
-                        OrderItem::create([
-                            'order_id' => $order->id,
-                            'product_id' => $itemData['product']->id,
-                            'product_name' => $itemData['product']->name,
-                            'product_sku' => $itemData['product']->sku ?? 'N/A',
-                            'quantity' => $itemData['quantity'],
-                            'unit_price' => $itemData['unit_price'],
-                            'total_price' => $itemData['total_price'],
-                        ]);
-                    }
-
-                    // Tạo payment với trạng thái phù hợp với order status
-                    $this->createPaymentForOrder($order, $status, $placedAt);
-
-                    // Track delivered orders để tạo reviews sau
-                    if ($status === 'delivered') {
-                        $deliveredOrders[] = [
-                            'order' => $order,
-                            'customer' => $customer,
-                            'items' => $orderItemsData,
-                        ];
-                    }
-
-                    $orderCount++;
-                    $this->command->info("✓ Created order #{$orderCount}: {$order->order_number} - {$status}");
-                }
-            }
-
-            // Tạo reviews cho delivered orders
-            $this->createReviewsForDeliveredOrders($deliveredOrders);
-
-            $this->command->info("\n========== Seeding Summary ==========");
-            $this->command->info("Total orders created: {$orderCount}");
-            $this->command->info("Orders by status:");
-            foreach ($orderStatuses as $status => $count) {
-                $this->command->info("  - {$status}: {$count}");
-            }
+            $this->command->info("\n✅ Successfully created 10 quality orders with detailed status histories!");
         });
     }
 
     /**
-     * Tạo payment với trạng thái hợp lý theo order status
-     * Tất cả đơn hàng đều dùng COD (thanh toán khi nhận hàng)
-     *
-     * Logic COD hợp lý:
-     * - pending: chưa thanh toán (chờ xác nhận)
-     * - confirmed/shipped/delivered: đã thanh toán (đã thu tiền hoặc sẽ thu khi giao)
-     * - cancelled: thất bại
+     * Tạo một đơn hàng với đầy đủ status histories
+     * Tất cả đơn hàng sử dụng COD
      */
-    private function createPaymentForOrder(Order $order, string $orderStatus, $placedAt): void
-    {
-        // Tất cả đơn đều dùng COD
-        $paymentMethod = 'cod';
+    private function createOrderWithStatusHistory(
+        string $finalStatus,
+        $customers,
+        $admins,
+        $products,
+        string $description,
+        bool $shouldCreateReview = false
+    ): void {
+        $customer = $customers->random();
+        $admin = $admins->isNotEmpty() ? $admins->random() : null;
 
-        // Logic trạng thái payment dựa trên order status
-        switch ($orderStatus) {
-            case 'pending':
-                // Đơn pending: payment pending (chờ xác nhận đơn hàng)
-                $paymentStatus = 'pending';
-                $processedAt = null;
-                $transactionId = null;
-                $gatewayResponse = null;
-                break;
+        // Lấy địa chỉ giao hàng
+        $shippingAddress = ShippingAddress::where('user_id', $customer->id)->inRandomOrder()->first();
 
-            case 'confirmed':
-                // Đơn đã xác nhận: payment completed (cam kết sẽ thanh toán khi nhận)
-                $paymentStatus = 'completed';
-                // Xử lý thanh toán khi xác nhận đơn (vài giờ sau khi đặt)
-                $processedAt = (clone $placedAt)->addHours(rand(1, 12));
-                $transactionId = 'COD-' . strtoupper(\Str::random(10));
-                $gatewayResponse = ['status' => 'confirmed', 'message' => 'Đơn hàng đã xác nhận, thanh toán COD khi nhận hàng'];
-                break;
-
-            case 'shipped':
-                // Đơn đang giao: payment completed (đã cam kết thanh toán)
-                $paymentStatus = 'completed';
-                // Xử lý khi chuyển sang shipped (vài ngày sau khi đặt)
-                $processedAt = (clone $placedAt)->addDays(rand(1, 3));
-                $transactionId = 'COD-' . strtoupper(\Str::random(10));
-                $gatewayResponse = ['status' => 'confirmed', 'message' => 'Hàng đang giao, thanh toán COD khi nhận'];
-                break;
-
-            case 'delivered':
-                // Đơn đã giao: payment completed (đã thu tiền thành công)
-                $paymentStatus = 'completed';
-                // Thu tiền khi giao hàng thành công
-                $processedAt = (clone $placedAt)->addDays(rand(3, 14));
-                $transactionId = 'COD-' . strtoupper(\Str::random(10));
-                $gatewayResponse = ['status' => 'success', 'message' => 'Đã thu tiền COD thành công'];
-                break;
-
-            case 'cancelled':
-                // Đơn hủy: payment failed
-                $paymentStatus = 'failed';
-                $processedAt = (clone $placedAt)->addHours(rand(2, 48));
-                $transactionId = null;
-                $gatewayResponse = ['status' => 'cancelled', 'message' => 'Đơn hàng đã bị hủy'];
-                break;
-
-            default:
-                $paymentStatus = 'completed';
-                $processedAt = (clone $placedAt)->addHours(rand(1, 24));
-                $transactionId = 'COD-' . strtoupper(\Str::random(10));
-                $gatewayResponse = ['status' => 'confirmed', 'message' => 'Thanh toán COD'];
+        if (!$shippingAddress) {
+            $shippingAddressData = [
+                'full_name' => $customer->name,
+                'phone' => '0987654321',
+                'address_line_1' => fake()->streetAddress(),
+                'city' => 'Hà Nội',
+                'district' => 'Hoàn Kiếm',
+                'ward' => 'Hàng Bài',
+            ];
+        } else {
+            $shippingAddressData = [
+                'full_name' => $shippingAddress->full_name,
+                'phone' => $shippingAddress->phone,
+                'address_line_1' => $shippingAddress->address_line_1,
+                'address_line_2' => $shippingAddress->address_line_2,
+                'city' => $shippingAddress->city,
+                'district' => $shippingAddress->district,
+                'ward' => $shippingAddress->ward,
+            ];
         }
+
+        // Tạo order items (2-3 sản phẩm)
+        $selectedProducts = $products->random(rand(2, 3));
+        $subtotal = 0;
+        $orderItemsData = [];
+
+        foreach ($selectedProducts as $product) {
+            $quantity = rand(1, 2);
+            $unitPrice = $product->price;
+            $totalPrice = $quantity * $unitPrice;
+            $subtotal += $totalPrice;
+
+            $orderItemsData[] = [
+                'product' => $product,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'total_price' => $totalPrice,
+            ];
+        }
+
+        // Discount ngẫu nhiên
+        $discountAmount = (rand(0, 10) > 8) ? round($subtotal * 0.05) : 0;
+        $totalAmount = $subtotal - $discountAmount;
+
+        // Timeline: Bắt đầu từ placed_at
+        $placedAt = match($finalStatus) {
+            'delivered' => now()->subDays(rand(7, 30)),
+            'shipped' => now()->subDays(rand(2, 5)),
+            'confirmed' => now()->subDays(rand(1, 3)),
+            'pending' => now()->subHours(rand(1, 24)),
+            'cancelled' => now()->subDays(rand(1, 7)),
+        };
+
+        // Tạo order với status pending ban đầu (sẽ tự động tạo history đầu tiên)
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'status' => 'pending',
+            'subtotal' => $subtotal,
+            'discount_amount' => $discountAmount,
+            'total_amount' => $totalAmount,
+            'currency' => 'VND',
+            'shipping_address' => $shippingAddressData,
+            'billing_address' => $shippingAddressData,
+            'notes' => null,
+            'placed_at' => $placedAt,
+        ]);
+
+        // Tạo order items
+        foreach ($orderItemsData as $itemData) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $itemData['product']->id,
+                'product_name' => $itemData['product']->name,
+                'product_sku' => $itemData['product']->sku ?? 'N/A',
+                'quantity' => $itemData['quantity'],
+                'unit_price' => $itemData['unit_price'],
+                'total_price' => $itemData['total_price'],
+            ]);
+        }
+
+        // Tạo payment (COD)
+        $this->createPayment($order, $finalStatus, $placedAt);
+
+        // Tạo status histories theo finalStatus
+        $this->createStatusHistories($order, $finalStatus, $placedAt, $admin);
+
+        // Tạo review nếu cần
+        if ($shouldCreateReview && $finalStatus === 'delivered') {
+            $this->createReviewForOrder($order, $customer, $orderItemsData);
+        }
+
+        $this->command->info("✓ {$order->order_number} - {$finalStatus} - {$description}");
+    }
+
+    /**
+     * Tạo payment record với COD
+     */
+    private function createPayment(Order $order, string $finalStatus, $placedAt): void
+    {
+        $paymentStatus = match($finalStatus) {
+            'pending' => 'pending',
+            'cancelled' => 'failed',
+            default => 'completed',
+        };
+
+        $processedAt = match($finalStatus) {
+            'pending' => null,
+            'confirmed' => (clone $placedAt)->addHours(rand(1, 6)),
+            'shipped' => (clone $placedAt)->addDays(rand(1, 2)),
+            'delivered' => (clone $placedAt)->addDays(rand(3, 7)),
+            'cancelled' => (clone $placedAt)->addHours(rand(2, 24)),
+        };
+
+        $transactionId = ($paymentStatus === 'completed') ? 'COD-' . strtoupper(\Str::random(10)) : null;
 
         Payment::create([
             'order_id' => $order->id,
-            'payment_method' => $paymentMethod,
+            'payment_method' => 'cod',
             'payment_status' => $paymentStatus,
             'amount' => $order->total_amount,
             'currency' => 'VND',
             'transaction_id' => $transactionId,
-            'gateway_response' => $gatewayResponse,
+            'gateway_response' => $paymentStatus === 'completed'
+                ? ['status' => 'confirmed', 'message' => 'Thanh toán COD khi nhận hàng']
+                : null,
             'processed_at' => $processedAt,
         ]);
     }
 
     /**
-     * Tạo reviews cho delivered orders
+     * Tạo status histories theo timeline thực tế
      */
-    private function createReviewsForDeliveredOrders(array $deliveredOrders): void
+    private function createStatusHistories(Order $order, string $finalStatus, $placedAt, $admin): void
     {
-        $reviewCount = 0;
+        // Xóa history tự động tạo bởi Order model
+        OrderStatusHistory::where('order_id', $order->id)->delete();
 
-        foreach ($deliveredOrders as $orderData) {
-            $order = $orderData['order'];
-            $customer = $orderData['customer'];
-            $items = $orderData['items'];
+        $currentTime = clone $placedAt;
+        $adminId = $admin?->id;
 
-            // Chỉ 40% delivered orders có review (realistic)
-            if (rand(1, 100) > 40) {
-                continue;
-            }
+        // Luôn có pending đầu tiên
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'pending',
+            'notes' => 'Đơn hàng mới được tạo, chờ xác nhận',
+            'created_by' => null, // Khách hàng tạo
+            'created_at' => $currentTime,
+        ]);
 
-            // Mỗi đơn có thể review 1-2 sản phẩm
-            $itemsToReview = rand(1, min(2, count($items)));
-            $selectedItems = array_rand($items, min($itemsToReview, count($items)));
+        // Thêm histories theo finalStatus
+        match($finalStatus) {
+            'pending' => null, // Chỉ có pending
 
-            if (!is_array($selectedItems)) {
-                $selectedItems = [$selectedItems];
-            }
+            'confirmed' => $this->addConfirmedHistory($order, $currentTime, $adminId),
 
-            foreach ($selectedItems as $itemIndex) {
-                $itemData = $items[$itemIndex];
-                $product = $itemData['product'];
+            'shipped' => $this->addShippedHistories($order, $currentTime, $adminId),
 
-                // Lấy order item
-                $orderItem = OrderItem::where('order_id', $order->id)
-                    ->where('product_id', $product->id)
-                    ->first();
+            'delivered' => $this->addDeliveredHistories($order, $currentTime, $adminId),
 
-                if (!$orderItem) {
-                    continue;
-                }
+            'cancelled' => $this->addCancelledHistory($order, $currentTime, $adminId),
+        };
 
-                // Rating distribution (realistic): 70% positive, 20% neutral, 10% negative
-                $ratingDistribution = rand(1, 100);
-                if ($ratingDistribution <= 70) {
-                    $rating = rand(4, 5); // Positive
-                } elseif ($ratingDistribution <= 90) {
-                    $rating = 3; // Neutral
-                } else {
-                    $rating = rand(1, 2); // Negative
-                }
+        // Cập nhật status cuối cùng của order (không trigger events để tránh tạo duplicate history)
+        DB::table('orders')->where('id', $order->id)->update(['status' => $finalStatus]);
+    }
 
-                // Tạo comment có nghĩa dựa trên rating
-                $comment = $this->generateReviewComment($rating, $product->name);
+    private function addConfirmedHistory($order, $currentTime, $adminId): void
+    {
+        $currentTime->addHours(rand(1, 8));
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'confirmed',
+            'notes' => 'Đã xác nhận đơn hàng, đang chuẩn bị hàng',
+            'created_by' => $adminId,
+            'created_at' => $currentTime,
+        ]);
+    }
 
-                // Review được tạo sau khi delivered 1-30 ngày
-                $reviewedAt = (clone $order->placed_at)->addDays(rand(10, 40));
+    private function addShippedHistories($order, $currentTime, $adminId): void
+    {
+        // Confirmed
+        $currentTime->addHours(rand(2, 12));
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'confirmed',
+            'notes' => 'Đã xác nhận và kiểm tra hàng',
+            'created_by' => $adminId,
+            'created_at' => $currentTime,
+        ]);
 
-                ProductReview::create([
-                    'user_id' => $customer->id,
-                    'product_id' => $product->id,
-                    'order_item_id' => $orderItem->id,
-                    'rating' => $rating,
-                    'comment' => $comment,
-                    'created_at' => $reviewedAt,
-                    'updated_at' => $reviewedAt,
-                ]);
+        // Shipped
+        $currentTime->addDays(rand(1, 2));
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'shipped',
+            'notes' => 'Đã đóng gói và giao cho đơn vị vận chuyển',
+            'created_by' => $adminId,
+            'created_at' => $currentTime,
+        ]);
+    }
 
-                $reviewCount++;
-            }
+    private function addDeliveredHistories($order, $currentTime, $adminId): void
+    {
+        // Confirmed
+        $currentTime->addHours(rand(3, 10));
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'confirmed',
+            'notes' => 'Xác nhận đơn hàng thành công',
+            'created_by' => $adminId,
+            'created_at' => $currentTime,
+        ]);
+
+        // Shipped
+        $currentTime->addDays(rand(1, 2));
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'shipped',
+            'notes' => 'Hàng đã xuất kho và đang trên đường giao',
+            'created_by' => $adminId,
+            'created_at' => $currentTime,
+        ]);
+
+        // Delivered
+        $currentTime->addDays(rand(2, 5));
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'delivered',
+            'notes' => 'Giao hàng thành công, khách hàng đã nhận và thanh toán',
+            'created_by' => $adminId,
+            'created_at' => $currentTime,
+        ]);
+    }
+
+    private function addCancelledHistory($order, $currentTime, $adminId): void
+    {
+        $currentTime->addHours(rand(2, 24));
+        OrderStatusHistory::create([
+            'order_id' => $order->id,
+            'status' => 'cancelled',
+            'notes' => 'Khách hàng yêu cầu hủy đơn',
+            'created_by' => $adminId,
+            'created_at' => $currentTime,
+        ]);
+    }
+
+    /**
+     * Tạo review cho đơn delivered
+     */
+    private function createReviewForOrder(Order $order, User $customer, array $orderItemsData): void
+    {
+        $itemData = $orderItemsData[array_rand($orderItemsData)];
+        $product = $itemData['product'];
+
+        $orderItem = OrderItem::where('order_id', $order->id)
+            ->where('product_id', $product->id)
+            ->first();
+
+        if ($orderItem) {
+            $reviewedAt = (clone $order->placed_at)->addDays(rand(10, 20));
+
+            ProductReview::create([
+                'user_id' => $customer->id,
+                'product_id' => $product->id,
+                'order_item_id' => $orderItem->id,
+                'rating' => 5,
+                'comment' => 'Đĩa nhạc chất lượng xuất sắc! Âm thanh trong trẻo, đóng gói rất cẩn thận. Shop phục vụ nhiệt tình, giao hàng nhanh. Sẽ tiếp tục ủng hộ!',
+                'created_at' => $reviewedAt,
+                'updated_at' => $reviewedAt,
+            ]);
         }
-
-        $this->command->info("Total reviews created: {$reviewCount}");
-    }
-
-    /**
-     * Tạo order notes hợp lý
-     */
-    private function getOrderNotes(string $status): ?string
-    {
-        $notes = [
-            'pending' => [
-                null,
-                'Khách hàng yêu cầu gọi trước khi giao',
-                'Giao giờ hành chính',
-            ],
-            'confirmed' => [
-                'Đã xác nhận đơn hàng',
-                'Đang chuẩn bị hàng',
-                'Đã đóng gói xong',
-            ],
-            'shipped' => [
-                'Đã giao cho đơn vị vận chuyển',
-                'Hàng đang trên đường giao',
-                'Đang giao hàng',
-            ],
-            'delivered' => [
-                'Đã giao hàng thành công',
-                'Khách hàng đã nhận hàng',
-                'Hoàn thành',
-            ],
-            'cancelled' => [
-                'Khách hàng hủy đơn',
-                'Hết hàng',
-                'Không liên hệ được khách hàng',
-            ],
-        ];
-
-        $statusNotes = $notes[$status] ?? [null];
-        return $statusNotes[array_rand($statusNotes)];
-    }
-
-    /**
-     * Tạo review comment có nghĩa dựa trên rating
-     */
-    private function generateReviewComment(int $rating, string $productName): string
-    {
-        $comments = [
-            5 => [
-                "Đĩa nhạc chất lượng tuyệt vời! Âm thanh trong trẻo, đóng gói cẩn thận.",
-                "Rất hài lòng với album này. Âm thanh analog ấm áp, đáng đồng tiền bát gạo.",
-                "Sản phẩm chính hãng, chất lượng cao. Shop đóng gói rất kỹ, giao hàng nhanh.",
-                "Album tuyệt vời! Chất âm vinyl thật sự khác biệt. Sẽ ủng hộ shop tiếp.",
-                "Mãn nhãn và mãn nhĩ! Đĩa vinyl đẹp, không tì vết. Highly recommended!",
-                "Chất lượng xuất sắc! Đóng gói cẩn thận, giao hàng đúng hẹn. 5 sao xứng đáng!",
-            ],
-            4 => [
-                "Sản phẩm tốt, âm thanh ổn. Giá hơi cao nhưng chấp nhận được.",
-                "Đĩa vinyl chất lượng, đóng gói tốt. Trừ 1 sao vì giao hàng hơi lâu.",
-                "Album hay, âm thanh tốt. Bìa hơi bị móp một chút nhưng không ảnh hưởng.",
-                "Chất lượng tốt, giao hàng nhanh. Giá cả hợp lý cho một đĩa vinyl chính hãng.",
-                "Âm thanh analog đúng như mong đợi. Sẽ tiếp tục ủng hộ shop.",
-            ],
-            3 => [
-                "Sản phẩm bình thường, giá hơi cao so với chất lượng.",
-                "Đĩa vinyl ổn nhưng âm thanh không ấn tượng lắm. Cần cải thiện đóng gói.",
-                "Nhìn chung ok, nhưng bìa album bị trầy xước. Cần cải thiện packaging.",
-                "Chất lượng tạm được, giao hàng chậm. Mong shop cải thiện dịch vụ.",
-                "Album ổn nhưng không xuất sắc như kỳ vọng. Giá hơi đắt.",
-            ],
-            2 => [
-                "Thất vọng về chất lượng đóng gói. Đĩa bị trầy nhẹ khi nhận hàng.",
-                "Sản phẩm không như mô tả. Bìa album bị móp góc.",
-                "Chất lượng dưới trung bình, không đáng giá tiền. Cần cải thiện nhiều.",
-                "Giao hàng chậm, đóng gói kém. Âm thanh cũng không ấn tượng.",
-            ],
-            1 => [
-                "Rất thất vọng! Đĩa bị trầy nhiều, ảnh hưởng đến âm thanh.",
-                "Chất lượng tệ, không giống mô tả. Yêu cầu trả hàng hoàn tiền.",
-                "Sản phẩm lỗi, nhiều tiếng xào xạo khi phát. Không đáng tiền.",
-                "Đóng gói quá tệ, đĩa bị vỡ khi nhận hàng. Rất không hài lòng!",
-            ],
-        ];
-
-        return $comments[$rating][array_rand($comments[$rating])];
     }
 }

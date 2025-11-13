@@ -67,10 +67,17 @@ class Order extends Model
         // Auto-create status history when status changes
         static::updated(function ($order) {
             if ($order->isDirty('status')) {
+                $oldStatusEnum = $order->getOriginal('status');
+                $oldStatus = $oldStatusEnum instanceof OrderStatus ? $oldStatusEnum->value : $oldStatusEnum;
+                $newStatus = $order->status->value;
+
+                // Get custom notes or generate automatic notes
+                $notes = $order->status_change_notes ?? static::generateStatusChangeNotes($oldStatus, $newStatus);
+
                 OrderStatusHistory::create([
                     'order_id' => $order->id,
-                    'status' => $order->status->value,
-                    'notes' => $order->status_change_notes ?? null,
+                    'status' => $newStatus,
+                    'notes' => $notes,
                     'created_by' => auth()->id(),
                 ]);
             }
@@ -78,10 +85,12 @@ class Order extends Model
 
         // Create initial status history when order is created
         static::created(function ($order) {
+            $notes = $order->status_change_notes ?? 'Đơn hàng mới được tạo, chờ xác nhận';
+
             OrderStatusHistory::create([
                 'order_id' => $order->id,
                 'status' => $order->status->value,
-                'notes' => $order->status_change_notes ?? null,
+                'notes' => $notes,
                 'created_by' => auth()->id(),
             ]);
         });
@@ -110,5 +119,48 @@ class Order extends Model
     public function statusHistories(): HasMany
     {
         return $this->hasMany(OrderStatusHistory::class);
+    }
+
+    /**
+     * Generate automatic notes based on status transition
+     */
+    private static function generateStatusChangeNotes(?string $oldStatus, string $newStatus): string
+    {
+        $isAdmin = auth()->check() && auth()->user()->role === 'admin';
+
+        // Status transition messages
+        $transitions = [
+            'pending->confirmed' => $isAdmin
+                ? 'Đã xác nhận đơn hàng, đang chuẩn bị hàng'
+                : 'Đơn hàng đã được xác nhận',
+            'pending->cancelled' => $isAdmin
+                ? 'Đơn hàng đã bị hủy bởi quản trị viên'
+                : 'Khách hàng yêu cầu hủy đơn hàng',
+            'confirmed->shipped' => 'Đơn hàng đã được đóng gói và giao cho đơn vị vận chuyển',
+            'confirmed->cancelled' => $isAdmin
+                ? 'Đơn hàng đã bị hủy sau khi xác nhận'
+                : 'Khách hàng yêu cầu hủy đơn hàng',
+            'shipped->delivered' => 'Đơn hàng đã được giao thành công, khách hàng đã nhận hàng',
+        ];
+
+        // Direct status messages (không có oldStatus hoặc không match transition)
+        $statusMessages = [
+            'pending' => 'Đơn hàng đang chờ xác nhận',
+            'confirmed' => 'Đơn hàng đã được xác nhận',
+            'shipped' => 'Đơn hàng đang được vận chuyển',
+            'delivered' => 'Đơn hàng đã được giao thành công',
+            'cancelled' => $isAdmin
+                ? 'Đơn hàng đã bị hủy bởi quản trị viên'
+                : 'Đơn hàng đã bị hủy',
+        ];
+
+        // Try to find transition message first
+        $transitionKey = $oldStatus ? "{$oldStatus}->{$newStatus}" : null;
+        if ($transitionKey && isset($transitions[$transitionKey])) {
+            return $transitions[$transitionKey];
+        }
+
+        // Fallback to direct status message
+        return $statusMessages[$newStatus] ?? "Trạng thái đơn hàng đã được cập nhật thành {$newStatus}";
     }
 }
