@@ -117,6 +117,7 @@ export interface Product {
   genre: string;
   label: string;
   image?: string;
+  image_url?: string;
   is_featured: boolean;
   status: 'active' | 'inactive' | 'out_of_stock';
   meta_title?: string;

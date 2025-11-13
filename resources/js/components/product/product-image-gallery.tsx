@@ -9,9 +9,9 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
   return (
     <div className="sticky top-4">
       <div className="aspect-square max-w-md mx-auto overflow-hidden rounded-lg border bg-muted flex items-center justify-center shadow-sm">
-        {product.image ? (
+        {product.image_url ? (
           <img
-            src={product.image}
+            src={product.image_url}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />

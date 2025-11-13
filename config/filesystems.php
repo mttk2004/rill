@@ -68,9 +68,12 @@ return [
             'bucket' => env('SUPABASE_BUCKET'),
             'endpoint' => env('SUPABASE_ENDPOINT'),
             'use_path_style_endpoint' => true,
-            'visibility' => 'public', // Quan trọng để ảnh có thể truy cập công khai
-            'throw' => false,
-            'url' => env('SUPABASE_URL') . '/storage/v1/object/public/' . env('SUPABASE_BUCKET'), // URL gốc để hiển thị ảnh
+            'visibility' => 'public',
+            'throw' => true,
+            'url' => env('SUPABASE_URL') . '/storage/v1/object/public/' . env('SUPABASE_BUCKET'),
+            'http' => [
+                'verify' => false, // Tạm thời bỏ qua SSL verification (chỉ dùng cho development)
+            ],
         ],
     ],
 

@@ -16,6 +16,7 @@ export type AdminProduct = {
   genre?: string;
   label?: string;
   image?: string;
+  image_url?: string;
   is_featured: boolean;
   status: 'active' | 'inactive' | 'out_of_stock';
   created_at: string;

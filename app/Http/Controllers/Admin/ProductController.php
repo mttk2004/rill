@@ -230,7 +230,7 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'supabase');
+            $path = $request->file('image')->store('', 'supabase');
             $validated['image'] = $path;
         }
 
@@ -350,7 +350,20 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        \Log::info('🔍 [Backend] Product update started', [
+            'product_id' => $id,
+            'request_method' => $request->method(),
+            'has_file' => $request->hasFile('image'),
+            'all_data' => $request->all(),
+            'files' => $request->allFiles(),
+        ]);
+
         $product = Product::withTrashed()->findOrFail($id);
+
+        \Log::info('🔍 [Backend] Current product data', [
+            'product_id' => $product->id,
+            'current_image' => $product->image,
+        ]);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -369,19 +382,76 @@ class ProductController extends Controller
             'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
         ]);
 
+        \Log::info('🔍 [Backend] Validated data', [
+            'validated' => $validated,
+            'has_image_in_validated' => isset($validated['image']),
+        ]);
+
         // Handle image upload
         if ($request->hasFile('image')) {
+            \Log::info('✅ [Backend] Image file detected');
+
+            $file = $request->file('image');
+            \Log::info('🔍 [Backend] Image file details', [
+                'original_name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime_type' => $file->getMimeType(),
+                'extension' => $file->getClientOriginalExtension(),
+                'is_valid' => $file->isValid(),
+            ]);
+
             // Delete old image if exists
             if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL)) {
-                Storage::disk('supabase')->delete($product->image);
+                \Log::info('🗑️ [Backend] Deleting old image', ['old_image_path' => $product->image]);
+                try {
+                    Storage::disk('supabase')->delete($product->image);
+                    \Log::info('✅ [Backend] Old image deleted successfully');
+                } catch (\Exception $e) {
+                    \Log::error('❌ [Backend] Failed to delete old image', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                }
             }
 
             // Store new image
-            $path = $request->file('image')->store('products', 'supabase');
-            $validated['image'] = $path;
+            \Log::info('📤 [Backend] Uploading new image to Supabase...');
+            \Log::info('🔍 [Backend] Storage config check', [
+                'default_disk' => config('filesystems.default'),
+                'supabase_key' => substr(config('filesystems.disks.supabase.key'), 0, 10) . '...',
+                'supabase_region' => config('filesystems.disks.supabase.region'),
+                'supabase_bucket' => config('filesystems.disks.supabase.bucket'),
+                'supabase_endpoint' => config('filesystems.disks.supabase.endpoint'),
+            ]);
+            try {
+                $path = $request->file('image')->store('', 'supabase');
+                \Log::info('✅ [Backend] Image uploaded successfully', ['path' => $path]);
+                $validated['image'] = $path;
+            } catch (\Exception $e) {
+                \Log::error('❌ [Backend] Failed to upload image', [
+                    'error' => $e->getMessage(),
+                    'class' => get_class($e),
+                    'file' => $e->getFile() . ':' . $e->getLine(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                throw $e;
+            }
+        } else {
+            \Log::info('⚠️ [Backend] No image file in request');
         }
 
+        \Log::info('🔍 [Backend] Data before update', [
+            'validated_data' => $validated,
+            'has_image' => isset($validated['image']),
+            'image_value' => $validated['image'] ?? 'not set',
+        ]);
+
         $product->update($validated);
+
+        \Log::info('🔍 [Backend] Product updated in database', [
+            'product_id' => $product->id,
+            'new_image_value' => $product->fresh()->image,
+        ]);
 
         // Sync artists if provided
         if (isset($validated['artists']) && is_array($validated['artists'])) {
@@ -393,15 +463,23 @@ class ProductController extends Controller
                 ];
             }
             $product->artists()->sync($artistsData);
+            \Log::info('✅ [Backend] Artists synced', ['count' => count($artistsData)]);
         } else {
             // If no artists provided, detach all
             $product->artists()->detach();
+            \Log::info('⚠️ [Backend] All artists detached');
         }
+
+        $freshProduct = $product->fresh();
+        \Log::info('✅ [Backend] Product update completed', [
+            'product_id' => $freshProduct->id,
+            'final_image_value' => $freshProduct->image,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật sản phẩm thành công',
-            'product' => $product,
+            'product' => $freshProduct,
         ]);
     }
 

@@ -26,7 +26,7 @@ export const ProductTable = ({
       render: (product) => (
         <div className="flex items-center gap-3">
           <img
-            src={product.image || "/placeholder.png"}
+            src={product.image_url || "/placeholder.png"}
             alt={product.name}
             className="w-16 h-16 object-cover rounded-lg"
           />

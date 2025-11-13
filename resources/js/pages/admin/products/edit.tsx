@@ -185,6 +185,11 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
     setErrors({});
     setIsSaving(true);
 
+    console.log('🔍 [Frontend] Starting form submission...');
+    console.log('🔍 [Frontend] formData.image:', formData.image);
+    console.log('🔍 [Frontend] formData.image type:', formData.image ? typeof formData.image : 'null');
+    console.log('🔍 [Frontend] formData.image instanceof File:', formData.image instanceof File);
+
     try {
       const submitData = new FormData();
       submitData.append('_method', 'PUT');
@@ -207,8 +212,26 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
       });
 
       if (formData.image) {
+        console.log('✅ [Frontend] Appending image to FormData');
+        console.log('🔍 [Frontend] Image file name:', formData.image.name);
+        console.log('🔍 [Frontend] Image file size:', formData.image.size, 'bytes');
+        console.log('🔍 [Frontend] Image file type:', formData.image.type);
         submitData.append('image', formData.image);
+      } else {
+        console.log('⚠️ [Frontend] No image to upload');
       }
+
+      // Log all FormData entries
+      console.log('🔍 [Frontend] FormData entries:');
+      for (const [key, value] of submitData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: [File] ${value.name} (${value.size} bytes)`);
+        } else {
+          console.log(`  ${key}: ${value}`);
+        }
+      }
+
+      console.log('📤 [Frontend] Sending request to:', `/admin/products/${product.id}`);
 
       const response = await axios.post(`/admin/products/${product.id}`, submitData, {
         headers: {
@@ -216,8 +239,11 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
         },
       });
 
+      console.log('📥 [Frontend] Response received:', response.data);
+
       if (response.data.success) {
         toast.success(response.data.message || 'Cập nhật sản phẩm thành công');
+        console.log('✅ [Frontend] Product updated successfully');
         router.visit('/admin/products');
       }
     } catch (error: unknown) {
@@ -622,21 +648,40 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {imagePreview ? (
-                      <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="w-full h-48 object-cover rounded-lg"
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-48 object-cover rounded-lg"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2"
+                            onClick={removeImage}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                          id="image-change"
                         />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2"
-                          onClick={removeImage}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                        <Label htmlFor="image-change" className="block">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full"
+                            asChild
+                          >
+                            <span className="cursor-pointer">Thay đổi ảnh</span>
+                          </Button>
+                        </Label>
                       </div>
                     ) : (
                       <div className="border-2 border-dashed rounded-lg p-8 text-center">

@@ -180,6 +180,7 @@ class ProductService
             'genre' => $product->genre,
             'label' => $product->label,
             'image' => $product->image,
+            'image_url' => $product->image_url,
             'is_featured' => $product->is_featured,
             'status' => $product->status,
             'artists' => $product->artists->map(function ($artist) {
@@ -275,6 +276,7 @@ class ProductService
                 'genre' => $product->genre,
                 'label' => $product->label,
                 'image' => $product->image,
+                'image_url' => $product->image_url,
                 'is_featured' => $product->is_featured,
                 'status' => $product->status,
                 'artists' => $product->artists->map(function ($artist) {

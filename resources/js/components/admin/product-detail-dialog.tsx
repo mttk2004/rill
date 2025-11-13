@@ -43,9 +43,9 @@ export const ProductDetailDialog = ({
             <div className="flex items-start gap-6">
               {/* Product Image */}
               <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 relative ring-4 ring-slate-100 dark:ring-slate-700">
-                {product.image ? (
+                {product.image_url ? (
                   <img
-                    src={product.image}
+                    src={product.image_url}
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />

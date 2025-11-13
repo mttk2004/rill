@@ -99,7 +99,7 @@ export const ProductEditDialog = ({
         status: product.status as 'active' | 'inactive' | 'out_of_stock',
         image: null,
       });
-      setImagePreview(product.image || null);
+      setImagePreview(product.image_url || null);
       setErrors({});
     }
   }, [product]);
