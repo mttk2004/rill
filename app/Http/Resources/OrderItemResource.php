@@ -20,7 +20,7 @@ class OrderItemResource extends JsonResource
             'artist_name' => $this->whenLoaded('product', fn() => $this->product->artists->first()->name ?? 'N/A', 'N/A'),
             'price' => (float) $this->total_price, // Ensure it's a number for frontend
             'unit_price' => (float) $this->unit_price,
-            'image_url' => $this->whenLoaded('product', fn() => $this->product->image, null),
+            'image_url' => $this->whenLoaded('product', fn() => $this->product->image_url, null),
             'quantity' => (int) $this->quantity,
             'sku' => $this->product_sku,
             'slug' => $this->whenLoaded('product', fn() => $this->product->slug, null),
