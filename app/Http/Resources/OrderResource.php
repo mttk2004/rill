@@ -10,6 +10,21 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class OrderResource extends JsonResource
 {
     /**
+     * Get human-readable description for order status.
+     */
+    private function getStatusDescription(string $status): string
+    {
+        return match($status) {
+            'pending' => 'Đơn hàng đã được đặt',
+            'confirmed' => 'Đơn hàng đã được xác nhận',
+            'shipped' => 'Đơn hàng đã được giao cho đơn vị vận chuyển',
+            'delivered' => 'Đơn hàng đã được giao thành công',
+            'cancelled' => 'Đơn hàng đã bị hủy',
+            default => 'Cập nhật trạng thái',
+        };
+    }
+
+    /**
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
@@ -51,22 +66,17 @@ class OrderResource extends JsonResource
                 ])),
                 'notes' => $this->notes,
             ] : null,
-            'timeline' => [
-                // This is a simplified timeline. A real app would use order_status_histories
-                ['status' => OrderStatus::PENDING->value, 'date' => $this->placed_at, 'description' => 'Đơn hàng đã được đặt'],
-                $this->when($this->status !== OrderStatus::PENDING, [
-                    'status' => OrderStatus::CONFIRMED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được xác nhận'
-                ]),
-                $this->when(in_array($this->status, [OrderStatus::SHIPPED, OrderStatus::DELIVERED]), [
-                    'status' => OrderStatus::SHIPPED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được giao cho đơn vị vận chuyển'
-                ]),
-                 $this->when($this->status === OrderStatus::DELIVERED, [
-                    'status' => OrderStatus::DELIVERED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được giao thành công'
-                ]),
-                  $this->when($this->status === OrderStatus::CANCELLED, [
-                    'status' => OrderStatus::CANCELLED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã bị hủy'
-                ]),
-            ],
+            'timeline' => $this->whenLoaded('statusHistories', function() {
+                return $this->statusHistories->map(function($history) {
+                    return [
+                        'status' => $history->status,
+                        'date' => $history->created_at,
+                        'description' => $this->getStatusDescription($history->status),
+                        'notes' => $history->notes,
+                        'created_by' => $history->createdBy?->name,
+                    ];
+                })->toArray();
+            }, []),
         ];
     }
 }

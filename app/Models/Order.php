@@ -70,6 +70,7 @@ class Order extends Model
                 OrderStatusHistory::create([
                     'order_id' => $order->id,
                     'status' => $order->status->value,
+                    'notes' => $order->status_change_notes ?? null,
                     'created_by' => auth()->id(),
                 ]);
             }
@@ -80,6 +81,7 @@ class Order extends Model
             OrderStatusHistory::create([
                 'order_id' => $order->id,
                 'status' => $order->status->value,
+                'notes' => $order->status_change_notes ?? null,
                 'created_by' => auth()->id(),
             ]);
         });

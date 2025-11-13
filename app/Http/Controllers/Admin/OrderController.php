@@ -134,6 +134,9 @@ class OrderController extends Controller
             'user',
             'payment',
             'items.product.artists',
+            'statusHistories' => function($query) {
+                $query->with('createdBy:id,name')->orderBy('created_at', 'asc');
+            }
         ])->findOrFail($id);
 
         // Transform order data for frontend
@@ -186,6 +189,20 @@ class OrderController extends Controller
                         ];
                     })->toArray(),
                 ],
+            ];
+        });
+
+        // Transform status histories
+        $orderData['status_histories'] = $order->statusHistories->map(function ($history) {
+            return [
+                'id' => $history->id,
+                'status' => $history->status,
+                'notes' => $history->notes,
+                'created_at' => $history->created_at,
+                'created_by' => $history->createdBy ? [
+                    'id' => $history->createdBy->id,
+                    'name' => $history->createdBy->name,
+                ] : null,
             ];
         });
 
@@ -257,6 +274,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'status' => 'required|in:' . implode(',', array_map(fn($case) => $case->value, OrderStatus::cases())),
+            'notes' => 'nullable|string|max:1000',
         ]);
 
         $order = Order::withTrashed()->findOrFail($id);
@@ -278,7 +296,10 @@ class OrderController extends Controller
             }
         }
 
-        // Update status
+        // Update status (set notes as temporary attribute for history)
+        if ($request->filled('notes')) {
+            $order->status_change_notes = $request->notes;
+        }
         $order->update(['status' => $newStatus]);
 
         // If status is cancelled, soft delete the order

@@ -402,35 +402,50 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               </CardContent>
             </Card>
 
-            {/* Order Timeline */}
+            {/* Status History Timeline */}
             <Card>
               <CardHeader className="border-b bg-muted/30">
-                <CardTitle>Thông tin đơn hàng</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Lịch sử trạng thái
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
-                  <div className="flex-1">
-                    <div className="text-xs text-muted-foreground">Ngày đặt hàng</div>
-                    <div className="font-medium text-sm mt-0.5">{formatDateTime(order.placed_at)}</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
-                  <div className="flex-1">
-                    <div className="text-xs text-muted-foreground">Cập nhật lần cuối</div>
-                    <div className="font-medium text-sm mt-0.5">{formatDateTime(order.updated_at)}</div>
-                  </div>
-                </div>
-                {order.deleted_at && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5" />
-                    <div className="flex-1">
-                      <div className="text-xs text-muted-foreground">Ngày hủy</div>
-                      <div className="font-medium text-sm text-red-600 mt-0.5">
-                        {formatDateTime(order.deleted_at)}
+              <CardContent className="p-4">
+                {order.status_histories && order.status_histories.length > 0 ? (
+                  <div className="space-y-4">
+                    {order.status_histories.map((history, index) => (
+                      <div key={history.id} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
+                          {index < order.status_histories!.length - 1 && (
+                            <div className="w-px h-full bg-border my-1" />
+                          )}
+                        </div>
+                        <div className="flex-1 pb-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            {getOrderStatusBadge(history.status as AdminOrder['status'], null)}
+                            <span className="text-xs text-muted-foreground">
+                              {formatDateTime(history.created_at)}
+                            </span>
+                          </div>
+                          {history.notes && (
+                            <div className="mt-1.5 text-xs text-muted-foreground bg-muted/50 p-2 rounded border">
+                              <span className="font-medium">Ghi chú:</span> {history.notes}
+                            </div>
+                          )}
+                          {history.created_by && (
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              Bởi: {history.created_by.name}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6 text-muted-foreground">
+                    <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Chưa có lịch sử trạng thái</p>
                   </div>
                 )}
               </CardContent>

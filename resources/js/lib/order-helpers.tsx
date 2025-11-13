@@ -63,6 +63,16 @@ export interface AdminOrder {
       }>;
     };
   }>;
+  status_histories?: Array<{
+    id: string;
+    status: string;
+    notes: string | null;
+    created_at: string;
+    created_by: {
+      id: string;
+      name: string;
+    } | null;
+  }>;
 }
 
 // Order status badge with icon

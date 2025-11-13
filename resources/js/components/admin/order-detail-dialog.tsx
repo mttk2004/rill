@@ -60,6 +60,16 @@ interface OrderDetail {
     processed_at?: string;
   };
   order_items: OrderItem[];
+  status_histories?: Array<{
+    id: string;
+    status: string;
+    notes: string | null;
+    created_at: string;
+    created_by: {
+      id: string;
+      name: string;
+    } | null;
+  }>;
 }
 
 interface OrderDetailDialogProps {
@@ -191,6 +201,49 @@ export const OrderDetailDialog = ({ order, isOpen, onClose }: OrderDetailDialogP
                   <p><span className="text-muted-foreground">Người nhận:</span> <span className="font-medium">{order.shipping_address.full_name}</span></p>
                   <p><span className="text-muted-foreground">SĐT:</span> <span className="font-medium">{order.shipping_address.phone}</span></p>
                   <p><span className="text-muted-foreground">Địa chỉ:</span> <span className="font-medium">{fullAddress}</span></p>
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
+
+          {/* Status History */}
+          {order.status_histories && order.status_histories.length > 0 && (
+            <>
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="font-semibold">Lịch sử trạng thái</h3>
+                </div>
+                <div className="space-y-3">
+                  {order.status_histories.map((history, index) => (
+                    <div key={history.id} className="flex gap-3">
+                      <div className="flex flex-col items-center">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 mt-1" />
+                        {index < order.status_histories!.length - 1 && (
+                          <div className="w-px h-full bg-border my-1" />
+                        )}
+                      </div>
+                      <div className="flex-1 pb-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {getStatusBadge(history.status)}
+                          <span className="text-xs text-muted-foreground">
+                            {formatDateTime(history.created_at)}
+                          </span>
+                        </div>
+                        {history.notes && (
+                          <div className="mt-1.5 text-xs text-muted-foreground bg-muted/50 p-2 rounded border">
+                            <span className="font-medium">Ghi chú:</span> {history.notes}
+                          </div>
+                        )}
+                        {history.created_by && (
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            Bởi: {history.created_by.name}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
               <Separator />

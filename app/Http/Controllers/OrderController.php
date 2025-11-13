@@ -55,7 +55,10 @@ class OrderController extends Controller
             'items.product.reviews' => function($query) {
                 $query->where('user_id', Auth::id());
             },
-            'payment'
+            'payment',
+            'statusHistories' => function($query) {
+                $query->with('createdBy:id,name')->orderBy('created_at', 'asc');
+            }
         ]);
 
         return Inertia::render('order-detail', [
