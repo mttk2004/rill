@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use App\Models\Concerns\HasSnowflakeId;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'status' => OrderStatus::class,
         'shipping_address' => 'array',
         'billing_address' => 'array',
         'placed_at' => 'datetime',

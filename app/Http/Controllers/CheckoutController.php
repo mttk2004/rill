@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentMethod;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\ShoppingCartItem;
 use App\Services\OrderService;
@@ -54,9 +55,9 @@ class CheckoutController extends Controller
             $order = $orderService->createOrderFromCart($user, $request->validated());
 
             // Kiểm tra payment method
-            $paymentMethod = $request->input('payment_method', 'cod');
+            $paymentMethod = $request->input('payment_method', PaymentMethod::COD->value);
 
-            if ($paymentMethod === 'vnpay') {
+            if ($paymentMethod === PaymentMethod::VNPAY->value) {
                 // Tạo URL thanh toán VNPAY
                 $paymentUrl = $vnpayService->createPaymentUrl($order, $request);
 

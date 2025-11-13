@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,18 +21,23 @@ class OrderResource extends JsonResource
             'order_id' => $this->id, // Actual database ID
             'order_number' => $this->order_number,
             'date' => $this->placed_at,
-            'status' => $this->status,
+            'status' => $this->status->value,
             'subtotal' => (float) $this->subtotal,
             'discount_amount' => (float) $this->discount_amount,
             'total' => (float) $this->total_amount,
             'currency' => $this->currency ?? 'VND',
-            'delivered_date' => $this->when($this->status === 'delivered', $this->updated_at),
+            'delivered_date' => $this->when($this->status === OrderStatus::DELIVERED, $this->updated_at),
             'payment_method' => $this->whenLoaded('payment', function() {
-                $method = $this->payment?->payment_method ?? 'N/A';
-                return $method === 'cod' ? 'Thanh toán khi nhận hàng' : ($method === 'vnpay' ? 'VNPAY' : $method);
+                $method = $this->payment?->payment_method;
+                if (!$method) return 'N/A';
+                return match($method) {
+                    PaymentMethod::COD => 'Thanh toán khi nhận hàng',
+                    PaymentMethod::VNPAY => 'VNPAY',
+                    default => $method->value,
+                };
             }, 'N/A'),
             'payment_status' => $this->whenLoaded('payment', function() {
-                return $this->payment?->payment_status ?? null;
+                return $this->payment?->payment_status?->value ?? null;
             }),
             'items' => OrderItemResource::collection($this->whenLoaded('items')),
             'shipping_address' => $this->shipping_address ? [
@@ -46,18 +53,18 @@ class OrderResource extends JsonResource
             ] : null,
             'timeline' => [
                 // This is a simplified timeline. A real app would use order_status_histories
-                ['status' => 'pending', 'date' => $this->placed_at, 'description' => 'Đơn hàng đã được đặt'],
-                $this->when($this->status !== 'pending', [
-                    'status' => 'confirmed', 'date' => $this->created_at->addMinutes(10), 'description' => 'Đơn hàng đã được xác nhận'
+                ['status' => OrderStatus::PENDING->value, 'date' => $this->placed_at, 'description' => 'Đơn hàng đã được đặt'],
+                $this->when($this->status !== OrderStatus::PENDING, [
+                    'status' => OrderStatus::CONFIRMED->value, 'date' => $this->created_at->addMinutes(10), 'description' => 'Đơn hàng đã được xác nhận'
                 ]),
-                $this->when(in_array($this->status, ['shipped', 'delivered']), [
-                    'status' => 'shipped', 'date' => $this->updated_at->subHours(2), 'description' => 'Đơn hàng đã được giao cho đơn vị vận chuyển'
+                $this->when(in_array($this->status, [OrderStatus::SHIPPED, OrderStatus::DELIVERED]), [
+                    'status' => OrderStatus::SHIPPED->value, 'date' => $this->updated_at->subHours(2), 'description' => 'Đơn hàng đã được giao cho đơn vị vận chuyển'
                 ]),
-                 $this->when($this->status === 'delivered', [
-                    'status' => 'delivered', 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được giao thành công'
+                 $this->when($this->status === OrderStatus::DELIVERED, [
+                    'status' => OrderStatus::DELIVERED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được giao thành công'
                 ]),
-                  $this->when($this->status === 'cancelled', [
-                    'status' => 'cancelled', 'date' => $this->updated_at, 'description' => 'Đơn hàng đã bị hủy'
+                  $this->when($this->status === OrderStatus::CANCELLED, [
+                    'status' => OrderStatus::CANCELLED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã bị hủy'
                 ]),
             ],
         ];

@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -35,7 +38,7 @@ class OrderService
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_number' => 'RL-' . strtoupper(Str::random(8)),
-                'status' => 'pending',
+                'status' => OrderStatus::PENDING,
                 'subtotal' => $subtotal,
                 'discount_amount' => 0,
                 'total_amount' => $totalAmount,
@@ -57,11 +60,11 @@ class OrderService
             }
 
             // Tạo payment record với payment method từ request
-            $paymentMethod = $data['payment_method'] ?? 'cod';
+            $paymentMethod = $data['payment_method'] ?? PaymentMethod::COD->value;
             Payment::create([
                 'order_id' => $order->id,
                 'payment_method' => $paymentMethod,
-                'payment_status' => 'pending',
+                'payment_status' => PaymentStatus::PENDING,
                 'amount' => $totalAmount,
             ]);
 

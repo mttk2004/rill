@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -42,7 +44,7 @@ class OrderController extends Controller
 
         // Payment status filter
         if ($payment_status && $payment_status !== 'all') {
-            if ($payment_status === 'pending') {
+            if ($payment_status === PaymentStatus::PENDING->value) {
                 // For pending: include orders with pending payment OR without payment record
                 $query->where(function ($q) use ($payment_status) {
                     $q->whereHas('payment', function ($subQ) use ($payment_status) {
@@ -95,7 +97,7 @@ class OrderController extends Controller
                 'email' => $order->user->email,
                 'phone' => $order->user->phone ?? null,
             ] : null;
-            $orderData['payment_status'] = $order->payment ? $order->payment->payment_status : 'pending';
+            $orderData['payment_status'] = $order->payment ? $order->payment->payment_status->value : PaymentStatus::PENDING->value;
             $orderData['order_items_count'] = $order->items_count;
 
             return $orderData;
@@ -104,11 +106,11 @@ class OrderController extends Controller
         // Calculate stats
         $stats = [
             'total' => Order::count(),
-            'pending' => Order::where('status', 'pending')->count(),
-            'confirmed' => Order::where('status', 'confirmed')->count(),
-            'shipped' => Order::where('status', 'shipped')->count(),
-            'delivered' => Order::where('status', 'delivered')->count(),
-            'cancelled' => Order::where('status', 'cancelled')->count(),
+            'pending' => Order::where('status', OrderStatus::PENDING)->count(),
+            'confirmed' => Order::where('status', OrderStatus::CONFIRMED)->count(),
+            'shipped' => Order::where('status', OrderStatus::SHIPPED)->count(),
+            'delivered' => Order::where('status', OrderStatus::DELIVERED)->count(),
+            'cancelled' => Order::where('status', OrderStatus::CANCELLED)->count(),
         ];
 
         return Inertia::render('admin/orders/index', [
@@ -210,7 +212,7 @@ class OrderController extends Controller
         ])->findOrFail($id);
 
         // Check if order is paid
-        if (!$order->payment || $order->payment->payment_status !== 'completed') {
+        if (!$order->payment || $order->payment->payment_status !== PaymentStatus::COMPLETED) {
             return redirect()->back()->with('error', 'Chỉ có thể xuất đơn hàng đã thanh toán');
         }
 
@@ -228,7 +230,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         // Update status to cancelled
-        $order->update(['status' => 'cancelled']);
+        $order->update(['status' => OrderStatus::CANCELLED]);
         $order->delete();
 
         return redirect()->back()->with('success', 'Đơn hàng đã được hủy');
@@ -243,7 +245,7 @@ class OrderController extends Controller
         $order->restore();
 
         // Restore to pending status
-        $order->update(['status' => 'pending']);
+        $order->update(['status' => OrderStatus::PENDING]);
 
         return redirect()->back()->with('success', 'Đơn hàng đã được khôi phục');
     }
@@ -254,7 +256,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, string $id)
     {
         $request->validate([
-            'status' => 'required|in:pending,confirmed,shipped,delivered,cancelled',
+            'status' => 'required|in:' . implode(',', array_map(fn($case) => $case->value, OrderStatus::cases())),
         ]);
 
         $order = Order::withTrashed()->findOrFail($id);
@@ -262,14 +264,14 @@ class OrderController extends Controller
         $newStatus = $request->status;
 
         // Business rules validation
-        if ($oldStatus === 'delivered' && $newStatus !== 'cancelled') {
+        if ($oldStatus === OrderStatus::DELIVERED && $newStatus !== OrderStatus::CANCELLED->value) {
             return response()->json([
                 'success' => false,
                 'message' => 'Không thể thay đổi trạng thái của đơn hàng đã giao',
             ], 422);
         }
 
-        if ($oldStatus === 'cancelled' && $newStatus !== 'cancelled') {
+        if ($oldStatus === OrderStatus::CANCELLED && $newStatus !== OrderStatus::CANCELLED->value) {
             // Restore cancelled order
             if ($order->trashed()) {
                 $order->restore();
@@ -280,7 +282,7 @@ class OrderController extends Controller
         $order->update(['status' => $newStatus]);
 
         // If status is cancelled, soft delete the order
-        if ($newStatus === 'cancelled' && !$order->trashed()) {
+        if ($newStatus === OrderStatus::CANCELLED->value && !$order->trashed()) {
             $order->delete();
         }
 

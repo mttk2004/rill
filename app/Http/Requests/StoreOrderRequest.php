@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,7 +29,7 @@ class StoreOrderRequest extends FormRequest
                 'string',
                 'exists:shipping_addresses,id,user_id,' . Auth::id(),
             ],
-            'payment_method' => ['required', 'string', 'in:cod,vnpay'],
+            'payment_method' => ['required', 'string', 'in:' . PaymentMethod::COD->value . ',' . PaymentMethod::VNPAY->value],
         ];
     }
 

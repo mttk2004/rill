@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Services\VnpayService;
 use Illuminate\Http\Request;
@@ -48,7 +50,7 @@ class VnpayController extends Controller
             return response()->json(['RspCode' => '01', 'Message' => 'Payment not found']);
         }
 
-        if ($payment->payment_status !== 'pending') {
+        if ($payment->payment_status !== PaymentStatus::PENDING) {
             Log::info('VNPAY IPN: Payment already processed.', $data);
             return response()->json(['RspCode' => '02', 'Message' => 'Order already confirmed']);
         }
@@ -57,27 +59,27 @@ class VnpayController extends Controller
         if ($data['vnp_ResponseCode'] === '00') {
             // Thanh toán thành công
             $payment->update([
-                'payment_status' => 'completed',
+                'payment_status' => PaymentStatus::COMPLETED,
                 'transaction_id' => $data['vnp_TransactionNo'] ?? null,
                 'gateway_response' => $data,
                 'processed_at' => now(),
             ]);
 
             $order->update([
-                'status' => 'confirmed', // Đơn hàng đã được xác nhận sau khi thanh toán thành công
+                'status' => OrderStatus::CONFIRMED, // Đơn hàng đã được xác nhận sau khi thanh toán thành công
             ]);
 
             Log::info('VNPAY IPN: Payment successful.', ['order_id' => $order->id]);
         } else {
             // Thanh toán thất bại
             $payment->update([
-                'payment_status' => 'failed',
+                'payment_status' => PaymentStatus::FAILED,
                 'gateway_response' => $data,
                 'processed_at' => now(),
             ]);
 
             $order->update([
-                'status' => 'cancelled', // Đơn hàng bị hủy do thanh toán thất bại
+                'status' => OrderStatus::CANCELLED, // Đơn hàng bị hủy do thanh toán thất bại
             ]);
 
             Log::warning('VNPAY IPN: Payment failed.', [

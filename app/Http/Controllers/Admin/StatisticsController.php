@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\User;
@@ -29,7 +31,7 @@ class StatisticsController extends Controller
 
         // Current period stats
         $currentRevenue = Order::whereBetween('placed_at', [$startDate, $endDate])
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', OrderStatus::CANCELLED)
             ->sum('total_amount');
 
         $currentOrders = Order::whereBetween('placed_at', [$startDate, $endDate])
@@ -44,7 +46,7 @@ class StatisticsController extends Controller
 
         // Previous period stats
         $prevRevenue = Order::whereBetween('placed_at', [$prevStartDate, $prevEndDate])
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', OrderStatus::CANCELLED)
             ->sum('total_amount');
 
         $prevOrders = Order::whereBetween('placed_at', [$prevStartDate, $prevEndDate])
@@ -100,7 +102,7 @@ class StatisticsController extends Controller
 
         // Daily revenue chart data (last 30 days)
         $dailyRevenue = Order::where('placed_at', '>=', now()->subDays(30))
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', OrderStatus::CANCELLED)
             ->select(
                 DB::raw('DATE(placed_at) as date'),
                 DB::raw('SUM(total_amount) as revenue'),
@@ -134,7 +136,7 @@ class StatisticsController extends Controller
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->whereBetween('orders.placed_at', [$startDate, $endDate])
-            ->where('orders.status', '!=', 'cancelled')
+            ->where('orders.status', '!=', OrderStatus::CANCELLED->value)
             ->select(
                 'products.id',
                 'products.name',
@@ -168,8 +170,8 @@ class StatisticsController extends Controller
                     'customer' => $order->user ? $order->user->name : 'N/A',
                     'items_count' => $order->items->count(),
                     'total_amount' => $order->total_amount,
-                    'status' => $order->status,
-                    'payment_status' => $order->payment ? $order->payment->payment_status : 'pending',
+                    'status' => $order->status->value,
+                    'payment_status' => $order->payment ? $order->payment->payment_status->value : PaymentStatus::PENDING->value,
                     'placed_at' => $order->placed_at->format('Y-m-d'),
                 ];
             });
@@ -177,7 +179,7 @@ class StatisticsController extends Controller
         // Revenue by payment method
         $revenueByPaymentMethod = Order::join('payments', 'orders.id', '=', 'payments.order_id')
             ->whereBetween('orders.placed_at', [$startDate, $endDate])
-            ->where('orders.status', '!=', 'cancelled')
+            ->where('orders.status', '!=', OrderStatus::CANCELLED->value)
             ->select(
                 'payments.payment_method',
                 DB::raw('SUM(orders.total_amount) as total'),
