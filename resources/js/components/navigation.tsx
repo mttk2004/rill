@@ -51,7 +51,7 @@ interface NavigationProps {
   user?: {
     name: string;
     email: string;
-    avatar?: string;
+    avatar_url?: string;
   } | null;
 }
 
@@ -301,7 +301,7 @@ export const Navigation = ({ user }: NavigationProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 h-9">
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarImage src={user.avatar_url} alt={user.name} />
                       <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:inline text-sm font-medium">{user.name}</span>

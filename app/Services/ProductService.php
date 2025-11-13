@@ -221,7 +221,7 @@ class ProductService
 
         // Get all reviews (auto-approved, no status filter needed)
         $reviews = $product->reviews()
-            ->with('user:id,name')
+            ->with('user:id,name,avatar')
             ->latest()
             ->get()
             ->map(function ($review) {
@@ -232,6 +232,7 @@ class ProductService
                     'created_at' => $review->created_at->format('d/m/Y'),
                     'user' => [
                         'name' => $review->user->name,
+                        'avatar_url' => $review->user->avatar_url,
                     ],
                 ];
             });

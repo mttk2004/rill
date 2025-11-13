@@ -5,6 +5,7 @@ interface ProductReview {
   id: string;
   user: {
     name: string;
+    avatar_url?: string;
   };
   rating: number;
   comment: string;
@@ -65,9 +66,17 @@ export function ReviewList({ reviews, selectedRatingFilter, onClearFilter }: Rev
               <div className="flex items-start gap-3">
                 {/* Avatar */}
                 <div className="flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold">
-                    {review.user.name.charAt(0).toUpperCase()}
-                  </div>
+                  {review.user.avatar_url ? (
+                    <img
+                      src={review.user.avatar_url}
+                      alt={review.user.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold">
+                      {review.user.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </div>
 
                 {/* Content */}
@@ -83,8 +92,8 @@ export function ReviewList({ reviews, selectedRatingFilter, onClearFilter }: Rev
                       <Star
                         key={i}
                         className={`h-4 w-4 ${i < review.rating
-                            ? 'fill-amber-500 text-amber-500'
-                            : 'fill-gray-200 text-gray-200 dark:fill-gray-700 dark:text-gray-700'
+                          ? 'fill-amber-500 text-amber-500'
+                          : 'fill-gray-200 text-gray-200 dark:fill-gray-700 dark:text-gray-700'
                           }`}
                       />
                     ))}
