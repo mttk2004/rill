@@ -169,9 +169,9 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
-        // Invoices are only available for delivered orders.
-        if ($order->status !== OrderStatus::DELIVERED) {
-            abort(403, 'Invoice is not available for this order status.');
+        // Invoices are only available for orders with completed payment.
+        if ($order->payment->payment_status !== PaymentStatus::COMPLETED) {
+            abort(403, 'Invoice is not available. Payment must be completed first.');
         }
 
         $order->load(['items.product', 'payment']);
