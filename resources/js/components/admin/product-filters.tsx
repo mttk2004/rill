@@ -16,7 +16,7 @@ interface ProductFiltersProps {
   onSortChange: (value: string) => void;
 }
 
-export const ProductFiltersRefactored = ({
+export const ProductFilters = ({
   filters,
   genres,
   onSearchChange,
