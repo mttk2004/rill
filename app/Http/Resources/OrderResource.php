@@ -55,10 +55,10 @@ class OrderResource extends JsonResource
                 // This is a simplified timeline. A real app would use order_status_histories
                 ['status' => OrderStatus::PENDING->value, 'date' => $this->placed_at, 'description' => 'Đơn hàng đã được đặt'],
                 $this->when($this->status !== OrderStatus::PENDING, [
-                    'status' => OrderStatus::CONFIRMED->value, 'date' => $this->created_at->addMinutes(10), 'description' => 'Đơn hàng đã được xác nhận'
+                    'status' => OrderStatus::CONFIRMED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được xác nhận'
                 ]),
                 $this->when(in_array($this->status, [OrderStatus::SHIPPED, OrderStatus::DELIVERED]), [
-                    'status' => OrderStatus::SHIPPED->value, 'date' => $this->updated_at->subHours(2), 'description' => 'Đơn hàng đã được giao cho đơn vị vận chuyển'
+                    'status' => OrderStatus::SHIPPED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được giao cho đơn vị vận chuyển'
                 ]),
                  $this->when($this->status === OrderStatus::DELIVERED, [
                     'status' => OrderStatus::DELIVERED->value, 'date' => $this->updated_at, 'description' => 'Đơn hàng đã được giao thành công'

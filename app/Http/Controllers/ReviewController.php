@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Http\Requests\StoreProductReviewRequest;
 use App\Models\Product;
 use App\Models\ProductReview;
@@ -34,7 +35,7 @@ class ReviewController extends Controller
         // Find a delivered order containing this product
         $orderItem = \App\Models\OrderItem::whereHas('order', function ($query) {
                 $query->where('user_id', Auth::id())
-                      ->where('status', 'delivered');
+                      ->where('status', OrderStatus::DELIVERED);
             })
             ->where('product_id', $product->id)
             ->first();

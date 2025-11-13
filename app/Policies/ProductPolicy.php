@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -16,7 +17,7 @@ class ProductPolicy
     {
         // User can review a product if they have a delivered order containing this product
         return Order::where('user_id', $user->id)
-            ->where('status', 'delivered')
+            ->where('status', OrderStatus::DELIVERED)
             ->whereHas('items', fn($query) => $query->where('product_id', $product->id))
             ->exists();
     }

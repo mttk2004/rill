@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -17,7 +20,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'status' => 'nullable|in:pending,confirmed,shipped,delivered,cancelled',
+            'status' => 'nullable|in:' . implode(',', array_map(fn($case) => $case->value, OrderStatus::cases())),
         ]);
 
         $query = Auth::user()
@@ -127,13 +130,14 @@ class OrderController extends Controller
             ];
 
             // Auto-trigger IPN in local environment (since VNPAY can't reach localhost)
-            if (app()->environment('local') && $order->payment->payment_status === 'pending') {
+            if (app()->environment('local') && $order->payment->payment_status === \App\Enums\PaymentStatus::PENDING) {
                 \Log::info('Auto-triggering IPN in local environment', ['order_id' => $order->id]);
 
                 try {
-                    // Call IPN handler internally
+                    // Call IPN handler internally with OrderService injected
                     $vnpayController = app(\App\Http\Controllers\VnpayController::class);
-                    $vnpayController->handleIpn($request, $vnpayService);
+                    $orderService = app(\App\Services\OrderService::class);
+                    $vnpayController->handleIpn($request, $vnpayService, $orderService);
 
                     // Reload payment to get updated status
                     $order->load('payment');
@@ -142,7 +146,8 @@ class OrderController extends Controller
                 } catch (\Exception $e) {
                     \Log::error('Failed to auto-trigger IPN', [
                         'order_id' => $order->id,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
                     ]);
                 }
             }
@@ -165,7 +170,7 @@ class OrderController extends Controller
         Gate::authorize('view', $order);
 
         // Invoices are only available for delivered orders.
-        if ($order->status !== 'delivered') {
+        if ($order->status !== OrderStatus::DELIVERED) {
             abort(403, 'Invoice is not available for this order status.');
         }
 
@@ -185,11 +190,11 @@ class OrderController extends Controller
         Gate::authorize('view', $order);
 
         // Only pending orders can be cancelled
-        if ($order->status !== 'pending') {
+        if ($order->status !== OrderStatus::PENDING) {
             return back()->with('error', 'Chỉ có thể hủy đơn hàng đang chờ xác nhận.');
         }
 
-        $order->update(['status' => 'cancelled']);
+        $order->update(['status' => OrderStatus::CANCELLED]);
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
@@ -206,19 +211,19 @@ class OrderController extends Controller
 
         // Validate conditions for retry
         if (!$order->payment) {
-            return back()->with('error', 'Không tìm thấy thông tin thanh toán.');
+            return response()->json(['error' => 'Không tìm thấy thông tin thanh toán.'], 400);
         }
 
-        if ($order->payment->payment_method !== 'vnpay') {
-            return back()->with('error', 'Chỉ có thể thanh toán lại cho đơn hàng VNPAY.');
+        if ($order->payment->payment_method !== PaymentMethod::VNPAY) {
+            return response()->json(['error' => 'Chỉ có thể thanh toán lại cho đơn hàng VNPAY.'], 400);
         }
 
-        if ($order->payment->payment_status !== 'pending') {
-            return back()->with('error', 'Đơn hàng này đã được thanh toán hoặc đã bị hủy.');
+        if ($order->payment->payment_status !== PaymentStatus::PENDING) {
+            return response()->json(['error' => 'Đơn hàng này đã được thanh toán hoặc đã bị hủy.'], 400);
         }
 
-        if ($order->status !== 'pending') {
-            return back()->with('error', 'Chỉ có thể thanh toán lại cho đơn hàng đang chờ xử lý.');
+        if ($order->status !== OrderStatus::PENDING) {
+            return response()->json(['error' => 'Chỉ có thể thanh toán lại cho đơn hàng đang chờ xử lý.'], 400);
         }
 
         try {
@@ -242,7 +247,7 @@ class OrderController extends Controller
                 'error' => $e->getMessage()
             ]);
 
-            return back()->with('error', 'Không thể tạo link thanh toán. Vui lòng thử lại!');
+            return response()->json(['error' => 'Không thể tạo link thanh toán. Vui lòng thử lại!'], 500);
         }
     }
 }

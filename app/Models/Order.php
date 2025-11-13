@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Concerns\HasSnowflakeId;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -50,6 +51,16 @@ class Order extends Model
             }
             if (empty($order->placed_at)) {
                 $order->placed_at = now();
+            }
+        });
+
+        // Auto-complete payment when order is delivered
+        static::updated(function ($order) {
+            if ($order->isDirty('status') && $order->status === OrderStatus::DELIVERED) {
+                $payment = $order->payment;
+                if ($payment && $payment->payment_status === PaymentStatus::PENDING) {
+                    $payment->update(['payment_status' => PaymentStatus::COMPLETED]);
+                }
             }
         });
     }
