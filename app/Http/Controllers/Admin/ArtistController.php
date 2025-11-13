@@ -131,7 +131,7 @@ class ArtistController extends Controller
             'description' => 'nullable|string',
             'country' => 'nullable|string|max:100',
             'is_active' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:500',
         ]);
 
         // Handle image upload
@@ -208,7 +208,7 @@ class ArtistController extends Controller
             'description' => 'nullable|string',
             'country' => 'nullable|string|max:100',
             'is_active' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:500',
         ]);
 
         // Handle image upload

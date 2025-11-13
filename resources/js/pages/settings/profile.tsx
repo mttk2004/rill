@@ -3,6 +3,7 @@ import { type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, usePage, useForm } from '@inertiajs/react';
 import { User, Calendar, Upload, Mail, Phone, UserCircle, AlertCircle } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 import DeleteUser from '@/components/delete-user';
 import InputError from '@/components/input-error';
@@ -44,6 +45,22 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     avatar: null as File | null,
     _method: 'patch',
   });
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file size (500KB = 512000 bytes)
+      const maxSize = 512000;
+      if (file.size > maxSize) {
+        toast.error(`Kích thước ảnh không được vượt quá 500KB. Ảnh hiện tại: ${(file.size / 1024).toFixed(0)}KB`);
+        e.target.value = ''; // Reset input
+        return;
+      }
+      setData('avatar', file);
+    } else {
+      setData('avatar', null);
+    }
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,11 +244,11 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                   type="file"
                   accept="image/*"
                   name="avatar"
-                  onChange={(e) => setData('avatar', e.target.files?.[0] || null)}
+                  onChange={handleAvatarChange}
                   className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 dark:bg-slate-700 dark:text-white transition-all duration-300 hover:border-amber-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-gradient-to-r file:from-amber-500 file:to-amber-600 file:text-white hover:file:from-amber-600 hover:file:to-amber-700 file:cursor-pointer file:transition-all file:duration-300"
                 />
                 <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                  📸 Chọn ảnh định dạng JPG, PNG hoặc GIF. Kích thước tối đa 2MB.
+                  📸 Chọn ảnh định dạng JPG, PNG hoặc GIF. Kích thước tối đa 500KB.
                 </p>
               </div>
             </div>

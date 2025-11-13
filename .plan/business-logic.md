@@ -46,7 +46,7 @@ Validation Rules:
 - Họ và tên: bắt buộc, string, max:255
 - Số điện thoại: format Việt Nam (03x, 05x, 07x, 08x, 09x)
 - Ngày sinh: không được lớn hơn ngày hiện tại
-- Avatar: file image, tối đa 2MB
+- Avatar: file image, tối đa 500KB
 - Chỉ có thể có 1 địa chỉ mặc định
 ```
 

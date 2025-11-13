@@ -142,6 +142,14 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file size (500KB = 512000 bytes)
+      const maxSize = 512000;
+      if (file.size > maxSize) {
+        toast.error(`Kích thước ảnh không được vượt quá 500KB. Ảnh hiện tại: ${(file.size / 1024).toFixed(0)}KB`);
+        e.target.value = ''; // Reset input
+        return;
+      }
+
       setFormData((prev) => ({ ...prev, image: file }));
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -695,7 +703,7 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
                         <Label htmlFor="image-upload" className="cursor-pointer">
                           <div className="text-muted-foreground">
                             <p>Click để tải ảnh lên</p>
-                            <p className="text-sm">PNG, JPG, GIF up to 2MB</p>
+                            <p className="text-sm">PNG, JPG, GIF up to 500KB</p>
                           </div>
                         </Label>
                       </div>
