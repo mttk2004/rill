@@ -20,13 +20,13 @@ class ProfileController extends Controller
     public function edit(Request $request): Response
     {
         $user = $request->user();
-        
+
         // Format user data for form display
         $userData = $user->toArray();
         if ($user->date_of_birth) {
             $userData['date_of_birth'] = $user->date_of_birth->format('Y-m-d');
         }
-        
+
         return Inertia::render('settings/profile', [
             'user' => $userData,
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
@@ -41,19 +41,19 @@ class ProfileController extends Controller
     {
         $validated = $request->validated();
         $user = $request->user();
-        
+
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
             // Delete old avatar if exists
             if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+                Storage::disk('supabase')->delete($user->avatar);
             }
-            
+
             // Store new avatar
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $avatarPath = $request->file('avatar')->store('avatars', 'supabase');
             $validated['avatar'] = $avatarPath;
         }
-        
+
         $user->fill($validated);
 
         if ($user->isDirty('email')) {

@@ -119,7 +119,9 @@ class Artist extends Model
             return $this->image;
         }
 
-        // Otherwise, prepend the storage path
-        return asset('storage/' . $this->image);
+        // Otherwise, use Supabase URL
+        $supabaseUrl = env('SUPABASE_URL');
+        $bucket = env('SUPABASE_BUCKET');
+        return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$this->image}";
     }
 }

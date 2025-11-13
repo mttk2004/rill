@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -229,10 +230,8 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/products'), $imageName);
-            $validated['image'] = '/images/products/' . $imageName;
+            $path = $request->file('image')->store('products', 'supabase');
+            $validated['image'] = $path;
         }
 
         $product = Product::create($validated);
@@ -372,15 +371,14 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images/products'), $imageName);
-            $validated['image'] = '/images/products/' . $imageName;
-
             // Delete old image if exists
-            if ($product->image && file_exists(public_path($product->image))) {
-                @unlink(public_path($product->image));
+            if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL)) {
+                Storage::disk('supabase')->delete($product->image);
             }
+
+            // Store new image
+            $path = $request->file('image')->store('products', 'supabase');
+            $validated['image'] = $path;
         }
 
         $product->update($validated);

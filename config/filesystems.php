@@ -60,6 +60,18 @@ return [
             'report' => false,
         ],
 
+        'supabase' => [
+            'driver' => 's3',
+            'key' => env('SUPABASE_ACCESS_KEY_ID'),
+            'secret' => env('SUPABASE_SECRET_ACCESS_KEY'),
+            'region' => env('SUPABASE_DEFAULT_REGION'),
+            'bucket' => env('SUPABASE_BUCKET'),
+            'endpoint' => env('SUPABASE_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'visibility' => 'public', // Quan trọng để ảnh có thể truy cập công khai
+            'throw' => false,
+            'url' => env('SUPABASE_URL') . '/storage/v1/object/public/' . env('SUPABASE_BUCKET'), // URL gốc để hiển thị ảnh
+        ],
     ],
 
     /*

@@ -80,7 +80,19 @@ class User extends Authenticatable
      */
     public function getAvatarUrlAttribute(): ?string
     {
-        return $this->avatar ? asset('storage/' . $this->avatar) : null;
+        if (!$this->avatar) {
+            return null;
+        }
+
+        // If it's already a full URL, return it
+        if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
+            return $this->avatar;
+        }
+
+        // Otherwise, use Supabase URL
+        $supabaseUrl = env('SUPABASE_URL');
+        $bucket = env('SUPABASE_BUCKET');
+        return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$this->avatar}";
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Models\Artist;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ArtistController extends Controller
 {
@@ -135,7 +136,7 @@ class ArtistController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('artists', 'public');
+            $path = $request->file('image')->store('artists', 'supabase');
             $validated['image'] = $path;
         }
 
@@ -214,14 +215,11 @@ class ArtistController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($artist->image && !filter_var($artist->image, FILTER_VALIDATE_URL)) {
-                $oldImagePath = storage_path('app/public/' . $artist->image);
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
-                }
+                Storage::disk('supabase')->delete($artist->image);
             }
 
             // Store new image
-            $path = $request->file('image')->store('artists', 'public');
+            $path = $request->file('image')->store('artists', 'supabase');
             $validated['image'] = $path;
         }
 

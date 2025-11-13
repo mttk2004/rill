@@ -176,7 +176,19 @@ class Product extends Model
      */
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        if (!$this->image) {
+            return null;
+        }
+
+        // Nếu là URL tuyệt đối (ảnh cũ hoặc link ngoài)
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        // Nếu đang lưu storage path, dùng URL của Supabase
+        $supabaseUrl = env('SUPABASE_URL');
+        $bucket = env('SUPABASE_BUCKET');
+        return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$this->image}";
     }
 
     /**
