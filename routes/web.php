@@ -108,7 +108,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::post('/artists', [App\Http\Controllers\Admin\ArtistController::class, 'store'])->name('admin.artists.store');
         Route::get('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'show'])->name('admin.artists.show');
         Route::get('/artists/{id}/edit', [App\Http\Controllers\Admin\ArtistController::class, 'edit'])->name('admin.artists.edit');
-        Route::post('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'update'])->name('admin.artists.update');
+        Route::match(['POST', 'PUT'], '/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'update'])->name('admin.artists.update');
         Route::delete('/artists/{id}', [App\Http\Controllers\Admin\ArtistController::class, 'destroy'])->name('admin.artists.destroy');
         Route::post('/artists/{id}/restore', [App\Http\Controllers\Admin\ArtistController::class, 'restore'])->name('admin.artists.restore');
 
