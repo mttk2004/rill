@@ -7,15 +7,18 @@
 ### ✅ Đã hoàn thành:
 
 1. **Cấu hình Supabase Storage** (`.env` và `config/filesystems.php`)
+   - Bucket: `rill-storage`
+   - Folder structure: `products/`, `artists/`, `avatars/`
+
 2. **Controllers đã được cập nhật:**
-   - `ProductController` - upload ảnh sản phẩm
-   - `ArtistController` - upload ảnh nghệ sĩ
-   - `ProfileController` - upload avatar người dùng
+   - `ProductController` - upload vào `products/` folder
+   - `ArtistController` - upload vào `artists/` folder
+   - `ProfileController` - upload vào `avatars/` folder
 
 3. **Models đã được cập nhật:**
-   - `Product` model - accessor `getImageUrlAttribute()`
-   - `Artist` model - accessor `getImageUrlAttribute()`
-   - `User` model - accessor `getAvatarUrlAttribute()`
+   - `Product` model - accessor `getImageUrlAttribute()` + `$appends`
+   - `Artist` model - accessor `getImageUrlAttribute()` + `$appends`
+   - `User` model - accessor `getAvatarUrlAttribute()` + `$appends`
 
 ### 📝 Cách hoạt động:
 
@@ -24,7 +27,7 @@
 // Trước đây (local storage)
 $image->move(public_path('images/products'), $imageName);
 
-// Bây giờ (Supabase)
+// Bây giờ (Supabase - có folder structure)
 $path = $request->file('image')->store('products', 'supabase');
 // $path sẽ là: "products/abc123xyz.jpg"
 ```
@@ -33,7 +36,10 @@ $path = $request->file('image')->store('products', 'supabase');
 ```php
 // Database lưu: "products/abc123xyz.jpg"
 // Accessor tự động chuyển thành:
-// "https://hqvescnsogknpicdxnxc.supabase.co/storage/v1/object/public/products/products/abc123xyz.jpg"
+// "https://<project-id>.supabase.co/storage/v1/object/public/rill-storage/products/abc123xyz.jpg"
+
+// Tương tự cho artists: "artists/xyz.jpg"
+// Tương tự cho avatars: "avatars/xyz.jpg"
 ```
 
 ## 🔄 Migration dữ liệu cũ

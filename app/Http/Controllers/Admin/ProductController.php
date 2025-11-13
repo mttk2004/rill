@@ -230,7 +230,7 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('', 'supabase');
+            $path = $request->file('image')->store('products', 'supabase');
             $validated['image'] = $path;
         }
 
@@ -424,7 +424,7 @@ class ProductController extends Controller
                 'supabase_endpoint' => config('filesystems.disks.supabase.endpoint'),
             ]);
             try {
-                $path = $request->file('image')->store('', 'supabase');
+                $path = $request->file('image')->store('products', 'supabase');
                 \Log::info('✅ [Backend] Image uploaded successfully', ['path' => $path]);
                 $validated['image'] = $path;
             } catch (\Exception $e) {

@@ -60,6 +60,13 @@ class User extends Authenticatable
     }
 
     /**
+     * The accessors to append to the model's array form.
+     */
+    protected $appends = [
+        'avatar_url',
+    ];
+
+    /**
      * Check if user is admin
      */
     public function isAdmin(): bool
