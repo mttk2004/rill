@@ -557,7 +557,7 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
               {/* Actions */}
               <Card className="border border-slate-200 dark:border-slate-800">
                 <CardContent className="p-4 space-y-2">
-                  {order.status === "delivered" && (
+                  {order.payment_status === "completed" && (
                     <>
                       <a href={route('orders.invoice', { order: order.order_id })}>
                         <Button
