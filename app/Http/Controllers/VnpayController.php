@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
+use App\Services\OrderService;
 use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ class VnpayController extends Controller
      * Xử lý IPN (Instant Payment Notification) từ VNPAY.
      * Đây là endpoint mà VNPAY gọi để thông báo kết quả thanh toán.
      */
-    public function handleIpn(Request $request, VnpayService $vnpayService)
+    public function handleIpn(Request $request, VnpayService $vnpayService, OrderService $orderService)
     {
         $data = $request->all();
         Log::info('VNPAY IPN Received:', $data);
@@ -56,36 +56,25 @@ class VnpayController extends Controller
         }
 
         // 5. Xử lý kết quả thanh toán
-        if ($data['vnp_ResponseCode'] === '00') {
-            // Thanh toán thành công
-            $payment->update([
-                'payment_status' => PaymentStatus::COMPLETED,
-                'transaction_id' => $data['vnp_TransactionNo'] ?? null,
-                'gateway_response' => $data,
-                'processed_at' => now(),
-            ]);
-
-            $order->update([
-                'status' => OrderStatus::CONFIRMED, // Đơn hàng đã được xác nhận sau khi thanh toán thành công
-            ]);
-
-            Log::info('VNPAY IPN: Payment successful.', ['order_id' => $order->id]);
-        } else {
-            // Thanh toán thất bại
-            $payment->update([
-                'payment_status' => PaymentStatus::FAILED,
-                'gateway_response' => $data,
-                'processed_at' => now(),
-            ]);
-
-            $order->update([
-                'status' => OrderStatus::CANCELLED, // Đơn hàng bị hủy do thanh toán thất bại
-            ]);
-
-            Log::warning('VNPAY IPN: Payment failed.', [
+        try {
+            if ($data['vnp_ResponseCode'] === '00') {
+                // Thanh toán thành công
+                $orderService->processPaymentSuccess($order, $data);
+                Log::info('VNPAY IPN: Payment successful.', ['order_id' => $order->id]);
+            } else {
+                // Thanh toán thất bại
+                $orderService->processPaymentFailure($order, $data);
+                Log::warning('VNPAY IPN: Payment failed.', [
+                    'order_id' => $order->id,
+                    'response_code' => $data['vnp_ResponseCode']
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('VNPAY IPN: Transaction failed.', [
                 'order_id' => $order->id,
-                'response_code' => $data['vnp_ResponseCode']
+                'error' => $e->getMessage()
             ]);
+            return response()->json(['RspCode' => '99', 'Message' => 'Unknown error']);
         }
 
         // 6. Phản hồi cho VNPAY (bắt buộc)

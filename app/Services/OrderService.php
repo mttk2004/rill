@@ -74,4 +74,49 @@ class OrderService
             return $order;
         });
     }
+
+    /**
+     * Xử lý thanh toán thành công từ VNPAY.
+     * Cập nhật trạng thái đơn hàng và payment trong transaction.
+     */
+    public function processPaymentSuccess(Order $order, array $vnpayData): void
+    {
+        DB::transaction(function () use ($order, $vnpayData) {
+            // Cập nhật payment record
+            $payment = $order->payment;
+            $payment->update([
+                'payment_status' => PaymentStatus::COMPLETED,
+                'transaction_id' => $vnpayData['vnp_TransactionNo'] ?? null,
+                'gateway_response' => $vnpayData,
+                'processed_at' => now(),
+            ]);
+
+            // Cập nhật trạng thái đơn hàng
+            $order->update([
+                'status' => OrderStatus::CONFIRMED,
+            ]);
+        });
+    }
+
+    /**
+     * Xử lý thanh toán thất bại từ VNPAY.
+     * Cập nhật trạng thái đơn hàng và payment trong transaction.
+     */
+    public function processPaymentFailure(Order $order, array $vnpayData): void
+    {
+        DB::transaction(function () use ($order, $vnpayData) {
+            // Cập nhật payment record
+            $payment = $order->payment;
+            $payment->update([
+                'payment_status' => PaymentStatus::FAILED,
+                'gateway_response' => $vnpayData,
+                'processed_at' => now(),
+            ]);
+
+            // Cập nhật trạng thái đơn hàng
+            $order->update([
+                'status' => OrderStatus::CANCELLED,
+            ]);
+        });
+    }
 }
