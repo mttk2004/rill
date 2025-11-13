@@ -18,15 +18,15 @@ interface RouterOptions {
 /**
  * Custom hook to wrap Inertia router with toast notifications
  * Provides consistent toast patterns across the application
- * 
+ *
  * @example
  * const { post, put, delete: destroy } = useToastRouter();
- * 
+ *
  * // Simple usage
  * post('/orders', data, {
  *   success: 'Order created successfully!'
  * });
- * 
+ *
  * // With all options
  * post('/orders', data, {
  *   pending: 'Creating order...',
@@ -48,7 +48,7 @@ export function useToastRouter() {
     const promise = new Promise((resolve, reject) => {
       const routerMethod = router[method];
       const requestData = method === 'delete' ? undefined : data;
-      
+
       routerMethod(url, requestData as never, {
         ...options,
         onSuccess: (response: unknown) => {
