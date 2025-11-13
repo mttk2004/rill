@@ -169,12 +169,20 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
+        // Load relations first
+        $order->load(['items.product', 'payment']);
+
         // Invoices are only available for orders with completed payment.
         if ($order->payment->payment_status !== PaymentStatus::COMPLETED) {
             abort(403, 'Invoice is not available. Payment must be completed first.');
         }
 
-        $order->load(['items.product', 'payment']);
+        // Debug log
+        \Log::info('Invoice Payment Debug', [
+            'payment_method' => $order->payment->payment_method,
+            'payment_method_type' => gettype($order->payment->payment_method),
+            'payment_method_class' => get_class($order->payment->payment_method),
+        ]);
 
         $pdf = app('dompdf.wrapper');
         $pdf->loadView('invoices.order', compact('order'));

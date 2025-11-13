@@ -114,7 +114,8 @@
           </td>
           <td class="right">
             @php
-              $paymentMethodText = match ($order->payment->payment_method ?? 'cod') {
+              $paymentMethodValue = $order->payment->payment_method?->value ?? 'cod';
+              $paymentMethodText = match ($paymentMethodValue) {
                 'cod' => 'Thanh toán khi nhận hàng (COD)',
                 'vnpay' => 'Thanh toán qua VNPAY',
                 default => 'Không xác định',
