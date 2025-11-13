@@ -13,57 +13,55 @@
     }
 
     body {
-      font-family: DejaVu Sans, sans-serif;
-      font-size: 13px;
+      font-family: "DejaVu Sans", "Arial", sans-serif;
+      font-size: 11px;
       color: #1e293b;
-      line-height: 1.6;
+      line-height: 1.4;
       background: #ffffff;
     }
 
     .container {
       width: 100%;
-      max-width: 800px;
+      max-width: 100%;
       margin: 0 auto;
-      padding: 40px 30px;
+      padding: 20px 25px;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 3px solid #f59e0b;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f59e0b;
     }
 
     .header .logo {
-      font-size: 32px;
+      font-size: 28px;
       font-weight: bold;
       color: #f59e0b;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
       letter-spacing: 2px;
     }
 
     .header .tagline {
-      font-size: 12px;
+      font-size: 10px;
       color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
     .invoice-title {
       text-align: center;
-      font-size: 24px;
+      font-size: 18px;
       font-weight: bold;
       color: #0f172a;
-      margin: 30px 0 25px 0;
-      text-transform: uppercase;
+      margin: 15px 0 15px 0;
       letter-spacing: 1px;
     }
 
     .invoice-meta {
       background: #f8fafc;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 30px;
+      padding: 12px 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
     }
 
     .invoice-meta table {
@@ -72,21 +70,24 @@
     }
 
     .invoice-meta td {
-      padding: 8px 0;
+      padding: 4px 0;
       vertical-align: top;
+      font-size: 10px;
     }
 
     .invoice-meta .label {
       font-weight: 600;
       color: #475569;
-      font-size: 11px;
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      margin-bottom: 3px;
     }
 
     .invoice-meta .value {
       color: #1e293b;
       margin-top: 2px;
+      line-height: 1.5;
     }
 
     .invoice-meta .right {
@@ -94,50 +95,44 @@
     }
 
     .section-title {
-      font-size: 14px;
+      font-size: 11px;
       font-weight: bold;
       color: #0f172a;
-      margin: 30px 0 15px 0;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #e2e8f0;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      margin: 15px 0 10px 0;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #e2e8f0;
+      letter-spacing: 0.3px;
     }
 
     .items-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-top: 10px;
     }
 
     .items-table thead {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      background: #f59e0b;
     }
 
     .items-table th {
-      padding: 12px 10px;
+      padding: 8px 6px;
       text-align: left;
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 600;
       color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
       border: none;
     }
 
     .items-table td {
-      padding: 12px 10px;
+      padding: 8px 6px;
       border-bottom: 1px solid #e2e8f0;
       color: #334155;
+      font-size: 10px;
     }
 
     .items-table tbody tr:last-child td {
       border-bottom: none;
-    }
-
-    .items-table tbody tr:hover {
-      background-color: #f8fafc;
     }
 
     .items-table .text-right {
@@ -149,27 +144,27 @@
     }
 
     .totals {
-      margin-top: 30px;
+      margin-top: 15px;
       clear: both;
     }
 
     .totals-table {
       width: 100%;
-      max-width: 350px;
+      max-width: 280px;
       float: right;
       border-collapse: collapse;
       background: #f8fafc;
-      padding: 15px;
-      border-radius: 8px;
+      padding: 10px;
+      border-radius: 4px;
     }
 
     .totals-table td {
-      padding: 8px 12px;
+      padding: 5px 8px;
+      font-size: 10px;
     }
 
     .totals-table .label {
       color: #64748b;
-      font-size: 13px;
     }
 
     .totals-table .amount {
@@ -179,63 +174,66 @@
     }
 
     .totals-table .total-row {
-      border-top: 2px solid #cbd5e1;
-      padding-top: 12px;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 8px;
     }
 
     .totals-table .total-row .label {
-      font-size: 15px;
+      font-size: 12px;
       font-weight: bold;
       color: #0f172a;
     }
 
     .totals-table .total-row .amount {
-      font-size: 18px;
+      font-size: 13px;
       font-weight: bold;
       color: #f59e0b;
     }
 
     .payment-info {
       clear: both;
-      margin-top: 40px;
-      padding: 20px;
+      margin-top: 20px;
+      padding: 12px;
       background: #fef3c7;
-      border-left: 4px solid #f59e0b;
-      border-radius: 4px;
+      border-left: 3px solid #f59e0b;
+      border-radius: 3px;
     }
 
     .payment-info .title {
       font-weight: bold;
       color: #92400e;
-      margin-bottom: 8px;
-      font-size: 12px;
+      margin-bottom: 5px;
+      font-size: 9px;
       text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
 
     .payment-info .detail {
       color: #78350f;
-      font-size: 13px;
+      font-size: 10px;
+      line-height: 1.6;
     }
 
     .footer {
       clear: both;
-      margin-top: 60px;
-      padding-top: 20px;
-      border-top: 2px solid #e2e8f0;
+      margin-top: 25px;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
       text-align: center;
     }
 
     .footer .thank-you {
-      font-size: 16px;
+      font-size: 12px;
       font-weight: 600;
       color: #0f172a;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
     .footer .contact {
-      font-size: 11px;
+      font-size: 9px;
       color: #64748b;
-      margin-top: 5px;
+      margin-top: 3px;
+      line-height: 1.5;
     }
 
     .footer .website {
@@ -246,12 +244,11 @@
 
     .status-badge {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 4px;
-      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 9px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
     }
 
     .status-completed {
