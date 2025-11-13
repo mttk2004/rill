@@ -299,21 +299,40 @@ const ArtistEdit = ({ artist, countries }: PageProps) => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {imagePreview ? (
-                      <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="w-full h-48 object-cover rounded-lg"
+                      <div className="space-y-2">
+                        <div className="relative">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-48 object-cover rounded-lg"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2"
+                            onClick={removeImage}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                          id="image-change"
                         />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2"
-                          onClick={removeImage}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                        <Label htmlFor="image-change" className="block">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full"
+                            asChild
+                          >
+                            <span className="cursor-pointer">Thay đổi ảnh</span>
+                          </Button>
+                        </Label>
                       </div>
                     ) : (
                       <div className="border-2 border-dashed rounded-lg p-8 text-center">
