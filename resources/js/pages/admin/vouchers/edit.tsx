@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { formatVND } from '@/lib/utils';
 import {
   Ticket,
   ArrowLeft,
@@ -95,7 +96,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
     put(`/admin/vouchers/${mockVoucher.id}`);
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
@@ -192,7 +193,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Giá trị</p>
-                    <p className="text-xl font-bold text-slate-900">{formatCurrency(mockVoucher.value)}</p>
+                    <p className="text-xl font-bold text-slate-900">{formatVND(mockVoucher.value)}</p>
                   </div>
                   <TrendingUp className="h-6 w-6 text-green-500" />
                 </div>

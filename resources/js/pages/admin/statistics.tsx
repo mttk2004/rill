@@ -15,6 +15,7 @@ import {
   CreditCard
 } from "lucide-react";
 import { Head } from "@inertiajs/react";
+import { formatVND } from '@/lib/utils';
 import {
   LineChart,
   Line,
@@ -97,7 +98,7 @@ const AdminStatistics = ({
   dateRange
 }: PageProps) => {
 
-  const formatCurrency = (value: number) => {
+  const formatVND = (value: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
@@ -107,7 +108,7 @@ const AdminStatistics = ({
   const statsCards = [
     {
       title: "Doanh thu tháng này",
-      value: formatCurrency(stats.revenue.value),
+      value: formatVND(stats.revenue.value),
       change: `${stats.revenue.change > 0 ? '+' : ''}${stats.revenue.change.toFixed(1)}%`,
       trend: stats.revenue.trend,
       icon: DollarSign,
@@ -248,7 +249,7 @@ const AdminStatistics = ({
                   return value.toString();
                 }} />
                 <Tooltip
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value: number) => formatVND(value)}
                   labelFormatter={(label) => `Ngày: ${formatDate(label)}`}
                 />
                 <Legend />
@@ -325,7 +326,7 @@ const AdminStatistics = ({
                   }} />
                   <Tooltip
                     formatter={(value: number, name: string) => [
-                      name === 'total' ? formatCurrency(value) : value,
+                      name === 'total' ? formatVND(value) : value,
                       name === 'total' ? 'Doanh thu' : 'Số đơn'
                     ]}
                   />
@@ -361,7 +362,7 @@ const AdminStatistics = ({
                       <p className="text-sm">Số sản phẩm: {order.items_count}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-accent">{formatCurrency(order.total_amount)}</p>
+                      <p className="font-semibold text-accent">{formatVND(order.total_amount)}</p>
                       <p className="text-xs text-muted-foreground">{formatDate(order.placed_at)}</p>
                     </div>
                   </div>
@@ -395,7 +396,7 @@ const AdminStatistics = ({
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-accent">{formatCurrency(product.revenue)}</p>
+                      <p className="font-semibold text-accent">{formatVND(product.revenue)}</p>
                     </div>
                   </div>
                 ))}

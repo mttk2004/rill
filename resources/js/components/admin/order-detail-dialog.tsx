@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import { formatCurrency, formatDateTime } from "@/lib/order-helpers";
+import { formatDateTime } from "@/lib/order-helpers";
+import { formatVND } from '@/lib/utils';
 
 interface OrderItem {
   id: string;
@@ -264,9 +265,9 @@ export const OrderDetailDialog = ({ order, isOpen, onClose }: OrderDetailDialogP
                     <p className="text-sm text-muted-foreground">SKU: {item.product.sku}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{formatCurrency(item.unit_price)}</p>
+                    <p className="font-medium">{formatVND(item.unit_price)}</p>
                     <p className="text-sm text-muted-foreground">x{item.quantity}</p>
-                    <p className="text-sm font-semibold text-primary">{formatCurrency(item.total_price)}</p>
+                    <p className="text-sm font-semibold text-primary">{formatVND(item.total_price)}</p>
                   </div>
                 </div>
               ))}
@@ -278,7 +279,7 @@ export const OrderDetailDialog = ({ order, isOpen, onClose }: OrderDetailDialogP
           {/* Total */}
           <div className="flex items-center justify-between text-lg font-bold">
             <span>Tổng cộng:</span>
-            <span className="text-primary">{formatCurrency(order.total_amount)}</span>
+            <span className="text-primary">{formatVND(order.total_amount)}</span>
           </div>
         </div>
       </DialogContent>

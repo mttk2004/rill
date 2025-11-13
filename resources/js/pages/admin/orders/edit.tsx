@@ -6,9 +6,9 @@ import {
   type AdminOrder,
   getOrderStatusBadge,
   getPaymentStatusBadge,
-  formatCurrency,
   formatDateTime,
 } from '@/lib/order-helpers';
+import { formatVND } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -151,7 +151,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-green-600">
-                      {formatCurrency(order.total_amount)}
+                      {formatVND(order.total_amount)}
                     </div>
                   </div>
                 </div>
@@ -176,10 +176,10 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                           </div>
                           <div className="text-right">
                             <div className="text-sm text-muted-foreground mb-1">
-                              {formatCurrency(item.unit_price)} × {item.quantity}
+                              {formatVND(item.unit_price)} × {item.quantity}
                             </div>
                             <div className="text-lg font-semibold">
-                              {formatCurrency(item.total_price)}
+                              {formatVND(item.total_price)}
                             </div>
                           </div>
                         </div>
@@ -190,13 +190,13 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     <div className="p-4 bg-muted/30 space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Tổng sản phẩm</span>
-                        <span className="font-medium">{formatCurrency(order.subtotal)}</span>
+                        <span className="font-medium">{formatVND(order.subtotal)}</span>
                       </div>
                       {order.discount_amount > 0 && (
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Giảm giá</span>
                           <span className="font-medium text-red-600">
-                            -{formatCurrency(order.discount_amount)}
+                            -{formatVND(order.discount_amount)}
                           </span>
                         </div>
                       )}
@@ -204,7 +204,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                       <div className="flex justify-between items-center pt-2">
                         <span className="font-semibold">Tổng cộng</span>
                         <span className="text-2xl font-bold text-green-600">
-                          {formatCurrency(order.total_amount)}
+                          {formatVND(order.total_amount)}
                         </span>
                       </div>
                     </div>
@@ -312,7 +312,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     <div>
                       <div className="text-xs text-muted-foreground mb-1">Số tiền</div>
                       <div className="font-semibold text-green-600">
-                        {formatCurrency(order.payment.amount)}
+                        {formatVND(order.payment.amount)}
                       </div>
                     </div>
                     {order.payment.processed_at && (

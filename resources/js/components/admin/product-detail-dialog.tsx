@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, formatPrice, isLowStock } from "@/lib/product-helpers";
+import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, isLowStock } from "@/lib/product-helpers";
+import { formatVND } from '@/lib/utils';
 
 interface ProductDetailDialogProps {
   product: AdminProduct | null;
@@ -109,7 +110,7 @@ export const ProductDetailDialog = ({
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400">Giá bán</p>
                       <p className="text-lg font-bold text-amber-600">
-                        {formatPrice(product.price)}
+                        {formatVND(product.price)}
                       </p>
                     </div>
                   </div>
@@ -167,7 +168,7 @@ export const ProductDetailDialog = ({
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400">Doanh thu</p>
                       <p className="text-lg font-bold text-green-600">
-                        {formatPrice(product.total_revenue || 0)}
+                        {formatVND(product.total_revenue || 0)}
                       </p>
                     </div>
                   </div>
@@ -279,7 +280,7 @@ export const ProductDetailDialog = ({
                           SL: {order.quantity}
                         </div>
                         <div className="font-bold text-lg text-slate-900 dark:text-white">
-                          {formatPrice(order.unit_price * order.quantity)}
+                          {formatVND(order.unit_price * order.quantity)}
                         </div>
                       </div>
                     </CardContent>

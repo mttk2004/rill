@@ -2,7 +2,8 @@ import { Link } from "@inertiajs/react";
 import { Eye, Edit, Trash2, RotateCcw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminTable, Column } from "@/components/admin/common/admin-table";
-import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, formatPrice, isLowStock } from "@/lib/product-helpers";
+import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, isLowStock } from "@/lib/product-helpers";
+import { formatVND } from '@/lib/utils';
 
 interface ProductTableProps {
   products: AdminProduct[];
@@ -56,7 +57,7 @@ export const ProductTable = ({
       header: "Giá bán",
       render: (product) => (
         <div>
-          <div className="font-medium">{formatPrice(product.price)}</div>
+          <div className="font-medium">{formatVND(product.price)}</div>
           <div className="text-xs text-gray-500">
             Lãi: {calculateProfit(product.price, product.cost_price)}
           </div>

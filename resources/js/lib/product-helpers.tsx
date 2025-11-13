@@ -84,14 +84,7 @@ export const getMainArtist = (artists?: AdminProduct['artists']) => {
   return mainArtist ? mainArtist.name : artists[0].name;
 };
 
-/**
- * @deprecated Use formatVND from @/lib/utils instead
- * This function is kept for backward compatibility
- */
-export const formatPrice = (price: number) => {
-  // Use space separator for better readability
-  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₫';
-};
+// formatPrice has been removed. Use formatVND from @/lib/utils instead
 
 export const isLowStock = (product: AdminProduct) => {
   return product.stock_quantity <= product.min_stock_level && product.stock_quantity > 0;

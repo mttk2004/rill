@@ -15,9 +15,9 @@ import {
   type AdminOrder,
   getOrderStatusBadge,
   getPaymentStatusBadge,
-  formatCurrency,
   formatDateTime,
 } from '@/lib/order-helpers';
+import { formatVND } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -246,7 +246,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
       header: 'Tổng tiền',
       accessor: 'total_amount',
       render: (order) => (
-        <div className="font-medium text-green-600">{formatCurrency(order.total_amount)}</div>
+        <div className="font-medium text-green-600">{formatVND(order.total_amount)}</div>
       ),
     },
     {

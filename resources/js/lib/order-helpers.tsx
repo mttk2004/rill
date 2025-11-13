@@ -165,13 +165,7 @@ export const getPaymentStatusBadge = (status: string) => {
   );
 };
 
-// Format currency in Vietnamese
-export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(amount);
-};
+// formatCurrency has been removed. Use formatVND from @/lib/utils instead
 
 // Format date and time
 export const formatDateTime = (dateString: string): string => {

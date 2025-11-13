@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Head, Link, router } from '@inertiajs/react';
+import { formatVND } from '@/lib/utils';
 import {
   Ticket,
   Plus,
@@ -114,7 +115,7 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
     });
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
@@ -209,7 +210,7 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
     },
     {
       title: 'Tiết kiệm cho KH',
-      value: formatCurrency(totalDiscount).replace('₫', '').trim(),
+      value: formatVND(totalDiscount).replace('₫', '').trim(),
       subtitle: 'Tổng giảm giá',
       icon: TrendingUp,
       gradient: 'from-amber-500 to-orange-500',
@@ -411,7 +412,7 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
                           <div className="flex items-center gap-2">
                             <DollarSign className="h-4 w-4 text-green-600" />
                             <span>
-                              <span className="font-medium">Giảm:</span> {formatCurrency(voucher.value)}
+                              <span className="font-medium">Giảm:</span> {formatVND(voucher.value)}
                             </span>
                           </div>
 
@@ -434,7 +435,7 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
                             <AlertCircle className="h-4 w-4 text-orange-600" />
                             <span>
                               <span className="font-medium">Tối thiểu:</span> {
-                                voucher.minimum_amount ? formatCurrency(voucher.minimum_amount) : 'Không'
+                                voucher.minimum_amount ? formatVND(voucher.minimum_amount) : 'Không'
                               }
                             </span>
                           </div>
