@@ -63,6 +63,26 @@ class Order extends Model
                 }
             }
         });
+
+        // Auto-create status history when status changes
+        static::updated(function ($order) {
+            if ($order->isDirty('status')) {
+                OrderStatusHistory::create([
+                    'order_id' => $order->id,
+                    'status' => $order->status->value,
+                    'created_by' => auth()->id(),
+                ]);
+            }
+        });
+
+        // Create initial status history when order is created
+        static::created(function ($order) {
+            OrderStatusHistory::create([
+                'order_id' => $order->id,
+                'status' => $order->status->value,
+                'created_by' => auth()->id(),
+            ]);
+        });
     }
 
     public function user(): BelongsTo
@@ -83,5 +103,10 @@ class Order extends Model
     public function voucherUsages(): HasMany
     {
         return $this->hasMany(VoucherUsage::class);
+    }
+
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(OrderStatusHistory::class);
     }
 }
