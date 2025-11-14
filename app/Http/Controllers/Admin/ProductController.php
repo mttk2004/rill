@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\ProductAdminService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -12,101 +13,31 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    protected ProductAdminService $productService;
+
+    public function __construct(ProductAdminService $productService)
+    {
+        $this->productService = $productService;
+    }
     /**
      * Display a listing of products for admin.
      */
     public function index(Request $request)
     {
         $perPage = (int) $request->get('per_page', 20);
-        $search = trim((string) $request->get('search', ''));
-        $status = $request->get('status'); // active/inactive/out_of_stock
-        $genre = $request->get('genre');
-        $featured = $request->get('featured'); // yes/no
-        $stock = $request->get('stock'); // low/out
-        $sort = $request->get('sort', 'newest');
 
-        $query = Product::query()->withTrashed();
+        $filters = [
+            'search' => $request->get('search'),
+            'status' => $request->get('status'),
+            'genre' => $request->get('genre'),
+            'featured' => $request->get('featured'),
+            'stock' => $request->get('stock'),
+            'sort' => $request->get('sort', 'newest'),
+        ];
 
-        // Search
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%")
-                  ->orWhere('genre', 'like', "%{$search}%")
-                  ->orWhere('label', 'like', "%{$search}%")
-                  ->orWhereHas('artists', function ($artistQuery) use ($search) {
-                      $artistQuery->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
+        $query = $this->productService->buildProductQuery($filters);
 
-        // Status filter
-        if ($status === 'active') {
-            $query->where('status', 'active');
-        } elseif ($status === 'inactive') {
-            $query->where('status', 'inactive');
-        } elseif ($status === 'out_of_stock') {
-            $query->where('status', 'out_of_stock');
-        }
-
-        // Genre filter
-        if ($genre && $genre !== 'all-genres') {
-            $query->where('genre', $genre);
-        }
-
-        // Featured filter
-        if ($featured === 'yes') {
-            $query->where('is_featured', true);
-        } elseif ($featured === 'no') {
-            $query->where('is_featured', false);
-        }
-
-        // Stock filter
-        if ($stock === 'low_stock') {
-            // Sắp hết: tồn kho <= mức tối thiểu và > 0
-            $query->whereColumn('stock_quantity', '<=', 'min_stock_level')
-                  ->where('stock_quantity', '>', 0);
-        } elseif ($stock === 'out_of_stock') {
-            // Hết hàng: tồn kho = 0
-            $query->where('stock_quantity', 0);
-        } elseif ($stock === 'in_stock') {
-            // Còn hàng: tồn kho > mức tối thiểu (không bao gồm sắp hết)
-            $query->whereColumn('stock_quantity', '>', 'min_stock_level');
-        }
-
-        // Sorting
-        switch ($sort) {
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'stock_asc':
-                $query->orderBy('stock_quantity', 'asc');
-                break;
-            case 'stock_desc':
-                $query->orderBy('stock_quantity', 'desc');
-                break;
-            case 'sold_desc':
-                $query->withCount('orderItems')
-                      ->orderBy('order_items_count', 'desc');
-                break;
-            case 'created_desc':
-                $query->orderBy('created_at', 'desc');
-                break;
-            default:
-                $query->orderBy('name', 'asc');
-                break;
-        }
-
-        // Eager load relationships and aggregate data
+        // Eager load relationships
         $products = $query->with(['artists' => function ($q) {
             $q->wherePivot('role', 'main')->orderByPivot('sort_order');
         }])
@@ -114,27 +45,11 @@ class ProductController extends Controller
         ->paginate($perPage)
         ->withQueryString();
 
-        // Add total sold quantity for each product
-        $products->getCollection()->transform(function ($product) {
-            $product->total_sold = DB::table('order_items')
-                ->where('product_id', $product->id)
-                ->sum('quantity');
+        // Add sales data efficiently (no N+1 queries)
+        $this->productService->enrichProductsWithSalesData($products->getCollection());
 
-            $product->total_revenue = DB::table('order_items')
-                ->where('product_id', $product->id)
-                ->sum(DB::raw('quantity * unit_price'));
-
-            return $product;
-        });        // Stats
-        $stats = [
-            'total' => Product::count(),
-            'active' => Product::where('status', 'active')->count(),
-            'out_of_stock' => Product::where('status', 'out_of_stock')->orWhere('stock_quantity', 0)->count(),
-            'low_stock' => Product::whereColumn('stock_quantity', '<=', 'min_stock_level')
-                                  ->where('stock_quantity', '>', 0)
-                                  ->count(),
-            'featured' => Product::where('is_featured', true)->count(),
-        ];
+        // Get stats
+        $stats = $this->productService->getProductStats();
 
         // Get unique genres for filter dropdown
         $genres = Product::select('genre')
@@ -162,14 +77,7 @@ class ProductController extends Controller
             'genres' => $genres,
             'labels' => $labels,
             'artists' => $artists,
-            'filters' => [
-                'search' => $search,
-                'status' => $status,
-                'genre' => $genre,
-                'featured' => $featured,
-                'stock' => $stock,
-                'sort' => $sort,
-            ],
+            'filters' => $filters,
         ]);
     }
 
@@ -230,21 +138,16 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'supabase');
-            $validated['image'] = $path;
+            $validated['image'] = $request->file('image')->store('products', 'supabase');
         }
 
         $product = Product::create($validated);
 
-        // Attach artists if provided
-        if (isset($validated['artists']) && is_array($validated['artists'])) {
-            foreach ($validated['artists'] as $index => $artistData) {
-                $product->artists()->attach($artistData['artist_id'], [
-                    'role' => $artistData['role'],
-                    'sort_order' => $index,
-                ]);
-            }
-        }
+        // Sync artists
+        $this->productService->syncArtists(
+            $product,
+            $validated['artists'] ?? null
+        );
 
         return response()->json([
             'success' => true,
@@ -350,20 +253,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        \Log::info('🔍 [Backend] Product update started', [
-            'product_id' => $id,
-            'request_method' => $request->method(),
-            'has_file' => $request->hasFile('image'),
-            'all_data' => $request->all(),
-            'files' => $request->allFiles(),
-        ]);
-
         $product = Product::withTrashed()->findOrFail($id);
-
-        \Log::info('🔍 [Backend] Current product data', [
-            'product_id' => $product->id,
-            'current_image' => $product->image,
-        ]);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -382,104 +272,34 @@ class ProductController extends Controller
             'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
         ]);
 
-        \Log::info('🔍 [Backend] Validated data', [
-            'validated' => $validated,
-            'has_image_in_validated' => isset($validated['image']),
-        ]);
-
         // Handle image upload
         if ($request->hasFile('image')) {
-            \Log::info('✅ [Backend] Image file detected');
-
-            $file = $request->file('image');
-            \Log::info('🔍 [Backend] Image file details', [
-                'original_name' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-                'extension' => $file->getClientOriginalExtension(),
-                'is_valid' => $file->isValid(),
-            ]);
-
-            // Delete old image if exists
-            if ($product->image && !filter_var($product->image, FILTER_VALIDATE_URL)) {
-                \Log::info('🗑️ [Backend] Deleting old image', ['old_image_path' => $product->image]);
-                try {
-                    Storage::disk('supabase')->delete($product->image);
-                    \Log::info('✅ [Backend] Old image deleted successfully');
-                } catch (\Exception $e) {
-                    \Log::error('❌ [Backend] Failed to delete old image', [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-                }
-            }
-
-            // Store new image
-            \Log::info('📤 [Backend] Uploading new image to Supabase...');
-            \Log::info('🔍 [Backend] Storage config check', [
-                'default_disk' => config('filesystems.default'),
-                'supabase_key' => substr(config('filesystems.disks.supabase.key'), 0, 10) . '...',
-                'supabase_region' => config('filesystems.disks.supabase.region'),
-                'supabase_bucket' => config('filesystems.disks.supabase.bucket'),
-                'supabase_endpoint' => config('filesystems.disks.supabase.endpoint'),
-            ]);
             try {
-                $path = $request->file('image')->store('products', 'supabase');
-                \Log::info('✅ [Backend] Image uploaded successfully', ['path' => $path]);
-                $validated['image'] = $path;
+                $validated['image'] = $this->productService->handleImageUpload(
+                    $product,
+                    $request->file('image')
+                );
             } catch (\Exception $e) {
-                \Log::error('❌ [Backend] Failed to upload image', [
-                    'error' => $e->getMessage(),
-                    'class' => get_class($e),
-                    'file' => $e->getFile() . ':' . $e->getLine(),
-                    'trace' => $e->getTraceAsString(),
+                \Log::error('Failed to upload product image', [
+                    'product_id' => $product->id,
+                    'error' => $e->getMessage()
                 ]);
                 throw $e;
             }
-        } else {
-            \Log::info('⚠️ [Backend] No image file in request');
         }
-
-        \Log::info('🔍 [Backend] Data before update', [
-            'validated_data' => $validated,
-            'has_image' => isset($validated['image']),
-            'image_value' => $validated['image'] ?? 'not set',
-        ]);
 
         $product->update($validated);
 
-        \Log::info('🔍 [Backend] Product updated in database', [
-            'product_id' => $product->id,
-            'new_image_value' => $product->fresh()->image,
-        ]);
-
-        // Sync artists if provided
-        if (isset($validated['artists']) && is_array($validated['artists'])) {
-            $artistsData = [];
-            foreach ($validated['artists'] as $index => $artistData) {
-                $artistsData[$artistData['artist_id']] = [
-                    'role' => $artistData['role'],
-                    'sort_order' => $index,
-                ];
-            }
-            $product->artists()->sync($artistsData);
-            \Log::info('✅ [Backend] Artists synced', ['count' => count($artistsData)]);
-        } else {
-            // If no artists provided, detach all
-            $product->artists()->detach();
-            \Log::info('⚠️ [Backend] All artists detached');
-        }
-
-        $freshProduct = $product->fresh();
-        \Log::info('✅ [Backend] Product update completed', [
-            'product_id' => $freshProduct->id,
-            'final_image_value' => $freshProduct->image,
-        ]);
+        // Sync artists
+        $this->productService->syncArtists(
+            $product,
+            $validated['artists'] ?? null
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật sản phẩm thành công',
-            'product' => $freshProduct,
+            'product' => $product->fresh(),
         ]);
     }
 

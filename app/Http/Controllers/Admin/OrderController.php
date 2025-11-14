@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderAdminResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -88,21 +89,6 @@ class OrderController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        // Transform orders data for frontend
-        $orders->getCollection()->transform(function ($order) {
-            $orderData = $order->toArray();
-            $orderData['customer'] = $order->user ? [
-                'id' => $order->user->id,
-                'name' => $order->user->name,
-                'email' => $order->user->email,
-                'phone' => $order->user->phone ?? null,
-            ] : null;
-            $orderData['payment_status'] = $order->payment ? $order->payment->payment_status->value : PaymentStatus::PENDING->value;
-            $orderData['order_items_count'] = $order->items_count;
-
-            return $orderData;
-        });
-
         // Calculate stats
         $stats = [
             'total' => Order::count(),
@@ -114,7 +100,7 @@ class OrderController extends Controller
         ];
 
         return Inertia::render('admin/orders/index', [
-            'orders' => $orders,
+            'orders' => OrderAdminResource::collection($orders),
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'payment_status', 'sort']) + [
                 'search' => '',
@@ -139,81 +125,16 @@ class OrderController extends Controller
             }
         ])->findOrFail($id);
 
-        // Transform order data for frontend
-        $orderData = $order->toArray();
-        $orderData['customer'] = $order->user ? [
-            'id' => $order->user->id,
-            'name' => $order->user->name,
-            'email' => $order->user->email,
-            'phone' => $order->user->phone ?? null,
-        ] : null;
-
-        // shipping_address already cast to array by model
-        $shippingAddress = $order->shipping_address ?? [];
-        $orderData['shipping_address'] = !empty($shippingAddress) ? [
-            'id' => $shippingAddress['id'] ?? 0,
-            'full_name' => $shippingAddress['full_name'] ?? '',
-            'phone' => $shippingAddress['phone'] ?? '',
-            'address_line_1' => $shippingAddress['address_line_1'] ?? '',
-            'address_line_2' => $shippingAddress['address_line_2'] ?? null,
-            'ward' => $shippingAddress['ward'] ?? '',
-            'district' => $shippingAddress['district'] ?? '',
-            'city' => $shippingAddress['city'] ?? '',
-            'postal_code' => $shippingAddress['postal_code'] ?? null,
-        ] : null;
-
-        // Transform payment data
-        $orderData['payment'] = $order->payment ? [
-            'id' => $order->payment->id,
-            'payment_method' => $order->payment->payment_method,
-            'payment_status' => $order->payment->payment_status,
-            'amount' => $order->payment->amount,
-            'processed_at' => $order->payment->processed_at,
-        ] : null;
-
-        $orderData['order_items'] = $order->items->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'unit_price' => $item->unit_price,
-                'total_price' => $item->total_price,
-                'product' => [
-                    'id' => $item->product->id,
-                    'name' => $item->product->name,
-                    'sku' => $item->product->sku,
-                    'artists' => $item->product->artists->map(function ($artist) {
-                        return [
-                            'id' => $artist->id,
-                            'name' => $artist->name,
-                        ];
-                    })->toArray(),
-                ],
-            ];
-        });
-
-        // Transform status histories
-        $orderData['status_histories'] = $order->statusHistories->map(function ($history) {
-            return [
-                'id' => $history->id,
-                'status' => $history->status,
-                'notes' => $history->notes,
-                'created_at' => $history->created_at,
-                'created_by' => $history->createdBy ? [
-                    'id' => $history->createdBy->id,
-                    'name' => $history->createdBy->name,
-                ] : null,
-            ];
-        });
+        $orderResource = new OrderAdminResource($order);
 
         // Return JSON for API requests, Inertia page for browser
         if ($request->wantsJson()) {
-            return response()->json($orderData);
+            return $orderResource;
         }
 
         // Render detail page
         return Inertia::render('admin/orders/edit', [
-            'order' => $orderData,
+            'order' => $orderResource,
         ]);
     }
 

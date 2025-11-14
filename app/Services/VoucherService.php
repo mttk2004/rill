@@ -165,7 +165,7 @@ class VoucherService
 
             foreach ($voucherUsages as $usage) {
                 // Decrement voucher used count
-                $usage->voucher->decrement('used_count');
+                $usage->voucher->decrementUsedCount();
 
                 // Delete usage record
                 $usage->delete();

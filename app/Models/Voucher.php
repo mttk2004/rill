@@ -142,6 +142,14 @@ class Voucher extends Model
     }
 
     /**
+     * Decrement used count.
+     */
+    public function decrementUsedCount(): void
+    {
+        $this->decrement('used_count');
+    }
+
+    /**
      * Scope to get active vouchers only.
      */
     public function scopeActive($query)
