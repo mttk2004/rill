@@ -8,10 +8,11 @@ class StoreVoucherRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     * Authorization is handled by VoucherPolicy.
      */
     public function authorize(): bool
     {
-        return $this->user()?->role === 'admin';
+        return true;
     }
 
     /**

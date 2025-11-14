@@ -7,14 +7,19 @@ use App\Http\Requests\StoreVoucherRequest;
 use App\Http\Requests\UpdateVoucherRequest;
 use App\Models\Voucher;
 use App\Services\VoucherService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class VoucherController extends Controller
 {
+    use AuthorizesRequests;
+
     public function __construct(
         protected VoucherService $voucherService
-    ) {}
+    ) {
+        $this->authorizeResource(Voucher::class, 'voucher');
+    }
 
     /**
      * Display a listing of vouchers.
