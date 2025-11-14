@@ -51,7 +51,7 @@ export default function Products({ products: productsData, pagination: paginatio
     e.preventDefault();
     e.stopPropagation();
 
-    post('/cart', { product_id: productId, quantity: 1 }, {
+    post('/cart/add', { product_id: productId, quantity: 1 }, {
       pending: 'Đang thêm vào giỏ hàng...',
       success: 'Đã thêm sản phẩm vào giỏ hàng! 🎉',
     });
