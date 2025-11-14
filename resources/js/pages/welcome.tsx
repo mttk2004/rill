@@ -8,7 +8,6 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { type ReactNode, MouseEvent, useMemo } from "react";
 import { useCart } from '@/hooks/use-cart';
 import { toast } from 'react-toastify';
-import { useToastRouter } from '@/hooks/use-toast-router';
 
 interface WelcomeProps {
   featuredProducts: Product[];
@@ -17,7 +16,6 @@ interface WelcomeProps {
 const Welcome = ({ featuredProducts }: WelcomeProps) => {
   const { cart } = usePage<SharedData>().props;
   const { addToCart } = useCart();
-  const { post } = useToastRouter();
 
   const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
 

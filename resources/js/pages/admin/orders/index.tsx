@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Head } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import { useQueryFilters } from '@/hooks/use-query-filters';
@@ -111,6 +111,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
   });
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Stats cards configuration
   const statsCards: StatCardData[] = [
@@ -164,7 +165,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
       name: 'search',
       label: 'Tìm kiếm',
       type: 'search',
-      value: currentFilters.search,
+      value: currentFilters.search || '',
       onChange: (value) => handleFilterChange('search', value),
       placeholder: 'Tìm theo mã đơn, tên khách hàng, email...',
       className: 'md:col-span-2',
@@ -173,7 +174,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
       name: 'status',
       label: 'Trạng thái đơn hàng',
       type: 'select',
-      value: currentFilters.status,
+      value: currentFilters.status || '',
       onChange: (value) => handleFilterChange('status', value),
       options: [
         { label: 'Tất cả trạng thái', value: 'all' },
@@ -188,7 +189,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
       name: 'payment_status',
       label: 'Trạng thái thanh toán',
       type: 'select',
-      value: currentFilters.payment_status,
+      value: currentFilters.payment_status || '',
       onChange: (value) => handleFilterChange('payment_status', value),
       options: [
         { label: 'Tất cả', value: 'all' },
@@ -202,7 +203,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
       name: 'sort',
       label: 'Sắp xếp',
       type: 'select',
-      value: currentFilters.sort,
+      value: currentFilters.sort || '',
       onChange: (value) => handleFilterChange('sort', value),
       options: [
         { label: 'Mới nhất', value: 'newest' },
@@ -311,9 +312,10 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
 
   // Cleanup timer on unmount
   useEffect(() => {
+    const timer = searchTimerRef.current;
     return () => {
-      if (searchTimerRef.current) {
-        clearTimeout(searchTimerRef.current);
+      if (timer) {
+        clearTimeout(timer);
       }
     };
   }, []);
