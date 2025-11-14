@@ -109,40 +109,6 @@ const AdminCustomers = () => {
     }
   };
 
-  // Handle filter changes
-  const handleFilterChange = useCallback((key: string, value: string | undefined) => {
-    const currentParams = new URLSearchParams(window.location.search);
-
-    if (value && value !== 'all' && !value.startsWith('all-')) {
-      currentParams.set(key, value);
-    } else {
-      currentParams.delete(key);
-    }
-
-    // Reset to page 1 when filters change
-    currentParams.delete('page');
-
-    const queryString = currentParams.toString();
-    router.get(`/admin/customers${queryString ? '?' + queryString : ''}`, {}, {
-      preserveState: true,
-      preserveScroll: true,
-    });
-  }, []);
-
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value;
-
-    // Clear previous timer
-    if (searchTimerRef.current) {
-      clearTimeout(searchTimerRef.current);
-    }
-
-    // Set new timer
-    searchTimerRef.current = setTimeout(() => {
-      handleFilterChange('search', searchTerm || undefined);
-    }, 500);
-  }, [handleFilterChange]);
-
   const handleStatusChange = useCallback((value: string) => {
     handleFilterChange('status', value === 'all-status' ? undefined : value);
   }, [handleFilterChange]);
@@ -256,9 +222,9 @@ const AdminCustomers = () => {
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
-                        placeholder="Tên, email, số điện thoại..."
-                        defaultValue={typeof filters.search === 'string' ? filters.search : ''}
-                        onChange={handleSearchChange}
+                        placeholder="Tìm kiếm theo tên, email, số điện thoại..."
+                        defaultValue={typeof currentFilters.search === 'string' ? currentFilters.search : ''}
+                        onChange={(e) => handleFilterChange('search', e.target.value)}
                         className="pl-10 border-slate-200 focus:border-amber-500 focus:ring-amber-500/20"
                       />
                     </div>
@@ -269,7 +235,7 @@ const AdminCustomers = () => {
                       Trạng thái
                     </Label>
                     <Select
-                      defaultValue={(filters.status as string) || "all-status"}
+                      defaultValue={(currentFilters.status as string) || "all-status"}
                       onValueChange={handleStatusChange}
                     >
                       <SelectTrigger className="border-slate-200">
@@ -288,7 +254,7 @@ const AdminCustomers = () => {
                       Xác thực email
                     </Label>
                     <Select
-                      defaultValue={(filters.verified as string) || "all-verified"}
+                      defaultValue={(currentFilters.verified as string) || "all-verified"}
                       onValueChange={handleVerifiedChange}
                     >
                       <SelectTrigger className="border-slate-200">
@@ -307,7 +273,7 @@ const AdminCustomers = () => {
                       Sắp xếp
                     </Label>
                     <Select
-                      defaultValue={(filters.sort as string) || "newest"}
+                      defaultValue={(currentFilters.sort as string) || "newest"}
                       onValueChange={handleSortChange}
                     >
                       <SelectTrigger className="border-slate-200">

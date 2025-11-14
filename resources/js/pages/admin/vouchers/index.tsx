@@ -5,7 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Head, Link, router } from '@inertiajs/react';
-import { formatVND } from '@/lib/utils';
+import { useQueryFilters } from '@/hooks/use-query-filters';
+import { useToastRouter } from '@/hooks/use-toast-router';
 import {
   Ticket,
   Plus,
@@ -22,7 +23,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Select,
   SelectContent,
@@ -81,7 +82,16 @@ interface Props {
 }
 
 export default function AdminVouchers({ vouchers, stats, filters, flash }: Props) {
-  const [searchTerm, setSearchTerm] = useState(filters.search || '');
+  const { filters: currentFilters, handleFilterChange } = useQueryFilters({
+    routeOrPath: '/admin/vouchers',
+    initialFilters: {
+      search: filters.search || '',
+      status: filters.status || '',
+      sort: filters.sort || 'created_desc',
+    },
+  });
+
+  const { delete: deleteVoucher } = useToastRouter();
 
   // Handle flash messages
   useEffect(() => {
@@ -92,28 +102,6 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
       toast.error(flash.error);
     }
   }, [flash]);
-
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    router.get('/admin/vouchers', {
-      ...filters,
-      search: value || undefined,
-    }, {
-      preserveState: true,
-      preserveScroll: true,
-    });
-  };
-
-  const handleFilterChange = (key: string, value: string) => {
-    router.get('/admin/vouchers', {
-      ...filters,
-      [key]: value === 'all' ? undefined : value,
-      page: undefined, // Reset to page 1 when filter changes
-    }, {
-      preserveState: true,
-      preserveScroll: true,
-    });
-  };
 
   const formatVND = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -169,8 +157,9 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
 
   const handleDeleteVoucher = (voucherId: string) => {
     if (confirm('Bạn có chắc chắn muốn xóa voucher này?')) {
-      router.delete(`/admin/vouchers/${voucherId}`, {
-        preserveScroll: true,
+      deleteVoucher(`/admin/vouchers/${voucherId}`, {
+        pending: 'Đang xóa voucher...',
+        success: 'Đã xóa voucher thành công!',
       });
     }
   };
@@ -251,16 +240,16 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                 <Input
                   placeholder="Tìm kiếm theo mã hoặc tên voucher..."
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
+                  value={currentFilters.search || ''}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
                   className="pl-10"
                 />
               </div>
 
               {/* Status Filter */}
               <Select
-                value={filters.status || 'all'}
-                onValueChange={(value) => handleFilterChange('status', value)}
+                value={currentFilters.status || 'all'}
+                onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}
               >
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Trạng thái" />
@@ -302,8 +291,8 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
 
               {/* Sort Filter */}
               <Select
-                value={filters.sort || 'created_desc'}
-                onValueChange={(value) => handleFilterChange('sort', value)}
+                value={currentFilters.sort || 'created_desc'}
+                onValueChange={(value) => handleFilterChange('sort', value === 'created_desc' ? undefined : value)}
               >
                 <SelectTrigger className="w-[220px]">
                   <SelectValue placeholder="Sắp xếp theo" />
@@ -322,16 +311,14 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
               </Select>
 
               {/* Clear Filters */}
-              {(filters.status || filters.sort !== 'created_desc') && (
+              {(currentFilters.status || currentFilters.sort !== 'created_desc') && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setSearchTerm('');
-                    router.get('/admin/vouchers', {}, {
-                      preserveState: true,
-                      preserveScroll: true,
-                    });
+                    handleFilterChange('search', undefined);
+                    handleFilterChange('status', undefined);
+                    handleFilterChange('sort', undefined);
                   }}
                   className="text-slate-600 hover:text-slate-900"
                 >
@@ -341,36 +328,36 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
             </div>
 
             {/* Active Filters Display */}
-            {(filters.search || filters.status || filters.sort !== 'created_desc') && (
+            {(currentFilters.search || currentFilters.status || currentFilters.sort !== 'created_desc') && (
               <div className="flex flex-wrap gap-2 items-center text-sm">
                 <span className="text-slate-600">Đang lọc:</span>
-                {filters.search && (
+                {currentFilters.search && (
                   <Badge variant="secondary" className="gap-1">
-                    Tìm kiếm: "{filters.search}"
+                    Tìm kiếm: "{currentFilters.search}"
                   </Badge>
                 )}
-                {filters.status && (
+                {currentFilters.status && (
                   <Badge variant="secondary" className="gap-1">
                     Trạng thái: {
-                      filters.status === 'active' ? 'Đang hoạt động' :
-                        filters.status === 'inactive' ? 'Tạm dừng' :
-                          filters.status === 'expired' ? 'Hết hạn' :
-                            filters.status === 'upcoming' ? 'Chưa bắt đầu' :
-                              filters.status === 'exhausted' ? 'Hết lượt' : ''
+                      currentFilters.status === 'active' ? 'Đang hoạt động' :
+                        currentFilters.status === 'inactive' ? 'Tạm dừng' :
+                          currentFilters.status === 'expired' ? 'Hết hạn' :
+                            currentFilters.status === 'upcoming' ? 'Chưa bắt đầu' :
+                              currentFilters.status === 'exhausted' ? 'Hết lượt' : ''
                     }
                   </Badge>
                 )}
-                {filters.sort && filters.sort !== 'created_desc' && (
+                {currentFilters.sort && currentFilters.sort !== 'created_desc' && (
                   <Badge variant="secondary" className="gap-1">
                     Sắp xếp: {
-                      filters.sort === 'created_asc' ? 'Cũ nhất' :
-                        filters.sort === 'code_asc' ? 'Mã A-Z' :
-                          filters.sort === 'code_desc' ? 'Mã Z-A' :
-                            filters.sort === 'value_desc' ? 'Giá trị cao' :
-                              filters.sort === 'value_asc' ? 'Giá trị thấp' :
-                                filters.sort === 'usage_desc' ? 'Tiến độ cao' :
-                                  filters.sort === 'valid_to_asc' ? 'Sắp hết hạn' :
-                                    filters.sort === 'valid_from_desc' ? 'Mới bắt đầu' : ''
+                      currentFilters.sort === 'created_asc' ? 'Cũ nhất' :
+                        currentFilters.sort === 'code_asc' ? 'Mã A-Z' :
+                          currentFilters.sort === 'code_desc' ? 'Mã Z-A' :
+                            currentFilters.sort === 'value_desc' ? 'Giá trị cao' :
+                              currentFilters.sort === 'value_asc' ? 'Giá trị thấp' :
+                                currentFilters.sort === 'usage_desc' ? 'Tiến độ cao' :
+                                  currentFilters.sort === 'valid_to_asc' ? 'Sắp hết hạn' :
+                                    currentFilters.sort === 'valid_from_desc' ? 'Mới bắt đầu' : ''
                     }
                   </Badge>
                 )}
@@ -495,15 +482,15 @@ export default function AdminVouchers({ vouchers, stats, filters, flash }: Props
                 <CardContent>
                   <Ticket className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-slate-900 mb-2">
-                    {searchTerm ? 'Không tìm thấy voucher' : 'Chưa có voucher nào'}
+                    {currentFilters.search ? 'Không tìm thấy voucher' : 'Chưa có voucher nào'}
                   </h3>
                   <p className="text-slate-600 mb-4">
-                    {searchTerm
-                      ? `Không tìm thấy voucher nào với từ khóa "${searchTerm}"`
+                    {currentFilters.search
+                      ? `Không tìm thấy voucher nào với từ khóa "${currentFilters.search}"`
                       : 'Tạo voucher đầu tiên để bắt đầu thu hút khách hàng'
                     }
                   </p>
-                  {!searchTerm && (
+                  {!currentFilters.search && (
                     <Link href="/admin/vouchers/create">
                       <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700">
                         <Plus className="h-4 w-4 mr-2" />
