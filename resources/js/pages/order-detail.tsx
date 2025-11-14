@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
 import { toast } from 'react-toastify';
+import { useToastRouter } from '@/hooks/use-toast-router';
 
 interface Product {
   id: number;
@@ -149,6 +150,7 @@ const getStatusVariant = (status: string): "default" | "secondary" | "outline" |
 const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
   // Normalize the order data - handle both direct Order and wrapped { data: Order }
   const order = orderProp && typeof orderProp === 'object' && 'data' in orderProp ? orderProp.data : orderProp as Order;
+  const toastRouter = useToastRouter();
 
   // State for dialogs
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -160,16 +162,17 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
 
   // Handle cancel order
   const handleCancelOrder = () => {
-    router.post(
+    toastRouter.post(
       route('orders.cancel', { order: order.order_id }),
       {},
       {
+        pending: 'Đang hủy đơn hàng...',
+        success: 'Đơn hàng đã được hủy thành công!',
+        error: 'Không thể hủy đơn hàng. Vui lòng thử lại!',
+      },
+      {
         onSuccess: () => {
           setShowCancelDialog(false);
-          toast.success('Đơn hàng đã được hủy thành công!');
-        },
-        onError: () => {
-          toast.error('Không thể hủy đơn hàng. Vui lòng thử lại!');
         },
       }
     );
@@ -221,11 +224,18 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
 
     const isUpdating = !!selectedProductForReview.user_review;
     setIsSubmitting(true);
-    router.post(
+    toastRouter.post(
       route('products.reviews.store', { product: selectedProductForReview.slug }),
       {
         rating: reviewRating,
         comment: reviewComment,
+      },
+      {
+        pending: 'Đang gửi đánh giá...',
+        success: isUpdating
+          ? 'Đánh giá đã được cập nhật thành công!'
+          : 'Cảm ơn bạn đã đánh giá sản phẩm!',
+        error: 'Có lỗi xảy ra. Vui lòng thử lại!',
       },
       {
         onSuccess: () => {
@@ -233,13 +243,6 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
           setSelectedProductForReview(null);
           setReviewRating(5);
           setReviewComment('');
-          toast.success(
-            isUpdating
-              ? 'Đánh giá đã được cập nhật thành công!'
-              : 'Cảm ơn bạn đã đánh giá sản phẩm!');
-        },
-        onError: () => {
-          toast.error('Có lỗi xảy ra. Vui lòng thử lại!');
         },
         onFinish: () => {
           setIsSubmitting(false);

@@ -6,13 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/navigation";
 import { Disc3, MapPin, CreditCard, ShieldCheck } from "lucide-react";
-import { Head, usePage, router } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import { type SharedData } from '@/types';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from "react-toastify";
 import { formatVND } from '@/lib/utils';
+import { useToastRouter } from '@/hooks/use-toast-router';
 
 // Define TypeScript interfaces for props
 interface CartItem {
@@ -60,6 +61,7 @@ type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 export default function Checkout() {
   const pageProps = usePage<CheckoutPageProps>().props;
   const { auth, cartItems, cartSummary, shippingAddresses, defaultShippingAddress, errors } = pageProps;
+  const toastRouter = useToastRouter();
 
   const form = useForm<CheckoutFormValues>({
     // @ts-expect-error - Type mismatch between zod .default() and react-hook-form
@@ -107,16 +109,16 @@ export default function Checkout() {
         toast.error(errorMessage);
       }
     } else {
-      // COD: Sử dụng Inertia như cũ
-      router.post('/orders', data, {
-        onSuccess: () => {
-          toast.success("Đặt hàng thành công!");
-        },
-        onError: (serverErrors) => {
-          const firstError = Object.values(serverErrors)[0];
-          toast.error(firstError || "Đã có lỗi xảy ra, vui lòng thử lại.");
+      // COD: Sử dụng useToastRouter
+      toastRouter.post(
+        '/orders',
+        data,
+        {
+          pending: 'Đang xử lý đơn hàng...',
+          success: 'Đặt hàng thành công!',
+          error: 'Đã có lỗi xảy ra, vui lòng thử lại.',
         }
-      });
+      );
     }
   };
 

@@ -78,8 +78,9 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
     });
   };
 
-  const handleAddToCart = async (e: MouseEvent<HTMLButtonElement>) => {
+  const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
     const promise = addToCart(product.id, quantity);
 
     toast.promise(promise, {
@@ -92,7 +93,9 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
         }
       }
     });
-  }; const handleWishlist = () => {
+  };
+
+  const handleWishlist = () => {
     setIsWishlisted(!isWishlisted);
   };
 
