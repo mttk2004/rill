@@ -166,7 +166,7 @@ class ProductController extends Controller
                 $query->orderByPivot('sort_order');
             },
             'reviews' => function ($query) {
-                $query->latest()->limit(config('pagination.admin.recent_items'));
+                $query->with('user:id,name')->latest()->limit(config('pagination.admin.recent_items'));
             },
         ])
         ->withCount('reviews')

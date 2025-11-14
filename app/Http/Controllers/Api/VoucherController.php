@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidateVoucherRequest;
+use App\Http\Resources\ApiResource;
 use App\Services\VoucherService;
 use Illuminate\Http\Request;
 
@@ -29,22 +30,24 @@ class VoucherController extends Controller
         );
 
         if ($result->isError()) {
-            return response()->json([
-                'success' => false,
-                'message' => $result->message,
-                'error_code' => $result->errorCode,
-            ], 422);
+            return ApiResource::error(
+                $result->message,
+                $result->errorCode,
+                null,
+                422
+            );
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => $result->message,
-            'voucher' => [
-                'code' => $result->data['voucher']->code,
-                'name' => $result->data['voucher']->name,
-                'discount_amount' => $result->data['discount_amount'],
+        return ApiResource::success(
+            [
+                'voucher' => [
+                    'code' => $result->data['voucher']->code,
+                    'name' => $result->data['voucher']->name,
+                    'discount_amount' => $result->data['discount_amount'],
+                ],
             ],
-        ]);
+            $result->message
+        );
     }
 
     /**
@@ -57,22 +60,24 @@ class VoucherController extends Controller
 
         $vouchers = $this->voucherService->getAvailableVouchers($userId, $orderTotal);
 
-        return response()->json([
-            'success' => true,
-            'vouchers' => $vouchers->map(function ($voucher) use ($orderTotal) {
-                return [
-                    'id' => $voucher->id,
-                    'code' => $voucher->code,
-                    'name' => $voucher->name,
-                    'description' => $voucher->description,
-                    'value' => $voucher->value,
-                    'minimum_amount' => $voucher->minimum_amount,
-                    'maximum_discount' => $voucher->maximum_discount,
-                    'valid_from' => $voucher->valid_from,
-                    'valid_to' => $voucher->valid_to,
-                    'discount_amount' => $orderTotal ? $voucher->calculateDiscount($orderTotal) : null,
-                ];
-            }),
-        ]);
+        return ApiResource::success(
+            [
+                'vouchers' => $vouchers->map(function ($voucher) use ($orderTotal) {
+                    return [
+                        'id' => $voucher->id,
+                        'code' => $voucher->code,
+                        'name' => $voucher->name,
+                        'description' => $voucher->description,
+                        'value' => $voucher->value,
+                        'minimum_amount' => $voucher->minimum_amount,
+                        'maximum_discount' => $voucher->maximum_discount,
+                        'valid_from' => $voucher->valid_from,
+                        'valid_to' => $voucher->valid_to,
+                        'discount_amount' => $orderTotal ? $voucher->calculateDiscount($orderTotal) : null,
+                    ];
+                }),
+            ],
+            'Available vouchers retrieved successfully'
+        );
     }
 }

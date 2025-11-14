@@ -40,5 +40,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\App\Exceptions\ServiceException $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json($e->toArray(), $e->getStatusCode());
+            }
+
+            // For web requests, return with error message
+            return back()->withErrors(['error' => $e->getMessage()])->withInput();
+        });
     })->create();
