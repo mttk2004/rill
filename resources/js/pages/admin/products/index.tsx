@@ -2,10 +2,12 @@ import { AdminNavigation } from "@/components/admin-navigation";
 import { AdminStatsCards, StatCardData } from "@/components/admin/common/admin-stats-cards";
 import { Button } from "@/components/ui/button";
 import { Plus, Upload, Download, Package, CheckCircle, AlertTriangle, TrendingUp, Star } from "lucide-react";
-import { Head, Link, usePage, router } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { toast } from 'react-toastify';
 import type { Paginator } from '@/types';
-import { useRef, useCallback, useState } from 'react';
+import { useState } from 'react';
+import { useQueryFilters } from '@/hooks/use-query-filters';
+import { useToastRouter } from '@/hooks/use-toast-router';
 import { ProductFilters } from "@/components/admin/product-filters";
 import { ProductTable } from "@/components/admin/product-table";
 import { ProductDetailDialog } from "@/components/admin/product-detail-dialog";
@@ -59,17 +61,18 @@ const AdminProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState<AdminProduct | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Debounce timer ref
-  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Filter state
-  const [currentFilters, setCurrentFilters] = useState({
-    search: (filters.search as string) || '',
-    status: (filters.status as string) || 'all',
-    genre: (filters.genre as string) || 'all',
-    stock: (filters.stock as string) || 'all',
-    sort: (filters.sort as string) || 'name_asc',
+  // Hooks
+  const { filters: currentFilters, handleFilterChange } = useQueryFilters({
+    initialFilters: {
+      search: (filters.search as string) || '',
+      status: (filters.status as string) || 'all',
+      genre: (filters.genre as string) || 'all',
+      stock: (filters.stock as string) || 'all',
+      sort: (filters.sort as string) || 'name_asc',
+    },
+    routeOrPath: '/admin/products',
   });
+  const { post, delete: destroy } = useToastRouter();
 
   // Fetch full product details
   const fetchProductDetails = async (productId: string) => {
@@ -102,83 +105,47 @@ const AdminProducts = () => {
     }
   };
 
-  // Handle filter changes
-  const handleFilterChange = useCallback((key: string, value: string | undefined) => {
-    const currentParams = new URLSearchParams(window.location.search);
+  // Specialized filter handlers
+  const handleSearchChange = (searchTerm: string) => {
+    handleFilterChange('search', searchTerm || undefined);
+  };
 
-    if (value && value !== 'all' && !value.startsWith('all-')) {
-      currentParams.set(key, value);
-    } else {
-      currentParams.delete(key);
-    }
-
-    currentParams.delete('page');
-
-    const queryString = currentParams.toString();
-    router.get(`/admin/products${queryString ? '?' + queryString : ''}`, {}, {
-      preserveState: true,
-      preserveScroll: true,
-    });
-  }, []);
-
-  const handleSearchChange = useCallback((searchTerm: string) => {
-    setCurrentFilters(prev => ({ ...prev, search: searchTerm }));
-
-    if (searchTimerRef.current) {
-      clearTimeout(searchTimerRef.current);
-    }
-
-    searchTimerRef.current = setTimeout(() => {
-      handleFilterChange('search', searchTerm || undefined);
-    }, 500);
-  }, [handleFilterChange]);
-
-  const handleStatusChange = useCallback((value: string) => {
-    setCurrentFilters(prev => ({ ...prev, status: value }));
+  const handleStatusChange = (value: string) => {
     handleFilterChange('status', value === 'all' ? undefined : value);
-  }, [handleFilterChange]);
+  };
 
-  const handleGenreChange = useCallback((value: string) => {
-    setCurrentFilters(prev => ({ ...prev, genre: value }));
+  const handleGenreChange = (value: string) => {
     handleFilterChange('genre', value === 'all' ? undefined : value);
-  }, [handleFilterChange]);
+  };
 
-  const handleStockChange = useCallback((value: string) => {
-    setCurrentFilters(prev => ({ ...prev, stock: value }));
+  const handleStockChange = (value: string) => {
     handleFilterChange('stock', value === 'all' ? undefined : value);
-  }, [handleFilterChange]);
+  };
 
-  const handleSortChange = useCallback((value: string) => {
-    setCurrentFilters(prev => ({ ...prev, sort: value }));
+  const handleSortChange = (value: string) => {
     handleFilterChange('sort', value);
-  }, [handleFilterChange]);
+  };
 
   const handleDelete = (productId: string, productName: string) => {
     if (confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${productName}"?`)) {
-      router.delete(`/admin/products/${productId}`, {
+      destroy(`/admin/products/${productId}`, {
+        success: 'Sản phẩm đã được xóa thành công',
+        error: 'Không thể xóa sản phẩm'
+      }, {
         preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {
-          toast.success('Sản phẩm đã được xóa thành công');
-        },
-        onError: () => {
-          toast.error('Không thể xóa sản phẩm');
-        }
+        preserveScroll: true
       });
     }
   };
 
   const handleRestore = (productId: string, productName: string) => {
     if (confirm(`Bạn có chắc chắn muốn khôi phục sản phẩm "${productName}"?`)) {
-      router.post(`/admin/products/${productId}/restore`, {}, {
+      post(`/admin/products/${productId}/restore`, {}, {
+        success: 'Sản phẩm đã được khôi phục thành công',
+        error: 'Không thể khôi phục sản phẩm'
+      }, {
         preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {
-          toast.success('Sản phẩm đã được khôi phục thành công');
-        },
-        onError: () => {
-          toast.error('Không thể khôi phục sản phẩm');
-        }
+        preserveScroll: true
       });
     }
   };
@@ -263,7 +230,13 @@ const AdminProducts = () => {
 
             {/* Filters */}
             <ProductFilters
-              filters={currentFilters}
+              filters={{
+                search: currentFilters.search || '',
+                status: currentFilters.status || 'all',
+                genre: currentFilters.genre || 'all',
+                stock: currentFilters.stock || 'all',
+                sort: currentFilters.sort || 'name_asc',
+              }}
               genres={genres}
               onSearchChange={handleSearchChange}
               onStatusChange={handleStatusChange}

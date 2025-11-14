@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import { Head } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import { useQueryFilters } from '@/hooks/use-query-filters';
 import { AdminNavigation } from '@/components/admin-navigation';
 import {
   AdminTable,
@@ -103,8 +104,11 @@ interface OrderDetail {
 }
 
 export default function Orders({ orders, filters, stats }: OrdersPageProps) {
-  const [currentFilters, setCurrentFilters] = useState(filters);
-  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { filters: currentFilters, handleFilterChange } = useQueryFilters({
+    initialFilters: filters,
+    routeOrPath: 'admin.orders',
+    routeHelper: route,
+  });
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -287,23 +291,6 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
   ];
 
   // Handlers
-  const handleFilterChange = (name: string, value: string) => {
-    const newFilters = { ...currentFilters, [name]: value };
-
-    if (name === 'search') {
-      // Debounce search
-      if (searchTimerRef.current) {
-        clearTimeout(searchTimerRef.current);
-      }
-      searchTimerRef.current = setTimeout(() => {
-        setCurrentFilters(newFilters);
-        router.get(route('admin.orders'), newFilters, { preserveState: true });
-      }, 500);
-    } else {
-      setCurrentFilters(newFilters);
-      router.get(route('admin.orders'), newFilters, { preserveState: true });
-    }
-  };
 
   const handleViewDetails = async (orderId: number) => {
     setIsDialogOpen(true);

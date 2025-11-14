@@ -1,5 +1,6 @@
 import AppLayout from "@/layouts/app-layout";
-import { Head, usePage, router } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
+import { useToastRouter } from '@/hooks/use-toast-router';
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -121,27 +122,27 @@ export default function Addresses({ addresses }: AddressesPageProps) {
     setIsModalOpen(true);
   };
 
+  const { delete: destroy, put } = useToastRouter();
+
   const handleDelete = (addressId: string) => {
     if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này không?')) {
-      router.delete(route('addresses.destroy', addressId), {
-        onSuccess: () => {
-          toast.success('Địa chỉ đã được xóa thành công.');
-        },
-        onError: (errors) => {
-          toast.error(errors.address || 'Không thể xóa địa chỉ này.');
-        },
+      destroy(route('addresses.destroy', addressId), {
+        success: 'Địa chỉ đã được xóa thành công.',
+        error: (err) => {
+          const error = err as { address?: string };
+          return error?.address || 'Không thể xóa địa chỉ này.';
+        }
       });
     }
   };
 
   const handleSetDefault = (addressId: string) => {
-    router.put(route('addresses.set-default', addressId), {}, {
-      onSuccess: () => {
-        toast.success('Địa chỉ mặc định đã được cập nhật.');
-      },
-      onError: (errors) => {
-        toast.error(errors.address || 'Không thể đặt địa chỉ này làm mặc định.');
-      },
+    put(route('addresses.set-default', addressId), {}, {
+      success: 'Địa chỉ mặc định đã được cập nhật.',
+      error: (err) => {
+        const error = err as { address?: string };
+        return error?.address || 'Không thể đặt địa chỉ này làm mặc định.';
+      }
     });
   };
 

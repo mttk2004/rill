@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Head, router, Link } from '@inertiajs/react';
+import { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import { useQueryFilters } from '@/hooks/use-query-filters';
+import { useToastRouter } from '@/hooks/use-toast-router';
 import { AdminNavigation } from '@/components/admin-navigation';
 import { ArtistDetailDialog } from '@/components/admin/artist-detail-dialog';
 import {
@@ -66,8 +68,12 @@ export default function Artists({
   stats,
   countries,
 }: ArtistsPageProps) {
-  const [currentFilters, setCurrentFilters] = useState(filters);
-  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { filters: currentFilters, handleFilterChange } = useQueryFilters({
+    initialFilters: filters,
+    routeOrPath: 'admin.artists',
+    routeHelper: route,
+  });
+  const { post, delete: destroy } = useToastRouter();
   const [selectedArtist, setSelectedArtist] = useState<AdminArtist | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -120,7 +126,7 @@ export default function Artists({
       name: 'search',
       label: 'Tìm kiếm',
       type: 'search',
-      value: currentFilters.search,
+      value: currentFilters.search || '',
       onChange: (value) => handleFilterChange('search', value),
       placeholder: 'Tìm theo tên nghệ sĩ, mô tả, quốc gia...',
       className: 'md:col-span-2',
@@ -263,62 +269,21 @@ export default function Artists({
   ];
 
   // Handlers
-  const handleFilterChange = (name: string, value: string) => {
-    const newFilters = { ...currentFilters, [name]: value };
-
-    if (name === 'search') {
-      // Debounce search
-      if (searchTimerRef.current) {
-        clearTimeout(searchTimerRef.current);
-      }
-      searchTimerRef.current = setTimeout(() => {
-        setCurrentFilters(newFilters);
-        router.get(route('admin.artists'), newFilters, { preserveState: true });
-      }, 500);
-    } else {
-      setCurrentFilters(newFilters);
-      router.get(route('admin.artists'), newFilters, { preserveState: true });
-    }
-  };
-
   const handleDelete = async (artistId: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa nghệ sĩ này?')) return;
 
-    try {
-      const response = await axios.delete(route('admin.artists.destroy', artistId));
-
-      if (response.data.success) {
-        toast.success(response.data.message || 'Đã xóa nghệ sĩ thành công');
-        router.reload();
-      }
-    } catch (error) {
-      console.error('Error deleting artist:', error);
-      toast.error('Không thể xóa nghệ sĩ');
-    }
+    destroy(route('admin.artists.destroy', artistId), {
+      success: 'Đã xóa nghệ sĩ thành công',
+      error: 'Không thể xóa nghệ sĩ'
+    });
   };
 
   const handleRestore = async (artistId: number) => {
-    try {
-      const response = await axios.post(route('admin.artists.restore', artistId));
-
-      if (response.data.success) {
-        toast.success(response.data.message || 'Đã khôi phục nghệ sĩ thành công');
-        router.reload();
-      }
-    } catch (error) {
-      console.error('Error restoring artist:', error);
-      toast.error('Không thể khôi phục nghệ sĩ');
-    }
+    post(route('admin.artists.restore', artistId), {}, {
+      success: 'Đã khôi phục nghệ sĩ thành công',
+      error: 'Không thể khôi phục nghệ sĩ'
+    });
   };
-
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (searchTimerRef.current) {
-        clearTimeout(searchTimerRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
