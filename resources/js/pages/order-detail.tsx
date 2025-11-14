@@ -223,6 +223,7 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
 
     const isUpdating = !!selectedProductForReview.user_review;
     setIsSubmitting(true);
+
     toastRouter.post(
       route('products.reviews.store', { product: selectedProductForReview.slug }),
       {
@@ -242,11 +243,14 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
           setSelectedProductForReview(null);
           setReviewRating(5);
           setReviewComment('');
-          setIsSubmitting(false);
         },
         onError: () => {
-          setIsSubmitting(false);
+          // Error is already handled by toast
         },
+        onFinish: () => {
+          // Always reset submitting state regardless of success or error
+          setIsSubmitting(false);
+        }
       }
     );
   };

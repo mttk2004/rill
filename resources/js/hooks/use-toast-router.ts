@@ -13,6 +13,7 @@ interface RouterOptions {
   only?: string[];
   onSuccess?: (response: unknown) => void;
   onError?: (errors: Record<string, unknown>) => void;
+  onFinish?: () => void;
 }
 
 /**
@@ -46,18 +47,24 @@ export function useToastRouter() {
     options: RouterOptions = {}
   ) => {
     const promise = new Promise((resolve, reject) => {
-      const routerMethod = router[method];
       const requestData = method === 'delete' ? undefined : data;
 
-      routerMethod(url, requestData as never, {
+      // Add timeout to prevent hanging forever
+      const timeout = setTimeout(() => {
+        reject(new Error('Request timeout - no response from server'));
+      }, 30000); // 30 second timeout
+
+      router[method](url, requestData as never, {
         ...options,
         onSuccess: (response: unknown) => {
+          clearTimeout(timeout);
           resolve(response);
           if (options.onSuccess) {
             options.onSuccess(response);
           }
         },
         onError: (errors: Record<string, unknown>) => {
+          clearTimeout(timeout);
           // Extract first error message
           const errorMessage = errors.message || Object.values(errors)[0];
           reject(new Error(typeof errorMessage === 'string' ? errorMessage : 'An error occurred'));
@@ -65,7 +72,14 @@ export function useToastRouter() {
             options.onError(errors);
           }
         },
+        onFinish: () => {
+          if (options.onFinish) {
+            options.onFinish();
+          }
+        },
       } as never);
+    }).catch((error) => {
+      throw error;
     });
 
     toast.promise(promise, {
