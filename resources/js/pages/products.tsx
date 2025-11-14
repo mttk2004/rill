@@ -9,11 +9,12 @@ import { ProductsStatsBar } from "@/components/products/products-stats-bar";
 import { ProductsGrid } from "@/components/products/products-grid";
 import { ProductsEmpty } from "@/components/products/products-empty";
 import { type ProductsPageData, type Pagination as PaginationType, type ProductFilters } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
-import { useState, FormEvent, MouseEvent, useMemo } from 'react';
+import { Head, usePage } from '@inertiajs/react';
+import { FormEvent, MouseEvent, useMemo } from 'react';
 import { type SharedData } from '@/types';
 import { useCart } from '@/hooks/use-cart';
-import { toast } from 'react-toastify';
+import { useQueryFilters } from '@/hooks/use-query-filters';
+import { useToastRouter } from '@/hooks/use-toast-router';
 
 interface ProductsProps extends ProductsPageData {
   search?: string;
@@ -27,74 +28,50 @@ interface ProductsProps extends ProductsPageData {
 export default function Products({ products: productsData, pagination: paginationProp, filters: filtersProp, ...props }: ProductsProps) {
   const { cart } = usePage<SharedData>().props;
   const { addToCart } = useCart();
+  const { post } = useToastRouter();
 
   // Normalize data - handle both direct data and wrapped { data: ... }
   const pagination = (paginationProp && typeof paginationProp === 'object' && 'data' in paginationProp ? paginationProp.data : paginationProp) as PaginationType;
   const filters = (filtersProp && typeof filtersProp === 'object' && 'data' in filtersProp ? filtersProp.data : filtersProp) as ProductFilters;
 
+  const { filters: currentFilters, handleFilterChange } = useQueryFilters({
+    routeOrPath: '/products',
+    initialFilters: {
+      search: props.search || '',
+      genre: props.genre || '',
+      label: props.label || '',
+      artist: props.artist || '',
+      sort: props.sort || '',
+    },
+  });
+
   const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
-  const [searchTerm, setSearchTerm] = useState(props.search || '');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const handleAddToCart = (e: MouseEvent<HTMLButtonElement>, productId: string) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const promise = addToCart(productId, 1);
-
-    toast.promise(promise, {
+    post('/cart', { product_id: productId, quantity: 1 }, {
       pending: 'Đang thêm vào giỏ hàng...',
       success: 'Đã thêm sản phẩm vào giỏ hàng! 🎉',
-      error: {
-        render({ data }: { data: Error | unknown }) {
-          const error = data as Error;
-          return error?.message || 'Đã xảy ra lỗi khi thêm vào giỏ hàng';
-        }
-      }
     });
   };
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
-    updateFilters({
-      search: searchTerm || undefined,
-      page: 1, // Reset to first page when searching
-    });
+    // Search is handled automatically by useQueryFilters debounce
   };
 
-  const handleFilterChange = (key: string, value: string) => {
-    const newValue = value === 'all' || value === '' ? undefined : value;
-    updateFilters({ [key]: newValue, page: 1 });
+  const handleGenreChange = (value: string) => {
+    handleFilterChange('genre', value === 'Tất cả' ? undefined : value);
   };
 
-  const updateFilters = (newFilters: Record<string, string | number | undefined>) => {
-    const currentFilters = {
-      search: props.search,
-      genre: props.genre,
-      label: props.label,
-      artist: props.artist,
-      sort: props.sort,
-      ...newFilters,
-    };
-
-    Object.keys(currentFilters).forEach(key => {
-      if (!currentFilters[key as keyof typeof currentFilters]) {
-        delete currentFilters[key as keyof typeof currentFilters];
-      }
-    });
-
-    router.get('/products', currentFilters, {
-      preserveState: true,
-      preserveScroll: true,
-    });
+  const handleLabelChange = (value: string) => {
+    handleFilterChange('label', value === 'Tất cả' ? undefined : value);
   };
 
-  const currentFilters = {
-    search: props.search,
-    genre: props.genre,
-    label: props.label,
-    artist: props.artist,
-    sort: props.sort,
+  const handleSortChange = (value: string) => {
+    handleFilterChange('sort', value);
   };
 
   const genres = filters?.genres ? ["Tất cả", ...filters.genres] : ["Tất cả"];
@@ -118,8 +95,8 @@ export default function Products({ products: productsData, pagination: paginatio
               <CardContent className="p-4">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                   <ProductsSearchBar
-                    searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
+                    searchTerm={currentFilters.search || ''}
+                    onSearchChange={(value) => handleFilterChange('search', value)}
                     onSubmit={handleSearch}
                   />
 
