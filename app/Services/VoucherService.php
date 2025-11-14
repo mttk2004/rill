@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\Voucher;
 use App\Models\VoucherUsage;
+use App\Services\Responses\ServiceResponse;
 use Illuminate\Support\Facades\DB;
 
 class VoucherService
@@ -13,51 +14,51 @@ class VoucherService
     /**
      * Validate if a voucher can be used by a user for a given order total.
      */
-    public function validateVoucher(string $code, float $orderTotal, ?int $userId = null): array
+    public function validateVoucher(string $code, float $orderTotal, ?int $userId = null): ServiceResponse
     {
         $voucher = Voucher::where('code', $code)->first();
 
         if (!$voucher) {
-            return [
-                'valid' => false,
-                'message' => 'Mã voucher không tồn tại',
-            ];
+            return ServiceResponse::error(
+                'Mã voucher không tồn tại',
+                'VOUCHER_NOT_FOUND'
+            );
         }
 
         if (!$voucher->is_active) {
-            return [
-                'valid' => false,
-                'message' => 'Mã voucher không còn hoạt động',
-            ];
+            return ServiceResponse::error(
+                'Mã voucher không còn hoạt động',
+                'VOUCHER_INACTIVE'
+            );
         }
 
         $now = now();
         if ($voucher->valid_from > $now) {
-            return [
-                'valid' => false,
-                'message' => 'Mã voucher chưa có hiệu lực',
-            ];
+            return ServiceResponse::error(
+                'Mã voucher chưa có hiệu lực',
+                'VOUCHER_NOT_STARTED'
+            );
         }
 
         if ($voucher->valid_to < $now) {
-            return [
-                'valid' => false,
-                'message' => 'Mã voucher đã hết hạn',
-            ];
+            return ServiceResponse::error(
+                'Mã voucher đã hết hạn',
+                'VOUCHER_EXPIRED'
+            );
         }
 
         if ($voucher->usage_limit !== null && $voucher->used_count >= $voucher->usage_limit) {
-            return [
-                'valid' => false,
-                'message' => 'Mã voucher đã hết lượt sử dụng',
-            ];
+            return ServiceResponse::error(
+                'Mã voucher đã hết lượt sử dụng',
+                'VOUCHER_USAGE_LIMIT_REACHED'
+            );
         }
 
         if ($voucher->minimum_amount !== null && $orderTotal < $voucher->minimum_amount) {
-            return [
-                'valid' => false,
-                'message' => 'Đơn hàng chưa đạt giá trị tối thiểu ' . number_format((float) $voucher->minimum_amount) . '₫',
-            ];
+            return ServiceResponse::error(
+                'Đơn hàng chưa đạt giá trị tối thiểu ' . number_format((float) $voucher->minimum_amount) . '₫',
+                'ORDER_TOTAL_TOO_LOW'
+            );
         }
 
         if ($userId && $voucher->usage_limit_per_user !== null) {
@@ -66,21 +67,22 @@ class VoucherService
                 ->count();
 
             if ($userUsageCount >= $voucher->usage_limit_per_user) {
-                return [
-                    'valid' => false,
-                    'message' => 'Bạn đã sử dụng hết lượt cho mã voucher này',
-                ];
+                return ServiceResponse::error(
+                    'Bạn đã sử dụng hết lượt cho mã voucher này',
+                    'USER_USAGE_LIMIT_REACHED'
+                );
             }
         }
 
         $discountAmount = $voucher->calculateDiscount($orderTotal);
 
-        return [
-            'valid' => true,
-            'voucher' => $voucher,
-            'discount_amount' => $discountAmount,
-            'message' => 'Mã voucher hợp lệ',
-        ];
+        return ServiceResponse::success(
+            'Mã voucher hợp lệ',
+            [
+                'voucher' => $voucher,
+                'discount_amount' => $discountAmount,
+            ]
+        );
     }
 
     /**

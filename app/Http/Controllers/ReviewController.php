@@ -43,10 +43,10 @@ class ReviewController extends Controller
             $validated
         );
 
-        if (!$result['success']) {
-            return back()->with('error', $result['message']);
+        if ($result->isError()) {
+            return back()->with('error', $result->message);
         }
 
-        return back()->with('success', $result['message']);
+        return back()->with('success', $result->message);
     }
 }

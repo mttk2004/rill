@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\User;
+use App\Services\Responses\ServiceResponse;
 
 class ReviewService
 {
@@ -50,18 +51,18 @@ class ReviewService
      * @param User $user
      * @param Product $product
      * @param array $data Array with 'rating' and 'comment' keys
-     * @return array{success: bool, message: string, review?: ProductReview}
+     * @return ServiceResponse
      */
-    public function createOrUpdateReview(User $user, Product $product, array $data): array
+    public function createOrUpdateReview(User $user, Product $product, array $data): ServiceResponse
     {
         // Find order item
         $orderItem = $this->getUserOrderItem($user, $product);
 
         if (!$orderItem) {
-            return [
-                'success' => false,
-                'message' => 'Bạn chỉ có thể đánh giá sản phẩm sau khi đã nhận hàng.',
-            ];
+            return ServiceResponse::error(
+                'Bạn chỉ có thể đánh giá sản phẩm sau khi đã nhận hàng.',
+                'ORDER_NOT_DELIVERED'
+            );
         }
 
         // Check for existing review
@@ -76,11 +77,10 @@ class ReviewService
                 'comment' => $data['comment'],
             ]);
 
-            return [
-                'success' => true,
-                'message' => 'Đánh giá của bạn đã được cập nhật.',
-                'review' => $existingReview,
-            ];
+            return ServiceResponse::success(
+                'Đánh giá của bạn đã được cập nhật.',
+                ['review' => $existingReview]
+            );
         }
 
         // Create new review
@@ -92,11 +92,10 @@ class ReviewService
             'comment' => $data['comment'],
         ]);
 
-        return [
-            'success' => true,
-            'message' => 'Cảm ơn bạn đã đánh giá sản phẩm!',
-            'review' => $review,
-        ];
+        return ServiceResponse::success(
+            'Cảm ơn bạn đã đánh giá sản phẩm!',
+            ['review' => $review]
+        );
     }
 
     /**

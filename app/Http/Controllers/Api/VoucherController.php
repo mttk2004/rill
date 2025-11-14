@@ -28,20 +28,21 @@ class VoucherController extends Controller
             $userId
         );
 
-        if (!$result['valid']) {
+        if ($result->isError()) {
             return response()->json([
                 'success' => false,
-                'message' => $result['message'],
+                'message' => $result->message,
+                'error_code' => $result->errorCode,
             ], 422);
         }
 
         return response()->json([
             'success' => true,
-            'message' => $result['message'],
+            'message' => $result->message,
             'voucher' => [
-                'code' => $result['voucher']->code,
-                'name' => $result['voucher']->name,
-                'discount_amount' => $result['discount_amount'],
+                'code' => $result->data['voucher']->code,
+                'name' => $result->data['voucher']->name,
+                'discount_amount' => $result->data['discount_amount'],
             ],
         ]);
     }
