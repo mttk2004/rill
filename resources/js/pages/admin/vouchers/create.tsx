@@ -16,31 +16,16 @@ import {
   Info
 } from 'lucide-react';
 
-interface VoucherFormData {
-  code: string;
-  name: string;
-  description: string;
-  type: 'fixed';
-  value: number;
-  minimum_amount: number | null;
-  maximum_discount: number | null;
-  usage_limit: number | null;
-  usage_limit_per_user: number;
-  valid_from: string;
-  valid_to: string;
-  is_active: boolean;
-}
-
 export default function AdminVoucherCreate() {
-  const { data, setData, post, processing, errors } = useForm<VoucherFormData>({
+  const { data, setData, post, processing, errors } = useForm({
     code: '',
     name: '',
     description: '',
-    type: 'fixed',
+    type: 'fixed' as const,
     value: 0,
-    minimum_amount: null,
-    maximum_discount: null,
-    usage_limit: null,
+    minimum_amount: null as number | null,
+    maximum_discount: null as number | null,
+    usage_limit: null as number | null,
     usage_limit_per_user: 1,
     valid_from: '',
     valid_to: '',
