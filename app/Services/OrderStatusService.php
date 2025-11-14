@@ -11,6 +11,14 @@ class OrderStatusService
 {
     /**
      * Generate automatic notes based on status transition.
+     *
+     * Creates context-aware messages for order status changes, with different
+     * messaging for admin vs customer actions. Supports direct status assignment
+     * or status-to-status transitions.
+     *
+     * @param string|null $oldStatus Previous order status value (pending, confirmed, etc.)
+     * @param string $newStatus New order status value
+     * @return string Human-readable status change message in Vietnamese
      */
     public function generateStatusChangeNotes(?string $oldStatus, string $newStatus): string
     {
@@ -54,6 +62,14 @@ class OrderStatusService
 
     /**
      * Create status history record for an order.
+     *
+     * Records order status changes in history table for audit trail and timeline display.
+     * If notes not provided, generates automatic notes based on status.
+     *
+     * @param Order $order The order to create history for
+     * @param string $status The status value to record
+     * @param string|null $notes Optional custom notes. Auto-generated if null
+     * @return OrderStatusHistory The created history record
      */
     public function createStatusHistory(Order $order, string $status, ?string $notes = null): OrderStatusHistory
     {
@@ -67,6 +83,14 @@ class OrderStatusService
 
     /**
      * Update order status and create history record.
+     *
+     * Main method for changing order status. Handles Enum conversion, sets custom notes
+     * if provided, updates the order, and triggers observers to create history record.
+     *
+     * @param Order $order The order to update
+     * @param string $newStatus The new status value
+     * @param string|null $notes Optional custom notes for this status change
+     * @return Order Fresh order instance with updated status
      */
     public function updateOrderStatus(Order $order, string $newStatus, ?string $notes = null): Order
     {

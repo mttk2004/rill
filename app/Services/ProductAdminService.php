@@ -11,6 +11,13 @@ class ProductAdminService
 {
     /**
      * Build query with filters for product listing.
+     *
+     * Constructs an Eloquent query for admin product listings with comprehensive
+     * filtering options including search, status, genre, featured flag, and stock levels.
+     * Includes soft-deleted products for admin visibility.
+     *
+     * @param array $filters Associative array with keys: search, status, genre, featured, stock, sort
+     * @return Builder Configured Eloquent query builder ready for pagination
      */
     public function buildProductQuery(array $filters): Builder
     {
@@ -75,6 +82,13 @@ class ProductAdminService
 
     /**
      * Apply sorting to query.
+     *
+     * Supports multiple sorting options: newest, oldest, name_asc, name_desc,
+     * price_asc, price_desc, stock_asc, stock_desc, and featured.
+     *
+     * @param Builder $query The query builder to apply sorting to
+     * @param string $sort Sort key (newest, oldest, name_asc, etc.)
+     * @return void
      */
     protected function applySorting(Builder $query, string $sort): void
     {
@@ -112,6 +126,11 @@ class ProductAdminService
 
     /**
      * Get product statistics for admin dashboard.
+     *
+     * Calculates aggregate statistics for products including total count,
+     * active products, out of stock, low stock, and featured products.
+     *
+     * @return array Associative array with keys: total, active, out_of_stock, low_stock, featured
      */
     public function getProductStats(): array
     {
@@ -129,7 +148,14 @@ class ProductAdminService
     }
 
     /**
-     * Enrich product with sales data (optimized to reduce N+1 queries).
+     * Enrich products with sales data (optimized to prevent N+1 queries).
+     *
+     * Fetches total sold quantity and revenue for multiple products in a single
+     * bulk query, then attaches the data to each product model. This prevents
+     * N+1 query issues when displaying sales statistics for product listings.
+     *
+     * @param \Illuminate\Support\Collection $products Collection of Product models to enrich
+     * @return void Modifies products in place by adding total_sold and total_revenue attributes
      */
     public function enrichProductsWithSalesData($products): void
     {
@@ -157,6 +183,13 @@ class ProductAdminService
 
     /**
      * Handle image upload for product.
+     *
+     * Manages product image uploads to Supabase storage. Deletes the old image
+     * if it exists (excluding external URLs), then stores the new image.
+     *
+     * @param Product $product The product to update image for
+     * @param \Illuminate\Http\UploadedFile $imageFile The uploaded image file
+     * @return string The storage path of the newly uploaded image
      */
     public function handleImageUpload(Product $product, $imageFile): string
     {
@@ -179,6 +212,14 @@ class ProductAdminService
 
     /**
      * Sync product artists.
+     *
+     * Manages the many-to-many relationship between products and artists.
+     * Handles artist attachment with pivot data (role, sort_order).
+     * If artists is null, detaches all artists from the product.
+     *
+     * @param Product $product The product to sync artists for
+     * @param array|null $artists Array of artist data with id, role, sort_order. Null to detach all
+     * @return void
      */
     public function syncArtists(Product $product, ?array $artists): void
     {

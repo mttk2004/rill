@@ -16,7 +16,16 @@ class ThankYouPageService
     ) {}
 
     /**
-     * Resolve the order from request parameters
+     * Resolve the order from request parameters.
+     *
+     * This method handles two scenarios:
+     * 1. Order passed directly from route parameter (normal flow)
+     * 2. Order ID from VNPAY return URL (vnp_TxnRef parameter)
+     *
+     * @param Request $request The HTTP request containing potential order identifiers
+     * @param Order|null $order Optional order from route parameter
+     * @return Order The resolved order instance
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException If order not found
      */
     public function resolveOrder(Request $request, ?Order $order): Order
     {
@@ -56,7 +65,13 @@ class ThankYouPageService
     }
 
     /**
-     * Get VNPAY response data from request
+     * Get VNPAY response data from request.
+     *
+     * Extracts and formats VNPAY payment gateway response parameters
+     * from the return URL after payment processing.
+     *
+     * @param Request $request The HTTP request with VNPAY response parameters
+     * @return array|null Array with response_code, message, transaction_no, is_success or null if no VNPAY params
      */
     public function getVnpayResponse(Request $request): ?array
     {
@@ -73,7 +88,14 @@ class ThankYouPageService
     }
 
     /**
-     * Auto-trigger IPN in local environment if payment is still pending
+     * Auto-trigger IPN in local environment if payment is still pending.
+     *
+     * VNPAY cannot reach localhost IPN URL, so we manually trigger the IPN handler
+     * in development environment to complete payment processing and update order status.
+     *
+     * @param Request $request The HTTP request with VNPAY parameters
+     * @param Order $order The order to process IPN for
+     * @return void
      */
     public function autoTriggerLocalIpn(Request $request, Order $order): void
     {
@@ -105,7 +127,14 @@ class ThankYouPageService
     }
 
     /**
-     * Log unauthenticated access for monitoring
+     * Log unauthenticated access for monitoring.
+     *
+     * Users may lose session after VNPAY redirect. This logs such access
+     * for security monitoring and debugging purposes.
+     *
+     * @param Order $order The order being accessed
+     * @param Request $request The HTTP request
+     * @return void
      */
     public function logUnauthenticatedAccess(Order $order, Request $request): void
     {

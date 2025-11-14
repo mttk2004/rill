@@ -38,7 +38,7 @@ class OrderController extends Controller
 
         $orders = $query
             ->orderBy('placed_at', 'desc')
-            ->paginate(10)
+            ->paginate(config('pagination.orders'))
             ->withQueryString();
 
         return Inertia::render('orders', [

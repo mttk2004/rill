@@ -161,7 +161,7 @@ class StatisticsController extends Controller
         // Recent orders
         $recentOrders = Order::with(['user', 'items.product', 'payment'])
             ->orderByDesc('placed_at')
-            ->limit(10)
+            ->limit(config('pagination.admin.recent_items'))
             ->get()
             ->map(function ($order) {
                 return [

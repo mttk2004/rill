@@ -24,7 +24,7 @@ class CategoryController extends Controller
                 ->groupBy('genre')
                 ->orderBy('count', 'desc')
                 ->orderBy('genre')
-                ->limit(20)
+                ->limit(config('pagination.api.default'))
                 ->get()
                 ->map(function ($item) {
                     return [
@@ -43,7 +43,7 @@ class CategoryController extends Controller
                 ->groupBy('label')
                 ->orderBy('count', 'desc')
                 ->orderBy('label')
-                ->limit(20)
+                ->limit(config('pagination.api.default'))
                 ->get()
                 ->map(function ($item) {
                     return [

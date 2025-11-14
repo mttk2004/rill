@@ -166,7 +166,7 @@ class ProductController extends Controller
                 $query->orderByPivot('sort_order');
             },
             'reviews' => function ($query) {
-                $query->latest()->limit(10);
+                $query->latest()->limit(config('pagination.admin.recent_items'));
             },
         ])
         ->withCount('reviews')
@@ -196,7 +196,7 @@ class ProductController extends Controller
                 'order_items.unit_price'
             )
             ->orderBy('orders.placed_at', 'desc')
-            ->limit(10)
+            ->limit(config('pagination.admin.recent_items'))
             ->get();
 
         // If AJAX request, return JSON

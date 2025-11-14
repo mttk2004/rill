@@ -102,7 +102,7 @@ class CustomerController extends Controller
     {
         $customer = User::where('role', 'customer')
             ->with(['orders' => function ($query) {
-                $query->latest()->limit(10);
+                $query->latest()->limit(config('pagination.admin.recent_items'));
             }])
             ->withCount('orders')
             ->findOrFail($id);

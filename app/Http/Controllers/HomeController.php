@@ -13,7 +13,7 @@ class HomeController extends Controller
         $featuredProducts = Product::with('artists')
             ->where('is_featured', true)
             ->inRandomOrder()
-            ->limit(5)
+            ->limit(config('pagination.featured_products'))
             ->get();
 
         return Inertia::render('welcome', [
