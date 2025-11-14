@@ -11,8 +11,8 @@ import { ProductsEmpty } from "@/components/products/products-empty";
 import { type ProductsPageData, type Pagination as PaginationType, type ProductFilters } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { FormEvent, MouseEvent, useMemo } from 'react';
+import * as React from 'react';
 import { type SharedData } from '@/types';
-import { useCart } from '@/hooks/use-cart';
 import { useQueryFilters } from '@/hooks/use-query-filters';
 import { useToastRouter } from '@/hooks/use-toast-router';
 
@@ -27,8 +27,8 @@ interface ProductsProps extends ProductsPageData {
 
 export default function Products({ products: productsData, pagination: paginationProp, filters: filtersProp, ...props }: ProductsProps) {
   const { cart } = usePage<SharedData>().props;
-  const { addToCart } = useCart();
   const { post } = useToastRouter();
+  const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid');
 
   // Normalize data - handle both direct data and wrapped { data: ... }
   const pagination = (paginationProp && typeof paginationProp === 'object' && 'data' in paginationProp ? paginationProp.data : paginationProp) as PaginationType;
@@ -60,18 +60,6 @@ export default function Products({ products: productsData, pagination: paginatio
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     // Search is handled automatically by useQueryFilters debounce
-  };
-
-  const handleGenreChange = (value: string) => {
-    handleFilterChange('genre', value === 'Tất cả' ? undefined : value);
-  };
-
-  const handleLabelChange = (value: string) => {
-    handleFilterChange('label', value === 'Tất cả' ? undefined : value);
-  };
-
-  const handleSortChange = (value: string) => {
-    handleFilterChange('sort', value);
   };
 
   const genres = filters?.genres ? ["Tất cả", ...filters.genres] : ["Tất cả"];
