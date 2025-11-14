@@ -2,18 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\OrderStatus;
 use App\Http\Requests\StoreProductReviewRequest;
 use App\Models\Product;
-use App\Models\ProductReview;
-use App\Models\Order;
-use Illuminate\Http\Request;
+use App\Services\ContentValidationService;
+use App\Services\ReviewService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 
 class ReviewController extends Controller
 {
+    /**
+     * Constructor with dependency injection.
+     *
+     * @param ReviewService $reviewService
+     * @param ContentValidationService $contentValidator
+     */
+    public function __construct(
+        protected ReviewService $reviewService,
+        protected ContentValidationService $contentValidator
+    ) {}
+
     /**
      * Store a new product review.
      */
@@ -22,52 +29,24 @@ class ReviewController extends Controller
         // Form Request automatically handles validation and authorization
         $validated = $request->validated();
 
-        // Check for spam/inappropriate content (simple implementation)
-        $spamKeywords = ['spam', 'scam', 'fake', 'shit', 'fuck', 'dm', 'đm', 'vcl', 'vãi'];
-        $comment = strtolower($validated['comment']);
-
-        foreach ($spamKeywords as $keyword) {
-            if (str_contains($comment, $keyword)) {
-                return back()->withErrors(['comment' => 'Nhận xét chứa nội dung không phù hợp. Vui lòng kiểm tra lại.']);
-            }
-        }
-
-        // Find a delivered order containing this product
-        $orderItem = \App\Models\OrderItem::whereHas('order', function ($query) {
-                $query->where('user_id', Auth::id())
-                      ->where('status', OrderStatus::DELIVERED);
-            })
-            ->where('product_id', $product->id)
-            ->first();
-
-        if (!$orderItem) {
-            return back()->with('error', 'Bạn chỉ có thể đánh giá sản phẩm sau khi đã nhận hàng.');
-        }
-
-        // Check if user has already reviewed this product
-        $existingReview = ProductReview::where('user_id', Auth::id())
-            ->where('product_id', $product->id)
-            ->first();
-
-        if ($existingReview) {
-            // Update existing review
-            $existingReview->update([
-                'rating' => $validated['rating'],
-                'comment' => $validated['comment'],
+        // Validate content for spam/inappropriate words
+        if (!$this->contentValidator->isClean($validated['comment'])) {
+            return back()->withErrors([
+                'comment' => 'Nhận xét chứa nội dung không phù hợp. Vui lòng kiểm tra lại.'
             ]);
-
-            return back()->with('success', 'Đánh giá của bạn đã được cập nhật.');
         }
 
-        // Create new review (auto-approved, no status needed)
-        ProductReview::create([
-            'user_id' => Auth::id(),
-            'product_id' => $product->id,
-            'order_item_id' => $orderItem->id,
-            'rating' => $validated['rating'],
-            'comment' => $validated['comment'],
-        ]);
+        // Delegate to service
+        $result = $this->reviewService->createOrUpdateReview(
+            Auth::user(),
+            $product,
+            $validated
+        );
 
-        return back()->with('success', 'Cảm ơn bạn đã đánh giá sản phẩm!');
+        if (!$result['success']) {
+            return back()->with('error', $result['message']);
+        }
+
+        return back()->with('success', $result['message']);
     }
 }
