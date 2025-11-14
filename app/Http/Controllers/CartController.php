@@ -59,7 +59,7 @@ class CartController extends Controller
     /**
      * Add item to cart
      */
-    public function add(Request $request): JsonResponse
+    public function add(Request $request): RedirectResponse
     {
         $request->validate([
             'product_id' => 'required|string|exists:products,id',
@@ -71,7 +71,11 @@ class CartController extends Controller
             $request->input('quantity', 1)
         );
 
-        return response()->json($result->toArray(), $result->isSuccess() ? 200 : 400);
+        if ($result->isError()) {
+            return back()->with('error', $result->message);
+        }
+
+        return back()->with('success', $result->message);
     }
 
     /**

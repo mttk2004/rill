@@ -6,8 +6,7 @@ import { Play, Star, ShoppingBag, Truck, Award, Users, Disc3 } from "lucide-reac
 import { type Product, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { type ReactNode, MouseEvent, useMemo } from "react";
-import { useCart } from '@/hooks/use-cart';
-import { toast } from 'react-toastify';
+import { useToastRouter } from '@/hooks/use-toast-router';
 
 interface WelcomeProps {
   featuredProducts: Product[];
@@ -15,7 +14,7 @@ interface WelcomeProps {
 
 const Welcome = ({ featuredProducts }: WelcomeProps) => {
   const { cart } = usePage<SharedData>().props;
-  const { addToCart } = useCart();
+  const { post } = useToastRouter();
 
   const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
 
@@ -23,17 +22,10 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const promise = addToCart(productId, 1);
-
-    toast.promise(promise, {
+    post('/cart/add', { product_id: productId, quantity: 1 }, {
       pending: 'Đang thêm vào giỏ hàng...',
       success: 'Đã thêm sản phẩm vào giỏ hàng! 🎉',
-      error: {
-        render({ data }: { data: Error | unknown }) {
-          const error = data as Error;
-          return error?.message || 'Đã xảy ra lỗi khi thêm vào giỏ hàng';
-        }
-      }
+      error: 'Đã xảy ra lỗi khi thêm vào giỏ hàng',
     });
   };
 

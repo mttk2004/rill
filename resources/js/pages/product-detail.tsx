@@ -2,8 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { Link, Head, usePage, useForm } from '@inertiajs/react';
 import { useState, MouseEvent, useMemo, useEffect, useRef } from "react";
 import { Product, SharedData } from '@/types';
-import { useCart } from "@/hooks/use-cart";
-import { toast } from 'react-toastify';
+import { useToastRouter } from '@/hooks/use-toast-router';
 import AppLayout from "@/layouts/app-layout";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { ProductInfoHeader } from "@/components/product/product-info-header";
@@ -36,7 +35,7 @@ interface ProductDetailProps {
 
 export default function ProductDetail({ product, openReviewTab = false }: ProductDetailProps) {
   const { cart } = usePage<SharedData>().props;
-  const { addToCart } = useCart();
+  const { post: routerPost } = useToastRouter();
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedRatingFilter, setSelectedRatingFilter] = useState<number | null>(null);
@@ -67,13 +66,9 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
     post(`/products/${product.slug}/reviews`, {
       preserveScroll: true,
       onSuccess: () => {
-        toast.success('Đánh giá của bạn đã được gửi!');
         if (!product.user_review) {
           reset();
         }
-      },
-      onError: () => {
-        toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
       },
     });
   };
@@ -81,17 +76,10 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
   const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    const promise = addToCart(product.id, quantity);
-
-    toast.promise(promise, {
+    routerPost('/cart/add', { product_id: product.id, quantity }, {
       pending: 'Đang thêm vào giỏ hàng...',
       success: `Đã thêm ${quantity} sản phẩm vào giỏ! 🎉`,
-      error: {
-        render({ data }: { data: Error | unknown }) {
-          const error = data as Error;
-          return error?.message || 'Đã xảy ra lỗi khi thêm vào giỏ hàng';
-        }
-      }
+      error: 'Đã xảy ra lỗi khi thêm vào giỏ hàng',
     });
   };
 
