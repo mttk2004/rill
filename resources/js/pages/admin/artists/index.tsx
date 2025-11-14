@@ -82,8 +82,7 @@ export default function Artists({
       const response = await axios.get(route('admin.artists.show', artistId));
       setSelectedArtist(response.data);
       setIsDialogOpen(true);
-    } catch (error) {
-      console.error('Error fetching artist details:', error);
+    } catch {
       toast.error('Không thể tải thông tin nghệ sĩ');
     }
   };

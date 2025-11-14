@@ -211,8 +211,7 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
         toast.error('Không thể tạo link thanh toán. Vui lòng thử lại!');
         setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error('Retry payment error:', error);
+    } catch {
       toast.error('Có lỗi xảy ra. Vui lòng thử lại!');
       setIsSubmitting(false);
     }

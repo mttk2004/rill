@@ -76,7 +76,6 @@ export default function OrderDetail({ order }: OrderDetailProps) {
         toast.error('Không thể cập nhật trạng thái');
       }
     } catch (error: unknown) {
-      console.error('Error updating status:', error);
       const errorMessage =
         error && typeof error === 'object' && 'response' in error &&
           error.response && typeof error.response === 'object' && 'data' in error.response &&

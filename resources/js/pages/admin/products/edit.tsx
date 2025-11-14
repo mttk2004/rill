@@ -193,11 +193,6 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
     setErrors({});
     setIsSaving(true);
 
-    console.log('🔍 [Frontend] Starting form submission...');
-    console.log('🔍 [Frontend] formData.image:', formData.image);
-    console.log('🔍 [Frontend] formData.image type:', formData.image ? typeof formData.image : 'null');
-    console.log('🔍 [Frontend] formData.image instanceof File:', formData.image instanceof File);
-
     try {
       const submitData = new FormData();
       submitData.append('_method', 'PUT');
@@ -220,26 +215,8 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
       });
 
       if (formData.image) {
-        console.log('✅ [Frontend] Appending image to FormData');
-        console.log('🔍 [Frontend] Image file name:', formData.image.name);
-        console.log('🔍 [Frontend] Image file size:', formData.image.size, 'bytes');
-        console.log('🔍 [Frontend] Image file type:', formData.image.type);
         submitData.append('image', formData.image);
-      } else {
-        console.log('⚠️ [Frontend] No image to upload');
       }
-
-      // Log all FormData entries
-      console.log('🔍 [Frontend] FormData entries:');
-      for (const [key, value] of submitData.entries()) {
-        if (value instanceof File) {
-          console.log(`  ${key}: [File] ${value.name} (${value.size} bytes)`);
-        } else {
-          console.log(`  ${key}: ${value}`);
-        }
-      }
-
-      console.log('📤 [Frontend] Sending request to:', `/admin/products/${product.id}`);
 
       const response = await axios.post(`/admin/products/${product.id}`, submitData, {
         headers: {
@@ -247,16 +224,11 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
         },
       });
 
-      console.log('📥 [Frontend] Response received:', response.data);
-
       if (response.data.success) {
         toast.success(response.data.message || 'Cập nhật sản phẩm thành công');
-        console.log('✅ [Frontend] Product updated successfully');
         router.visit('/admin/products');
       }
     } catch (error: unknown) {
-      console.error('Error updating product:', error);
-
       if (
         error &&
         typeof error === 'object' &&

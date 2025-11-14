@@ -84,7 +84,6 @@ export function useCategoryMenu(): UseCategoryMenuReturn {
             
             setData(result);
         } catch (err) {
-            console.error('Failed to fetch category menu data:', err);
             setError(err instanceof Error ? err.message : 'Không thể tải dữ liệu danh mục');
             
             // Fall back to default data on error

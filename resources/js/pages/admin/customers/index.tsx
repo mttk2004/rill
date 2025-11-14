@@ -100,14 +100,10 @@ const AdminCustomers = () => {
         setSelectedCustomer(data.props.customer);
         setIsDialogOpen(true);
       } else {
-        // Helpful debug: log non-JSON response body to console for diagnosis
-        const text = await response.text();
-        console.error('Expected JSON but received:', text);
-        toast.error('Server trả về dữ liệu không hợp lệ. Kiểm tra console để biết chi tiết.');
+        toast.error('Server trả về dữ liệu không hợp lệ');
         return;
       }
     } catch (error) {
-      console.error('Error fetching customer details:', error);
       toast.error('Không thể tải thông tin khách hàng');
     } finally {
       setIsLoadingCustomer(false);

@@ -104,7 +104,6 @@ export default function Checkout() {
           toast.error(errorMessage);
         }
       } catch (error) {
-        console.error('Lỗi khi đặt hàng:', error);
         const errorMessage = error instanceof Error ? error.message : "Đã xảy ra lỗi. Vui lòng thử lại.";
         toast.error(errorMessage);
       }

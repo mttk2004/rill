@@ -134,8 +134,6 @@ const ArtistEdit = ({ artist, countries }: PageProps) => {
         router.visit('/admin/artists');
       }
     } catch (error: unknown) {
-      console.error('Error updating artist:', error);
-
       if (
         error &&
         typeof error === 'object' &&

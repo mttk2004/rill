@@ -122,8 +122,6 @@ const ArtistCreate = ({ countries }: PageProps) => {
         router.visit('/admin/artists');
       }
     } catch (error: unknown) {
-      console.error('Error creating artist:', error);
-
       if (
         error &&
         typeof error === 'object' &&

@@ -299,8 +299,7 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
     try {
       const response = await axios.get(route('admin.orders.show', orderId));
       setSelectedOrder(response.data);
-    } catch (error) {
-      console.error('Failed to fetch order details:', error);
+    } catch {
       setIsDialogOpen(false);
     }
   };

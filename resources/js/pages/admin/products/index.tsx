@@ -94,13 +94,10 @@ const AdminProducts = () => {
         setSelectedProduct(data.props.product);
         setIsDialogOpen(true);
       } else {
-        const text = await response.text();
-        console.error('Expected JSON but received:', text);
         toast.error('Server trả về dữ liệu không hợp lệ');
         return;
       }
-    } catch (error) {
-      console.error('Error fetching product details:', error);
+    } catch {
       toast.error('Không thể tải thông tin sản phẩm');
     }
   };

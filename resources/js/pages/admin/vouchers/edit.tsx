@@ -41,43 +41,24 @@ interface Props {
 }
 
 export default function AdminVoucherEdit({ voucher }: Props) {
-  // Mock data cho demo - thực tế sẽ từ props
-  const mockVoucher = voucher || {
-    id: 1,
-    code: 'VINYL50K',
-    name: 'Giảm 50K cho đơn hàng đầu tiên',
-    description: 'Voucher chào mừng khách hàng mới, giảm 50,000 VND cho đơn hàng từ 300,000 VND',
-    type: 'fixed' as const,
-    value: 50000,
-    minimum_amount: 300000,
-    maximum_discount: null,
-    usage_limit: 100,
-    used_count: 23,
-    usage_limit_per_user: 1,
-    valid_from: '2025-01-01T00:00:00Z',
-    valid_to: '2025-12-31T23:59:59Z',
-    is_active: true,
-    created_at: '2025-01-01T00:00:00Z'
-  };
-
   const { data, setData, put, processing, errors } = useForm({
-    code: mockVoucher.code,
-    name: mockVoucher.name,
-    description: mockVoucher.description,
+    code: voucher.code,
+    name: voucher.name,
+    description: voucher.description,
     type: 'fixed' as const,
-    value: mockVoucher.value,
-    minimum_amount: mockVoucher.minimum_amount,
-    maximum_discount: mockVoucher.maximum_discount,
-    usage_limit: mockVoucher.usage_limit,
-    usage_limit_per_user: mockVoucher.usage_limit_per_user,
-    valid_from: mockVoucher.valid_from.split('T')[0],
-    valid_to: mockVoucher.valid_to.split('T')[0],
-    is_active: mockVoucher.is_active
+    value: voucher.value,
+    minimum_amount: voucher.minimum_amount,
+    maximum_discount: voucher.maximum_discount,
+    usage_limit: voucher.usage_limit,
+    usage_limit_per_user: voucher.usage_limit_per_user,
+    valid_from: voucher.valid_from.split('T')[0],
+    valid_to: voucher.valid_to.split('T')[0],
+    is_active: voucher.is_active
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    put(`/admin/vouchers/${mockVoucher.id}`);
+    put(`/admin/vouchers/${voucher.id}`);
   };
 
   const formatVND = (amount: number) => {
@@ -97,10 +78,10 @@ export default function AdminVoucherEdit({ voucher }: Props) {
 
   const getStatusBadge = () => {
     const now = new Date();
-    const validFrom = new Date(mockVoucher.valid_from);
-    const validTo = new Date(mockVoucher.valid_to);
+    const validFrom = new Date(voucher.valid_from);
+    const validTo = new Date(voucher.valid_to);
 
-    if (!mockVoucher.is_active) {
+    if (!voucher.is_active) {
       return <Badge variant="secondary" className="bg-gray-100 text-gray-700">Tạm dừng</Badge>;
     }
 
@@ -112,7 +93,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
       return <Badge variant="secondary" className="bg-red-100 text-red-700">Hết hạn</Badge>;
     }
 
-    if (mockVoucher.usage_limit && mockVoucher.used_count >= mockVoucher.usage_limit) {
+    if (voucher.usage_limit && voucher.used_count >= voucher.usage_limit) {
       return <Badge variant="secondary" className="bg-orange-100 text-orange-700">Hết lượt</Badge>;
     }
 
@@ -120,13 +101,13 @@ export default function AdminVoucherEdit({ voucher }: Props) {
   };
 
   const getUsagePercentage = () => {
-    if (!mockVoucher.usage_limit) return 0;
-    return (mockVoucher.used_count / mockVoucher.usage_limit) * 100;
+    if (!voucher.usage_limit) return 0;
+    return (voucher.used_count / voucher.usage_limit) * 100;
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Head title={`Chỉnh sửa Voucher: ${mockVoucher.code} - Admin`} />
+      <Head title={`Chỉnh sửa Voucher: ${voucher.code} - Admin`} />
       <AdminNavigation />
 
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -152,7 +133,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                   {getStatusBadge()}
                 </div>
                 <p className="text-slate-600">
-                  Cập nhật thông tin và cài đặt cho voucher: <code className="font-mono bg-slate-100 px-2 py-1 rounded">{mockVoucher.code}</code>
+                  Cập nhật thông tin và cài đặt cho voucher: <code className="font-mono bg-slate-100 px-2 py-1 rounded">{voucher.code}</code>
                 </p>
               </div>
             </div>
@@ -165,7 +146,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Đã sử dụng</p>
-                    <p className="text-xl font-bold text-slate-900">{mockVoucher.used_count}</p>
+                    <p className="text-xl font-bold text-slate-900">{voucher.used_count}</p>
                   </div>
                   <Users className="h-6 w-6 text-blue-500" />
                 </div>
@@ -177,7 +158,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Giá trị</p>
-                    <p className="text-xl font-bold text-slate-900">{formatVND(mockVoucher.value)}</p>
+                    <p className="text-xl font-bold text-slate-900">{formatVND(voucher.value)}</p>
                   </div>
                   <TrendingUp className="h-6 w-6 text-green-500" />
                 </div>
@@ -189,7 +170,7 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-600">Hết hạn</p>
-                    <p className="text-xl font-bold text-slate-900">{formatDate(mockVoucher.valid_to)}</p>
+                    <p className="text-xl font-bold text-slate-900">{formatDate(voucher.valid_to)}</p>
                   </div>
                   <Calendar className="h-6 w-6 text-purple-500" />
                 </div>
@@ -198,12 +179,12 @@ export default function AdminVoucherEdit({ voucher }: Props) {
           </div>
 
           {/* Usage Progress */}
-          {mockVoucher.usage_limit && (
+          {voucher.usage_limit && (
             <Card className="mb-6">
               <CardContent className="p-6">
                 <div className="flex justify-between text-sm text-slate-600 mb-2">
                   <span className="font-medium">Tiến độ sử dụng</span>
-                  <span>{getUsagePercentage().toFixed(1)}% ({mockVoucher.used_count} / {mockVoucher.usage_limit})</span>
+                  <span>{getUsagePercentage().toFixed(1)}% ({voucher.used_count} / {voucher.usage_limit})</span>
                 </div>
                 <div className="w-full bg-slate-200 rounded-full h-3">
                   <div
@@ -354,14 +335,14 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                 </div>
               </div>
 
-              {mockVoucher.used_count > 0 && (
+              {voucher.used_count > 0 && (
                 <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
                   <div className="flex gap-3">
                     <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5 shrink-0" />
                     <div className="text-sm">
                       <p className="font-medium text-orange-900 mb-1">Lưu ý khi chỉnh sửa</p>
                       <p className="text-orange-700">
-                        Voucher này đã được sử dụng {mockVoucher.used_count} lần.
+                        Voucher này đã được sử dụng {voucher.used_count} lần.
                         Một số thay đổi có thể ảnh hưởng đến khách hàng đã sử dụng.
                       </p>
                     </div>
@@ -431,11 +412,11 @@ export default function AdminVoucherEdit({ voucher }: Props) {
                     value={data.usage_limit || ''}
                     onChange={(e) => setData('usage_limit', e.target.value ? parseInt(e.target.value) : null)}
                     placeholder="100"
-                    min={mockVoucher.used_count || 1}
+                    min={voucher.used_count || 1}
                   />
                   <p className="text-xs text-slate-500">
-                    {mockVoucher.used_count > 0
-                      ? `Tối thiểu ${mockVoucher.used_count} (đã sử dụng)`
+                    {voucher.used_count > 0
+                      ? `Tối thiểu ${voucher.used_count} (đã sử dụng)`
                       : 'Để trống = không giới hạn số lượt sử dụng'
                     }
                   </p>

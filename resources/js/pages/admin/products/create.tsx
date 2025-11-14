@@ -198,8 +198,6 @@ const ProductCreate = ({ genres, labels, artists }: PageProps) => {
         router.visit('/admin/products');
       }
     } catch (error: unknown) {
-      console.error('Error creating product:', error);
-
       if (
         error &&
         typeof error === 'object' &&
