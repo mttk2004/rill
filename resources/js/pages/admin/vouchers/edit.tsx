@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { formatVND } from '@/lib/utils';
 import {
   Ticket,
   ArrowLeft,
@@ -35,21 +34,6 @@ interface Voucher {
   valid_to: string;
   is_active: boolean;
   created_at: string;
-}
-
-interface VoucherFormData {
-  code: string;
-  name: string;
-  description: string;
-  type: 'fixed';
-  value: number;
-  minimum_amount: number | null;
-  maximum_discount: number | null;
-  usage_limit: number | null;
-  usage_limit_per_user: number;
-  valid_from: string;
-  valid_to: string;
-  is_active: boolean;
 }
 
 interface Props {
