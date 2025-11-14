@@ -68,19 +68,23 @@ class CustomerController extends Controller
         // Eager load order count for display
         $users = $query->withCount('orders')->paginate($perPage)->withQueryString();
 
-        // Some quick stats
-        $total = User::where('role', 'customer')->count();
-        $active = User::where('role', 'customer')->where('is_active', true)->count();
-        $verifiedCount = User::where('role', 'customer')->whereNotNull('email_verified_at')->count();
-        $newThisMonth = User::where('role', 'customer')->where('created_at', '>=', now()->subMonth())->count();
+        // Calculate stats with single query
+        $stats = User::where('role', 'customer')
+            ->selectRaw('
+                COUNT(*) as total,
+                SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active,
+                SUM(CASE WHEN email_verified_at IS NOT NULL THEN 1 ELSE 0 END) as verified,
+                SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_this_month
+            ', [now()->subMonth()])
+            ->first();
 
         return Inertia::render('admin/customers/index', [
             'users' => $users,
             'stats' => [
-                'total' => $total,
-                'active' => $active,
-                'verified' => $verifiedCount,
-                'new_this_month' => $newThisMonth,
+                'total' => $stats->total,
+                'active' => $stats->active,
+                'verified' => $stats->verified,
+                'new_this_month' => $stats->new_this_month,
             ],
             'filters' => [
                 'search' => $search,

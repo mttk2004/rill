@@ -7,6 +7,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Services\ThankYouPageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -14,6 +15,9 @@ use Inertia\Inertia;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private ThankYouPageService $thankYouPageService
+    ) {}
     /**
      * Display a listing of the resource.
      */
@@ -71,89 +75,26 @@ class OrderController extends Controller
      */
     public function thankYou(Request $request, ?Order $order = null)
     {
-        \Log::info('Thank You Page Called', [
-            'has_order_param' => !is_null($order),
-            'has_vnp_txnref' => $request->has('vnp_TxnRef'),
-            'vnp_txnref_value' => $request->query('vnp_TxnRef'),
-            'all_params' => $request->all(),
-            'user_id' => Auth::id(),
-            'is_authenticated' => Auth::check(),
-        ]);
+        // Resolve order from route parameter or VNPAY return URL
+        $order = $this->thankYouPageService->resolveOrder($request, $order);
 
-        // Nếu không có $order (từ VNPAY return), lấy từ vnp_TxnRef
-        if (!$order && $request->has('vnp_TxnRef')) {
-            $orderId = $request->query('vnp_TxnRef');
-            \Log::info('Looking for order', ['order_id' => $orderId]);
-
-            $order = Order::find($orderId);
-
-            if (!$order) {
-                \Log::error('Order not found', ['order_id' => $orderId]);
-                abort(404, 'Không tìm thấy đơn hàng với ID: ' . $orderId);
-            }
-
-            \Log::info('Order found', [
-                'order_id' => $order->id,
-                'order_user_id' => $order->user_id,
-                'current_user_id' => Auth::id(),
-            ]);
-        }
-
-        if (!$order) {
-            \Log::error('No order parameter provided');
-            abort(404, 'Không tìm thấy đơn hàng.');
-        }
-
-        // Nếu user authenticated, check authorization
-        // Nếu không (từ VNPAY return), cho phép xem để hiển thị kết quả thanh toán
+        // Check authorization for authenticated users
         if (Auth::check()) {
             Gate::authorize('view', $order);
         } else {
-            // User chưa auth (session mất sau VNPAY redirect)
-            // Vẫn cho phép xem trang thank you nhưng sẽ yêu cầu login để xem chi tiết đơn hàng
-            \Log::info('Unauthenticated user viewing thank you page', [
-                'order_id' => $order->id,
-                'has_vnpay_params' => $request->has('vnp_ResponseCode'),
-            ]);
+            // Log unauthenticated access (from VNPAY redirect with lost session)
+            $this->thankYouPageService->logUnauthenticatedAccess($order, $request);
         }
 
         // Load payment information
         $order->load('payment');
 
-        // Lấy thông tin từ VNPAY return URL (nếu có)
-        $vnpayResponse = null;
-        if ($request->has('vnp_ResponseCode')) {
-            $vnpayService = app(\App\Services\VnpayService::class);
+        // Get VNPAY response data if available
+        $vnpayResponse = $this->thankYouPageService->getVnpayResponse($request);
 
-            $vnpayResponse = [
-                'response_code' => $request->query('vnp_ResponseCode'),
-                'message' => $vnpayService->getResponseMessage($request->query('vnp_ResponseCode')),
-                'transaction_no' => $request->query('vnp_TransactionNo'),
-                'is_success' => $request->query('vnp_ResponseCode') === '00',
-            ];
-
-            // Auto-trigger IPN in local environment (since VNPAY can't reach localhost)
-            if (app()->environment('local') && $order->payment->payment_status === \App\Enums\PaymentStatus::PENDING) {
-                \Log::info('Auto-triggering IPN in local environment', ['order_id' => $order->id]);
-
-                try {
-                    // Call IPN handler internally with OrderService injected
-                    $vnpayController = app(\App\Http\Controllers\VnpayController::class);
-                    $orderService = app(\App\Services\OrderService::class);
-                    $vnpayController->handleIpn($request, $vnpayService, $orderService);
-
-                    // Reload payment to get updated status
-                    $order->load('payment');
-
-                    \Log::info('IPN auto-triggered successfully', ['order_id' => $order->id]);
-                } catch (\Exception $e) {
-                    \Log::error('Failed to auto-trigger IPN', [
-                        'order_id' => $order->id,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                }
-            }
+        // Auto-trigger IPN in local environment if payment is pending
+        if ($vnpayResponse) {
+            $this->thankYouPageService->autoTriggerLocalIpn($request, $order);
         }
 
         return Inertia::render('orders/thank-you', [

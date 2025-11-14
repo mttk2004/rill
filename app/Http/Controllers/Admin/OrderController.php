@@ -89,15 +89,23 @@ class OrderController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        // Calculate stats
-        $stats = [
-            'total' => Order::count(),
-            'pending' => Order::where('status', OrderStatus::PENDING)->count(),
-            'confirmed' => Order::where('status', OrderStatus::CONFIRMED)->count(),
-            'shipped' => Order::where('status', OrderStatus::SHIPPED)->count(),
-            'delivered' => Order::where('status', OrderStatus::DELIVERED)->count(),
-            'cancelled' => Order::where('status', OrderStatus::CANCELLED)->count(),
-        ];
+        // Calculate stats with single query
+        $stats = Order::selectRaw('
+                COUNT(*) as total,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as confirmed,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as shipped,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as delivered,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as cancelled
+            ', [
+                OrderStatus::PENDING->value,
+                OrderStatus::CONFIRMED->value,
+                OrderStatus::SHIPPED->value,
+                OrderStatus::DELIVERED->value,
+                OrderStatus::CANCELLED->value,
+            ])
+            ->first()
+            ->toArray();
 
         return Inertia::render('admin/orders/index', [
             'orders' => OrderAdminResource::collection($orders),

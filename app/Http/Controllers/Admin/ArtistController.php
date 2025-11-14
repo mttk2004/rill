@@ -86,11 +86,19 @@ class ArtistController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        // Calculate stats
+        // Calculate stats with optimized queries
+        $artistStats = Artist::selectRaw('
+                COUNT(*) as total,
+                SUM(CASE WHEN EXISTS (
+                    SELECT 1 FROM artist_product WHERE artist_product.artist_id = artists.id
+                ) THEN 1 ELSE 0 END) as with_products
+            ')
+            ->first();
+
         $stats = [
-            'total' => Artist::count(),
-            'with_products' => Artist::has('products')->count(),
-            'without_products' => Artist::doesntHave('products')->count(),
+            'total' => $artistStats->total,
+            'with_products' => $artistStats->with_products,
+            'without_products' => $artistStats->total - $artistStats->with_products,
             'total_products' => DB::table('artist_product')->count(),
         ];
 

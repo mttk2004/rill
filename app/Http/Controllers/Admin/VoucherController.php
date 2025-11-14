@@ -100,16 +100,15 @@ class VoucherController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        // Calculate stats
-        $stats = [
-            'total' => Voucher::count(),
-            'active' => Voucher::where('is_active', true)
-                ->where('valid_from', '<=', $now)
-                ->where('valid_to', '>=', $now)
-                ->count(),
-            'expired' => Voucher::where('valid_to', '<', $now)->count(),
-            'total_used' => Voucher::sum('used_count'),
-        ];
+        // Calculate stats with single query
+        $stats = Voucher::selectRaw('
+                COUNT(*) as total,
+                SUM(CASE WHEN is_active = 1 AND valid_from <= ? AND valid_to >= ? THEN 1 ELSE 0 END) as active,
+                SUM(CASE WHEN valid_to < ? THEN 1 ELSE 0 END) as expired,
+                SUM(used_count) as total_used
+            ', [$now, $now, $now])
+            ->first()
+            ->toArray();
 
         return Inertia::render('admin/vouchers/index', [
             'vouchers' => $vouchers,

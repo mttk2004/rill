@@ -211,15 +211,7 @@ class CartService
      */
     private function findCartItem(string $productId): ?ShoppingCartItem
     {
-        $query = ShoppingCartItem::where('product_id', $productId);
-
-        if (Auth::check()) {
-            $query->where('user_id', Auth::id());
-        } else {
-            $query->where('session_id', Session::getId());
-        }
-
-        return $query->first();
+        return $this->findCartItemBy('product_id', $productId);
     }
 
     /**
@@ -227,7 +219,15 @@ class CartService
      */
     private function findCartItemById(int $cartItemId): ?ShoppingCartItem
     {
-        $query = ShoppingCartItem::where('id', $cartItemId);
+        return $this->findCartItemBy('id', $cartItemId);
+    }
+
+    /**
+     * Base method to find cart item by any column with user/session context
+     */
+    private function findCartItemBy(string $column, mixed $value): ?ShoppingCartItem
+    {
+        $query = ShoppingCartItem::where($column, $value);
 
         if (Auth::check()) {
             $query->where('user_id', Auth::id());
