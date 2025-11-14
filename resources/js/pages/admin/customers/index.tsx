@@ -21,11 +21,12 @@ import {
   Calendar,
   DollarSign
 } from "lucide-react";
-import { Head, Link, usePage, router } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { toast } from 'react-toastify';
 import type { Paginator, User, PaginationLink } from '@/types';
-import { useRef, useCallback, useState } from 'react';
+import { useState } from 'react';
 import { formatVND } from "@/lib/utils";
+import { useQueryFilters } from '@/hooks/use-query-filters';
 
 const AdminCustomers = () => {
 
@@ -66,13 +67,17 @@ const AdminCustomers = () => {
 
   const customers = usersPaginator.data;
 
+  // Use query filters hook
+  const { filters: currentFilters, handleFilterChange } = useQueryFilters({
+    initialFilters: filters as Record<string, string | undefined>,
+    routeOrPath: '/admin/customers',
+    searchDebounce: 500,
+  });
+
   // Dialog state
   const [selectedCustomer, setSelectedCustomer] = useState<AdminCustomer | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
-
-  // Debounce timer ref
-  const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch full customer details with orders
   const fetchCustomerDetails = async (customerId: string) => {
@@ -109,17 +114,17 @@ const AdminCustomers = () => {
     }
   };
 
-  const handleStatusChange = useCallback((value: string) => {
+  const handleStatusChange = (value: string) => {
     handleFilterChange('status', value === 'all-status' ? undefined : value);
-  }, [handleFilterChange]);
+  };
 
-  const handleVerifiedChange = useCallback((value: string) => {
+  const handleVerifiedChange = (value: string) => {
     handleFilterChange('verified', value === 'all-verified' ? undefined : value);
-  }, [handleFilterChange]);
+  };
 
-  const handleSortChange = useCallback((value: string) => {
+  const handleSortChange = (value: string) => {
     handleFilterChange('sort', value === 'newest' ? undefined : value);
-  }, [handleFilterChange]);
+  };
 
   const getStatusBadge = (is_active?: boolean) => {
     if (is_active) {

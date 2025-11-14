@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, Truck, CheckCircle, Clock, ArrowLeft, X, Download, MessageCircle, Disc3, Music2, Star, AlertTriangle } from "lucide-react";
-import { Link, router } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
 import { route } from 'ziggy-js';
 import { formatVND } from "@/lib/utils";
 import {
@@ -243,8 +243,9 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
           setSelectedProductForReview(null);
           setReviewRating(5);
           setReviewComment('');
+          setIsSubmitting(false);
         },
-        onFinish: () => {
+        onError: () => {
           setIsSubmitting(false);
         },
       }

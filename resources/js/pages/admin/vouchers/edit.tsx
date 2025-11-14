@@ -76,11 +76,11 @@ export default function AdminVoucherEdit({ voucher }: Props) {
     created_at: '2025-01-01T00:00:00Z'
   };
 
-  const { data, setData, put, processing, errors } = useForm<VoucherFormData>({
+  const { data, setData, put, processing, errors } = useForm({
     code: mockVoucher.code,
     name: mockVoucher.name,
     description: mockVoucher.description,
-    type: 'fixed',
+    type: 'fixed' as const,
     value: mockVoucher.value,
     minimum_amount: mockVoucher.minimum_amount,
     maximum_discount: mockVoucher.maximum_discount,
