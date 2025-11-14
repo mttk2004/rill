@@ -71,7 +71,7 @@ class CartController extends Controller
             $request->input('quantity', 1)
         );
 
-        return response()->json($result);
+        return response()->json($result->toArray(), $result->isSuccess() ? 200 : 400);
     }
 
     /**
@@ -88,11 +88,11 @@ class CartController extends Controller
             $request->input('quantity')
         );
 
-        if (!$result['success']) {
-            return back()->withErrors(['message' => $result['message']]);
+        if ($result->isError()) {
+            return back()->withErrors(['message' => $result->message]);
         }
 
-        return back()->with('message', $result['message']);
+        return back()->with('message', $result->message);
     }
 
     /**
@@ -102,11 +102,11 @@ class CartController extends Controller
     {
         $result = $this->cartService->removeFromCart($cartItemId);
 
-        if (!$result['success']) {
-            return back()->withErrors(['message' => $result['message']]);
+        if ($result->isError()) {
+            return back()->withErrors(['message' => $result->message]);
         }
 
-        return back()->with('message', $result['message']);
+        return back()->with('message', $result->message);
     }
 
     /**
@@ -116,7 +116,7 @@ class CartController extends Controller
     {
         $result = $this->cartService->clearCart();
 
-        return response()->json($result);
+        return response()->json($result->toArray());
     }
 
     /**

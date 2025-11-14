@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ShoppingCartItem;
+use App\Services\Responses\ServiceResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -50,22 +51,22 @@ class CartService
     /**
      * Add item to cart
      */
-    public function addToCart(string $productId, int $quantity = 1): array
+    public function addToCart(string $productId, int $quantity = 1): ServiceResponse
     {
         $product = Product::findOrFail($productId);
 
         if (!$product->isInStock()) {
-            return [
-                'success' => false,
-                'message' => 'Sản phẩm không còn hàng hoặc tạm ngưng bán'
-            ];
+            return ServiceResponse::error(
+                'Sản phẩm không còn hàng hoặc tạm ngưng bán',
+                'PRODUCT_OUT_OF_STOCK'
+            );
         }
 
         if ($quantity > $product->stock_quantity) {
-            return [
-                'success' => false,
-                'message' => "Chỉ còn {$product->stock_quantity} sản phẩm trong kho"
-            ];
+            return ServiceResponse::error(
+                "Chỉ còn {$product->stock_quantity} sản phẩm trong kho",
+                'INSUFFICIENT_STOCK'
+            );
         }
 
         // Check if item already exists in cart
@@ -75,10 +76,10 @@ class CartService
             $newQuantity = $existingItem->quantity + $quantity;
 
             if ($newQuantity > $product->stock_quantity) {
-                return [
-                    'success' => false,
-                    'message' => "Tổng số lượng vượt quá tồn kho ({$product->stock_quantity} sản phẩm)"
-                ];
+                return ServiceResponse::error(
+                    "Tổng số lượng vượt quá tồn kho ({$product->stock_quantity} sản phẩm)",
+                    'QUANTITY_EXCEEDS_STOCK'
+                );
             }
 
             $existingItem->update(['quantity' => $newQuantity]);
@@ -92,17 +93,16 @@ class CartService
             ]);
         }
 
-        return [
-            'success' => true,
-            'message' => 'Đã thêm sản phẩm vào giỏ hàng',
-            'cart_summary' => $this->getCartSummary()
-        ];
+        return ServiceResponse::success(
+            'Đã thêm sản phẩm vào giỏ hàng',
+            ['cart_summary' => $this->getCartSummary()]
+        );
     }
 
     /**
      * Update cart item quantity
      */
-    public function updateQuantity(int $cartItemId, int $quantity): array
+    public function updateQuantity(int $cartItemId, int $quantity): ServiceResponse
     {
         if ($quantity <= 0) {
             return $this->removeFromCart($cartItemId);
@@ -111,55 +111,53 @@ class CartService
         $cartItem = $this->findCartItemById($cartItemId);
 
         if (!$cartItem) {
-            return [
-                'success' => false,
-                'message' => 'Không tìm thấy sản phẩm trong giỏ hàng'
-            ];
+            return ServiceResponse::error(
+                'Không tìm thấy sản phẩm trong giỏ hàng',
+                'CART_ITEM_NOT_FOUND'
+            );
         }
 
         if ($quantity > $cartItem->product->stock_quantity) {
-            return [
-                'success' => false,
-                'message' => "Chỉ còn {$cartItem->product->stock_quantity} sản phẩm trong kho"
-            ];
+            return ServiceResponse::error(
+                "Chỉ còn {$cartItem->product->stock_quantity} sản phẩm trong kho",
+                'INSUFFICIENT_STOCK'
+            );
         }
 
         $cartItem->update(['quantity' => $quantity]);
 
-        return [
-            'success' => true,
-            'message' => 'Đã cập nhật số lượng sản phẩm',
-            'cart_summary' => $this->getCartSummary()
-        ];
+        return ServiceResponse::success(
+            'Đã cập nhật số lượng sản phẩm',
+            ['cart_summary' => $this->getCartSummary()]
+        );
     }
 
     /**
      * Remove item from cart
      */
-    public function removeFromCart(int $cartItemId): array
+    public function removeFromCart(int $cartItemId): ServiceResponse
     {
         $cartItem = $this->findCartItemById($cartItemId);
 
         if (!$cartItem) {
-            return [
-                'success' => false,
-                'message' => 'Không tìm thấy sản phẩm trong giỏ hàng'
-            ];
+            return ServiceResponse::error(
+                'Không tìm thấy sản phẩm trong giỏ hàng',
+                'CART_ITEM_NOT_FOUND'
+            );
         }
 
         $cartItem->delete();
 
-        return [
-            'success' => true,
-            'message' => 'Đã xóa sản phẩm khỏi giỏ hàng',
-            'cart_summary' => $this->getCartSummary()
-        ];
+        return ServiceResponse::success(
+            'Đã xóa sản phẩm khỏi giỏ hàng',
+            ['cart_summary' => $this->getCartSummary()]
+        );
     }
 
     /**
      * Clear all cart items
      */
-    public function clearCart(): array
+    public function clearCart(): ServiceResponse
     {
         $query = ShoppingCartItem::query();
 
@@ -171,11 +169,10 @@ class CartService
 
         $query->delete();
 
-        return [
-            'success' => true,
-            'message' => 'Đã xóa tất cả sản phẩm khỏi giỏ hàng',
-            'cart_summary' => $this->getCartSummary()
-        ];
+        return ServiceResponse::success(
+            'Đã xóa tất cả sản phẩm khỏi giỏ hàng',
+            ['cart_summary' => $this->getCartSummary()]
+        );
     }
 
     /**
