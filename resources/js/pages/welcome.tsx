@@ -26,7 +26,7 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
       pending: 'Đang thêm vào giỏ hàng...',
       success: 'Đã thêm sản phẩm vào giỏ hàng! 🎉',
       error: 'Đã xảy ra lỗi khi thêm vào giỏ hàng',
-    });
+    }, { preserveScroll: true });
   };
 
   const features = [

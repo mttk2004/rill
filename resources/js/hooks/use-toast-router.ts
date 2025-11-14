@@ -46,6 +46,8 @@ export function useToastRouter() {
     messages: ToastMessages,
     options: RouterOptions = {}
   ) => {
+    console.log(`[useToastRouter] Making ${method.toUpperCase()} request to:`, url, 'with data:', data);
+
     const promise = new Promise((resolve, reject) => {
       const requestData = method === 'delete' ? undefined : data;
 

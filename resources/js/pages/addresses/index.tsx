@@ -1,7 +1,9 @@
 import AppLayout from "@/layouts/app-layout";
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useToastRouter } from '@/hooks/use-toast-router';
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { type SharedData } from '@/types';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,8 +15,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { toast } from 'react-toastify';
-import { type SharedData } from '@/types';
 
 interface ShippingAddress {
   id: string;
@@ -52,8 +52,19 @@ type AddressFormValues = z.infer<typeof addressSchema>;
 
 export default function Addresses({ addresses }: AddressesPageProps) {
   const { flash } = usePage<SharedData>().props;
+  const { post, put } = useToastRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<ShippingAddress | null>(null);
+
+  // Handle flash messages (only for delete/setDefault which use router directly)
+  useEffect(() => {
+    if (flash?.success) {
+      toast.success(flash.success);
+    }
+    if (flash?.error) {
+      toast.error(flash.error);
+    }
+  }, [flash?.success, flash?.error]);
 
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressSchema),
@@ -71,15 +82,6 @@ export default function Addresses({ addresses }: AddressesPageProps) {
   });
 
   useEffect(() => {
-    if (flash?.success) {
-      toast.success(flash.success);
-    }
-    if (flash?.error) {
-      toast.error(flash.error);
-    }
-  }, [flash]);
-
-  useEffect(() => {
     if (!isModalOpen) {
       setEditingAddress(null);
       form.reset();
@@ -90,18 +92,27 @@ export default function Addresses({ addresses }: AddressesPageProps) {
     const url = editingAddress
       ? route('addresses.update', editingAddress.id)
       : route('addresses.store');
-    const method = editingAddress ? 'put' : 'post';
+    const method = editingAddress ? put : post;
+    const successMessage = editingAddress
+      ? 'Địa chỉ đã được cập nhật thành công.'
+      : 'Địa chỉ đã được thêm thành công.';
 
-    router[method](url, values, {
+    method(url, values, {
+      pending: 'Đang lưu địa chỉ...',
+      success: successMessage,
+      error: 'Có lỗi xảy ra khi lưu địa chỉ.',
+    }, {
+      preserveScroll: true,
       onSuccess: () => {
         setIsModalOpen(false);
-        // Inertia will automatically re-render with new addresses
       },
-      onError: (errors) => {
+      onError: (errors: Record<string, unknown>) => {
         for (const key in errors) {
-          form.setError(key as keyof AddressFormValues, { message: errors[key] });
+          const message = errors[key];
+          form.setError(key as keyof AddressFormValues, {
+            message: typeof message === 'string' ? message : String(message)
+          });
         }
-        toast.error('Có lỗi xảy ra khi lưu địa chỉ.');
       },
     });
   };
@@ -122,27 +133,17 @@ export default function Addresses({ addresses }: AddressesPageProps) {
     setIsModalOpen(true);
   };
 
-  const { delete: destroy, put } = useToastRouter();
-
   const handleDelete = (addressId: string) => {
     if (confirm('Bạn có chắc chắn muốn xóa địa chỉ này không?')) {
-      destroy(route('addresses.destroy', addressId), {
-        success: 'Địa chỉ đã được xóa thành công.',
-        error: (err) => {
-          const error = err as { address?: string };
-          return error?.address || 'Không thể xóa địa chỉ này.';
-        }
+      router.delete(route('addresses.destroy', addressId), {
+        preserveScroll: true,
       });
     }
   };
 
   const handleSetDefault = (addressId: string) => {
-    put(route('addresses.set-default', addressId), {}, {
-      success: 'Địa chỉ mặc định đã được cập nhật.',
-      error: (err) => {
-        const error = err as { address?: string };
-        return error?.address || 'Không thể đặt địa chỉ này làm mặc định.';
-      }
+    router.put(route('addresses.set-default', addressId), {}, {
+      preserveScroll: true,
     });
   };
 

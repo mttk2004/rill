@@ -80,21 +80,37 @@ class AddressService
      */
     public function deleteAddress(ShippingAddress $address): void
     {
+        \Log::info('[AddressService] deleteAddress called', [
+            'address_id' => $address->id,
+            'is_default' => $address->is_default,
+            'user_id' => $address->user_id,
+        ]);
+
         // Business rule: Cannot delete address if it's the only one and default
-        if ($address->is_default && $address->user->shippingAddresses()->count() === 1) {
+        $addressCount = $address->user->shippingAddresses()->count();
+        \Log::info('[AddressService] Address count for user', ['count' => $addressCount]);
+
+        if ($address->is_default && $addressCount === 1) {
+            \Log::warning('[AddressService] Cannot delete default address - it is the only one');
             throw ValidationException::withMessages([
                 'address' => 'Không thể xóa địa chỉ mặc định duy nhất của bạn.'
             ]);
         }
 
         DB::transaction(function () use ($address) {
+            \Log::info('[AddressService] Deleting address in transaction', ['address_id' => $address->id]);
             $address->delete();
+            \Log::info('[AddressService] Address deleted');
 
             // If the deleted address was default, set another one as default
             if ($address->is_default && $address->user->shippingAddresses()->exists()) {
-                $address->user->shippingAddresses()->first()->update(['is_default' => true]);
+                $newDefault = $address->user->shippingAddresses()->first();
+                \Log::info('[AddressService] Setting new default address', ['new_default_id' => $newDefault->id]);
+                $newDefault->update(['is_default' => true]);
             }
         });
+
+        \Log::info('[AddressService] deleteAddress completed successfully');
     }
 
     /**
@@ -102,13 +118,28 @@ class AddressService
      */
     public function setDefaultAddress(User $user, ShippingAddress $address): ShippingAddress
     {
+        \Log::info('[AddressService] setDefaultAddress called', [
+            'user_id' => $user->id,
+            'address_id' => $address->id,
+            'address_user_id' => $address->user_id,
+        ]);
+
         if ($user->id !== $address->user_id) {
+            \Log::error('[AddressService] User mismatch', [
+                'user_id' => $user->id,
+                'address_user_id' => $address->user_id,
+            ]);
             throw new \Exception('Địa chỉ không thuộc về người dùng này.');
         }
 
         return DB::transaction(function () use ($user, $address) {
+            \Log::info('[AddressService] Unsetting all default addresses');
             $user->shippingAddresses()->update(['is_default' => false]);
+
+            \Log::info('[AddressService] Setting address as default', ['address_id' => $address->id]);
             $address->update(['is_default' => true]);
+
+            \Log::info('[AddressService] setDefaultAddress completed successfully');
             return $address;
         });
     }

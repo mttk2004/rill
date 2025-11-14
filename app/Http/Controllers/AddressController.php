@@ -42,13 +42,18 @@ class AddressController extends Controller
      */
     public function store(StoreShippingAddressRequest $request): RedirectResponse
     {
+        \Log::info('[AddressController] Store request received', [
+            'user_id' => Auth::id(),
+            'data' => $request->validated(),
+        ]);
+
         $this->authorize('create', ShippingAddress::class);
 
         $user = Auth::user();
-        $this->addressService->createAddress($user, $request->validated());
+        $address = $this->addressService->createAddress($user, $request->validated());
+        \Log::info('[AddressController] Address created successfully', ['address_id' => $address->id]);
 
-        return redirect()->route('addresses.index')
-            ->with('success', 'Địa chỉ đã được thêm thành công.');
+        return back();
     }
 
     /**
@@ -56,12 +61,18 @@ class AddressController extends Controller
      */
     public function update(UpdateShippingAddressRequest $request, ShippingAddress $address): RedirectResponse
     {
+        \Log::info('[AddressController] Update request received', [
+            'address_id' => $address->id,
+            'user_id' => Auth::id(),
+            'data' => $request->validated(),
+        ]);
+
         $this->authorize('update', $address);
 
         $this->addressService->updateAddress($address, $request->validated());
+        \Log::info('[AddressController] Address updated successfully', ['address_id' => $address->id]);
 
-        return redirect()->route('addresses.index')
-            ->with('success', 'Địa chỉ đã được cập nhật thành công.');
+        return back();
     }
 
     /**
@@ -69,15 +80,23 @@ class AddressController extends Controller
      */
     public function destroy(ShippingAddress $address): RedirectResponse
     {
+        \Log::info('[AddressController] Delete request received', [
+            'address_id' => $address->id,
+            'user_id' => Auth::id(),
+        ]);
+
         $this->authorize('delete', $address);
 
         try {
             $this->addressService->deleteAddress($address);
-            return redirect()->route('addresses.index')
-                ->with('success', 'Địa chỉ đã được xóa thành công.');
+            \Log::info('[AddressController] Address deleted successfully', ['address_id' => $address->id]);
+            return back()->with('success', 'Địa chỉ đã được xóa thành công.');
         } catch (\Exception $e) {
-            return redirect()->route('addresses.index')
-                ->with('error', $e->getMessage());
+            \Log::error('[AddressController] Failed to delete address', [
+                'address_id' => $address->id,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -86,15 +105,23 @@ class AddressController extends Controller
      */
     public function setDefault(ShippingAddress $address): RedirectResponse
     {
+        \Log::info('[AddressController] Set default request received', [
+            'address_id' => $address->id,
+            'user_id' => Auth::id(),
+        ]);
+
         $this->authorize('setDefault', $address);
 
         try {
             $this->addressService->setDefaultAddress(Auth::user(), $address);
-            return redirect()->route('addresses.index')
-                ->with('success', 'Địa chỉ mặc định đã được cập nhật.');
+            \Log::info('[AddressController] Default address updated successfully', ['address_id' => $address->id]);
+            return back()->with('success', 'Địa chỉ mặc định đã được cập nhật.');
         } catch (\Exception $e) {
-            return redirect()->route('addresses.index')
-                ->with('error', $e->getMessage());
+            \Log::error('[AddressController] Failed to set default address', [
+                'address_id' => $address->id,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('error', $e->getMessage());
         }
     }
 }

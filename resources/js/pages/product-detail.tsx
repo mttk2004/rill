@@ -80,7 +80,7 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
       pending: 'Đang thêm vào giỏ hàng...',
       success: `Đã thêm ${quantity} sản phẩm vào giỏ! 🎉`,
       error: 'Đã xảy ra lỗi khi thêm vào giỏ hàng',
-    });
+    }, { preserveScroll: true });
   };
 
   const handleWishlist = () => {

@@ -54,7 +54,7 @@ export default function Products({ products: productsData, pagination: paginatio
     post('/cart/add', { product_id: productId, quantity: 1 }, {
       pending: 'Đang thêm vào giỏ hàng...',
       success: 'Đã thêm sản phẩm vào giỏ hàng! 🎉',
-    });
+    }, { preserveScroll: true });
   };
 
   const handleSearch = (e: FormEvent) => {
