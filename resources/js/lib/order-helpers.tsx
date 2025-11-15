@@ -43,8 +43,7 @@ export interface AdminOrder {
     address_line_2: string | null;
     ward: string;
     district: string;
-    city: string;
-    postal_code: string | null;
+    province: string;
   };
   order_items_count: number;
   order_items?: Array<{
@@ -211,7 +210,7 @@ export const formatAddress = (
     address.address_line_2,
     address.ward,
     address.district,
-    address.city,
+    address.province,
   ].filter(Boolean);
 
   return parts.join(', ');

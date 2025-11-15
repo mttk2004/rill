@@ -37,7 +37,7 @@ interface ShippingAddress {
   full_name: string;
   phone: string;
   address_line_1: string;
-  city: string;
+  province: string;
   district: string;
   ward: string;
   is_default: boolean;
@@ -159,7 +159,7 @@ export default function Checkout() {
                                   {address.is_default && <Badge variant="outline" className="text-xs">Mặc định</Badge>}
                                 </div>
                                 <p className="text-slate-600 dark:text-slate-300">{address.phone}</p>
-                                <p className="text-slate-600 dark:text-slate-300">{`${address.address_line_1}, ${address.ward}, ${address.district}, ${address.city}`}</p>
+                                <p className="text-slate-600 dark:text-slate-300">{`${address.address_line_1}, ${address.ward}, ${address.district}, ${address.province}`}</p>
                               </div>
                             </Label>
                           ))}

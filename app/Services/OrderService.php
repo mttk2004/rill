@@ -40,10 +40,10 @@ class OrderService
                 'order_number' => 'RL-' . strtoupper(Str::random(8)),
                 'status' => OrderStatus::PENDING,
                 'subtotal' => $subtotal,
+                'shipping_fee' => 0, // Will be calculated by GHN API
                 'discount_amount' => 0,
                 'total_amount' => $totalAmount,
                 'shipping_address' => $addressData,
-                'billing_address' => $addressData, // Billing same as shipping for simplicity
                 'placed_at' => now(),
             ]);
 

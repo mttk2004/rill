@@ -38,9 +38,9 @@ class OrderResource extends JsonResource
             'date' => $this->placed_at,
             'status' => $this->status->value,
             'subtotal' => (float) $this->subtotal,
+            'shipping_fee' => (float) $this->shipping_fee,
             'discount_amount' => (float) $this->discount_amount,
             'total' => (float) $this->total_amount,
-            'currency' => $this->currency ?? 'VND',
             'delivered_date' => $this->when($this->status === OrderStatus::DELIVERED, $this->updated_at),
             'payment_method' => $this->whenLoaded('payment', function() {
                 $method = $this->payment?->payment_method;

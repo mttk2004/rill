@@ -80,8 +80,7 @@ interface OrderDetail {
     address_line_2?: string;
     ward: string;
     district: string;
-    city: string;
-    postal_code?: string;
+    province: string;
   };
   payment?: {
     payment_method: string;

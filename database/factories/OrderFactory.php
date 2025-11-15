@@ -26,14 +26,14 @@ class OrderFactory extends Factory
             'user_id' => User::factory(),
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']),
             'subtotal' => 0, // Will be calculated
+            'shipping_fee' => $this->faker->numberBetween(15000, 50000), // Random shipping fee 15k-50k VND
             'discount_amount' => 0,
             'total_amount' => 0, // Will be calculated
-            'currency' => 'VND',
             'shipping_address' => [
                 'full_name' => $this->faker->name,
                 'phone' => $this->faker->phoneNumber,
                 'address_line_1' => $this->faker->streetAddress,
-                'city' => $this->faker->city,
+                'province' => $this->faker->city,
                 'district' => $this->faker->city,
                 'ward' => $this->faker->city,
             ],
@@ -76,7 +76,7 @@ class OrderFactory extends Factory
             // Update the order totals
             $order->update([
                 'subtotal' => $subtotal,
-                'total_amount' => $subtotal, // Assuming no discount for now
+                'total_amount' => $subtotal + $order->shipping_fee - $order->discount_amount,
             ]);
         });
     }

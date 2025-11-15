@@ -51,8 +51,7 @@ interface OrderDetail {
     address_line_2?: string;
     ward: string;
     district: string;
-    city: string;
-    postal_code?: string;
+    province: string;
   };
   payment?: {
     payment_method: string;
@@ -116,7 +115,7 @@ export const OrderDetailDialog = ({ order, isOpen, onClose }: OrderDetailDialogP
   if (!order) return null;
 
   const fullAddress = order.shipping_address
-    ? `${order.shipping_address.address_line_1}${order.shipping_address.address_line_2 ? ', ' + order.shipping_address.address_line_2 : ''}, ${order.shipping_address.ward}, ${order.shipping_address.district}, ${order.shipping_address.city}`
+    ? `${order.shipping_address.address_line_1}${order.shipping_address.address_line_2 ? ', ' + order.shipping_address.address_line_2 : ''}, ${order.shipping_address.ward}, ${order.shipping_address.district}, ${order.shipping_address.province}`
     : 'N/A';
 
   return (

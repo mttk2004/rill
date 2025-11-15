@@ -277,7 +277,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                           {[
                             order.shipping_address.ward,
                             order.shipping_address.district,
-                            order.shipping_address.city,
+                            order.shipping_address.province,
                           ]
                             .filter(Boolean)
                             .join(', ')}

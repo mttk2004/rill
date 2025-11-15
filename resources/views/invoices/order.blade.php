@@ -109,7 +109,7 @@
             <strong>Khách hàng:</strong> {{ $order->shipping_address['full_name'] }}<br>
             <strong>Địa chỉ:</strong> {{ $order->shipping_address['address_line_1'] }},
             {{ $order->shipping_address['ward'] }}, {{ $order->shipping_address['district'] }},
-            {{ $order->shipping_address['city'] }}<br>
+            {{ $order->shipping_address['province'] }}<br>
             <strong>Điện thoại:</strong> {{ $order->shipping_address['phone'] }}
           </td>
           <td class="right">

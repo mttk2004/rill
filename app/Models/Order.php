@@ -26,11 +26,10 @@ class Order extends Model
         'user_id',
         'status',
         'subtotal',
+        'shipping_fee',
         'discount_amount',
         'total_amount',
-        'currency',
         'shipping_address',
-        'billing_address',
         'notes',
         'placed_at',
     ];
@@ -38,8 +37,11 @@ class Order extends Model
     protected $casts = [
         'status' => OrderStatus::class,
         'shipping_address' => 'array',
-        'billing_address' => 'array',
         'placed_at' => 'datetime',
+        'subtotal' => 'decimal:2',
+        'shipping_fee' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'total_amount' => 'decimal:2',
     ];
 
     protected static function boot()

@@ -79,7 +79,7 @@ class OrderSeeder extends Seeder
                 'full_name' => $customer->name,
                 'phone' => '0987654321',
                 'address_line_1' => fake()->streetAddress(),
-                'city' => 'Hà Nội',
+                'province' => 'Hà Nội',
                 'district' => 'Hoàn Kiếm',
                 'ward' => 'Hàng Bài',
             ];
@@ -89,7 +89,7 @@ class OrderSeeder extends Seeder
                 'phone' => $shippingAddress->phone,
                 'address_line_1' => $shippingAddress->address_line_1,
                 'address_line_2' => $shippingAddress->address_line_2,
-                'city' => $shippingAddress->city,
+                'province' => $shippingAddress->province,
                 'district' => $shippingAddress->district,
                 'ward' => $shippingAddress->ward,
             ];
@@ -116,7 +116,8 @@ class OrderSeeder extends Seeder
 
         // Discount ngẫu nhiên
         $discountAmount = (rand(0, 10) > 8) ? round($subtotal * 0.05) : 0;
-        $totalAmount = $subtotal - $discountAmount;
+        $shippingFee = rand(15000, 50000);
+        $totalAmount = $subtotal + $shippingFee - $discountAmount;
 
         // Timeline: Bắt đầu từ placed_at
         $placedAt = match($finalStatus) {
@@ -132,11 +133,10 @@ class OrderSeeder extends Seeder
             'user_id' => $customer->id,
             'status' => 'pending',
             'subtotal' => $subtotal,
+            'shipping_fee' => $shippingFee,
             'discount_amount' => $discountAmount,
             'total_amount' => $totalAmount,
-            'currency' => 'VND',
             'shipping_address' => $shippingAddressData,
-            'billing_address' => $shippingAddressData,
             'notes' => null,
             'placed_at' => $placedAt,
         ]);
@@ -194,7 +194,6 @@ class OrderSeeder extends Seeder
             'payment_method' => 'cod',
             'payment_status' => $paymentStatus,
             'amount' => $order->total_amount,
-            'currency' => 'VND',
             'transaction_id' => $transactionId,
             'gateway_response' => $paymentStatus === 'completed'
                 ? ['status' => 'confirmed', 'message' => 'Thanh toán COD khi nhận hàng']
