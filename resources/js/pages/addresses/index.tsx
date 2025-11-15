@@ -29,7 +29,7 @@ interface ShippingAddress {
   district: string;
   district_id: number;
   ward: string;
-  ward_id: number;
+  ward_id: string;
   is_default: boolean;
   created_at: string;
   updated_at: string;
@@ -67,7 +67,7 @@ const addressSchema = z.object({
   district: z.string().min(1, 'Quận/Huyện là bắt buộc.').max(100, 'Quận/Huyện không được vượt quá 100 ký tự.'),
   district_id: z.number(),
   ward: z.string().min(1, 'Phường/Xã là bắt buộc.').max(100, 'Phường/Xã không được vượt quá 100 ký tự.'),
-  ward_id: z.number(),
+  ward_id: z.string(),
   is_default: z.boolean().optional(),
 });
 
@@ -104,7 +104,7 @@ export default function Addresses({ addresses }: AddressesPageProps) {
       district: '',
       district_id: 0,
       ward: '',
-      ward_id: 0,
+      ward_id: '',
       is_default: false,
     },
   });
@@ -223,9 +223,7 @@ export default function Addresses({ addresses }: AddressesPageProps) {
         }
       },
     });
-  };
-
-  const handleEdit = (address: ShippingAddress) => {
+  }; const handleEdit = (address: ShippingAddress) => {
     setEditingAddress(address);
     form.reset({
       full_name: address.full_name,
@@ -440,7 +438,7 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                                 const ward = wards.find(w => w.WardName === value);
                                 if (ward) {
                                   field.onChange(value);
-                                  form.setValue('ward_id', parseInt(ward.WardCode));
+                                  form.setValue('ward_id', ward.WardCode);
                                 }
                               }}
                               value={field.value || ''}

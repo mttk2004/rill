@@ -48,9 +48,7 @@ class AddressController extends Controller
         $this->addressService->createAddress($user, $request->validated());
 
         return back();
-    }
-
-    /**
+    }    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateShippingAddressRequest $request, ShippingAddress $address): RedirectResponse

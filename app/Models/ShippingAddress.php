@@ -31,6 +31,8 @@ class ShippingAddress extends Model
 
     protected $casts = [
         'is_default' => 'boolean',
+        'province_id' => 'integer',
+        'district_id' => 'integer',
     ];
 
     /**

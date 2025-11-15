@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('district', 100)->comment('Quận/Huyện');
             $table->integer('district_id')->comment('GHN District ID');
             $table->string('ward', 100)->comment('Phường/Xã');
-            $table->integer('ward_id')->comment('GHN Ward ID');
+            $table->string('ward_id', 20)->comment('GHN Ward ID');
             $table->boolean('is_default')->default(false)->comment('Địa chỉ mặc định');
             $table->timestamps(); // created_at, updated_at
 
