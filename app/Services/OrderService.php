@@ -16,6 +16,13 @@ use Illuminate\Support\Str;
 
 class OrderService
 {
+    protected $shippingService;
+
+    public function __construct(ShippingService $shippingService)
+    {
+        $this->shippingService = $shippingService;
+    }
+
     public function createOrderFromCart(User $user, array $data): Order
     {
         return DB::transaction(function () use ($user, $data) {
@@ -30,7 +37,18 @@ class OrderService
                 ->firstOrFail();
 
             $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->unit_price);
-            $totalAmount = $subtotal; // Assuming no discounts for now
+
+            // Calculate shipping fee using GHN API
+            $itemsCount = $cartItems->sum('quantity');
+            $estimatedWeight = $this->shippingService->estimateWeight($itemsCount);
+            $shippingFee = $this->shippingService->calculateFee(
+                $shippingAddress,
+                (int) $subtotal,
+                $estimatedWeight
+            );
+
+            $discountAmount = 0; // TODO: Implement discount logic
+            $totalAmount = $subtotal + $shippingFee - $discountAmount;
 
             // Prepare address data
             $addressData = $shippingAddress->toArray();
@@ -40,8 +58,8 @@ class OrderService
                 'order_number' => 'RL-' . strtoupper(Str::random(8)),
                 'status' => OrderStatus::PENDING,
                 'subtotal' => $subtotal,
-                'shipping_fee' => 0, // Will be calculated by GHN API
-                'discount_amount' => 0,
+                'shipping_fee' => $shippingFee,
+                'discount_amount' => $discountAmount,
                 'total_amount' => $totalAmount,
                 'shipping_address' => $addressData,
                 'placed_at' => now(),

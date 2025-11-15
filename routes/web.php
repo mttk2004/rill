@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\VnpayController;
+use App\Http\Controllers\Api\ShippingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
     // Checkout and Order Placement
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout/shipping-fee', [ShippingController::class, 'calculate'])->name('checkout.shipping-fee');
     Route::post('/orders', [CheckoutController::class, 'store'])->name('orders.store');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');

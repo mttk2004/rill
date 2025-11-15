@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/navigation";
-import { MapPin, CreditCard, ShieldCheck } from "lucide-react";
+import { MapPin, CreditCard, ShieldCheck, Loader2 } from "lucide-react";
 import { Head, usePage } from "@inertiajs/react";
 import { type SharedData } from '@/types';
 import { useForm, Controller } from 'react-hook-form';
@@ -14,6 +14,8 @@ import { z } from 'zod';
 import { toast } from "react-toastify";
 import { formatVND } from '@/lib/utils';
 import { useToastRouter } from '@/hooks/use-toast-router';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 // Define TypeScript interfaces for props
 interface CartItem {
@@ -63,6 +65,11 @@ export default function Checkout() {
   const { auth, cartItems, cartSummary, shippingAddresses, defaultShippingAddress, errors } = pageProps;
   const toastRouter = useToastRouter();
 
+  // Shipping fee state
+  const [shippingFee, setShippingFee] = useState<number | null>(null);
+  const [isCalculatingFee, setIsCalculatingFee] = useState(false);
+  const [isFreeShipping, setIsFreeShipping] = useState(false);
+
   const form = useForm<CheckoutFormValues>({
     // @ts-expect-error - Type mismatch between zod .default() and react-hook-form
     resolver: zodResolver(checkoutSchema),
@@ -72,7 +79,37 @@ export default function Checkout() {
     },
   });
 
-  const { control, handleSubmit, formState: { isSubmitting } } = form;
+  const { control, handleSubmit, watch, formState: { isSubmitting } } = form;
+  const selectedAddressId = watch('shipping_address_id');
+
+  // Calculate shipping fee when address changes
+  useEffect(() => {
+    const calculateShippingFee = async () => {
+      if (!selectedAddressId) {
+        setShippingFee(null);
+        return;
+      }
+
+      setIsCalculatingFee(true);
+      try {
+        const response = await axios.post('/checkout/shipping-fee', {
+          address_id: selectedAddressId,
+        });
+
+        setShippingFee(response.data.shipping_fee);
+        setIsFreeShipping(response.data.is_free_shipping);
+      } catch (error) {
+        console.error('Error calculating shipping fee:', error);
+        toast.error('Không thể tính phí vận chuyển. Vui lòng thử lại.');
+        setShippingFee(50000); // Fallback fee
+        setIsFreeShipping(false);
+      } finally {
+        setIsCalculatingFee(false);
+      }
+    };
+
+    calculateShippingFee();
+  }, [selectedAddressId]);
 
   const onSubmit = async (data: CheckoutFormValues) => {
     // Nếu là VNPAY, cần xử lý khác
@@ -243,12 +280,30 @@ export default function Checkout() {
                       </div>
                       <div className="flex justify-between">
                         <span>Phí vận chuyển</span>
-                        <span className="font-semibold text-green-600">Miễn phí</span>
+                        {isCalculatingFee ? (
+                          <span className="text-slate-500 flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Đang tính...
+                          </span>
+                        ) : shippingFee === null ? (
+                          <span className="text-slate-500">Chọn địa chỉ</span>
+                        ) : isFreeShipping || shippingFee === 0 ? (
+                          <span className="font-semibold text-green-600">Miễn phí</span>
+                        ) : (
+                          <span>{formatVND(shippingFee)}</span>
+                        )}
                       </div>
+                      {isFreeShipping && (
+                        <p className="text-xs text-green-600">🎉 Miễn phí vận chuyển cho đơn hàng trên 1.000.000₫</p>
+                      )}
                       <Separator className="my-2" />
                       <div className="flex justify-between font-bold text-lg">
                         <span>Tổng cộng</span>
-                        <span className="text-amber-600">{formatVND(cartSummary.total_amount)}</span>
+                        <span className="text-amber-600">
+                          {shippingFee !== null
+                            ? formatVND(cartSummary.total_amount + shippingFee)
+                            : formatVND(cartSummary.total_amount)}
+                        </span>
                       </div>
                     </div>
                     <Button type="submit" disabled={isSubmitting} className="w-full mt-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white" size="lg">
