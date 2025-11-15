@@ -5,13 +5,13 @@ import {
   Disc3,
   Menu,
   Search,
-  Heart,
   Settings,
   Package,
   LogOut,
   UserCircle,
-  X, // Import X icon
-  Home, // Import Home icon
+  X,
+  Home,
+  Sparkles,
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react"; // Import useRef, useEffect
 import {
@@ -75,11 +75,20 @@ const NavLink = ({
     <Link
       href={href}
       className={cn(
-        "text-sm font-medium transition-colors hover:text-amber-500 relative after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-amber-500 after:scale-x-0 after:origin-left after:transition-transform",
-        isActive && "text-amber-500 after:scale-x-100"
+        "text-sm font-medium transition-all duration-300 hover:text-amber-500 relative group",
+        "after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px]",
+        "after:bg-gradient-to-r after:from-amber-500 after:to-amber-600",
+        "after:scale-x-0 after:origin-left after:transition-transform after:duration-300",
+        "hover:after:scale-x-100",
+        isActive && "text-amber-500 after:scale-x-100 font-semibold"
       )}
     >
-      {children}
+      <span className="relative">
+        {children}
+        {isActive && (
+          <span className="absolute -inset-1 bg-amber-500/10 rounded-md -z-10 animate-pulse"></span>
+        )}
+      </span>
     </Link>
   );
 };
@@ -122,16 +131,17 @@ export const Navigation = ({ user }: NavigationProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between relative"> {/* Added relative here */}
           {/* Logo */}
-          {!showSearchInput && ( // Conditionally render logo
+          {!showSearchInput && (
             <Link href="/" className="flex items-center space-x-2 group mr-8 md:mr-16">
               <div className="relative">
-                <Disc3 className="h-8 w-8 text-amber-500 transition-transform group-hover:rotate-180" />
+                <Disc3 className="h-8 w-8 text-amber-500 transition-all duration-500 group-hover:rotate-180 group-hover:scale-110 drop-shadow-lg" />
+                <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <span className="text-xl font-bold tracking-tight">Rill</span>
+              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text group-hover:from-amber-500 group-hover:to-amber-600 transition-all duration-300">Rill</span>
             </Link>
           )}
 
@@ -146,9 +156,12 @@ export const Navigation = ({ user }: NavigationProps) => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger
                     onClick={() => router.visit('/products')}
-                    className="h-auto bg-transparent px-0 py-0 text-sm font-medium transition-colors hover:bg-transparent hover:text-amber-500 focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-amber-500 relative after:content-[''] after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-[2px] after:bg-amber-500 after:scale-x-0 after:origin-left after:transition-transform data-[state=open]:after:scale-x-100 cursor-pointer"
+                    className="h-auto bg-transparent px-0 py-0 text-sm font-medium transition-all duration-300 hover:bg-transparent hover:text-amber-500 focus:bg-transparent data-[state=open]:bg-transparent data-[state=open]:text-amber-500 data-[state=open]:font-semibold relative group after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-gradient-to-r after:from-amber-500 after:to-amber-600 after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100 data-[state=open]:after:scale-x-100 cursor-pointer"
                   >
-                    Sản phẩm
+                    <span className="relative">
+                      Sản phẩm
+                      <Sparkles className="inline-block ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </span>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ProductsFlyoutMenu />
@@ -175,36 +188,38 @@ export const Navigation = ({ user }: NavigationProps) => {
           >
             {showSearchInput && (
               <div className="relative w-full">
-                <Input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Tìm kiếm sản phẩm..."
-                  value={searchInputValue}
-                  onChange={(e) => setSearchInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSearchSubmit();
-                    }
-                  }}
-                  onBlur={() => {
-                    // Hide input if empty and loses focus
-                    if (!searchInputValue.trim()) {
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="Tìm kiếm sản phẩm..."
+                    value={searchInputValue}
+                    onChange={(e) => setSearchInputValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSearchSubmit();
+                      }
+                    }}
+                    onBlur={() => {
+                      if (!searchInputValue.trim()) {
+                        setShowSearchInput(false);
+                      }
+                    }}
+                    className="w-full pl-10 pr-10 bg-background/50 backdrop-blur-sm border-amber-500/20 focus:border-amber-500/50 focus:ring-amber-500/20 transition-all duration-300"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 hover:bg-amber-500/10 hover:text-amber-500 transition-colors"
+                    onClick={() => {
                       setShowSearchInput(false);
-                    }
-                  }}
-                  className="w-full pr-10"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2"
-                  onClick={() => {
-                    setShowSearchInput(false);
-                    setSearchInputValue('');
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                      setSearchInputValue('');
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -218,47 +233,49 @@ export const Navigation = ({ user }: NavigationProps) => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className={cn("hidden sm:flex", showSearchInput && "hidden")} // Hide search icon when input is shown
+                    className={cn(
+                      "hidden sm:flex hover:bg-amber-500/10 hover:text-amber-500 transition-all duration-300",
+                      showSearchInput && "hidden"
+                    )}
                     onClick={() => setShowSearchInput(!showSearchInput)}
                   >
                     <Search className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent><p>Tìm kiếm</p></TooltipContent>
+                <TooltipContent side="bottom" className="bg-background/95 backdrop-blur-sm border-amber-500/20">
+                  <p className="text-foreground">Tìm kiếm</p>
+                </TooltipContent>
               </Tooltip>
 
               {user && (
                 <>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href="/wishlist"><Heart className="h-4 w-4" /></Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent><p>Danh sách yêu thích</p></TooltipContent>
-                  </Tooltip>
-
                   <HoverCard>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <HoverCardTrigger asChild>
-                          <Button variant="ghost" size="icon" asChild>
-                            <Link href="/cart" className="relative">
+                          <Button variant="ghost" size="icon" className="hover:bg-amber-500/10 hover:text-amber-500 transition-all duration-300" asChild>
+                            <Link href="/cart" className="relative group">
                               {cartSummary.items_count > 0 && (
-                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">
-                                  {cartSummary.items_count}
+                                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-xs font-bold text-white shadow-lg animate-in zoom-in-50 duration-300">
+                                  <span className="absolute inset-0 rounded-full bg-amber-500 animate-ping opacity-75"></span>
+                                  <span className="relative">{cartSummary.items_count}</span>
                                 </span>
                               )}
-                              <ShoppingBag className="h-4 w-4" />
+                              <ShoppingBag className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                             </Link>
                           </Button>
                         </HoverCardTrigger>
                       </TooltipTrigger>
-                      <TooltipContent><p>Giỏ hàng</p></TooltipContent>
+                      <TooltipContent side="bottom" className="bg-background/95 backdrop-blur-sm border-amber-500/20">
+                        <p className="text-foreground">Giỏ hàng ({cartSummary.items_count})</p>
+                      </TooltipContent>
                     </Tooltip>
-                    <HoverCardContent className="w-80" align="end">
+                    <HoverCardContent className="w-80 bg-background/95 backdrop-blur-xl border-amber-500/20 shadow-xl" align="end">
                       <div className="space-y-4">
-                        <h4 className="text-sm font-semibold">Giỏ hàng ({cartSummary.items_count})</h4>
+                        <h4 className="text-sm font-semibold flex items-center gap-2">
+                          <ShoppingBag className="h-4 w-4 text-amber-500" />
+                          Giỏ hàng ({cartSummary.items_count})
+                        </h4>
 
                         {cartItems.length === 0 ? (
                           <div className="text-center text-sm text-muted-foreground py-4">
@@ -280,9 +297,9 @@ export const Navigation = ({ user }: NavigationProps) => {
                             <div className="border-t pt-4 space-y-3">
                               <div className="flex justify-between items-center text-sm font-semibold">
                                 <span>Tổng cộng</span>
-                                <span>{cartSummary.formatted_total}</span>
+                                <span className="text-amber-500">{cartSummary.formatted_total}</span>
                               </div>
-                              <Button size="sm" className="w-full" asChild>
+                              <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" asChild>
                                 <Link href="/cart">Đến giỏ hàng</Link>
                               </Button>
                             </div>
@@ -296,52 +313,52 @@ export const Navigation = ({ user }: NavigationProps) => {
             </TooltipProvider>
 
             {/* User Dropdown */}
-            {!showSearchInput && user ? ( // Conditionally render user dropdown
+            {!showSearchInput && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 h-9">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={user.avatar_url} alt={user.name} />
-                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                  <Button variant="ghost" className="flex items-center gap-2 h-9 hover:bg-amber-500/10 transition-all duration-300 group">
+                    <Avatar className="h-6 w-6 ring-2 ring-transparent group-hover:ring-amber-500/50 transition-all duration-300">
+                      <AvatarImage src={user.avatar_url || undefined} alt={user.name} />
+                      <AvatarFallback className="bg-gradient-to-br from-amber-500 to-amber-600 text-white text-xs">{getInitials(user.name)}</AvatarFallback>
                     </Avatar>
-                    <span className="hidden sm:inline text-sm font-medium">{user.name}</span>
+                    <span className="hidden sm:inline text-sm font-medium group-hover:text-amber-500 transition-colors">{user.name}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-xl border-amber-500/20">
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user.name}</p>
+                      <p className="text-sm font-semibold leading-none">{user.name}</p>
                       <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings/profile"><UserCircle className="mr-2 h-4 w-4" />Hồ sơ cá nhân</Link>
+                  <DropdownMenuSeparator className="bg-border/50" />
+                  <DropdownMenuItem asChild className="cursor-pointer hover:bg-amber-500/10 hover:text-amber-600 focus:bg-amber-500/10 focus:text-amber-600 transition-colors">
+                    <Link href="/settings/profile"><UserCircle className="mr-2 h-4 w-4 text-amber-500" />Hồ sơ cá nhân</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/addresses"><Home className="mr-2 h-4 w-4" />Địa chỉ</Link>
+                  <DropdownMenuItem asChild className="cursor-pointer hover:bg-amber-500/10 hover:text-amber-600 focus:bg-amber-500/10 focus:text-amber-600 transition-colors">
+                    <Link href="/addresses"><Home className="mr-2 h-4 w-4 text-amber-500" />Địa chỉ</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/orders"><Package className="mr-2 h-4 w-4" />Đơn hàng của tôi</Link>
+                  <DropdownMenuItem asChild className="cursor-pointer hover:bg-amber-500/10 hover:text-amber-600 focus:bg-amber-500/10 focus:text-amber-600 transition-colors">
+                    <Link href="/orders"><Package className="mr-2 h-4 w-4 text-amber-500" />Đơn hàng của tôi</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/settings/appearance"><Settings className="mr-2 h-4 w-4" />Cài đặt</Link>
+                  <DropdownMenuItem asChild className="cursor-pointer hover:bg-amber-500/10 hover:text-amber-600 focus:bg-amber-500/10 focus:text-amber-600 transition-colors">
+                    <Link href="/settings/appearance"><Settings className="mr-2 h-4 w-4 text-amber-500" />Cài đặt</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuSeparator className="bg-border/50" />
+                  <DropdownMenuItem asChild className="cursor-pointer hover:bg-red-500/10 focus:bg-red-500/10 text-red-600 dark:text-red-400 transition-colors hover:text-red-600 focus:text-red-600">
                     <Link href="/logout" method="post" as="button" className="w-full">
-                      <LogOut className="mr-2 h-4 w-4" />Đăng xuất
+                      <LogOut className="mr-2 h-4 w-4 text-red-600" />Đăng xuất
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              !showSearchInput && ( // Conditionally render login/register buttons
+              !showSearchInput && (
                 <div className="flex items-center space-x-2 pl-2">
-                  <Button variant="ghost" size="sm" asChild>
+                  <Button variant="ghost" size="sm" className="hover:bg-amber-500/10 hover:text-amber-500 transition-all duration-300" asChild>
                     <Link href="/login">Đăng nhập</Link>
                   </Button>
-                  <Button size="sm" asChild>
+                  <Button size="sm" className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105" asChild>
                     <Link href="/register">Đăng ký</Link>
                   </Button>
                 </div>
@@ -381,30 +398,27 @@ export const Navigation = ({ user }: NavigationProps) => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start"
+                  className="w-full justify-start hover:bg-amber-500/10 hover:text-amber-500 transition-colors"
                   onClick={() => {
-                    setShowSearchInput(true); // Show search input
-                    setIsMenuOpen(false); // Close mobile menu
+                    setShowSearchInput(true);
+                    setIsMenuOpen(false);
                   }}
                 >
                   <Search className="h-4 w-4 mr-2" />
                   Tìm kiếm
                 </Button>
                 {user && (
-                  <>
-                    <Button variant="ghost" size="sm" className="w-full justify-start" asChild>
-                      <Link href="/wishlist">
-                        <Heart className="h-4 w-4 mr-2" />
-                        Danh sách yêu thích
-                      </Link>
-                    </Button>
-                    <Button variant="ghost" size="sm" className="w-full justify-start" asChild>
-                      <Link href="/cart">
-                        <ShoppingBag className="h-4 w-4 mr-2" />
-                        Giỏ hàng
-                      </Link>
-                    </Button>
-                  </>
+                  <Button variant="ghost" size="sm" className="w-full justify-start hover:bg-amber-500/10 hover:text-amber-500 transition-colors" asChild>
+                    <Link href="/cart">
+                      <ShoppingBag className="h-4 w-4 mr-2" />
+                      Giỏ hàng
+                      {cartSummary.items_count > 0 && (
+                        <span className="ml-auto bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                          {cartSummary.items_count}
+                        </span>
+                      )}
+                    </Link>
+                  </Button>
                 )}
               </div>
             </nav>
