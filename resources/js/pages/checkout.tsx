@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Navigation } from "@/components/navigation";
-import { Disc3, MapPin, CreditCard, ShieldCheck } from "lucide-react";
+import { MapPin, CreditCard, ShieldCheck } from "lucide-react";
 import { Head, usePage } from "@inertiajs/react";
 import { type SharedData } from '@/types';
 import { useForm, Controller } from 'react-hook-form';
@@ -216,12 +216,15 @@ export default function Checkout() {
                     <div className="space-y-4">
                       {cartItems.map(item => (
                         <div key={item.id} className="flex items-center gap-4">
-                          <div className="relative w-16 h-16 rounded-full bg-slate-800 flex-shrink-0">
-                            {item.product.image_url ? (
-                              <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover rounded-full" />
-                            ) : (
-                              <Disc3 className="w-10 h-10 text-amber-500 m-auto" />
-                            )}
+                          <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 flex-shrink-0">
+                            <img
+                              src={item.product.image_url || '/images/placeholder-vinyl.png'}
+                              alt={item.product.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = '/images/placeholder-vinyl.png';
+                              }}
+                            />
                             <Badge className="absolute -top-1 -right-1 text-xs rounded-full h-5 w-5 flex items-center justify-center">{item.quantity}</Badge>
                           </div>
                           <div className="flex-1 min-w-0">
