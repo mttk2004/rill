@@ -49,8 +49,7 @@ class OrderAdminResource extends JsonResource
                     'address_line_2' => $address['address_line_2'] ?? null,
                     'ward' => $address['ward'] ?? '',
                     'district' => $address['district'] ?? '',
-                    'city' => $address['city'] ?? '',
-                    'postal_code' => $address['postal_code'] ?? null,
+                    'province' => $address['province'] ?? '',
                 ];
             }),
 

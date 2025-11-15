@@ -27,12 +27,12 @@ class StoreShippingAddressRequest extends FormRequest
             'phone' => ['required', 'string', 'max:10', 'regex:/^(03|05|07|08|09)[0-9]{8}$/'],
             'address_line_1' => 'required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'province_id' => 'nullable|integer',
+            'province' => 'required|string|max:100',
+            'province_id' => 'required|integer',
             'district' => 'required|string|max:100',
-            'district_id' => 'nullable|integer',
+            'district_id' => 'required|integer',
             'ward' => 'required|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
+            'ward_id' => 'required|string|max:20',
             'is_default' => 'nullable|boolean',
         ];
     }
@@ -51,7 +51,7 @@ class StoreShippingAddressRequest extends FormRequest
             'phone.max' => 'Số điện thoại không được vượt quá 10 ký tự.',
             'phone.regex' => 'Số điện thoại không đúng định dạng Việt Nam (03x, 05x, 07x, 08x, 09x).',
             'address_line_1.required' => 'Địa chỉ dòng 1 là bắt buộc.',
-            'city.required' => 'Thành phố là bắt buộc.',
+            'province.required' => 'Tỉnh/Thành phố là bắt buộc.',
             'district.required' => 'Quận/Huyện là bắt buộc.',
             'ward.required' => 'Phường/Xã là bắt buộc.',
         ];

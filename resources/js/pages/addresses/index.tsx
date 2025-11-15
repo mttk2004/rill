@@ -24,10 +24,12 @@ interface ShippingAddress {
   phone: string;
   address_line_1: string;
   address_line_2: string | null;
-  city: string;
+  province: string;
+  province_id: number;
   district: string;
+  district_id: number;
   ward: string;
-  postal_code: string | null;
+  ward_id: number;
   is_default: boolean;
   created_at: string;
   updated_at: string;
@@ -60,12 +62,12 @@ const addressSchema = z.object({
   phone: z.string().regex(/^(03|05|07|08|09)[0-9]{8}$/, 'Số điện thoại không đúng định dạng Việt Nam.').max(10, 'Số điện thoại không được vượt quá 10 ký tự.'),
   address_line_1: z.string().min(1, 'Địa chỉ dòng 1 là bắt buộc.').max(255, 'Địa chỉ dòng 1 không được vượt quá 255 ký tự.'),
   address_line_2: z.string().max(255, 'Địa chỉ dòng 2 không được vượt quá 255 ký tự.').nullable(),
-  city: z.string().min(1, 'Thành phố là bắt buộc.').max(100, 'Thành phố không được vượt quá 100 ký tự.'),
-  province_id: z.number().optional(),
+  province: z.string().min(1, 'Tỉnh/Thành phố là bắt buộc.').max(100, 'Tỉnh/Thành phố không được vượt quá 100 ký tự.'),
+  province_id: z.number(),
   district: z.string().min(1, 'Quận/Huyện là bắt buộc.').max(100, 'Quận/Huyện không được vượt quá 100 ký tự.'),
-  district_id: z.number().optional(),
+  district_id: z.number(),
   ward: z.string().min(1, 'Phường/Xã là bắt buộc.').max(100, 'Phường/Xã không được vượt quá 100 ký tự.'),
-  postal_code: z.string().max(20, 'Mã bưu điện không được vượt quá 20 ký tự.').nullable(),
+  ward_id: z.number(),
   is_default: z.boolean().optional(),
 });
 
@@ -96,13 +98,13 @@ export default function Addresses({ addresses }: AddressesPageProps) {
       full_name: '',
       phone: '',
       address_line_1: '',
-      address_line_2: '',
-      city: '',
-      province_id: undefined,
+      address_line_2: null,
+      province: '',
+      province_id: 0,
       district: '',
-      district_id: undefined,
+      district_id: 0,
       ward: '',
-      postal_code: '',
+      ward_id: 0,
       is_default: false,
     },
   });
@@ -230,10 +232,12 @@ export default function Addresses({ addresses }: AddressesPageProps) {
       phone: address.phone,
       address_line_1: address.address_line_1,
       address_line_2: address.address_line_2,
-      city: address.city,
+      province: address.province,
+      province_id: address.province_id,
       district: address.district,
+      district_id: address.district_id,
       ward: address.ward,
-      postal_code: address.postal_code,
+      ward_id: address.ward_id,
       is_default: address.is_default,
     });
     setIsModalOpen(true);
@@ -347,11 +351,11 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                         )}
                       />
 
-                      {/* Row 4: City and District in 2 columns */}
+                      {/* Row 4: Province and District in 2 columns */}
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
-                          name="city"
+                          name="province"
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Tỉnh/Thành phố</FormLabel>
@@ -364,7 +368,7 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                                     setSelectedProvinceId(province.ProvinceID);
                                   }
                                 }}
-                                value={field.value}
+                                value={field.value || ''}
                                 disabled={loadingProvinces}
                               >
                                 <FormControl>
@@ -424,53 +428,44 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                         />
                       </div>
 
-                      {/* Row 5: Ward and Postal Code in 2 columns */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="ward"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Phường/Xã</FormLabel>
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                disabled={!selectedDistrictId || loadingWards}
-                              >
-                                <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder={
-                                      !selectedDistrictId ? "Chọn quận/huyện trước" :
-                                        loadingWards ? "Đang tải..." : "Chọn phường/xã"
-                                    } />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {wards.map((ward) => (
-                                    <SelectItem key={ward.WardCode} value={ward.WardName}>
-                                      {ward.WardName}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="postal_code"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Mã bưu điện (Tùy chọn)</FormLabel>
+                      {/* Row 5: Ward */}
+                      <FormField
+                        control={form.control}
+                        name="ward"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phường/Xã</FormLabel>
+                            <Select
+                              onValueChange={(value) => {
+                                const ward = wards.find(w => w.WardName === value);
+                                if (ward) {
+                                  field.onChange(value);
+                                  form.setValue('ward_id', parseInt(ward.WardCode));
+                                }
+                              }}
+                              value={field.value || ''}
+                              disabled={!selectedDistrictId || loadingWards}
+                            >
                               <FormControl>
-                                <Input placeholder="70000" {...field} value={field.value || ''} />
+                                <SelectTrigger>
+                                  <SelectValue placeholder={
+                                    !selectedDistrictId ? "Chọn quận/huyện trước" :
+                                      loadingWards ? "Đang tải..." : "Chọn phường/xã"
+                                  } />
+                                </SelectTrigger>
                               </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                              <SelectContent>
+                                {wards.map((ward) => (
+                                  <SelectItem key={ward.WardCode} value={ward.WardName}>
+                                    {ward.WardName}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       {/* Row 6: Default Address Setting */}
                       <FormField
@@ -581,13 +576,8 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                                 {address.address_line_2 && `, ${address.address_line_2}`}
                               </p>
                               <p className="text-muted-foreground">
-                                {address.ward}, {address.district}, {address.city}
+                                {address.ward}, {address.district}, {address.province}
                               </p>
-                              {address.postal_code && (
-                                <p className="text-muted-foreground text-xs">
-                                  Mã bưu điện: {address.postal_code}
-                                </p>
-                              )}
                             </div>
                           </div>
                         </div>

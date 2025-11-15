@@ -61,10 +61,12 @@ class ShippingAddressFactory extends Factory
             'phone' => $this->faker->numerify('09########'), // Vietnamese mobile format
             'address_line_1' => "$streetNumber $streetName",
             'address_line_2' => $this->faker->optional(0.3)->randomElement(['Tầng 2', 'Tầng 3', 'Căn hộ ' . $this->faker->numberBetween(101, 999)]),
-            'city' => $city,
+            'province' => $city,
+            'province_id' => 202, // Default to HCM province ID
             'district' => $district,
+            'district_id' => 1442, // Default HCM district ID
             'ward' => $ward,
-            'postal_code' => $this->faker->optional(0.7)->numerify('#####0'), // Vietnamese postal code format
+            'ward_id' => $this->faker->numberBetween(10000, 99999), // Random ward ID
             'is_default' => false, // Will be set to true for one address per user in seeder
         ];
     }
@@ -85,9 +87,12 @@ class ShippingAddressFactory extends Factory
     public function hoChiMinh(): static
     {
         return $this->state(fn (array $attributes) => [
-            'city' => 'Hồ Chí Minh',
+            'province' => 'Hồ Chí Minh',
+            'province_id' => 202,
             'district' => $this->faker->randomElement(['Quận 1', 'Quận 3', 'Quận 7', 'Thủ Đức']),
+            'district_id' => 1442, // Quận 1
             'ward' => $this->faker->randomElement(['Phường Bến Nghé', 'Phường Đa Kao', 'Phường Tân Định']),
+            'ward_id' => $this->faker->numberBetween(10000, 99999),
         ]);
     }
 
@@ -97,9 +102,12 @@ class ShippingAddressFactory extends Factory
     public function hanoi(): static
     {
         return $this->state(fn (array $attributes) => [
-            'city' => 'Hà Nội',
+            'province' => 'Hà Nội',
+            'province_id' => 201, // Hanoi province ID
             'district' => $this->faker->randomElement(['Hoàn Kiếm', 'Ba Đình', 'Đống Đa', 'Cầu Giấy']),
+            'district_id' => 1451, // Ba Dinh district
             'ward' => $this->faker->randomElement(['Phường Hàng Bài', 'Phường Hàng Đào', 'Phường Cửa Nam']),
+            'ward_id' => $this->faker->numberBetween(10000, 99999),
         ]);
     }
 }

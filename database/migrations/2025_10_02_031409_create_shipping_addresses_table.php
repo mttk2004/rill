@@ -18,10 +18,12 @@ return new class extends Migration
             $table->string('phone', 10)->comment('Số điện thoại');
             $table->string('address_line_1', 255)->comment('Địa chỉ dòng 1');
             $table->string('address_line_2', 255)->nullable()->comment('Địa chỉ dòng 2');
-            $table->string('city', 100)->comment('Thành phố');
+            $table->string('province', 100)->comment('Tỉnh/Thành phố');
+            $table->integer('province_id')->comment('GHN Province ID');
             $table->string('district', 100)->comment('Quận/Huyện');
+            $table->integer('district_id')->comment('GHN District ID');
             $table->string('ward', 100)->comment('Phường/Xã');
-            $table->string('postal_code', 20)->nullable()->comment('Mã bưu điện');
+            $table->integer('ward_id')->comment('GHN Ward ID');
             $table->boolean('is_default')->default(false)->comment('Địa chỉ mặc định');
             $table->timestamps(); // created_at, updated_at
 

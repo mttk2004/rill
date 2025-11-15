@@ -62,7 +62,7 @@ class OrderResource extends JsonResource
                     $this->shipping_address['address_line_1'] ?? '',
                     $this->shipping_address['ward'] ?? '',
                     $this->shipping_address['district'] ?? '',
-                    $this->shipping_address['city'] ?? ''
+                    $this->shipping_address['province'] ?? ''
                 ])),
                 'notes' => $this->notes,
             ] : null,

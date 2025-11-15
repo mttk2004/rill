@@ -20,12 +20,12 @@ class ShippingAddress extends Model
         'phone',
         'address_line_1',
         'address_line_2',
-        'city',
+        'province',
         'province_id',
         'district',
         'district_id',
         'ward',
-        'postal_code',
+        'ward_id',
         'is_default',
     ];
 

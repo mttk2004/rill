@@ -28,12 +28,12 @@ class UpdateShippingAddressRequest extends FormRequest
             'phone' => ['sometimes', 'required', 'string', 'max:10', 'regex:/^(03|05|07|08|09)[0-9]{8}$/'],
             'address_line_1' => 'sometimes|required|string|max:255',
             'address_line_2' => 'nullable|string|max:255',
-            'city' => 'sometimes|required|string|max:100',
-            'province_id' => 'nullable|integer',
+            'province' => 'sometimes|required|string|max:100',
+            'province_id' => 'sometimes|required|integer',
             'district' => 'sometimes|required|string|max:100',
-            'district_id' => 'nullable|integer',
+            'district_id' => 'sometimes|required|integer',
             'ward' => 'sometimes|required|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
+            'ward_id' => 'sometimes|required|string|max:20',
             'is_default' => 'sometimes|nullable|boolean',
         ];
     }
@@ -46,13 +46,13 @@ class UpdateShippingAddressRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'full_name.required' => 'Họ tên người nhận là bắt buộc.',
-            'full_name.min' => 'Họ tên người nhận phải có ít nhất 2 ký tự.',
+            'full_name.required' => 'Họ tên người nhẫn là bắt buộc.',
+            'full_name.min' => 'Họ tên người nhẫn phải có ít nhất 2 ký tự.',
             'phone.required' => 'Số điện thoại là bắt buộc.',
             'phone.max' => 'Số điện thoại không được vượt quá 10 ký tự.',
             'phone.regex' => 'Số điện thoại không đúng định dạng Việt Nam (03x, 05x, 07x, 08x, 09x).',
             'address_line_1.required' => 'Địa chỉ dòng 1 là bắt buộc.',
-            'city.required' => 'Thành phố là bắt buộc.',
+            'province.required' => 'Tỉnh/Thành phố là bắt buộc.',
             'district.required' => 'Quận/Huyện là bắt buộc.',
             'ward.required' => 'Phường/Xã là bắt buộc.',
         ];
