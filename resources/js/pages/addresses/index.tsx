@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ShippingAddress {
   id: string;
@@ -36,13 +37,33 @@ interface AddressesPageProps {
   addresses: ShippingAddress[];
 }
 
+interface Province {
+  ProvinceID: number;
+  ProvinceName: string;
+  Code?: string;
+}
+
+interface District {
+  DistrictID: number;
+  DistrictName: string;
+  ProvinceID: number;
+}
+
+interface Ward {
+  WardCode: string;
+  WardName: string;
+  DistrictID: number;
+}
+
 const addressSchema = z.object({
   full_name: z.string().min(2, 'Họ tên phải có ít nhất 2 ký tự.').max(255, 'Họ tên không được vượt quá 255 ký tự.'),
   phone: z.string().regex(/^(03|05|07|08|09)[0-9]{8}$/, 'Số điện thoại không đúng định dạng Việt Nam.').max(10, 'Số điện thoại không được vượt quá 10 ký tự.'),
   address_line_1: z.string().min(1, 'Địa chỉ dòng 1 là bắt buộc.').max(255, 'Địa chỉ dòng 1 không được vượt quá 255 ký tự.'),
   address_line_2: z.string().max(255, 'Địa chỉ dòng 2 không được vượt quá 255 ký tự.').nullable(),
   city: z.string().min(1, 'Thành phố là bắt buộc.').max(100, 'Thành phố không được vượt quá 100 ký tự.'),
+  province_id: z.number().optional(),
   district: z.string().min(1, 'Quận/Huyện là bắt buộc.').max(100, 'Quận/Huyện không được vượt quá 100 ký tự.'),
+  district_id: z.number().optional(),
   ward: z.string().min(1, 'Phường/Xã là bắt buộc.').max(100, 'Phường/Xã không được vượt quá 100 ký tự.'),
   postal_code: z.string().max(20, 'Mã bưu điện không được vượt quá 20 ký tự.').nullable(),
   is_default: z.boolean().optional(),
@@ -56,6 +77,36 @@ export default function Addresses({ addresses }: AddressesPageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<ShippingAddress | null>(null);
 
+  // Address data state
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [wards, setWards] = useState<Ward[]>([]);
+  const [loadingProvinces, setLoadingProvinces] = useState(false);
+  const [loadingDistricts, setLoadingDistricts] = useState(false);
+  const [loadingWards, setLoadingWards] = useState(false);
+
+  // Selected IDs for API calls
+  const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
+  const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
+
+  // Initialize form first before using it in useEffects
+  const form = useForm<AddressFormValues>({
+    resolver: zodResolver(addressSchema),
+    defaultValues: {
+      full_name: '',
+      phone: '',
+      address_line_1: '',
+      address_line_2: '',
+      city: '',
+      province_id: undefined,
+      district: '',
+      district_id: undefined,
+      ward: '',
+      postal_code: '',
+      is_default: false,
+    },
+  });
+
   // Handle flash messages (only for delete/setDefault which use router directly)
   useEffect(() => {
     if (flash?.success) {
@@ -66,25 +117,80 @@ export default function Addresses({ addresses }: AddressesPageProps) {
     }
   }, [flash?.success, flash?.error]);
 
-  const form = useForm<AddressFormValues>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: {
-      full_name: '',
-      phone: '',
-      address_line_1: '',
-      address_line_2: '',
-      city: '',
-      district: '',
-      ward: '',
-      postal_code: '',
-      is_default: false,
-    },
-  });
+  // Load provinces when modal opens
+  useEffect(() => {
+    if (isModalOpen && provinces.length === 0) {
+      setLoadingProvinces(true);
+      fetch('/api/provinces')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data) {
+            setProvinces(data.data);
+          }
+        })
+        .catch(err => {
+          console.error('Error loading provinces:', err);
+          toast.error('Không thể tải danh sách tỉnh/thành phố');
+        })
+        .finally(() => setLoadingProvinces(false));
+    }
+  }, [isModalOpen, provinces.length]);
+
+  // Load districts when province changes
+  useEffect(() => {
+    if (selectedProvinceId) {
+      setLoadingDistricts(true);
+      setDistricts([]);
+      setWards([]);
+      setSelectedDistrictId(null);
+      form.setValue('district', '');
+      form.setValue('ward', '');
+
+      fetch(`/api/districts?province_id=${selectedProvinceId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data) {
+            setDistricts(data.data);
+          }
+        })
+        .catch(err => {
+          console.error('Error loading districts:', err);
+          toast.error('Không thể tải danh sách quận/huyện');
+        })
+        .finally(() => setLoadingDistricts(false));
+    }
+  }, [selectedProvinceId, form]);
+
+  // Load wards when district changes
+  useEffect(() => {
+    if (selectedDistrictId) {
+      setLoadingWards(true);
+      setWards([]);
+      form.setValue('ward', '');
+
+      fetch(`/api/wards?district_id=${selectedDistrictId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data) {
+            setWards(data.data);
+          }
+        })
+        .catch(err => {
+          console.error('Error loading wards:', err);
+          toast.error('Không thể tải danh sách phường/xã');
+        })
+        .finally(() => setLoadingWards(false));
+    }
+  }, [selectedDistrictId, form]);
 
   useEffect(() => {
     if (!isModalOpen) {
       setEditingAddress(null);
       form.reset();
+      setDistricts([]);
+      setWards([]);
+      setSelectedProvinceId(null);
+      setSelectedDistrictId(null);
     }
   }, [isModalOpen, form]);
 
@@ -248,10 +354,32 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                           name="city"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Thành phố</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Hồ Chí Minh" {...field} />
-                              </FormControl>
+                              <FormLabel>Tỉnh/Thành phố</FormLabel>
+                              <Select
+                                onValueChange={(value) => {
+                                  const province = provinces.find(p => p.ProvinceName === value);
+                                  if (province) {
+                                    field.onChange(value);
+                                    form.setValue('province_id', province.ProvinceID);
+                                    setSelectedProvinceId(province.ProvinceID);
+                                  }
+                                }}
+                                value={field.value}
+                                disabled={loadingProvinces}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={loadingProvinces ? "Đang tải..." : "Chọn tỉnh/thành phố"} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {provinces.map((province) => (
+                                    <SelectItem key={province.ProvinceID} value={province.ProvinceName}>
+                                      {province.ProvinceName}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -262,9 +390,34 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Quận/Huyện</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Quận 1" {...field} />
-                              </FormControl>
+                              <Select
+                                onValueChange={(value) => {
+                                  const district = districts.find(d => d.DistrictName === value);
+                                  if (district) {
+                                    field.onChange(value);
+                                    form.setValue('district_id', district.DistrictID);
+                                    setSelectedDistrictId(district.DistrictID);
+                                  }
+                                }}
+                                value={field.value}
+                                disabled={!selectedProvinceId || loadingDistricts}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={
+                                      !selectedProvinceId ? "Chọn tỉnh/thành phố trước" :
+                                        loadingDistricts ? "Đang tải..." : "Chọn quận/huyện"
+                                    } />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {districts.map((district) => (
+                                    <SelectItem key={district.DistrictID} value={district.DistrictName}>
+                                      {district.DistrictName}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -279,9 +432,27 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Phường/Xã</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Phường Đa Kao" {...field} />
-                              </FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                                disabled={!selectedDistrictId || loadingWards}
+                              >
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={
+                                      !selectedDistrictId ? "Chọn quận/huyện trước" :
+                                        loadingWards ? "Đang tải..." : "Chọn phường/xã"
+                                    } />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {wards.map((ward) => (
+                                    <SelectItem key={ward.WardCode} value={ward.WardName}>
+                                      {ward.WardName}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -460,15 +631,6 @@ export default function Addresses({ addresses }: AddressesPageProps) {
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-            )}
-
-            {/* Info Note */}
-            {addresses.length > 0 && addresses.length < 3 && (
-              <div className="bg-accent/5 border border-accent/20 rounded-lg p-4">
-                <p className="text-sm text-muted-foreground text-center">
-                  💡 Bạn có thể lưu tối đa 3 địa chỉ giao hàng
-                </p>
               </div>
             )}
           </div>

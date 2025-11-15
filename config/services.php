@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'ghn' => [
+        'token' => env('GHN_API_TOKEN'),
+    ],
+
 ];
