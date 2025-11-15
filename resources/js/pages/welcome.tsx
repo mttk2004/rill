@@ -70,8 +70,8 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
           </div>
         </div>
 
-        <div className="relative container mx-auto px-4 pt-8  pb-12 lg:pt-16 lg:pb-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="relative container mx-auto px-4 pt-8 pb-12 lg:pt-16 lg:pb-24">
+          <div className="max-w-4xl mx-auto text-center">
             <div className="hero-fade-in">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent mb-6">
                 <Disc3 className="h-4 w-4" />
@@ -122,26 +122,7 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
               </div>
             </div>
 
-            <div className="relative lg:justify-self-end">
-              <div className="relative w-full max-w-md mx-auto">
-                <div className="relative w-80 h-80 mx-auto">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-accent/20 to-accent/40 animate-spin-slow"></div>
-                  <div className="absolute inset-4 rounded-full bg-gradient-to-r from-accent to-accent/80 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                      <Disc3 className="h-6 w-6 text-accent" />
-                    </div>
-                  </div>
-                  <div className="absolute top-0 right-12 w-1 h-32 bg-accent/60 rounded-full origin-bottom transform rotate-12"></div>
-                </div>
 
-                <div className="absolute -top-8 -left-8 w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center animate-bounce">
-                  <Star className="h-8 w-8 text-accent" />
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center animate-pulse">
-                  <Award className="h-6 w-6 text-accent" />
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
