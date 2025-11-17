@@ -138,7 +138,7 @@ export interface Product {
 export interface ProductFilters {
   genres: string[];
   labels: string[];
-  artists: { name: string; slug: string }[];
+  artists: string[];
   sort_options: { value: string; label: string }[];
 }
 

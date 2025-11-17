@@ -11,9 +11,11 @@ interface SortOption {
 interface ProductsFiltersMobileProps {
   currentGenre?: string;
   currentLabel?: string;
+  currentArtist?: string;
   currentSort?: string;
   genres: string[];
   labels: string[];
+  artists: string[];
   sortOptions: SortOption[];
   onFilterChange: (key: string, value: string) => void;
 }
@@ -21,9 +23,11 @@ interface ProductsFiltersMobileProps {
 export function ProductsFiltersMobile({
   currentGenre = 'all',
   currentLabel = 'all',
+  currentArtist = 'all',
   currentSort = 'featured',
   genres,
   labels,
+  artists,
   sortOptions,
   onFilterChange,
 }: ProductsFiltersMobileProps) {
@@ -36,6 +40,11 @@ export function ProductsFiltersMobile({
   const getLabelDisplay = () => {
     if (!currentLabel || currentLabel === 'all') return 'Tất cả';
     return currentLabel;
+  };
+
+  const getArtistDisplay = () => {
+    if (!currentArtist || currentArtist === 'all') return 'Tất cả';
+    return currentArtist;
   };
 
   const getSortDisplay = () => {
@@ -91,6 +100,26 @@ export function ProductsFiltersMobile({
                   {labels.map((label) => (
                     <SelectItem key={label} value={label === "Tất cả" ? "all" : label}>
                       {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                Nghệ sĩ
+              </label>
+              <Select value={currentArtist} onValueChange={(value) => onFilterChange('artist', value)}>
+                <SelectTrigger>
+                  <SelectValue>
+                    {getArtistDisplay()}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {artists.map((artist) => (
+                    <SelectItem key={artist} value={artist === "Tất cả" ? "all" : artist}>
+                      {artist}
                     </SelectItem>
                   ))}
                 </SelectContent>

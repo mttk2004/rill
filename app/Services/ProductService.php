@@ -80,7 +80,7 @@ class ProductService
         // Artist filter
         if (!empty($filters['artist'])) {
             $query->whereHas('artists', function ($artistQuery) use ($filters) {
-                $artistQuery->where('slug', $filters['artist']);
+                $artistQuery->where('name', $filters['artist']);
             });
         }
     }
@@ -142,15 +142,10 @@ class ProductService
                 ->whereHas('products', function ($query) {
                     $query->active();
                 })
-                ->select('name', 'slug')
                 ->orderBy('name')
-                ->get()
-                ->map(function ($artist) {
-                    return [
-                        'name' => $artist->name,
-                        'slug' => $artist->slug,
-                    ];
-                })
+                ->pluck('name')
+                ->filter()
+                ->values()
                 ->toArray(),
 
             'sort_options' => [

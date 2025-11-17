@@ -64,6 +64,7 @@ export default function Products({ products: productsData, pagination: paginatio
 
   const genres = filters?.genres ? ["Tất cả", ...filters.genres] : ["Tất cả"];
   const labels = filters?.labels ? ["Tất cả", ...filters.labels] : ["Tất cả"];
+  const artists = filters?.artists ? ["Tất cả", ...filters.artists] : ["Tất cả"];
   const sortOptions = filters?.sort_options || [
     { value: 'featured', label: 'Nổi bật' },
     { value: 'newest', label: 'Mới nhất' },
@@ -91,9 +92,11 @@ export default function Products({ products: productsData, pagination: paginatio
                   <ProductsFilters
                     currentGenre={props.genre}
                     currentLabel={props.label}
+                    currentArtist={props.artist}
                     currentSort={props.sort}
                     genres={genres}
                     labels={labels}
+                    artists={artists}
                     sortOptions={sortOptions}
                     viewMode={viewMode}
                     onFilterChange={handleFilterChange}
@@ -103,9 +106,11 @@ export default function Products({ products: productsData, pagination: paginatio
                   <ProductsFiltersMobile
                     currentGenre={props.genre}
                     currentLabel={props.label}
+                    currentArtist={props.artist}
                     currentSort={props.sort}
                     genres={genres}
                     labels={labels}
+                    artists={artists}
                     sortOptions={sortOptions}
                     onFilterChange={handleFilterChange}
                   />

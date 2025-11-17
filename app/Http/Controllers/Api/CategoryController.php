@@ -53,6 +53,27 @@ class CategoryController extends Controller
                     ];
                 });
 
+            // Get artists with product counts
+            $artists = \DB::table('artist_product')
+                ->join('artists', 'artist_product.artist_id', '=', 'artists.id')
+                ->join('products', 'artist_product.product_id', '=', 'products.id')
+                ->select('artists.name', 'artists.slug')
+                ->selectRaw('COUNT(DISTINCT products.id) as count')
+                ->where('products.status', 'active')
+                ->where('artists.is_active', true)
+                ->groupBy('artists.id', 'artists.name', 'artists.slug')
+                ->orderBy('count', 'desc')
+                ->orderBy('artists.name')
+                ->limit(config('pagination.api.default'))
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'name' => $item->name,
+                        'slug' => $item->slug,
+                        'count' => (int) $item->count,
+                    ];
+                });
+
             // Get featured products count
             $featuredCount = Product::where('status', 'active')
                 ->where('is_featured', true)
@@ -72,6 +93,7 @@ class CategoryController extends Controller
             return response()->json([
                 'genres' => $genres,
                 'labels' => $labels,
+                'artists' => $artists,
                 'special' => [
                     [
                         'name' => 'Sản phẩm nổi bật',
