@@ -1,5 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/page-header";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Tooltip,
   TooltipContent,
@@ -7,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Navigation } from "@/components/navigation";
-import { Package, Truck, CheckCircle, Clock, X, Disc3 } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, X } from "lucide-react";
 import { Link, Head, usePage, router } from "@inertiajs/react";
 import { type SharedData, type Paginator, type PaginationLink } from '@/types';
 import { formatVND } from "@/lib/utils";
@@ -125,18 +127,11 @@ export default function Orders() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
         <Navigation user={auth.user} />
 
-        <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 overflow-hidden">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDI1ल्यूLCAyNTUsLCAyNTUsIDAuMDMpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
-          <div className="absolute top-10 left-10 animate-spin-slow"><Disc3 className="h-20 w-20 text-amber-500/10" /></div>
-          <div className="absolute top-20 right-10 animate-spin-reverse"><Disc3 className="h-16 w-16 text-amber-500/5" /></div>
-
-          <div className="relative container mx-auto px-4 py-12">
-            <h1 className="text-4xl font-bold text-white drop-shadow-lg flex items-center gap-3">
-              Đơn hàng của tôi
-            </h1>
-            <p className="text-slate-200 drop-shadow">Theo dõi và quản lý các đơn hàng của bạn.</p>
-          </div>
-        </div>
+        <PageHeader
+          title="Đơn hàng của tôi"
+          subtitle="Theo dõi và quản lý các đơn hàng của bạn."
+          size="md"
+        />
 
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
@@ -168,15 +163,10 @@ export default function Orders() {
               {/* Main Content */}
               <div className="flex-1">
                 {orders.data.length === 0 ? (
-                  <Card className="text-center py-16 border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
-                    <CardContent>
-                      <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center">
-                        <Package className="h-10 w-10 text-slate-500" />
-                      </div>
-                      <h3 className="text-2xl font-bold mb-3 text-slate-900 dark:text-white">Không tìm thấy đơn hàng</h3>
-                      <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">Không có đơn hàng nào khớp với bộ lọc hiện tại.</p>
-                    </CardContent>
-                  </Card>
+                  <EmptyState
+                    title="Không tìm thấy đơn hàng"
+                    description="Không có đơn hàng nào khớp với bộ lọc hiện tại."
+                  />
                 ) : (
                   <Card className="border-0 shadow-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
                     <CardContent className="p-0">
