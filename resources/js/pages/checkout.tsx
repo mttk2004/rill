@@ -255,11 +255,11 @@ export default function Checkout() {
                         <div key={item.id} className="flex items-center gap-4">
                           <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 flex-shrink-0">
                             <img
-                              src={item.product.image_url || '/images/placeholder-vinyl.png'}
+                              src={item.product.image_url || '/placeholder-vinyl.jpg'}
                               alt={item.product.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.currentTarget.src = '/images/placeholder-vinyl.png';
+                                e.currentTarget.src = '/placeholder-vinyl.jpg';
                               }}
                             />
                             <Badge className="absolute -top-1 -right-1 text-xs rounded-full h-5 w-5 flex items-center justify-center">{item.quantity}</Badge>
