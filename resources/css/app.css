@@ -68,6 +68,7 @@
   --animate-vinyl-spin: vinyl-spin 3s linear infinite;
   --animate-hero-fade-in: hero-fade-in 1s ease-out forwards;
   --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-shimmer: shimmer 2s infinite;
 }
 
 @layer base {
@@ -400,6 +401,16 @@
 
   50% {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
   }
 }
 

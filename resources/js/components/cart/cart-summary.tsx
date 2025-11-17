@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { ShoppingCart } from "lucide-react";
 import { router } from "@inertiajs/react";
 import { formatVND } from '@/lib/utils';
+import { FreeShippingProgressBar } from './free-shipping-progress-bar';
 
 interface CartSummaryProps {
   cartSummary: {
@@ -26,6 +27,11 @@ export function CartSummary({ cartSummary }: CartSummaryProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Free Shipping Progress Bar */}
+          <FreeShippingProgressBar currentAmount={cartSummary.total_amount} />
+
+          <Separator />
+
           <div className="flex justify-between text-sm">
             <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartSummary.total_items} sản phẩm)</span>
             <span className="font-semibold text-slate-900 dark:text-white">{formatVND(cartSummary.total_amount)}</span>
