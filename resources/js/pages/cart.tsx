@@ -2,9 +2,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Navigation } from "@/components/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { Link, Head, usePage } from "@inertiajs/react";
+import { useState } from "react";
 import { type SharedData } from '@/types';
 import { CartItemDesktop } from "@/components/cart/cart-item-desktop";
 import { CartItemMobile } from "@/components/cart/cart-item-mobile";
@@ -51,6 +62,21 @@ export default function Cart() {
   const pageProps = usePage<CartPageProps>().props;
   const { auth, cartItems, cartSummary } = pageProps;
   const { isUpdating, updateQuantity, removeItem } = useCartOperations();
+  const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState<CartItem | null>(null);
+
+  const handleRemoveClick = (item: CartItem) => {
+    setItemToRemove(item);
+    setShowRemoveDialog(true);
+  };
+
+  const confirmRemove = () => {
+    if (itemToRemove) {
+      removeItem(itemToRemove.id, true); // skipConfirm = true
+      setShowRemoveDialog(false);
+      setItemToRemove(null);
+    }
+  };
 
   return (
     <>
@@ -104,7 +130,7 @@ export default function Cart() {
                                 item={item}
                                 isUpdating={isUpdating === item.id}
                                 onUpdateQuantity={(qty) => updateQuantity(item.id, qty)}
-                                onRemove={() => removeItem(item.id)}
+                                onRemove={() => handleRemoveClick(item)}
                               />
                             </div>
                             {/* Mobile View */}
@@ -113,7 +139,7 @@ export default function Cart() {
                                 item={item}
                                 isUpdating={isUpdating === item.id}
                                 onUpdateQuantity={(qty) => updateQuantity(item.id, qty)}
-                                onRemove={() => removeItem(item.id)}
+                                onRemove={() => handleRemoveClick(item)}
                               />
                             </div>
                           </div>
@@ -132,6 +158,30 @@ export default function Cart() {
           </div>
         </main>
       </div>
+
+      {/* Remove Product Confirmation Dialog */}
+      <AlertDialog open={showRemoveDialog} onOpenChange={setShowRemoveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Xác nhận xóa sản phẩm
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa <span className="font-semibold text-slate-900 dark:text-white">{itemToRemove?.product.name}</span> khỏi giỏ hàng? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Không, giữ lại</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRemove}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Có, xóa sản phẩm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

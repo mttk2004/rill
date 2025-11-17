@@ -30,8 +30,8 @@ export function useCartOperations() {
     });
   };
 
-  const removeItem = async (cartItemId: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+  const removeItem = async (cartItemId: number, skipConfirm: boolean = false) => {
+    if (!skipConfirm && !confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
       return;
     }
 
