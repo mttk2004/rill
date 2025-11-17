@@ -29,7 +29,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { type FlyoutCartItem } from "@/types";
 import {
   HoverCard,
   HoverCardContent,
@@ -43,9 +42,10 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { useCart } from "@/hooks/use-cart";
-import { cn, formatVND } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input"; // Import Input
 import { ProductsFlyoutMenu } from "@/components/products-flyout-menu";
+import { CartFlyout } from "@/components/cart/cart-flyout";
 
 interface NavigationProps {
   user?: {
@@ -271,41 +271,7 @@ export const Navigation = ({ user }: NavigationProps) => {
                       </TooltipContent>
                     </Tooltip>
                     <HoverCardContent className="w-80 bg-background/95 backdrop-blur-xl border-amber-500/20 shadow-xl" align="end">
-                      <div className="space-y-4">
-                        <h4 className="text-sm font-semibold flex items-center gap-2">
-                          <ShoppingBag className="h-4 w-4 text-amber-500" />
-                          Giỏ hàng ({cartSummary.items_count})
-                        </h4>
-
-                        {cartItems.length === 0 ? (
-                          <div className="text-center text-sm text-muted-foreground py-4">
-                            Giỏ hàng của bạn đang trống.
-                          </div>
-                        ) : (
-                          <>
-                            <div className="max-h-60 overflow-y-auto space-y-3 pr-2 -mr-3">
-                              {cartItems.map((item: FlyoutCartItem) => (
-                                <div key={item.id} className="flex items-start justify-between text-xs">
-                                  <div className="flex-grow overflow-hidden pr-4">
-                                    <p className="font-medium truncate">{item.product.name}</p>
-                                    <p className="text-muted-foreground">SL: {item.quantity}</p>
-                                  </div>
-                                  <span className="font-semibold">{formatVND(item.unit_price)}</span>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="border-t pt-4 space-y-3">
-                              <div className="flex justify-between items-center text-sm font-semibold">
-                                <span>Tổng cộng</span>
-                                <span className="text-amber-500">{cartSummary.formatted_total}</span>
-                              </div>
-                              <Button size="sm" className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" asChild>
-                                <Link href="/cart">Đến giỏ hàng</Link>
-                              </Button>
-                            </div>
-                          </>
-                        )}
-                      </div>
+                      <CartFlyout cartItems={cartItems} cartSummary={cartSummary} />
                     </HoverCardContent>
                   </HoverCard>
                 </>
