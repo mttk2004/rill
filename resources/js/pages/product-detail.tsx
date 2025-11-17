@@ -37,7 +37,6 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
   const { cart } = usePage<SharedData>().props;
   const { post: routerPost } = useToastRouter();
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedRatingFilter, setSelectedRatingFilter] = useState<number | null>(null);
   const reviewFormRef = useRef<HTMLTextAreaElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
@@ -83,10 +82,6 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
     }, { preserveScroll: true });
   };
 
-  const handleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-  };
-
   const averageRating = product.average_rating || 0;
   const reviewCount = product.reviews_count || 0;
 
@@ -124,10 +119,8 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
                   product={product}
                   quantity={quantity}
                   isInCart={isInCart}
-                  isWishlisted={isWishlisted}
                   onQuantityChange={setQuantity}
                   onAddToCart={handleAddToCart}
-                  onWishlist={handleWishlist}
                 />
               </div>
             </div>
@@ -152,7 +145,7 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  <span>Miễn phí vận chuyển cho đơn hàng từ 500,000₫</span>
+                  <span>Miễn phí vận chuyển cho đơn hàng từ 1.000.000₫</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { Product } from "@/types";
+import ReactMarkdown from 'react-markdown';
 
 interface ProductInfoHeaderProps {
   product: Product & {
@@ -53,9 +54,11 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
 
       {/* Description */}
       <div className="pt-2 border-t">
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {product.detailed_description || product.description}
-        </p>
+        <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm dark:prose-invert max-w-none">
+          <ReactMarkdown>
+            {product.detailed_description || product.description}
+          </ReactMarkdown>
+        </div>
       </div>
     </div>
   );

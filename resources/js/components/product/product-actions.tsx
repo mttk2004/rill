@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Heart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Product } from "@/types";
 import { MouseEvent } from "react";
 
@@ -7,20 +7,16 @@ interface ProductActionsProps {
   product: Product;
   quantity: number;
   isInCart: boolean;
-  isWishlisted: boolean;
   onQuantityChange: (quantity: number) => void;
   onAddToCart: (e: MouseEvent<HTMLButtonElement>) => void;
-  onWishlist: () => void;
 }
 
 export function ProductActions({
   product,
   quantity,
   isInCart,
-  isWishlisted,
   onQuantityChange,
   onAddToCart,
-  onWishlist,
 }: ProductActionsProps) {
   return (
     <div className="p-4 bg-muted/50 rounded-lg border space-y-3">
@@ -57,9 +53,6 @@ export function ProductActions({
             ? 'Đã trong giỏ'
             : (product.in_stock ? 'Thêm vào giỏ' : 'Hết hàng')
           }
-        </Button>
-        <Button variant="outline" size="sm" onClick={onWishlist} className="h-9 px-3">
-          <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
       </div>
     </div>
