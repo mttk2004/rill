@@ -205,6 +205,52 @@ class ProductService
     }
 
     /**
+     * Get related products based on same artist or genre.
+     */
+    public function getRelatedProducts(Product $product, int $limit = 6): array
+    {
+        // Get artist IDs from the current product
+        $artistIds = $product->artists->pluck('id')->toArray();
+
+        // Build query for related products
+        $query = Product::with(['artists' => function ($query) {
+            $query->orderByPivot('sort_order');
+        }])
+            ->active()
+            ->where('id', '!=', $product->id);
+
+        // Priority 1: Products with same artists
+        $sameArtistProducts = (clone $query)
+            ->whereHas('artists', function ($q) use ($artistIds) {
+                $q->whereIn('artists.id', $artistIds);
+            })
+            ->limit($limit)
+            ->get();
+
+        $relatedProducts = $sameArtistProducts;
+
+        // If we don't have enough products, add products from same genre
+        if ($relatedProducts->count() < $limit && $product->genre) {
+            $needed = $limit - $relatedProducts->count();
+            $excludeIds = $relatedProducts->pluck('id')->toArray();
+            $excludeIds[] = $product->id;
+
+            $sameGenreProducts = (clone $query)
+                ->whereNotIn('id', $excludeIds)
+                ->where('genre', $product->genre)
+                ->limit($needed)
+                ->get();
+
+            $relatedProducts = $relatedProducts->merge($sameGenreProducts);
+        }
+
+        // Transform products for frontend
+        return $relatedProducts->map(function ($relatedProduct) {
+            return $this->transformProduct($relatedProduct);
+        })->toArray();
+    }
+
+    /**
      * Get all data needed for the product detail page.
      */
     public function getDataForShowPage(Product $product, ?User $user): array
@@ -258,6 +304,9 @@ class ProductService
             }
         }
 
+        // Get related products
+        $relatedProducts = $this->getRelatedProducts($product);
+
         // Transform product data for frontend
         return [
             'product' => [
@@ -294,6 +343,7 @@ class ProductService
                 'user_can_review' => $userCanReview,
                 'user_review' => $userReview,
             ],
+            'relatedProducts' => $relatedProducts,
         ];
     }
 }

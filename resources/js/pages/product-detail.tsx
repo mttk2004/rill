@@ -11,6 +11,7 @@ import { ProductActions } from "@/components/product/product-actions";
 import { ReviewOverview } from "@/components/product/review-overview";
 import { ReviewForm } from "@/components/product/review-form";
 import { ReviewList } from "@/components/product/review-list";
+import { RelatedProducts } from "@/components/product/related-products";
 
 interface ProductReview {
   id: string;
@@ -30,10 +31,11 @@ interface ProductDetailProps {
     user_can_review?: boolean;
     user_review?: ProductReview | null;
   };
+  relatedProducts?: Product[];
   openReviewTab?: boolean;
 }
 
-export default function ProductDetail({ product, openReviewTab = false }: ProductDetailProps) {
+export default function ProductDetail({ product, relatedProducts = [], openReviewTab = false }: ProductDetailProps) {
   const { cart } = usePage<SharedData>().props;
   const { post: routerPost } = useToastRouter();
   const [quantity, setQuantity] = useState(1);
@@ -42,6 +44,20 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
   const reviewsRef = useRef<HTMLDivElement>(null);
 
   const isInCart = useMemo(() => cart.items.some(item => item.product.id === product.id), [cart.items, product.id]);
+
+  const isProductInCart = (productId: string) => {
+    return cart.items.some(item => item.product.id === productId);
+  };
+
+  const handleAddToCartRelated = (e: MouseEvent<HTMLButtonElement>, productId: string) => {
+    e.preventDefault();
+
+    routerPost('/cart/add', { product_id: productId, quantity: 1 }, {
+      pending: 'Đang thêm vào giỏ hàng...',
+      success: 'Đã thêm sản phẩm vào giỏ! 🎉',
+      error: 'Đã xảy ra lỗi khi thêm vào giỏ hàng',
+    }, { preserveScroll: true });
+  };
 
   const { data, setData, post, processing, errors, reset } = useForm({
     rating: product.user_review?.rating || 5,
@@ -208,6 +224,13 @@ export default function ProductDetail({ product, openReviewTab = false }: Produc
               </div>
             </div>
           </div>
+
+          {/* Related Products Section */}
+          <RelatedProducts
+            products={relatedProducts}
+            onAddToCart={handleAddToCartRelated}
+            isInCart={isProductInCart}
+          />
         </div>
       </main>
     </AppLayout>
