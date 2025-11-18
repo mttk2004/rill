@@ -19,7 +19,10 @@ class OrderStatusUpdated extends Mailable implements ShouldQueue
      */
     public function __construct(
         public Order $order
-    ) {}
+    ) {
+        // Eager load relationships before queuing to avoid lazy loading issues
+        $this->order->load(['user', 'items.product']);
+    }
 
     /**
      * Get the message envelope.

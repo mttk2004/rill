@@ -118,7 +118,6 @@ class OrderService
         });
 
         // Send email notification after transaction completes
-        $order->load('user', 'items.product');
         Mail::to($order->user)->send(new OrderStatusUpdated($order));
     }
 
@@ -144,7 +143,6 @@ class OrderService
         });
 
         // Send email notification after transaction completes
-        $order->load('user', 'items.product');
         Mail::to($order->user)->send(new OrderStatusUpdated($order));
     }
 
@@ -160,7 +158,6 @@ class OrderService
         });
 
         // Send email notification after transaction completes
-        $order->load('user', 'items.product');
         Mail::to($order->user)->send(new OrderStatusUpdated($order));
     }
 }
