@@ -25,7 +25,7 @@ class CheckoutController extends Controller
         $shippingAddresses = $user->shippingAddresses()->get();
 
         if ($shippingAddresses->isEmpty()) {
-            return redirect()->route('cart')->with('error', 'Please add a shipping address before proceeding to checkout.');
+            return redirect()->route('addresses.index')->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi thanh toán.');
         }
 
         $cartItems = ShoppingCartItem::with('product.artists')->where('user_id', $user->id)->get();
