@@ -25,6 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*'); // Tin tưởng mọi proxy (vì IP của Railway thay đổi động)
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
