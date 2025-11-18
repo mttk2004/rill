@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Mail\OrderStatusUpdated;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -12,6 +13,7 @@ use App\Models\ShippingAddress;
 use App\Models\ShoppingCartItem;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class OrderService
@@ -114,6 +116,10 @@ class OrderService
                 'status' => OrderStatus::CONFIRMED,
             ]);
         });
+
+        // Send email notification after transaction completes
+        $order->load('user', 'items.product');
+        Mail::to($order->user)->send(new OrderStatusUpdated($order));
     }
 
     /**
@@ -136,5 +142,25 @@ class OrderService
                 'status' => OrderStatus::CANCELLED,
             ]);
         });
+
+        // Send email notification after transaction completes
+        $order->load('user', 'items.product');
+        Mail::to($order->user)->send(new OrderStatusUpdated($order));
+    }
+
+    /**
+     * Update order status and send notification email.
+     */
+    public function updateOrderStatus(Order $order, OrderStatus $newStatus): void
+    {
+        DB::transaction(function () use ($order, $newStatus) {
+            $order->update([
+                'status' => $newStatus,
+            ]);
+        });
+
+        // Send email notification after transaction completes
+        $order->load('user', 'items.product');
+        Mail::to($order->user)->send(new OrderStatusUpdated($order));
     }
 }
