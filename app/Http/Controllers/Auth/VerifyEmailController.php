@@ -14,13 +14,13 @@ class VerifyEmailController extends Controller
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
-            $route = auth()->user()->isAdmin() ? 'admin.statistics' : 'dashboard';
-            return redirect()->intended(route($route, absolute: false).'?verified=1');
+            return redirect()->route('products')
+                ->with('success', 'Email của bạn đã được xác nhận trước đó!');
         }
 
         $request->fulfill();
 
-        $route = auth()->user()->isAdmin() ? 'admin.statistics' : 'dashboard';
-        return redirect()->intended(route($route, absolute: false).'?verified=1');
+        return redirect()->route('products')
+            ->with('success', 'Xác nhận email thành công! Chào mừng bạn đến với Rill! 🎉');
     }
 }
