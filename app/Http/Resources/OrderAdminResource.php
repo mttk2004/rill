@@ -18,7 +18,7 @@ class OrderAdminResource extends JsonResource
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
-            'status' => $this->status,
+            'status' => $this->status->value,
             'subtotal' => $this->subtotal,
             'shipping_fee' => $this->shipping_fee,
             'discount_amount' => $this->discount_amount,
@@ -57,8 +57,8 @@ class OrderAdminResource extends JsonResource
             'payment' => $this->when($this->relationLoaded('payment'), function () {
                 return $this->payment ? [
                     'id' => $this->payment->id,
-                    'payment_method' => $this->payment->payment_method,
-                    'payment_status' => $this->payment->payment_status,
+                    'payment_method' => $this->payment->payment_method->value,
+                    'payment_status' => $this->payment->payment_status->value,
                     'amount' => $this->payment->amount,
                     'transaction_id' => $this->payment->transaction_id,
                     'processed_at' => $this->payment->processed_at,
@@ -114,7 +114,7 @@ class OrderAdminResource extends JsonResource
                 return $this->statusHistories->map(function ($history) {
                     return [
                         'id' => $history->id,
-                        'status' => $history->status,
+                        'status' => is_object($history->status) ? $history->status->value : $history->status,
                         'notes' => $history->notes,
                         'created_at' => $history->created_at,
                         'created_by' => $this->when($history->relationLoaded('createdBy'), function () use ($history) {
