@@ -27,6 +27,7 @@ import type { Paginator, User, PaginationLink } from '@/types';
 import { useState } from 'react';
 import { formatVND } from "@/lib/utils";
 import { useQueryFilters } from '@/hooks/use-query-filters';
+import { OrderStatusBadge } from '@/lib/order-helpers';
 
 const AdminCustomers = () => {
 
@@ -40,7 +41,7 @@ const AdminCustomers = () => {
     orders?: Array<{
       id: string;
       order_number: string;
-      status: string;
+      status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
       total_amount: number;
       placed_at: string;
       items_count: number;
@@ -617,9 +618,7 @@ const AdminCustomers = () => {
                             <div className="flex items-center justify-between mb-2">
                               <div className="flex items-center gap-3">
                                 <span className="font-bold text-amber-600">#{order.order_number}</span>
-                                <Badge className="bg-blue-500 text-white border-0">
-                                  {order.status}
-                                </Badge>
+                                <OrderStatusBadge status={order.status} />
                               </div>
                               <Link href={`/admin/orders/${order.id}`}>
                                 <Button variant="ghost" size="sm">
