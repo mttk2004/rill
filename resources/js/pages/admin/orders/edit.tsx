@@ -32,7 +32,7 @@ import axios from 'axios';
 import type { LucideIcon } from 'lucide-react';
 
 interface OrderDetailProps {
-  order: AdminOrder;
+  order: AdminOrder | { data: AdminOrder };
 }
 
 // Status transition map
@@ -52,12 +52,16 @@ const statusTransitions: Record<string, Array<{ status: string; label: string; i
   cancelled: [],
 };
 
-export default function OrderDetail({ order }: OrderDetailProps) {
+export default function OrderDetail({ order: orderWrapper }: OrderDetailProps) {
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Unwrap the data from Inertia response
+  const order = 'data' in orderWrapper ? orderWrapper.data : orderWrapper;
 
   // DEBUG: Log order data received from backend
   console.log('=== ORDER DETAIL DEBUG ===');
-  console.log('Full order object:', order);
+  console.log('Full order wrapper:', orderWrapper);
+  console.log('Unwrapped order:', order);
   console.log('Order ID:', order.id);
   console.log('Order items array:', order.order_items);
   console.log('Order items count:', order.order_items_count);
