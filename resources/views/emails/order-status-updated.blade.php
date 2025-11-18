@@ -263,7 +263,7 @@
         <div class="order-info-row">
           <span class="order-info-label">Phương thức thanh toán:</span>
           <span class="order-info-value">
-            {{ $order->payment_method->value === 'COD' ? 'Thanh toán khi nhận hàng' : 'VNPAY' }}
+            {{ $order->payment?->payment_method?->value === 'COD' ? 'Thanh toán khi nhận hàng' : 'VNPAY' }}
           </span>
         </div>
       </div>

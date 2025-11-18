@@ -21,7 +21,7 @@ class OrderStatusUpdated extends Mailable implements ShouldQueue
         public Order $order
     ) {
         // Eager load relationships before queuing to avoid lazy loading issues
-        $this->order->load(['user', 'items.product']);
+        $this->order->load(['user', 'items.product', 'payment']);
     }
 
     /**
