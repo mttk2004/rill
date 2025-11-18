@@ -1,12 +1,9 @@
 import { Badge } from '@/components/ui/badge';
-import {
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Package,
-  Truck,
-  PackageCheck,
-} from 'lucide-react';
+import { OrderStatusBadge } from '@/components/ui/order-status-badge';
+import { CheckCircle2, XCircle, Clock } from 'lucide-react';
+
+// Re-export the new component
+export { OrderStatusBadge };
 
 // Type definitions
 export interface AdminOrder {
@@ -74,57 +71,12 @@ export interface AdminOrder {
   }>;
 }
 
-// Order status badge with icon
+// Order status badge with icon (wrapper for backward compatibility)
 export const getOrderStatusBadge = (
   status: AdminOrder['status'],
   deleted_at: string | null
 ) => {
-  if (deleted_at) {
-    return (
-      <Badge variant="outline" className="gap-1.5 text-red-600 border-red-300">
-        <XCircle className="h-3.5 w-3.5" />
-        Đã hủy
-      </Badge>
-    );
-  }
-
-  const statusConfig = {
-    pending: {
-      label: 'Chờ xác nhận',
-      icon: Clock,
-      className: 'gap-1.5 bg-amber-100 text-amber-700 border-amber-300',
-    },
-    confirmed: {
-      label: 'Đang xử lý',
-      icon: Package,
-      className: 'gap-1.5 bg-blue-100 text-blue-700 border-blue-300',
-    },
-    shipped: {
-      label: 'Đang giao',
-      icon: Truck,
-      className: 'gap-1.5 bg-purple-100 text-purple-700 border-purple-300',
-    },
-    delivered: {
-      label: 'Đã giao',
-      icon: PackageCheck,
-      className: 'gap-1.5 bg-green-100 text-green-700 border-green-300',
-    },
-    cancelled: {
-      label: 'Đã hủy',
-      icon: XCircle,
-      className: 'gap-1.5 bg-red-100 text-red-700 border-red-300',
-    },
-  };
-
-  const config = statusConfig[status] || statusConfig.pending;
-  const Icon = config.icon;
-
-  return (
-    <Badge variant="outline" className={config.className}>
-      <Icon className="h-3.5 w-3.5" />
-      {config.label}
-    </Badge>
-  );
+  return <OrderStatusBadge status={status} deletedAt={deleted_at} />;
 };
 
 // Payment status badge

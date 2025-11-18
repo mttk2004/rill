@@ -4,19 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Package,
-  Truck,
-  CheckCircle,
-  Clock,
-  XCircle,
   User,
   MapPin,
   CreditCard,
   Calendar,
-  Edit
+  Edit,
+  Clock
 } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import { formatDateTime } from "@/lib/order-helpers";
+import { formatDateTime, OrderStatusBadge } from "@/lib/order-helpers";
 import { formatVND } from '@/lib/utils';
 
 interface OrderItem {
@@ -78,25 +75,7 @@ interface OrderDetailDialogProps {
   onClose: () => void;
 }
 
-const getStatusBadge = (status: string) => {
-  const configs = {
-    pending: { label: "Chờ xử lý", className: "bg-amber-100 text-amber-700", icon: Clock },
-    confirmed: { label: "Đã xác nhận", className: "bg-blue-100 text-blue-700", icon: Package },
-    shipped: { label: "Đang giao", className: "bg-purple-100 text-purple-700", icon: Truck },
-    delivered: { label: "Đã giao", className: "bg-green-100 text-green-700", icon: CheckCircle },
-    cancelled: { label: "Đã hủy", className: "bg-red-100 text-red-700", icon: XCircle },
-  };
-
-  const config = configs[status as keyof typeof configs] || configs.pending;
-  const Icon = config.icon;
-
-  return (
-    <Badge className={config.className}>
-      <Icon className="h-3 w-3 mr-1" />
-      {config.label}
-    </Badge>
-  );
-};
+// Use OrderStatusBadge component instead of local function
 
 const getPaymentStatusBadge = (status: string) => {
   const configs = {
@@ -128,7 +107,7 @@ export const OrderDetailDialog = ({ order, isOpen, onClose }: OrderDetailDialogP
               <span>Chi tiết đơn hàng #{order.order_number}</span>
             </div>
             <div className="flex items-center gap-2">
-              {getStatusBadge(order.status)}
+              <OrderStatusBadge status={order.status as 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'} />
               <Link href={route('admin.orders.show', order.id)}>
                 <Button size="sm" variant="outline" className="gap-2">
                   <Edit className="h-4 w-4" />
@@ -226,7 +205,7 @@ export const OrderDetailDialog = ({ order, isOpen, onClose }: OrderDetailDialogP
                       </div>
                       <div className="flex-1 pb-2">
                         <div className="flex items-center gap-2 flex-wrap">
-                          {getStatusBadge(history.status)}
+                          <OrderStatusBadge status={history.status as 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'} />
                           <span className="text-xs text-muted-foreground">
                             {formatDateTime(history.created_at)}
                           </span>
