@@ -68,10 +68,10 @@
       display: inline-block;
       padding: 14px 32px;
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #ffffff;
+      color: #1f2937 !important;
       text-decoration: none;
       border-radius: 8px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 16px;
       margin: 20px 0;
       box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);

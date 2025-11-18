@@ -163,10 +163,10 @@
       display: inline-block;
       padding: 14px 32px;
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #ffffff;
+      color: #ffffff !important;
       text-decoration: none;
       border-radius: 8px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 16px;
       margin: 20px 0;
       box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
