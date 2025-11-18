@@ -97,12 +97,12 @@ class OrderAdminResource extends JsonResource
                                             'name' => $artist->name,
                                             'slug' => $artist->slug,
                                         ];
-                                    });
+                                    })->values()->toArray();
                                 }),
                             ] : null;
                         }),
                     ];
-                });
+                })->values()->toArray();
             }),
 
             // Items count
@@ -124,7 +124,7 @@ class OrderAdminResource extends JsonResource
                             ] : null;
                         }),
                     ];
-                });
+                })->values()->toArray();
             }),
         ];
     }

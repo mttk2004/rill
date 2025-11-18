@@ -125,7 +125,7 @@ class OrderController extends Controller
     public function show(Request $request, string $id)
     {
         \Log::info("Admin OrderController::show - Loading order ID: {$id}");
-        
+
         $order = Order::with([
             'user',
             'payment',
