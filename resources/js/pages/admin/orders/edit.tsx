@@ -58,25 +58,6 @@ export default function OrderDetail({ order: orderWrapper }: OrderDetailProps) {
   // Unwrap the data from Inertia response
   const order = 'data' in orderWrapper ? orderWrapper.data : orderWrapper;
 
-  // DEBUG: Log order data received from backend
-  console.log('=== ORDER DETAIL DEBUG ===');
-  console.log('Full order wrapper:', orderWrapper);
-  console.log('Unwrapped order:', order);
-  console.log('Order ID:', order.id);
-  console.log('Order items array:', order.order_items);
-  console.log('Order items count:', order.order_items_count);
-  console.log('Order items length:', order.order_items?.length);
-  console.log('Order items type:', typeof order.order_items);
-  console.log('Is array?:', Array.isArray(order.order_items));
-  if (order.order_items && order.order_items.length > 0) {
-    console.log('First item:', order.order_items[0]);
-    console.log('First item product:', order.order_items[0]?.product);
-  }
-  console.log('Order status:', order.status);
-  console.log('Payment method:', order.payment?.payment_method);
-  console.log('Payment status:', order.payment?.payment_status);
-  console.log('========================');
-
   const handleUpdateStatus = async (newStatus: string) => {
     // Confirm for critical actions
     if (newStatus === 'cancelled') {

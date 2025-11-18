@@ -103,6 +103,14 @@ interface OrderDetail {
 }
 
 export default function Orders({ orders, filters, stats }: OrdersPageProps) {
+  // DEBUG: Check pagination data
+  console.log('=== ORDERS PAGINATION DEBUG ===');
+  console.log('Orders object:', orders);
+  console.log('Orders.links:', orders.links);
+  console.log('Is links array?:', Array.isArray(orders.links));
+  console.log('Links type:', typeof orders.links);
+  console.log('========================');
+
   const { filters: currentFilters, handleFilterChange } = useQueryFilters({
     initialFilters: filters,
     routeOrPath: 'admin.orders',

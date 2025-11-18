@@ -26,6 +26,9 @@ export const AdminPagination = ({
     return null;
   }
 
+  // Handle if links is undefined or not an array
+  const links = Array.isArray(pagination.links) ? pagination.links : [];
+
   return (
     <div className="mt-6 flex items-center justify-between">
       <div className="text-sm text-slate-600 dark:text-slate-400">
@@ -36,15 +39,15 @@ export const AdminPagination = ({
         {itemName}
       </div>
       <div className="flex gap-2">
-        {pagination.links.map((link, idx) => {
+        {links.map((link, idx) => {
           if (!link.url) return null;
           return (
             <Link
               key={idx}
               href={link.url}
               className={`px-3 py-1 rounded-md transition-colors ${link.active
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-white/80 dark:bg-slate-800/80 hover:bg-amber-100 dark:hover:bg-slate-700'
+                ? 'bg-amber-500 text-white'
+                : 'bg-white/80 dark:bg-slate-800/80 hover:bg-amber-100 dark:hover:bg-slate-700'
                 }`}
               dangerouslySetInnerHTML={{ __html: link.label }}
             />
