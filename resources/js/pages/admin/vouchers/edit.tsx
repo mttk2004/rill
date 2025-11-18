@@ -1,13 +1,13 @@
 import { AdminNavigation } from '@/components/admin-navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Head, Link, useForm } from '@inertiajs/react';
 import {
-  Ticket,
   ArrowLeft,
   Calendar,
   Settings,
@@ -110,34 +110,30 @@ export default function AdminVoucherEdit({ voucher }: Props) {
       <Head title={`Chỉnh sửa Voucher: ${voucher.code} - Admin`} />
       <AdminNavigation />
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Link href="/admin/vouchers">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Quay lại
-              </Button>
-            </Link>
-
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl">
-                <Ticket className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold text-slate-900">
-                    Chỉnh sửa Voucher
-                  </h1>
-                  {getStatusBadge()}
-                </div>
-                <p className="text-slate-600">
-                  Cập nhật thông tin và cài đặt cho voucher: <code className="font-mono bg-slate-100 px-2 py-1 rounded">{voucher.code}</code>
-                </p>
-              </div>
-            </div>
+      <PageHeader
+        title={
+          <div className="flex items-center gap-3">
+            <span>Chỉnh sửa Voucher</span>
+            {getStatusBadge()}
           </div>
+        }
+        subtitle={
+          <span>
+            Cập nhật thông tin và cài đặt cho voucher: <code className="font-mono bg-slate-100 px-2 py-1 rounded">{voucher.code}</code>
+          </span>
+        }
+        actions={
+          <Link href="/admin/vouchers">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Quay lại
+            </Button>
+          </Link>
+        }
+      />
+
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="mb-8">
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

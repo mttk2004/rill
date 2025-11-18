@@ -1,12 +1,12 @@
 import { AdminNavigation } from '@/components/admin-navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/ui/page-header';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Head, Link, useForm } from '@inertiajs/react';
 import {
-  Ticket,
   ArrowLeft,
   Calendar,
   Settings,
@@ -51,32 +51,20 @@ export default function AdminVoucherCreate() {
       <Head title="Tạo Voucher Mới - Admin" />
       <AdminNavigation />
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <Link href="/admin/vouchers">
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Quay lại
-              </Button>
-            </Link>
+      <PageHeader
+        title="Tạo Voucher Mới"
+        subtitle="Tạo mã giảm giá để thu hút và giữ chân khách hàng"
+        actions={
+          <Link href="/admin/vouchers">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Quay lại
+            </Button>
+          </Link>
+        }
+      />
 
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl">
-                <Ticket className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-slate-900">
-                  Tạo Voucher Mới
-                </h1>
-                <p className="text-slate-600 mt-1">
-                  Tạo mã giảm giá để thu hút và giữ chân khách hàng
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
 
         <form onSubmit={handleSubmit} className="max-w-4xl mx-auto space-y-8">
           {/* Thông tin cơ bản */}
