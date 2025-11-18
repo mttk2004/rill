@@ -125,7 +125,7 @@ class OrderController extends Controller
     public function show(Request $request, string $id)
     {
         \Log::info("Admin OrderController::show - Loading order ID: {$id}");
-
+        
         $order = Order::with([
             'user',
             'payment',
@@ -133,7 +133,11 @@ class OrderController extends Controller
             'statusHistories' => function($query) {
                 $query->with('createdBy:id,name')->orderBy('created_at', 'asc');
             }
-        ])->findOrFail($id);        \Log::info("Admin OrderController::show - Order loaded", [
+        ])
+        ->withCount('items')
+        ->findOrFail($id);
+
+        \Log::info("Admin OrderController::show - Order loaded", [
             'order_id' => $order->id,
             'order_number' => $order->order_number,
             'items_count' => $order->items->count(),
@@ -161,9 +165,7 @@ class OrderController extends Controller
         return Inertia::render('admin/orders/edit', [
             'order' => $orderResource,
         ]);
-    }
-
-    /**
+    }    /**
      * Export order as PDF.
      */
     public function export(string $id)
