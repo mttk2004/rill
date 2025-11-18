@@ -23,7 +23,7 @@ class SendWelcomeEmail implements ShouldQueue
     /**
      * Handle the event.
      */
-    public function handle(Registered $event): void
+    public function __invoke(Registered $event): void
     {
         // Ensure user is instance of User model
         $user = $event->user instanceof \App\Models\User
