@@ -22,13 +22,13 @@
     }
 
     .header {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       padding: 40px 20px;
       text-align: center;
     }
 
     .header h1 {
-      color: #ffffff;
+      color: #1f2937;
       margin: 0;
       font-size: 28px;
       font-weight: 700;
@@ -93,7 +93,7 @@
 
     .order-info {
       background-color: #f9fafb;
-      border-left: 4px solid #3b82f6;
+      border-left: 4px solid #f59e0b;
       padding: 20px;
       margin: 25px 0;
       border-radius: 4px;
@@ -162,14 +162,14 @@
     .cta-button {
       display: inline-block;
       padding: 14px 32px;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #ffffff !important;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #1f2937 !important;
       text-decoration: none;
       border-radius: 8px;
       font-weight: 700;
       font-size: 16px;
       margin: 20px 0;
-      box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
     }
 
     .message {
@@ -188,7 +188,7 @@
     }
 
     .footer-link {
-      color: #3b82f6;
+      color: #f59e0b;
       text-decoration: none;
       margin: 0 10px;
     }
