@@ -124,6 +124,8 @@ class OrderController extends Controller
      */
     public function show(Request $request, string $id)
     {
+        \Log::info("Admin OrderController::show - Loading order ID: {$id}");
+
         $order = Order::with([
             'user',
             'payment',
@@ -131,9 +133,24 @@ class OrderController extends Controller
             'statusHistories' => function($query) {
                 $query->with('createdBy:id,name')->orderBy('created_at', 'asc');
             }
-        ])->findOrFail($id);
+        ])->findOrFail($id);        \Log::info("Admin OrderController::show - Order loaded", [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'items_count' => $order->items->count(),
+            'items_loaded' => $order->relationLoaded('items'),
+            'items_preview' => $order->items->map(fn($item) => [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'product_loaded' => $item->relationLoaded('product'),
+                'product_name' => $item->product?->name ?? 'NULL',
+            ])->toArray(),
+        ]);
 
         $orderResource = new OrderAdminResource($order);
+
+        \Log::info("Admin OrderController::show - Resource created", [
+            'resource_data' => $orderResource->toArray($request),
+        ]);
 
         // Return JSON for API requests, Inertia page for browser
         if ($request->wantsJson()) {

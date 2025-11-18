@@ -38,7 +38,7 @@ class OrderAdminResource extends JsonResource
                 ] : null;
             }),
 
-            // Shipping address
+            // Shipping address (JSON column)
             'shipping_address' => $this->when(!empty($this->shipping_address), function () {
                 $address = $this->shipping_address;
                 return [
