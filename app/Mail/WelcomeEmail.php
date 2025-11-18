@@ -41,6 +41,13 @@ class WelcomeEmail extends Mailable implements ShouldQueue
             with: [
                 'userName' => $this->user->name,
                 'userEmail' => $this->user->email,
+                'verificationUrl' => $this->user->hasVerifiedEmail()
+                    ? null
+                    : \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                        'verification.verify',
+                        now()->addMinutes(60),
+                        ['id' => $this->user->id, 'hash' => sha1($this->user->email)]
+                    ),
             ],
         );
     }

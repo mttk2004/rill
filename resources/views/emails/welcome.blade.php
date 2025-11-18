@@ -161,6 +161,28 @@
         Tại Rill, bạn sẽ tìm thấy những album vinyl độc đáo từ các nghệ sĩ tài năng trên toàn thế giới.
       </div>
 
+      @if($verificationUrl)
+        <!-- Email Verification -->
+        <div
+          style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 30px 0; border-radius: 8px;">
+          <div style="font-size: 16px; color: #1e40af; font-weight: 600; margin-bottom: 10px;">
+            ✉️ Vui lòng xác nhận địa chỉ email của bạn
+          </div>
+          <div style="font-size: 14px; color: #475569; margin-bottom: 15px;">
+            Để bắt đầu mua sắm và nhận ưu đãi đặc biệt, hãy xác nhận email bằng cách nhấp vào nút bên dưới:
+          </div>
+          <div style="text-align: center;">
+            <a href="{{ $verificationUrl }}" class="cta-button"
+              style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+              Xác nhận email ngay
+            </a>
+          </div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 15px;">
+            Link xác nhận có hiệu lực trong 60 phút. Nếu bạn không thực hiện hành động này, vui lòng bỏ qua email này.
+          </div>
+        </div>
+      @endif
+
       <div style="text-align: center;">
         <a href="{{ config('app.url') }}/products" class="cta-button">
           Khám phá ngay

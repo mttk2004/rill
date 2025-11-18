@@ -149,4 +149,13 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(VoucherUsage::class);
     }
+
+    /**
+     * Override to prevent Laravel's default email verification notification.
+     * We send the verification link in the welcome email instead.
+     */
+    public function sendEmailVerificationNotification()
+    {
+        // Do nothing - verification link is included in welcome email
+    }
 }

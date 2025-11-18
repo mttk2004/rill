@@ -10,18 +10,21 @@ import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
   return (
-    <AuthLayout title="Đăng ký thành công! 🎉" description="Cảm ơn bạn đã đăng ký tài khoản tại Rill. Hãy kiểm tra email để xác nhận tài khoản và nhận voucher giảm giá 100K cho đơn hàng đầu tiên!">
+    <AuthLayout title="Đăng ký thành công! 🎉" description="Cảm ơn bạn đã đăng ký tài khoản tại Rill. Hãy kiểm tra email để xác nhận tài khoản và nhận món quà bất ngờ từ chúng tôi!">
       <Head title="Xác nhận email" />
 
       <div className="mb-6 space-y-4 text-center">
-        <div className="rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 p-6 shadow-sm">
-          <div className="mb-3 text-4xl">🎁</div>
+        <div className="rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-sm border-2 border-blue-100">
+          <div className="mb-3 text-4xl">✉️</div>
           <h3 className="mb-2 text-lg font-semibold text-gray-900">
-            Quà tặng chào mừng
+            Kiểm tra email của bạn
           </h3>
-          <p className="text-sm text-gray-600">
-            Mã voucher <span className="font-bold text-orange-600">RILLNEW</span> giảm giá{' '}
-            <span className="font-bold text-orange-600">100.000đ</span> đã được gửi vào email của bạn!
+          <p className="text-sm text-gray-600 mb-3">
+            Chúng tôi đã gửi một email chào mừng đến hộp thư của bạn.
+          </p>
+          <p className="text-sm text-gray-700">
+            Email này chứa link xác nhận tài khoản và{' '}
+            <span className="font-bold text-orange-600">một món quà bí mật đặc biệt</span> dành riêng cho bạn! 🎁
           </p>
         </div>
 
