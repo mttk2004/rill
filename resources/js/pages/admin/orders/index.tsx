@@ -297,8 +297,11 @@ export default function Orders({ orders, filters, stats }: OrdersPageProps) {
 
     try {
       const response = await axios.get(route('admin.orders.show', orderId));
-      setSelectedOrder(response.data);
-    } catch {
+      // Unwrap data if needed (Laravel Resource wraps in 'data' property)
+      const orderData = 'data' in response.data ? response.data.data : response.data;
+      setSelectedOrder(orderData);
+    } catch (error) {
+      console.error('Error loading order:', error);
       setIsDialogOpen(false);
     }
   };
