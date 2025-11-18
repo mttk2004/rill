@@ -9,30 +9,43 @@ import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
-    return (
-        <AuthLayout title="Verify email" description="Please verify your email address by clicking on the link we just emailed to you.">
-            <Head title="Email verification" />
+  return (
+    <AuthLayout title="Đăng ký thành công! 🎉" description="Cảm ơn bạn đã đăng ký tài khoản tại Rill. Hãy kiểm tra email để xác nhận tài khoản và nhận voucher giảm giá 100K cho đơn hàng đầu tiên!">
+      <Head title="Xác nhận email" />
 
-            {status === 'verification-link-sent' && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address you provided during registration.
-                </div>
-            )}
+      <div className="mb-6 space-y-4 text-center">
+        <div className="rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 p-6 shadow-sm">
+          <div className="mb-3 text-4xl">🎁</div>
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">
+            Quà tặng chào mừng
+          </h3>
+          <p className="text-sm text-gray-600">
+            Mã voucher <span className="font-bold text-orange-600">RILLNEW</span> giảm giá{' '}
+            <span className="font-bold text-orange-600">100.000đ</span> đã được gửi vào email của bạn!
+          </p>
+        </div>
 
-            <Form {...EmailVerificationNotificationController.store.form()} className="space-y-6 text-center">
-                {({ processing }) => (
-                    <>
-                        <Button disabled={processing} variant="secondary">
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Resend verification email
-                        </Button>
+        {status === 'verification-link-sent' && (
+          <div className="text-sm font-medium text-green-600">
+            Email xác nhận mới đã được gửi đến địa chỉ email của bạn.
+          </div>
+        )}
+      </div>
 
-                        <TextLink href={logout()} className="mx-auto block text-sm">
-                            Log out
-                        </TextLink>
-                    </>
-                )}
-            </Form>
-        </AuthLayout>
-    );
+      <Form {...EmailVerificationNotificationController.store.form()} className="space-y-6 text-center">
+        {({ processing }) => (
+          <>
+            <Button disabled={processing} variant="secondary" className="w-full">
+              {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+              Gửi lại email xác nhận
+            </Button>
+
+            <TextLink href={logout()} className="mx-auto block text-sm">
+              Đăng xuất
+            </TextLink>
+          </>
+        )}
+      </Form>
+    </AuthLayout>
+  );
 }

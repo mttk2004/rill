@@ -48,13 +48,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        // Role-based redirect after registration (new users are always customers)
-        $intendedRoute = match($user->role) {
-            'admin' => route('dashboard', absolute: false),
-            'customer' => route('products', absolute: false),
-            default => route('products', absolute: false),
-        };
-
-        return redirect()->intended($intendedRoute);
+        // Redirect to verification notice page
+        return redirect()->route('verification.notice');
     }
 }

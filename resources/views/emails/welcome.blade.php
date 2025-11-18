@@ -167,6 +167,25 @@
         </a>
       </div>
 
+      <!-- Welcome Gift Voucher -->
+      <div class="features"
+        style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="font-size: 48px; margin-bottom: 10px;">🎁</div>
+          <div style="font-size: 20px; font-weight: 700; color: #92400e; margin-bottom: 10px;">
+            Quà tặng chào mừng!
+          </div>
+          <div style="font-size: 16px; color: #78350f; margin-bottom: 15px;">
+            Giảm ngay 100.000₫ cho đơn hàng đầu tiên
+          </div>
+          <div
+            style="background-color: #ffffff; padding: 15px 25px; border-radius: 8px; display: inline-block; border: 2px dashed #f59e0b;">
+            <div style="font-size: 14px; color: #78350f; margin-bottom: 5px;">Mã voucher</div>
+            <div style="font-size: 28px; font-weight: 800; color: #f59e0b; letter-spacing: 3px;">RILLNEW</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Features -->
       <div class="features">
         <div class="feature-item">
@@ -181,13 +200,6 @@
           <div class="feature-text">
             <strong>Giao hàng miễn phí</strong><br>
             Cho đơn hàng từ 1.000.000₫
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">🎁</div>
-          <div class="feature-text">
-            <strong>Ưu đãi hấp dẫn</strong><br>
-            Nhận ngay mã giảm giá cho lần mua đầu tiên
           </div>
         </div>
         <div class="feature-item">
