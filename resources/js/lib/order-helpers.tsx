@@ -10,7 +10,7 @@ import {
 
 // Type definitions
 export interface AdminOrder {
-  id: number;
+  id: string;
   order_number: string;
   user_id: number;
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
