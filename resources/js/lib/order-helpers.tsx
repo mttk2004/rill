@@ -167,8 +167,10 @@ export const getPaymentStatusBadge = (status: string) => {
 // formatCurrency has been removed. Use formatVND from @/lib/utils instead
 
 // Format date and time
-export const formatDateTime = (dateString: string): string => {
+export const formatDateTime = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'N/A';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'N/A';
   return new Intl.DateTimeFormat('vi-VN', {
     year: 'numeric',
     month: '2-digit',
@@ -179,8 +181,10 @@ export const formatDateTime = (dateString: string): string => {
 };
 
 // Format date only
-export const formatDate = (dateString: string): string => {
+export const formatDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'N/A';
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'N/A';
   return new Intl.DateTimeFormat('vi-VN', {
     year: 'numeric',
     month: '2-digit',
