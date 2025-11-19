@@ -49,6 +49,7 @@ export function useToastRouter() {
   ) => {
     let isRedirecting = false;
     let hasCompleted = false;
+    const startPath = window.location.pathname;
 
     const promise = new Promise((resolve, reject) => {
       const requestData = method === 'delete' ? undefined : data;
@@ -67,8 +68,23 @@ export function useToastRouter() {
             return (options.onBefore as () => boolean | void)();
           }
         },
+        onStart: () => {
+          // Store the start path to compare later
+        },
         onSuccess: (response: unknown) => {
           clearTimeout(timeout);
+          
+          // Check if path changed to login/register (auth redirect)
+          const currentPath = window.location.pathname;
+          if (currentPath === '/login' || currentPath === '/register') {
+            if (currentPath !== startPath) {
+              // We were redirected to login/register
+              isRedirecting = true;
+              reject(new Error('REDIRECT'));
+              return;
+            }
+          }
+          
           hasCompleted = true;
           resolve(response);
           if (options.onSuccess) {
@@ -88,11 +104,10 @@ export function useToastRouter() {
         onFinish: () => {
           clearTimeout(timeout);
 
-          // Check if we were redirected (likely to login page)
-          // If current URL changed to /login and we haven't completed, it's a redirect
-          if (!hasCompleted && (window.location.pathname === '/login' || window.location.pathname === '/register')) {
+          // Double-check for redirect in onFinish as well
+          const currentPath = window.location.pathname;
+          if (!hasCompleted && currentPath !== startPath && (currentPath === '/login' || currentPath === '/register')) {
             isRedirecting = true;
-            // Reject silently to stop toast promise
             reject(new Error('REDIRECT'));
           }
 
