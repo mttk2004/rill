@@ -92,7 +92,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
 
       <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
         <DialogContent
-          className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-0 bg-black/95 border-0 !left-1/2 !top-1/2 !-translate-x-1/2 !-translate-y-1/2"
+          className="max-w-screen max-h-screen w-screen h-screen p-0 bg-black/95 border-0"
           onInteractOutside={handleDialogClose}
         >
           <VisuallyHidden>
@@ -100,7 +100,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
           </VisuallyHidden>
 
           {/* Control Bar */}
-          <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+          <div className="absolute top-4 right-4 z-50 flex items-center gap-2 pointer-events-auto">
             <div className="bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2">
               <Button
                 size="sm"
@@ -146,7 +146,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
 
           {/* Image Container */}
           <div
-            className="relative w-[90vw] h-[90vh] flex items-center justify-center overflow-hidden"
+            className="relative w-full h-full flex items-center justify-center overflow-hidden"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -156,7 +156,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
             <img
               src={product.image_url}
               alt={product.name}
-              className="max-w-full max-h-full object-contain transition-transform duration-200 select-none"
+              className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain transition-transform duration-200 select-none"
               style={{
                 transform: `scale(${zoomLevel}) translate(${position.x / zoomLevel}px, ${position.y / zoomLevel}px)`,
                 transformOrigin: 'center center'
@@ -166,7 +166,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
           </div>
 
           {/* Product Info Overlay */}
-          <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm text-white rounded-lg px-4 py-3 max-w-md">
+          <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm text-white rounded-lg px-4 py-3 max-w-md pointer-events-none">
             <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
             <p className="text-xs text-white/70">
               {product.artists?.map(a => a.name).join(', ')}
@@ -175,7 +175,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
 
           {/* Zoom Hint */}
           {zoomLevel === 1 && (
-            <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white/70 rounded-lg px-3 py-2 text-xs">
+            <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white/70 rounded-lg px-3 py-2 text-xs pointer-events-none">
               💡 Dùng nút +/- để phóng to/thu nhỏ
             </div>
           )}
