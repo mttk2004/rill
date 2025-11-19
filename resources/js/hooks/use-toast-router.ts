@@ -87,7 +87,7 @@ export function useToastRouter() {
         },
         onFinish: () => {
           clearTimeout(timeout);
-          
+
           // Check if we were redirected (likely to login page)
           // If current URL changed to /login and we haven't completed, it's a redirect
           if (!hasCompleted && (window.location.pathname === '/login' || window.location.pathname === '/register')) {
@@ -95,7 +95,7 @@ export function useToastRouter() {
             // Reject silently to stop toast promise
             reject(new Error('REDIRECT'));
           }
-          
+
           if (options.onFinish) {
             options.onFinish();
           }
