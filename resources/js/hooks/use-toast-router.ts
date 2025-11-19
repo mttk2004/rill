@@ -49,6 +49,7 @@ export function useToastRouter() {
   ) => {
     let isRedirecting = false;
     let hasCompleted = false;
+    let pendingToastId: ReturnType<typeof toast.loading> | null = null;
     const startPath = window.location.pathname;
 
     const promise = new Promise((resolve, reject) => {
@@ -69,7 +70,10 @@ export function useToastRouter() {
           }
         },
         onStart: () => {
-          // Store the start path to compare later
+          // Show pending toast
+          if (messages.pending) {
+            pendingToastId = toast.loading(messages.pending);
+          }
         },
         onSuccess: (response: unknown) => {
           clearTimeout(timeout);
@@ -78,14 +82,30 @@ export function useToastRouter() {
           const currentPath = window.location.pathname;
           if (currentPath === '/login' || currentPath === '/register') {
             if (currentPath !== startPath) {
-              // We were redirected to login/register
+              // We were redirected to login/register - dismiss pending toast
               isRedirecting = true;
+              if (pendingToastId) {
+                toast.dismiss(pendingToastId);
+              }
               reject(new Error('REDIRECT'));
               return;
             }
           }
 
           hasCompleted = true;
+
+          // Update pending toast to success
+          if (pendingToastId) {
+            toast.update(pendingToastId, {
+              render: messages.success,
+              type: 'success',
+              isLoading: false,
+              autoClose: 3000,
+            });
+          } else {
+            toast.success(messages.success);
+          }
+
           resolve(response);
           if (options.onSuccess) {
             options.onSuccess(response);
@@ -94,9 +114,31 @@ export function useToastRouter() {
         onError: (errors: Record<string, unknown>) => {
           clearTimeout(timeout);
           hasCompleted = true;
+
           // Extract first error message
           const errorMessage = errors.message || Object.values(errors)[0];
-          reject(new Error(typeof errorMessage === 'string' ? errorMessage : 'An error occurred'));
+          const errorText = typeof errorMessage === 'string' ? errorMessage : 'An error occurred';
+
+          // Update pending toast to error
+          if (pendingToastId) {
+            const errorMsg = typeof messages.error === 'function'
+              ? messages.error(new Error(errorText))
+              : messages.error || errorText;
+
+            toast.update(pendingToastId, {
+              render: errorMsg,
+              type: 'error',
+              isLoading: false,
+              autoClose: 5000,
+            });
+          } else if (messages.error) {
+            const errorMsg = typeof messages.error === 'function'
+              ? messages.error(new Error(errorText))
+              : messages.error;
+            toast.error(errorMsg);
+          }
+
+          reject(new Error(errorText));
           if (options.onError) {
             options.onError(errors);
           }
@@ -108,6 +150,9 @@ export function useToastRouter() {
           const currentPath = window.location.pathname;
           if (!hasCompleted && currentPath !== startPath && (currentPath === '/login' || currentPath === '/register')) {
             isRedirecting = true;
+            if (pendingToastId) {
+              toast.dismiss(pendingToastId);
+            }
             reject(new Error('REDIRECT'));
           }
 
@@ -116,43 +161,15 @@ export function useToastRouter() {
           }
         },
       } as never);
-    }).catch((error) => {
-      // Don't throw if we're redirecting
-      if (isRedirecting || (error as Error).message === 'REDIRECT') {
-        return Promise.reject(new Error('REDIRECT'));
-      }
-      throw error;
     });
 
-    // Only show toast if we have a pending message
-    if (messages.pending) {
-      toast.promise(promise, {
-        pending: messages.pending,
-        success: messages.success,
-        error: {
-          render({ data }: { data: Error | unknown }) {
-            const error = data as Error;
-            // Don't show error toast for redirects
-            if (error?.message === 'REDIRECT') {
-              return null;
-            }
-            if (typeof messages.error === 'function') {
-              return messages.error(data);
-            }
-            if (typeof messages.error === 'string') {
-              return messages.error;
-            }
-            return error?.message || 'An error occurred';
-          },
-        },
-      });
-    }
-
-    return promise.catch(() => {
-      // Suppress redirect errors
-      if (isRedirecting) {
+    return promise.catch((error) => {
+      // Suppress redirect errors silently
+      if (isRedirecting || (error as Error)?.message === 'REDIRECT') {
         return;
       }
+      // Re-throw other errors
+      throw error;
     });
   };
 
