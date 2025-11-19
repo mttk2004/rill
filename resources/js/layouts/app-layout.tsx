@@ -1,5 +1,6 @@
 import { Navigation } from '@/components/navigation';
 import Footer from '@/components/Footer'; // Import the new Footer component
+import { MarketingBanner } from '@/components/marketing-banner';
 import { type BreadcrumbItem } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { type ReactNode } from 'react';
@@ -16,6 +17,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation user={auth.user} />
+      <MarketingBanner />
       <main className="flex-grow container mx-auto">
         {children}
       </main>

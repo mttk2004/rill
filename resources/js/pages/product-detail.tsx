@@ -13,6 +13,18 @@ import { ReviewForm } from "@/components/product/review-form";
 import { ReviewList } from "@/components/product/review-list";
 import { RelatedProducts } from "@/components/product/related-products";
 
+interface ProductDetailSettings {
+  shipping: {
+    free_threshold: number;
+    estimate_min_days: number;
+    estimate_max_days: number;
+  };
+  policy: {
+    return_days: number;
+    return_condition: string;
+  };
+}
+
 interface ProductReview {
   id: string;
   user: {
@@ -36,7 +48,7 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product, relatedProducts = [], openReviewTab = false }: ProductDetailProps) {
-  const { cart } = usePage<SharedData>().props;
+  const { cart, settings } = usePage<SharedData & { settings: ProductDetailSettings }>().props;
   const { post: routerPost } = useToastRouter();
   const [quantity, setQuantity] = useState(1);
   const [selectedRatingFilter, setSelectedRatingFilter] = useState<number | null>(null);
@@ -161,7 +173,7 @@ export default function ProductDetail({ product, relatedProducts = [], openRevie
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  <span>Miễn phí vận chuyển cho đơn hàng từ 1.000.000₫</span>
+                  <span>Miễn phí vận chuyển cho đơn hàng từ {settings.shipping.free_threshold.toLocaleString('vi-VN')}₫</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -170,13 +182,13 @@ export default function ProductDetail({ product, relatedProducts = [], openRevie
                     <circle cx="5.5" cy="18.5" r="2.5"></circle>
                     <circle cx="18.5" cy="18.5" r="2.5"></circle>
                   </svg>
-                  <span>Giao hàng trong 2-5 ngày làm việc</span>
+                  <span>Giao hàng trong {settings.shipping.estimate_min_days}-{settings.shipping.estimate_max_days} ngày làm việc</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                   </svg>
-                  <span>Đổi trả miễn phí trong 7 ngày nếu lỗi nhà sản xuất</span>
+                  <span>Đổi trả miễn phí trong {settings.policy.return_days} ngày nếu {settings.policy.return_condition}</span>
                 </div>
               </div>
             </div>

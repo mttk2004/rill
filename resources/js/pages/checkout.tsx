@@ -17,6 +17,12 @@ import { useToastRouter } from '@/hooks/use-toast-router';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+interface CheckoutSettings {
+  shipping: {
+    free_threshold: number;
+  };
+}
+
 // Define TypeScript interfaces for props
 interface CartItem {
   id: number;
@@ -61,8 +67,8 @@ const checkoutSchema = z.object({
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
 export default function Checkout() {
-  const pageProps = usePage<CheckoutPageProps>().props;
-  const { auth, cartItems, cartSummary, shippingAddresses, defaultShippingAddress, errors } = pageProps;
+  const pageProps = usePage<CheckoutPageProps & { settings: CheckoutSettings }>().props;
+  const { auth, cartItems, cartSummary, shippingAddresses, defaultShippingAddress, errors, settings } = pageProps;
   const toastRouter = useToastRouter();
 
   // Shipping fee state
@@ -294,7 +300,7 @@ export default function Checkout() {
                         )}
                       </div>
                       {isFreeShipping && (
-                        <p className="text-xs text-green-600">🎉 Miễn phí vận chuyển cho đơn hàng trên 1.000.000₫</p>
+                        <p className="text-xs text-green-600">🎉 Miễn phí vận chuyển cho đơn hàng trên {settings.shipping.free_threshold.toLocaleString('vi-VN')}₫</p>
                       )}
                       <Separator className="my-2" />
                       <div className="flex justify-between font-bold text-lg">

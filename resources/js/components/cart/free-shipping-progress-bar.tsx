@@ -1,5 +1,12 @@
 import { formatVND } from '@/lib/utils';
 import { Truck } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
+
+interface FreeShippingProgressBarSettings {
+  shipping: {
+    free_threshold: number;
+  };
+}
 
 interface FreeShippingProgressBarProps {
   currentAmount: number;
@@ -8,11 +15,13 @@ interface FreeShippingProgressBarProps {
 
 export function FreeShippingProgressBar({
   currentAmount,
-  threshold = 1000000
+  threshold
 }: FreeShippingProgressBarProps) {
-  const progress = Math.min((currentAmount / threshold) * 100, 100);
-  const remaining = Math.max(threshold - currentAmount, 0);
-  const isEligible = currentAmount >= threshold;
+  const { settings } = usePage<{ settings: FreeShippingProgressBarSettings }>().props;
+  const actualThreshold = threshold ?? settings.shipping.free_threshold;
+  const progress = Math.min((currentAmount / actualThreshold) * 100, 100);
+  const remaining = Math.max(actualThreshold - currentAmount, 0);
+  const isEligible = currentAmount >= actualThreshold;
 
   return (
     <div className="space-y-2">
@@ -33,7 +42,7 @@ export function FreeShippingProgressBar({
         <Truck className={`h-4 w-4 ${isEligible ? 'text-green-600' : 'text-slate-500'}`} />
         {isEligible ? (
           <p className="text-green-600 dark:text-green-500 font-medium">
-            🎉 Bạn được miễn phí vận chuyển!
+            Bạn được miễn phí vận chuyển! 🎉
           </p>
         ) : (
           <p className="text-slate-600 dark:text-slate-400">

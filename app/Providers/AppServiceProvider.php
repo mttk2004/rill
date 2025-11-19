@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Setting;
+use App\Observers\SettingObserver;
 use Illuminate\Support\ServiceProvider;
 use Godruoyi\Snowflake\Snowflake;
 use Godruoyi\Snowflake\LaravelSequenceResolver;
@@ -26,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register model observers
+        Setting::observe(SettingObserver::class);
+
         if($this->app->environment('production')) {
             URL::forceScheme('https');
         }

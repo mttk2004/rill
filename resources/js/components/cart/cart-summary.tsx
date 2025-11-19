@@ -3,9 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingCart } from "lucide-react";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { formatVND } from '@/lib/utils';
 import { FreeShippingProgressBar } from './free-shipping-progress-bar';
+
+interface CartSummarySettings {
+  shipping: {
+    free_threshold: number;
+    estimate_min_days: number;
+    estimate_max_days: number;
+  };
+  policy: {
+    return_days: number;
+  };
+}
 
 interface CartSummaryProps {
   cartSummary: {
@@ -16,6 +27,8 @@ interface CartSummaryProps {
 }
 
 export function CartSummary({ cartSummary }: CartSummaryProps) {
+  const { settings } = usePage<{ settings: CartSummarySettings }>().props;
+
   return (
     <div className="sticky top-4 space-y-4">
       {/* Order Summary */}
@@ -83,19 +96,19 @@ export function CartSummary({ cartSummary }: CartSummaryProps) {
           <div className="flex items-start gap-2 text-xs">
             <span className="text-green-600">✓</span>
             <p className="text-slate-600 dark:text-slate-300">
-              Miễn phí vận chuyển cho đơn hàng trên 1.000.000₫
+              Miễn phí vận chuyển cho đơn hàng trên {settings.shipping.free_threshold.toLocaleString('vi-VN')}₫
             </p>
           </div>
           <div className="flex items-start gap-2 text-xs">
             <span className="text-blue-600">✓</span>
             <p className="text-slate-600 dark:text-slate-300">
-              Giao hàng trong 3-5 ngày làm việc
+              Giao hàng trong {settings.shipping.estimate_min_days}-{settings.shipping.estimate_max_days} ngày làm việc
             </p>
           </div>
           <div className="flex items-start gap-2 text-xs">
             <span className="text-amber-600">✓</span>
             <p className="text-slate-600 dark:text-slate-300">
-              Đổi trả miễn phí trong 30 ngày
+              Đổi trả miễn phí trong {settings.policy.return_days} ngày
             </p>
           </div>
         </CardContent>

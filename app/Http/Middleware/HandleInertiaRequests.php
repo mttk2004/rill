@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\CartService;
+use App\Services\SettingService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -70,6 +71,25 @@ class HandleInertiaRequests extends Middleware
                             ],
                         ];
                     }),
+                ];
+            },
+            'settings' => function () {
+                $settingService = app(SettingService::class);
+                return [
+                    'banner' => [
+                        'enabled' => $settingService->get('banner_enabled', false),
+                        'content' => $settingService->get('banner_content', ''),
+                        'type' => $settingService->get('banner_type', 'info'),
+                    ],
+                    'shipping' => [
+                        'free_threshold' => $settingService->get('shipping_free_threshold', 1000000),
+                        'estimate_min_days' => $settingService->get('shipping_estimate_min_days', 2),
+                        'estimate_max_days' => $settingService->get('shipping_estimate_max_days', 5),
+                    ],
+                    'policy' => [
+                        'return_days' => $settingService->get('return_policy_days', 7),
+                        'return_condition' => $settingService->get('return_policy_condition', 'lỗi nhà sản xuất'),
+                    ],
                 ];
             },
         ];
