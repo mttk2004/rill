@@ -82,10 +82,17 @@ export function useToastRouter() {
           const currentPath = window.location.pathname;
           if (currentPath === '/login' || currentPath === '/register') {
             if (currentPath !== startPath) {
-              // We were redirected to login/register - dismiss pending toast
+              // We were redirected to login/register - dismiss pending toast and show info
               isRedirecting = true;
               if (pendingToastId) {
-                toast.dismiss(pendingToastId);
+                toast.update(pendingToastId, {
+                  render: 'Vui lòng đăng nhập để tiếp tục',
+                  type: 'info',
+                  isLoading: false,
+                  autoClose: 4000,
+                });
+              } else {
+                toast.info('Vui lòng đăng nhập để tiếp tục');
               }
               reject(new Error('REDIRECT'));
               return;
@@ -151,7 +158,14 @@ export function useToastRouter() {
           if (!hasCompleted && currentPath !== startPath && (currentPath === '/login' || currentPath === '/register')) {
             isRedirecting = true;
             if (pendingToastId) {
-              toast.dismiss(pendingToastId);
+              toast.update(pendingToastId, {
+                render: 'Vui lòng đăng nhập để tiếp tục',
+                type: 'info',
+                isLoading: false,
+                autoClose: 4000,
+              });
+            } else {
+              toast.info('Vui lòng đăng nhập để tiếp tục');
             }
             reject(new Error('REDIRECT'));
           }
