@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { Product } from "@/types";
 import ReactMarkdown from 'react-markdown';
+import { Link } from '@inertiajs/react';
 
 interface ProductInfoHeaderProps {
   product: Product & {
@@ -22,9 +23,12 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
       <div className="flex items-center gap-2">
         {product.artists?.map((artist, index) => (
           <span key={artist.id}>
-            <span className="text-lg text-accent hover:underline cursor-pointer">
+            <Link
+              href={`/products?artist=${encodeURIComponent(artist.name)}`}
+              className="text-lg text-accent hover:underline cursor-pointer"
+            >
               {artist.name}
-            </span>
+            </Link>
             {index < product.artists.length - 1 && (
               <span className="text-muted-foreground">, </span>
             )}
@@ -47,8 +51,16 @@ export function ProductInfoHeader({ product }: ProductInfoHeaderProps) {
           {averageRating.toFixed(1)} ({reviewCount})
         </span>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">{product.genre}</Badge>
-          <Badge variant="outline" className="text-xs">{product.label}</Badge>
+          <Link href={`/products?label=${encodeURIComponent(product.label)}`}>
+            <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+              {product.label}
+            </Badge>
+          </Link>
+          <Link href={`/products?genre=${encodeURIComponent(product.genre)}`}>
+            <Badge variant="outline" className="text-xs hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer">
+              {product.genre}
+            </Badge>
+          </Link>
         </div>
       </div>
 
