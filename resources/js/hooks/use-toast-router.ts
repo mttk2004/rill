@@ -11,6 +11,7 @@ interface RouterOptions {
   preserveScroll?: boolean;
   preserveState?: boolean;
   only?: string[];
+  onBefore?: () => boolean | void;
   onSuccess?: (response: unknown) => void;
   onError?: (errors: Record<string, unknown>) => void;
   onFinish?: () => void;
@@ -46,18 +47,29 @@ export function useToastRouter() {
     messages: ToastMessages,
     options: RouterOptions = {}
   ) => {
+    let isRedirecting = false;
+    let hasCompleted = false;
+
     const promise = new Promise((resolve, reject) => {
       const requestData = method === 'delete' ? undefined : data;
 
       // Add timeout to prevent hanging forever
       const timeout = setTimeout(() => {
-        reject(new Error('Request timeout - no response from server'));
+        if (!isRedirecting && !hasCompleted) {
+          reject(new Error('Request timeout - no response from server'));
+        }
       }, 30000); // 30 second timeout
 
       router[method](url, requestData as never, {
         ...options,
+        onBefore: () => {
+          if (options.onBefore) {
+            return (options.onBefore as () => boolean | void)();
+          }
+        },
         onSuccess: (response: unknown) => {
           clearTimeout(timeout);
+          hasCompleted = true;
           resolve(response);
           if (options.onSuccess) {
             options.onSuccess(response);
@@ -65,6 +77,7 @@ export function useToastRouter() {
         },
         onError: (errors: Record<string, unknown>) => {
           clearTimeout(timeout);
+          hasCompleted = true;
           // Extract first error message
           const errorMessage = errors.message || Object.values(errors)[0];
           reject(new Error(typeof errorMessage === 'string' ? errorMessage : 'An error occurred'));
@@ -73,33 +86,59 @@ export function useToastRouter() {
           }
         },
         onFinish: () => {
+          clearTimeout(timeout);
+          
+          // Check if we were redirected (likely to login page)
+          // If current URL changed to /login and we haven't completed, it's a redirect
+          if (!hasCompleted && (window.location.pathname === '/login' || window.location.pathname === '/register')) {
+            isRedirecting = true;
+            // Reject silently to stop toast promise
+            reject(new Error('REDIRECT'));
+          }
+          
           if (options.onFinish) {
             options.onFinish();
           }
         },
       } as never);
     }).catch((error) => {
+      // Don't throw if we're redirecting
+      if (isRedirecting || (error as Error).message === 'REDIRECT') {
+        return Promise.reject(new Error('REDIRECT'));
+      }
       throw error;
     });
 
-    toast.promise(promise, {
-      pending: messages.pending || 'Processing...',
-      success: messages.success,
-      error: {
-        render({ data }: { data: Error | unknown }) {
-          if (typeof messages.error === 'function') {
-            return messages.error(data);
-          }
-          if (typeof messages.error === 'string') {
-            return messages.error;
-          }
-          const error = data as Error;
-          return error?.message || 'An error occurred';
+    // Only show toast if we have a pending message
+    if (messages.pending) {
+      toast.promise(promise, {
+        pending: messages.pending,
+        success: messages.success,
+        error: {
+          render({ data }: { data: Error | unknown }) {
+            const error = data as Error;
+            // Don't show error toast for redirects
+            if (error?.message === 'REDIRECT') {
+              return null;
+            }
+            if (typeof messages.error === 'function') {
+              return messages.error(data);
+            }
+            if (typeof messages.error === 'string') {
+              return messages.error;
+            }
+            return error?.message || 'An error occurred';
+          },
         },
-      },
-    });
+      });
+    }
 
-    return promise;
+    return promise.catch(() => {
+      // Suppress redirect errors
+      if (isRedirecting) {
+        return;
+      }
+    });
   };
 
   return {
