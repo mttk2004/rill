@@ -73,7 +73,7 @@ export function useToastRouter() {
         },
         onSuccess: (response: unknown) => {
           clearTimeout(timeout);
-          
+
           // Check if path changed to login/register (auth redirect)
           const currentPath = window.location.pathname;
           if (currentPath === '/login' || currentPath === '/register') {
@@ -84,7 +84,7 @@ export function useToastRouter() {
               return;
             }
           }
-          
+
           hasCompleted = true;
           resolve(response);
           if (options.onSuccess) {
