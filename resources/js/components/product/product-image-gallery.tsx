@@ -17,18 +17,28 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 0.5, 3));
+    setZoomLevel(prev => Math.min(prev + 0.25, 3));
   };
 
   const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 0.5, 1));
-    if (zoomLevel <= 1.5) {
+    setZoomLevel(prev => Math.max(prev - 0.25, 0.25));
+    if (zoomLevel <= 1) {
       setPosition({ x: 0, y: 0 });
     }
   };
 
   const handleReset = () => {
     setZoomLevel(1);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const handleZoom50 = () => {
+    setZoomLevel(0.5);
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const handleZoom25 = () => {
+    setZoomLevel(0.25);
     setPosition({ x: 0, y: 0 });
   };
 
@@ -107,7 +117,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
                 variant="ghost"
                 className="h-8 w-8 p-0 text-white hover:bg-white/20"
                 onClick={handleZoomOut}
-                disabled={zoomLevel <= 1}
+                disabled={zoomLevel <= 0.25}
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
@@ -123,15 +133,35 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
               >
                 <ZoomIn className="h-4 w-4" />
               </Button>
-              {zoomLevel > 1 && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 px-3 text-white hover:bg-white/20 text-xs"
-                  onClick={handleReset}
-                >
-                  Đặt lại
-                </Button>
+              {zoomLevel !== 1 && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 px-2 text-white hover:bg-white/20 text-xs"
+                    onClick={handleZoom25}
+                    disabled={zoomLevel === 0.25}
+                  >
+                    25%
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 px-2 text-white hover:bg-white/20 text-xs"
+                    onClick={handleZoom50}
+                    disabled={zoomLevel === 0.5}
+                  >
+                    50%
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 px-2 text-white hover:bg-white/20 text-xs"
+                    onClick={handleReset}
+                  >
+                    100%
+                  </Button>
+                </>
               )}
             </div>
             <Button
