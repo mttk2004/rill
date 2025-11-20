@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingCart } from "lucide-react";
 import { router, usePage } from "@inertiajs/react";
@@ -49,10 +48,6 @@ export function CartSummary({ cartSummary }: CartSummaryProps) {
             <span className="text-slate-600 dark:text-slate-300">Tạm tính ({cartSummary.total_items} sản phẩm)</span>
             <span className="font-semibold text-slate-900 dark:text-white">{formatVND(cartSummary.total_amount)}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-600 dark:text-slate-300">Phí vận chuyển</span>
-            <span className="font-semibold text-green-600">Miễn phí</span>
-          </div>
           <Separator />
           <div className="flex justify-between text-lg font-bold">
             <span className="text-slate-900 dark:text-white">Tổng cộng</span>
@@ -65,28 +60,6 @@ export function CartSummary({ cartSummary }: CartSummaryProps) {
           >
             Tiến hành thanh toán
           </Button>
-        </CardContent>
-      </Card>
-
-      {/* Discount Code */}
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base text-slate-900 dark:text-white">Mã giảm giá</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Nhập mã giảm giá"
-              className="text-sm"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-amber-200 text-amber-600 hover:bg-amber-50"
-            >
-              Áp dụng
-            </Button>
-          </div>
         </CardContent>
       </Card>
 
