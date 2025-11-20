@@ -29,9 +29,3 @@ Route::get('/categories/menu-data', [CategoryController::class, 'getMenuData'])-
 Route::get('/provinces', [AddressDataController::class, 'getProvinces'])->name('api.provinces');
 Route::get('/districts', [AddressDataController::class, 'getDistricts'])->name('api.districts');
 Route::get('/wards', [AddressDataController::class, 'getWards'])->name('api.wards');
-
-// Voucher routes
-Route::middleware('auth')->group(function () {
-    Route::get('/vouchers/available', [VoucherController::class, 'available'])->name('api.vouchers.available');
-    Route::post('/vouchers/validate', [VoucherController::class, 'validate'])->name('api.vouchers.validate');
-});

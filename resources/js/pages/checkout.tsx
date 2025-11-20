@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { formatVND } from '@/lib/utils';
 import { useToastRouter } from '@/hooks/use-toast-router';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 interface CheckoutSettings {
   shipping: {
@@ -200,9 +200,7 @@ export default function Checkout() {
     } finally {
       setIsValidatingVoucher(false);
     }
-  };
-
-  // Remove applied voucher
+  };  // Remove applied voucher
   const handleRemoveVoucher = () => {
     setAppliedVoucher(null);
   };

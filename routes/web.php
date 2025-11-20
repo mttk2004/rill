@@ -51,6 +51,11 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     // Checkout and Order Placement
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::post('/checkout/shipping-fee', [ShippingController::class, 'calculate'])->name('checkout.shipping-fee');
+
+    // Voucher API endpoints (using web middleware for session auth)
+    Route::get('/api/vouchers/available', [App\Http\Controllers\Api\VoucherController::class, 'available'])->name('api.vouchers.available');
+    Route::post('/api/vouchers/validate', [App\Http\Controllers\Api\VoucherController::class, 'validate'])->name('api.vouchers.validate');
+
     Route::post('/orders', [CheckoutController::class, 'store'])->name('orders.store');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
