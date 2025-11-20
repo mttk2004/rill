@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Package, Truck, CheckCircle, Clock, ArrowLeft, X, Download, MessageCircle, Disc3, Music2, Star, AlertTriangle } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, ArrowLeft, X, Download, MessageCircle, Disc3, Music2, Star, AlertTriangle, Camera } from "lucide-react";
 import { Link, Head } from "@inertiajs/react";
 import { route } from 'ziggy-js';
 import AppLayout from '@/layouts/app-layout';
@@ -27,9 +27,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from 'react-toastify';
 import { useToastRouter } from '@/hooks/use-toast-router';
+import imageCompression from 'browser-image-compression';
 
 interface Product {
   id: number;
@@ -44,6 +45,7 @@ interface Product {
     id: number;
     rating: number;
     comment: string;
+    images?: string[];
   } | null;
 }
 
@@ -160,7 +162,11 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
   const [selectedProductForReview, setSelectedProductForReview] = useState<Product | null>(null);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
+  const [reviewImages, setReviewImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]); // Track existing server images
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle cancel order
   const handleCancelOrder = () => {
@@ -226,12 +232,18 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
     const isUpdating = !!selectedProductForReview.user_review;
     setIsSubmitting(true);
 
+    // Create FormData to support file uploads
+    // Include existing image URLs that should be kept
+    const formData = {
+      rating: reviewRating,
+      comment: reviewComment,
+      images: reviewImages,
+      existing_images: existingImageUrls,
+    };
+
     toastRouter.post(
       route('products.reviews.store', { product: selectedProductForReview.slug }),
-      {
-        rating: reviewRating,
-        comment: reviewComment,
-      },
+      formData,
       {
         pending: 'Đang gửi đánh giá...',
         success: isUpdating
@@ -245,6 +257,9 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
           setSelectedProductForReview(null);
           setReviewRating(5);
           setReviewComment('');
+          setReviewImages([]);
+          setImagePreviews([]);
+          setExistingImageUrls([]);
         },
         onError: () => {
           // Error is already handled by toast
@@ -264,9 +279,21 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
     if (product.user_review) {
       setReviewRating(product.user_review.rating);
       setReviewComment(product.user_review.comment);
+      // Show existing images as previews
+      if (product.user_review.images && product.user_review.images.length > 0) {
+        setExistingImageUrls(product.user_review.images);
+        setImagePreviews([]); // Clear new image previews
+      } else {
+        setExistingImageUrls([]);
+        setImagePreviews([]);
+      }
+      setReviewImages([]); // No new images yet
     } else {
       setReviewRating(5);
       setReviewComment('');
+      setReviewImages([]);
+      setImagePreviews([]);
+      setExistingImageUrls([]);
     }
     setShowReviewDialog(true);
   };
@@ -718,6 +745,122 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                 />
                 <p className="text-xs text-slate-500">
                   Tối thiểu 10 ký tự, tối đa 5000 ký tự
+                </p>
+              </div>
+
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <Label>Hình ảnh sản phẩm (tùy chọn)</Label>
+                <div className="flex flex-wrap gap-2">
+                  {/* Upload button */}
+                  {(existingImageUrls.length + reviewImages.length) < 5 && (
+                    <label className="cursor-pointer border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg p-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex flex-col items-center justify-center w-20 h-20">
+                      <Camera className="w-5 h-5 text-slate-400 mb-1" />
+                      <span className="text-xs text-slate-400">Thêm ảnh</span>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/jpeg,image/png,image/jpg,image/webp"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const files = e.target.files;
+                          if (!files) return;
+
+                          const newImages = [...reviewImages];
+                          const newPreviews = [...imagePreviews];
+                          const currentTotal = existingImageUrls.length + newImages.length;
+
+                          for (let i = 0; i < files.length; i++) {
+                            if (currentTotal + i >= 5) {
+                              toast.warning('Bạn chỉ có thể tải lên tối đa 5 ảnh');
+                              break;
+                            }
+
+                            const file = files[i];
+
+                            try {
+                              // Compress image
+                              const compressedFile = await imageCompression(file, {
+                                maxSizeMB: 1,
+                                maxWidthOrHeight: 1920,
+                              });
+
+                              newImages.push(compressedFile);
+                              newPreviews.push(URL.createObjectURL(compressedFile));
+                            } catch (error) {
+                              console.error('Error compressing image:', error);
+                              // If compression fails, use original file
+                              newImages.push(file);
+                              newPreviews.push(URL.createObjectURL(file));
+                            }
+                          }
+
+                          setReviewImages(newImages);
+                          setImagePreviews(newPreviews);
+
+                          // Reset input
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        }}
+                        disabled={isSubmitting}
+                      />
+                    </label>
+                  )}
+
+                  {/* Existing images from server */}
+                  {existingImageUrls.map((url, idx) => (
+                    <div key={`existing-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-amber-300 dark:border-amber-700">
+                      <img
+                        src={url}
+                        alt={`Existing ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newExisting = existingImageUrls.filter((_, i) => i !== idx);
+                          setExistingImageUrls(newExisting);
+                        }}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg"
+                        disabled={isSubmitting}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* New image previews */}
+                  {imagePreviews.map((src, idx) => (
+                    <div key={`new-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                      <img
+                        src={src}
+                        alt={`Preview ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newImages = reviewImages.filter((_, i) => i !== idx);
+                          const newPreviews = imagePreviews.filter((_, i) => i !== idx);
+
+                          // Revoke object URL to free memory
+                          URL.revokeObjectURL(imagePreviews[idx]);
+
+                          setReviewImages(newImages);
+                          setImagePreviews(newPreviews);
+                        }}
+                        className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg"
+                        disabled={isSubmitting}
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-500">
+                  Tối đa 5 ảnh, mỗi ảnh không quá 2MB (JPEG, PNG, WebP)
                 </p>
               </div>
             </div>

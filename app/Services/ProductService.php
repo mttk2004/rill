@@ -270,6 +270,7 @@ class ProductService
                     'id' => $review->id,
                     'rating' => $review->rating,
                     'comment' => $review->comment,
+                    'images' => $review->images, // Accessor will convert to full URLs
                     'created_at' => $review->created_at->format('d/m/Y'),
                     'user' => [
                         'name' => $review->user->name,
@@ -300,6 +301,7 @@ class ProductService
                     'id' => $existingReview->id,
                     'rating' => $existingReview->rating,
                     'comment' => $existingReview->comment,
+                    'images' => $existingReview->images, // Accessor will convert to full URLs
                 ];
             }
         }

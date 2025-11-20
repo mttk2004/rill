@@ -33,6 +33,7 @@ class OrderItemResource extends JsonResource
                     'id' => $review->id,
                     'rating' => $review->rating,
                     'comment' => $review->comment,
+                    'images' => $review->images, // Accessor will convert to full URLs
                 ] : null;
             }, null),
         ];

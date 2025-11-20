@@ -28,7 +28,24 @@ class StoreProductReviewRequest extends FormRequest
             'comment' => ['required', 'string', 'min:10', 'max:5000'],
             'images' => ['nullable', 'array', 'max:5'],
             'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'existing_images' => ['nullable', 'array', 'max:5'],
+            'existing_images.*' => ['string', 'url'],
         ];
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $existingCount = is_array($this->existing_images) ? count($this->existing_images) : 0;
+            $newCount = is_array($this->images) ? count($this->images) : 0;
+
+            if ($existingCount + $newCount > 5) {
+                $validator->errors()->add('images', 'Tổng số ảnh không được vượt quá 5.');
+            }
+        });
     }
 
     /**

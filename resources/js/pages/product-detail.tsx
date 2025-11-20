@@ -32,6 +32,7 @@ interface ProductReview {
   };
   rating: number;
   comment: string;
+  images?: string[];
   created_at: string;
 }
 
@@ -75,6 +76,7 @@ export default function ProductDetail({ product, relatedProducts = [], openRevie
     rating: product.user_review?.rating || 5,
     comment: product.user_review?.comment || '',
     images: [] as File[],
+    existing_images: product.user_review?.images || [],
   });
 
   useEffect(() => {
@@ -217,12 +219,14 @@ export default function ProductDetail({ product, relatedProducts = [], openRevie
                       rating={data.rating}
                       comment={data.comment}
                       images={data.images}
+                      existingImages={data.existing_images}
                       processing={processing}
                       errors={errors}
                       formRef={reviewFormRef}
                       onRatingChange={(rating) => setData('rating', rating)}
                       onCommentChange={(comment) => setData('comment', comment)}
                       onImagesChange={(images) => setData('images', images)}
+                      onExistingImagesChange={(urls) => setData('existing_images', urls)}
                       onSubmit={handleSubmitReview}
                     />
                   )}

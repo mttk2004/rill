@@ -16,12 +16,14 @@ interface ReviewFormProps {
   rating: number;
   comment: string;
   images: File[];
+  existingImages: string[];
   processing: boolean;
   errors: { comment?: string; images?: string };
   formRef: RefObject<HTMLTextAreaElement | null>;
   onRatingChange: (rating: number) => void;
   onCommentChange: (comment: string) => void;
   onImagesChange: (images: File[]) => void;
+  onExistingImagesChange: (urls: string[]) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -30,12 +32,14 @@ export function ReviewForm({
   rating,
   comment,
   images,
+  existingImages,
   processing,
   errors,
   formRef,
   onRatingChange,
   onCommentChange,
   onImagesChange,
+  onExistingImagesChange,
   onSubmit,
 }: ReviewFormProps) {
   const [previews, setPreviews] = useState<string[]>([]);
@@ -58,9 +62,10 @@ export function ReviewForm({
 
     const newImages = [...images];
     const newPreviews = [...previews];
+    const currentTotal = existingImages.length + newImages.length;
 
     for (let i = 0; i < files.length; i++) {
-      if (newImages.length >= 5) {
+      if (currentTotal + i >= 5) {
         alert('Bạn chỉ có thể tải lên tối đa 5 ảnh');
         break;
       }
@@ -167,7 +172,7 @@ export function ReviewForm({
           </label>
           <div className="flex flex-wrap gap-2">
             {/* Upload button */}
-            {images.length < 5 && (
+            {(existingImages.length + images.length) < 5 && (
               <label className="cursor-pointer border-2 border-dashed border-amber-300 dark:border-amber-700 rounded-lg p-4 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors flex flex-col items-center justify-center w-20 h-20">
                 <Camera className="w-6 h-6 text-amber-600 dark:text-amber-400 mb-1" />
                 <span className="text-xs text-amber-600 dark:text-amber-400">Thêm ảnh</span>
@@ -183,9 +188,31 @@ export function ReviewForm({
               </label>
             )}
 
-            {/* Image previews */}
+            {/* Existing images from server */}
+            {existingImages.map((url, idx) => (
+              <div key={`existing-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-amber-300 dark:border-amber-700">
+                <img
+                  src={url}
+                  alt={`Existing ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newExisting = existingImages.filter((_, i) => i !== idx);
+                    onExistingImagesChange(newExisting);
+                  }}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg"
+                  disabled={processing}
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+
+            {/* New image previews */}
             {previews.map((src, idx) => (
-              <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-amber-200 dark:border-amber-800">
+              <div key={`new-${idx}`} className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-amber-200 dark:border-amber-800">
                 <img
                   src={src}
                   alt={`Preview ${idx + 1}`}

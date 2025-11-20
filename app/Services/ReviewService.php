@@ -67,6 +67,23 @@ class ReviewService
 
         // Handle image uploads
         $imagePaths = [];
+
+        // Get existing image paths from URLs (for updates)
+        if (isset($data['existing_images']) && is_array($data['existing_images'])) {
+            $supabaseUrl = env('SUPABASE_URL');
+            $bucket = env('SUPABASE_BUCKET');
+            $baseUrl = "{$supabaseUrl}/storage/v1/object/public/{$bucket}/";
+
+            foreach ($data['existing_images'] as $url) {
+                // Extract path from URL
+                if (str_starts_with($url, $baseUrl)) {
+                    $path = str_replace($baseUrl, '', $url);
+                    $imagePaths[] = $path;
+                }
+            }
+        }
+
+        // Add new uploaded images
         if (isset($data['images']) && is_array($data['images'])) {
             foreach ($data['images'] as $image) {
                 if ($image instanceof \Illuminate\Http\UploadedFile) {
@@ -88,7 +105,7 @@ class ReviewService
             $existingReview->update([
                 'rating' => $data['rating'],
                 'comment' => $data['comment'],
-                'images' => !empty($imagePaths) ? $imagePaths : $existingReview->getRawOriginal('images'),
+                'images' => !empty($imagePaths) ? $imagePaths : null,
             ]);
 
             return ServiceResponse::success(
