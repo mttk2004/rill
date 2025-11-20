@@ -124,17 +124,41 @@ class VoucherService
         }
 
         if ($userId !== null) {
-            // Exclude vouchers that user has reached usage limit
-            $query->where(function ($q) use ($userId) {
-                $q->whereNull('usage_limit_per_user')
-                    ->orWhereDoesntHave('usages', function ($subQ) use ($userId) {
-                        $subQ->where('user_id', $userId)
-                            ->havingRaw('COUNT(*) >= vouchers.usage_limit_per_user');
-                    });
-            });
+            // Add count of user's usages
+            $query->withCount(['usages as user_usage_count' => function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            }]);
         }
 
-        return $query->orderBy('value', 'desc')->get();
+        // Debug logging
+        \Log::info('Voucher Query Debug', [
+            'userId' => $userId,
+            'orderTotal' => $orderTotal,
+            'query' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+            'now' => now()->toDateTimeString(),
+        ]);
+
+        $vouchers = $query->orderBy('value', 'desc')->get();
+
+        // Filter out vouchers where user has reached their limit
+        if ($userId !== null) {
+            $vouchers = $vouchers->filter(function ($voucher) {
+                // If no per-user limit, include it
+                if ($voucher->usage_limit_per_user === null) {
+                    return true;
+                }
+                // Check if user hasn't reached their limit
+                return $voucher->user_usage_count < $voucher->usage_limit_per_user;
+            })->values();
+        }
+
+        \Log::info('Vouchers Found', [
+            'count' => $vouchers->count(),
+            'vouchers' => $vouchers->toArray(),
+        ]);
+
+        return $vouchers;
     }
 
     /**

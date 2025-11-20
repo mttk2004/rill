@@ -147,6 +147,8 @@ export default function Checkout() {
         const response = await axios.get('/api/vouchers/available', {
           params: { order_total: cartSummary.total_amount },
         });
+        console.log('Vouchers API Response:', response.data);
+        console.log('Available vouchers:', response.data.data.vouchers);
         setAvailableVouchers(response.data.data.vouchers);
       } catch (error) {
         console.error('Error fetching vouchers:', error);

@@ -50,3 +50,48 @@ Route::get('/test/email/order-status', function () {
 
     return 'Order status email queued successfully! Email will be sent to: ' . $order->user->email . '<br><br>Run "php artisan queue:work" to process the job.<br><br><a href="/test/email">← Back to dashboard</a>';
 })->name('test.email.order');
+
+// Test Voucher Debug
+Route::get('/test/vouchers/debug', function () {
+    $voucherService = app(\App\Services\VoucherService::class);
+
+    // Get all vouchers
+    $allVouchers = \App\Models\Voucher::all();
+
+    // Get RILLNEW voucher
+    $rillnewVoucher = \App\Models\Voucher::where('code', 'RILLNEW')->first();
+
+    // Get available vouchers (no filter)
+    $availableNoFilter = $voucherService->getAvailableVouchers();
+
+    // Get available vouchers with user and order total
+    $availableWithUser = $voucherService->getAvailableVouchers(auth()->id(), 100000);
+
+    return response()->json([
+        'all_vouchers_count' => $allVouchers->count(),
+        'all_vouchers' => $allVouchers->map(fn($v) => [
+            'code' => $v->code,
+            'name' => $v->name,
+            'is_active' => $v->is_active,
+            'valid_from' => $v->valid_from->toDateTimeString(),
+            'valid_to' => $v->valid_to->toDateTimeString(),
+            'usage_limit_per_user' => $v->usage_limit_per_user,
+        ]),
+        'rillnew_voucher' => $rillnewVoucher ? [
+            'code' => $rillnewVoucher->code,
+            'name' => $rillnewVoucher->name,
+            'is_active' => $rillnewVoucher->is_active,
+            'is_valid' => $rillnewVoucher->isValid(),
+        ] : null,
+        'available_no_filter_count' => $availableNoFilter->count(),
+        'available_no_filter' => $availableNoFilter->map(fn($v) => $v->code),
+        'available_with_user_count' => $availableWithUser->count(),
+        'available_with_user' => $availableWithUser->map(fn($v) => [
+            'code' => $v->code,
+            'user_usage_count' => $v->user_usage_count ?? 0,
+            'usage_limit_per_user' => $v->usage_limit_per_user,
+        ]),
+        'user_id' => auth()->id(),
+        'now' => now()->toDateTimeString(),
+    ]);
+})->middleware('auth')->name('test.vouchers.debug');
