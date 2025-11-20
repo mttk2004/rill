@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ShippingAddress;
 use App\Services\CartService;
+use App\Services\SettingService;
 use App\Services\ShippingService;
 use Illuminate\Http\Request;
 
@@ -16,12 +17,14 @@ class ShippingController extends Controller
      * @param Request $request
      * @param CartService $cartService
      * @param ShippingService $shippingService
+     * @param SettingService $settingService
      * @return \Illuminate\Http\JsonResponse
      */
     public function calculate(
         Request $request,
         CartService $cartService,
-        ShippingService $shippingService
+        ShippingService $shippingService,
+        SettingService $settingService
     ) {
         $request->validate([
             'address_id' => 'required|exists:shipping_addresses,id'
@@ -66,9 +69,12 @@ class ShippingController extends Controller
             $estimatedWeight
         );
 
+        // Get dynamic free shipping threshold
+        $freeShippingThreshold = $settingService->get('shipping_free_threshold', 1000000);
+
         return response()->json([
             'shipping_fee' => $shippingFee,
-            'is_free_shipping' => $cartTotal >= 1000000,
+            'is_free_shipping' => $cartTotal >= $freeShippingThreshold,
             'cart_total' => $cartTotal,
             'total_amount' => $cartTotal + $shippingFee,
         ]);

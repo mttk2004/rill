@@ -14,9 +14,11 @@ class ShippingService
     protected $fromDistrictId;
     protected $fromWardCode;
     protected $apiUrl;
+    protected $settingService;
 
-    public function __construct()
+    public function __construct(SettingService $settingService)
     {
+        $this->settingService = $settingService;
         $this->token = config('ghn.api_token');
         $this->shopId = config('ghn.shop_id');
         $this->fromDistrictId = (int) config('ghn.shop_district_id');
@@ -26,7 +28,7 @@ class ShippingService
 
     /**
      * Calculate shipping fee based on address and cart total.
-     * Free shipping for orders >= 1,000,000 VND
+     * Free shipping for orders >= dynamic threshold from settings
      *
      * @param ShippingAddress $toAddress
      * @param int $cartTotalInVND
@@ -38,8 +40,10 @@ class ShippingService
         int $cartTotalInVND,
         int $totalWeight = 1000
     ): int {
-        // Free shipping for orders >= 1,000,000 VND
-        if ($cartTotalInVND >= 1000000) {
+        // Get dynamic free shipping threshold from settings
+        $freeShippingThreshold = $this->settingService->get('shipping_free_threshold', 1000000);
+
+        if ($cartTotalInVND >= $freeShippingThreshold) {
             return 0;
         }
 
