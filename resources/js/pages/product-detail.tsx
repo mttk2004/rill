@@ -74,6 +74,7 @@ export default function ProductDetail({ product, relatedProducts = [], openRevie
   const { data, setData, post, processing, errors, reset } = useForm({
     rating: product.user_review?.rating || 5,
     comment: product.user_review?.comment || '',
+    images: [] as File[],
   });
 
   useEffect(() => {
@@ -215,11 +216,13 @@ export default function ProductDetail({ product, relatedProducts = [], openRevie
                       userReview={product.user_review}
                       rating={data.rating}
                       comment={data.comment}
+                      images={data.images}
                       processing={processing}
                       errors={errors}
                       formRef={reviewFormRef}
                       onRatingChange={(rating) => setData('rating', rating)}
                       onCommentChange={(comment) => setData('comment', comment)}
+                      onImagesChange={(images) => setData('images', images)}
                       onSubmit={handleSubmitReview}
                     />
                   )}

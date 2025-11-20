@@ -50,7 +50,7 @@ class ReviewService
      *
      * @param User $user
      * @param Product $product
-     * @param array $data Array with 'rating' and 'comment' keys
+     * @param array $data Array with 'rating', 'comment', and optional 'images' keys
      * @return ServiceResponse
      */
     public function createOrUpdateReview(User $user, Product $product, array $data): ServiceResponse
@@ -65,6 +65,19 @@ class ReviewService
             );
         }
 
+        // Handle image uploads
+        $imagePaths = [];
+        if (isset($data['images']) && is_array($data['images'])) {
+            foreach ($data['images'] as $image) {
+                if ($image instanceof \Illuminate\Http\UploadedFile) {
+                    // Store image to Supabase in 'reviews' folder
+                    // File name will be automatically hashed
+                    $path = $image->store('reviews', 'supabase');
+                    $imagePaths[] = $path;
+                }
+            }
+        }
+
         // Check for existing review
         $existingReview = ProductReview::where('user_id', $user->id)
             ->where('product_id', $product->id)
@@ -75,6 +88,7 @@ class ReviewService
             $existingReview->update([
                 'rating' => $data['rating'],
                 'comment' => $data['comment'],
+                'images' => !empty($imagePaths) ? $imagePaths : $existingReview->getRawOriginal('images'),
             ]);
 
             return ServiceResponse::success(
@@ -90,6 +104,7 @@ class ReviewService
             'order_item_id' => $orderItem->id,
             'rating' => $data['rating'],
             'comment' => $data['comment'],
+            'images' => !empty($imagePaths) ? $imagePaths : null,
         ]);
 
         return ServiceResponse::success(

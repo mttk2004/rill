@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Star } from "lucide-react";
+import { useState } from "react";
 
 interface ProductReview {
   id: string;
@@ -9,6 +11,7 @@ interface ProductReview {
   };
   rating: number;
   comment: string;
+  images?: string[];
   created_at: string;
 }
 
@@ -19,6 +22,8 @@ interface ReviewListProps {
 }
 
 export function ReviewList({ reviews, selectedRatingFilter, onClearFilter }: ReviewListProps) {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   const filteredReviews = selectedRatingFilter
     ? reviews.filter((review) => review.rating === selectedRatingFilter)
     : reviews;
@@ -101,6 +106,37 @@ export function ReviewList({ reviews, selectedRatingFilter, onClearFilter }: Rev
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
                     {review.comment}
                   </p>
+
+                  {/* Review Images */}
+                  {review.images && review.images.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {review.images.map((image, idx) => (
+                        <Dialog key={idx}>
+                          <DialogTrigger asChild>
+                            <button
+                              onClick={() => setSelectedImage(image)}
+                              className="relative w-20 h-20 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-amber-500 dark:hover:border-amber-500 transition-colors cursor-pointer group"
+                            >
+                              <img
+                                src={image}
+                                alt={`Review image ${idx + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                              />
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl p-0">
+                            <div className="relative">
+                              <img
+                                src={selectedImage || image}
+                                alt={`Review image ${idx + 1} - Full size`}
+                                className="w-full h-auto max-h-[80vh] object-contain"
+                              />
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
