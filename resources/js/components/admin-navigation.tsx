@@ -25,6 +25,7 @@ const adminNavItems = [
   { name: "Nghệ sĩ", href: "/admin/artists", icon: Music },
   { name: "Voucher", href: "/admin/vouchers", icon: Ticket },
   { name: "Thống kê", href: "/admin/statistics", icon: BarChart3 },
+  { name: "Cài đặt", href: "/admin/settings", icon: Settings },
 ];
 
 export const AdminNavigation = () => {
