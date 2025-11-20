@@ -17,22 +17,29 @@ export function MarketingBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Only show if enabled and not dismissed
-    const dismissed = localStorage.getItem('banner_dismissed');
-    const dismissedContent = localStorage.getItem('banner_content');
+    // Generate a simple hash from content for tracking dismissal
+    const contentHash = banner.content.split('').reduce((acc, char) => {
+      return ((acc << 5) - acc) + char.charCodeAt(0);
+    }, 0).toString();
+
+    const dismissedHash = localStorage.getItem('banner_dismissed_hash');
 
     // Show banner if:
     // 1. Enabled by admin
-    // 2. Never dismissed OR content changed
-    if (banner.enabled && (!dismissed || dismissedContent !== banner.content)) {
+    // 2. Has content
+    // 3. Never dismissed OR content changed (different hash)
+    if (banner.enabled && banner.content && dismissedHash !== contentHash) {
       setIsVisible(true);
     }
   }, [banner.enabled, banner.content]);
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('banner_dismissed', 'true');
-    localStorage.setItem('banner_content', banner.content);
+    // Store hash of current content
+    const contentHash = banner.content.split('').reduce((acc, char) => {
+      return ((acc << 5) - acc) + char.charCodeAt(0);
+    }, 0).toString();
+    localStorage.setItem('banner_dismissed_hash', contentHash);
   };
 
   // Don't render if not visible or not enabled
@@ -43,18 +50,18 @@ export function MarketingBanner() {
   // Define styles based on banner type
   const styles = {
     info: {
-      bg: 'bg-blue-600',
-      hoverBg: 'hover:bg-blue-700',
+      bg: 'bg-gradient-to-r from-blue-500/90 to-indigo-500/90',
+      hoverBg: 'hover:bg-white/20',
       icon: Info,
     },
     success: {
-      bg: 'bg-green-600',
-      hoverBg: 'hover:bg-green-700',
+      bg: 'bg-gradient-to-r from-emerald-500/90 to-teal-500/90',
+      hoverBg: 'hover:bg-white/20',
       icon: CheckCircle,
     },
     warning: {
-      bg: 'bg-amber-600',
-      hoverBg: 'hover:bg-amber-700',
+      bg: 'bg-gradient-to-r from-orange-500/90 to-amber-500/90',
+      hoverBg: 'hover:bg-white/20',
       icon: AlertTriangle,
     },
   };
@@ -63,23 +70,33 @@ export function MarketingBanner() {
   const Icon = currentStyle.icon;
 
   return (
-    <div className={cn('relative px-4 py-3 text-white', currentStyle.bg)}>
+    <div
+      className={cn(
+        'sticky top-0 z-50 px-4 py-4 text-white shadow-lg backdrop-blur-sm',
+        'animate-in slide-in-from-top-5 duration-500',
+        currentStyle.bg
+      )}
+      style={{
+        animation: 'banner-shake 0.8s ease-in-out 0.5s 1, banner-glow 2s ease-in-out infinite'
+      }}
+    >
       <div className="container mx-auto">
-        <div className="flex items-center justify-center gap-2 pr-8">
-          <Icon className="h-4 w-4 flex-shrink-0" />
-          <p className="text-center text-sm font-medium">
+        <div className="flex items-center justify-center gap-3 pr-10">
+          <Icon className="h-7 w-7 flex-shrink-0 animate-pulse drop-shadow-lg" />
+          <p className="text-center text-lg md:text-xl font-bold tracking-wide animate-in fade-in duration-700 drop-shadow-md">
             {banner.content}
           </p>
         </div>
         <button
           onClick={handleDismiss}
           className={cn(
-            'absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-1.5 transition-colors',
+            'absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-2 transition-all duration-300',
+            'hover:scale-125 hover:rotate-90 active:scale-95',
             currentStyle.hoverBg
           )}
           aria-label="Đóng banner"
         >
-          <X className="h-4 w-4" />
+          <X className="h-5 w-5 drop-shadow-lg" />
         </button>
       </div>
     </div>
