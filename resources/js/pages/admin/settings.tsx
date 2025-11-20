@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { AdminNavigation } from '@/components/admin-navigation';
 import { Settings, Save, RefreshCw } from 'lucide-react';
+import { useToastRouter } from '@/hooks/use-toast-router';
 
 interface Setting {
   key: string;
@@ -32,8 +33,11 @@ interface SettingsPageProps {
 
 export default function SettingsPage({ settings }: SettingsPageProps) {
   const [activeTab, setActiveTab] = useState('banner');
+  const { post } = useToastRouter();
+  const [processing, setProcessing] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const [data, setData] = useState({
     settings: {
       // Banner settings
       banner_enabled: settings.banner.banner_enabled?.value || '0',
@@ -49,12 +53,38 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
     },
   });
 
+  const reset = () => {
+    setData({
+      settings: {
+        banner_enabled: settings.banner.banner_enabled?.value || '0',
+        banner_content: settings.banner.banner_content?.value || '',
+        banner_type: settings.banner.banner_type?.value || 'info',
+        shipping_free_threshold: settings.shipping.shipping_free_threshold?.value || '1000000',
+        shipping_estimate_min_days: settings.shipping.shipping_estimate_min_days?.value || '2',
+        shipping_estimate_max_days: settings.shipping.shipping_estimate_max_days?.value || '5',
+        return_policy_days: settings.policy.return_policy_days?.value || '7',
+        return_policy_condition: settings.policy.return_policy_condition?.value || 'lỗi nhà sản xuất',
+      },
+    });
+    setErrors({});
+  };
+
   const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    post(route('admin.settings.update'), {
+    setProcessing(true);
+    setErrors({});
+
+    post('/admin/settings', data, {
+      pending: 'Đang cập nhật cài đặt...',
+      success: 'Cài đặt đã được cập nhật thành công!',
+      error: 'Có lỗi xảy ra khi cập nhật cài đặt. Vui lòng kiểm tra lại thông tin.',
+    }, {
       preserveScroll: true,
-      onSuccess: () => {
-        // Success message will be shown via flash message
+      onError: (responseErrors) => {
+        setErrors(responseErrors as Record<string, string>);
+      },
+      onFinish: () => {
+        setProcessing(false);
       },
     });
   };
@@ -109,9 +139,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                       id="banner_enabled"
                       checked={data.settings.banner_enabled === '1'}
                       onCheckedChange={(checked) =>
-                        setData('settings', {
-                          ...data.settings,
-                          banner_enabled: checked ? '1' : '0',
+                        setData({
+                          settings: {
+                            ...data.settings,
+                            banner_enabled: checked ? '1' : '0',
+                          },
                         })
                       }
                     />
@@ -124,9 +156,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                       placeholder="Nhập nội dung thông báo..."
                       value={data.settings.banner_content}
                       onChange={(e) =>
-                        setData('settings', {
-                          ...data.settings,
-                          banner_content: e.target.value,
+                        setData({
+                          settings: {
+                            ...data.settings,
+                            banner_content: e.target.value,
+                          },
                         })
                       }
                       rows={3}
@@ -145,9 +179,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                     <Select
                       value={data.settings.banner_type}
                       onValueChange={(value) =>
-                        setData('settings', {
-                          ...data.settings,
-                          banner_type: value,
+                        setData({
+                          settings: {
+                            ...data.settings,
+                            banner_type: value,
+                          },
                         })
                       }
                     >
@@ -201,9 +237,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                         value={formatCurrency(data.settings.shipping_free_threshold)}
                         onChange={(e) => {
                           const rawValue = e.target.value.replace(/\D/g, '');
-                          setData('settings', {
-                            ...data.settings,
-                            shipping_free_threshold: rawValue,
+                          setData({
+                            settings: {
+                              ...data.settings,
+                              shipping_free_threshold: rawValue,
+                            },
                           });
                         }}
                         className={errors['settings.shipping_free_threshold'] ? 'border-red-500 pr-12' : 'pr-12'}
@@ -230,9 +268,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                           min="1"
                           value={data.settings.shipping_estimate_min_days}
                           onChange={(e) =>
-                            setData('settings', {
-                              ...data.settings,
-                              shipping_estimate_min_days: e.target.value,
+                            setData({
+                              settings: {
+                                ...data.settings,
+                                shipping_estimate_min_days: e.target.value,
+                              },
                             })
                           }
                           className="pr-16"
@@ -252,9 +292,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                           min="1"
                           value={data.settings.shipping_estimate_max_days}
                           onChange={(e) =>
-                            setData('settings', {
-                              ...data.settings,
-                              shipping_estimate_max_days: e.target.value,
+                            setData({
+                              settings: {
+                                ...data.settings,
+                                shipping_estimate_max_days: e.target.value,
+                              },
                             })
                           }
                           className="pr-16"
@@ -288,9 +330,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                         min="1"
                         value={data.settings.return_policy_days}
                         onChange={(e) =>
-                          setData('settings', {
-                            ...data.settings,
-                            return_policy_days: e.target.value,
+                          setData({
+                            settings: {
+                              ...data.settings,
+                              return_policy_days: e.target.value,
+                            },
                           })
                         }
                         className="pr-16"
@@ -312,9 +356,11 @@ export default function SettingsPage({ settings }: SettingsPageProps) {
                       placeholder="Ví dụ: lỗi nhà sản xuất"
                       value={data.settings.return_policy_condition}
                       onChange={(e) =>
-                        setData('settings', {
-                          ...data.settings,
-                          return_policy_condition: e.target.value,
+                        setData({
+                          settings: {
+                            ...data.settings,
+                            return_policy_condition: e.target.value,
+                          },
                         })
                       }
                     />
