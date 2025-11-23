@@ -9,6 +9,7 @@ use App\Mail\OrderStatusUpdated;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
+use App\Models\Product;
 use App\Models\ShippingAddress;
 use App\Models\ShoppingCartItem;
 use App\Models\User;
@@ -28,10 +29,27 @@ class OrderService
     public function createOrderFromCart(User $user, array $data): Order
     {
         return DB::transaction(function () use ($user, $data) {
-            $cartItems = ShoppingCartItem::with('product')->where('user_id', $user->id)->get();
+            // Lock cart items to prevent modification during checkout
+            $cartItems = ShoppingCartItem::with('product')
+                ->where('user_id', $user->id)
+                ->lockForUpdate()
+                ->get();
 
             if ($cartItems->isEmpty()) {
                 throw new \Exception('Cannot create order from an empty cart.');
+            }
+
+            // CRITICAL: Validate and decrement stock FIRST before creating order
+            // This ensures we don't create orders for out-of-stock products
+            foreach ($cartItems as $cartItem) {
+                try {
+                    $cartItem->product->decrementStock($cartItem->quantity);
+                } catch (\Exception $e) {
+                    // Rollback entire transaction if any product is out of stock
+                    throw new \Exception(
+                        "Không thể tạo đơn hàng: " . $e->getMessage()
+                    );
+                }
             }
 
             $shippingAddress = ShippingAddress::where('id', $data['shipping_address_id'])
@@ -158,6 +176,57 @@ class OrderService
         });
 
         // Send email notification after transaction completes
+        Mail::to($order->user)->send(new OrderStatusUpdated($order));
+    }
+
+    /**
+     * Cancel order and restore stock quantities.
+     * Only allows cancellation if order hasn't been shipped yet.
+     *
+     * @param Order $order
+     * @throws \Exception if order cannot be cancelled
+     * @return void
+     */
+    public function cancelOrder(Order $order): void
+    {
+        // Validate order can be cancelled
+        if (in_array($order->status, [OrderStatus::SHIPPED, OrderStatus::DELIVERED, OrderStatus::CANCELLED])) {
+            throw new \Exception(
+                'Không thể hủy đơn hàng đã được giao hoặc đã hủy trước đó.'
+            );
+        }
+
+        DB::transaction(function () use ($order) {
+            // Restore stock for all order items
+            foreach ($order->items as $item) {
+                $product = Product::find($item->product_id);
+
+                if ($product) {
+                    $product->incrementStock($item->quantity);
+
+                    \Log::info("Stock restored for product: {$product->name}", [
+                        'product_id' => $product->id,
+                        'quantity' => $item->quantity,
+                        'new_stock' => $product->fresh()->stock_quantity,
+                        'order_id' => $order->id,
+                    ]);
+                }
+            }
+
+            // Update order status
+            $order->update([
+                'status' => OrderStatus::CANCELLED,
+            ]);
+
+            // Update payment status if exists
+            if ($order->payment) {
+                $order->payment->update([
+                    'payment_status' => PaymentStatus::FAILED,
+                ]);
+            }
+        });
+
+        // Send cancellation email
         Mail::to($order->user)->send(new OrderStatusUpdated($order));
     }
 }
