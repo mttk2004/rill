@@ -171,6 +171,62 @@ class Product extends Model
     }
 
     /**
+     * Decrease stock quantity safely with pessimistic locking.
+     *
+     * @param int $quantity Amount to decrease
+     * @throws \Exception if insufficient stock
+     * @return void
+     */
+    public function decrementStock(int $quantity): void
+    {
+        if ($quantity <= 0) {
+            throw new \InvalidArgumentException('Quantity must be greater than 0');
+        }
+
+        // Lock this product row to prevent race conditions
+        $product = self::lockForUpdate()->find($this->id);
+
+        if (!$product) {
+            throw new \Exception("Product not found: {$this->id}");
+        }
+
+        if ($product->stock_quantity < $quantity) {
+            throw new \Exception(
+                "Sản phẩm '{$product->name}' không đủ số lượng. " .
+                "Yêu cầu: {$quantity}, Còn lại: {$product->stock_quantity}"
+            );
+        }
+
+        // Decrement stock
+        $product->decrement('stock_quantity', $quantity);
+
+        // Update status if out of stock
+        if ($product->fresh()->stock_quantity === 0) {
+            $product->update(['status' => 'out_of_stock']);
+        }
+    }
+
+    /**
+     * Increase stock quantity (e.g., when order is cancelled).
+     *
+     * @param int $quantity Amount to increase
+     * @return void
+     */
+    public function incrementStock(int $quantity): void
+    {
+        if ($quantity <= 0) {
+            throw new \InvalidArgumentException('Quantity must be greater than 0');
+        }
+
+        $this->increment('stock_quantity', $quantity);
+
+        // Restore status if was out of stock
+        if ($this->status === 'out_of_stock' && $this->fresh()->stock_quantity > 0) {
+            $this->update(['status' => 'active']);
+        }
+    }
+
+    /**
      * Get the shopping cart items for the product.
      */
     public function shoppingCartItems()
