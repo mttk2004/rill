@@ -37,7 +37,6 @@ interface FormData {
   cost_price: string;
   stock_quantity: string;
   min_stock_level: string;
-  is_featured: boolean;
   status: 'active' | 'inactive' | 'out_of_stock';
   image: File | null;
   artists: Array<{
@@ -80,7 +79,6 @@ const ProductCreate = ({ genres, labels, artists }: PageProps) => {
     cost_price: '',
     stock_quantity: '',
     min_stock_level: '10',
-    is_featured: false,
     status: 'active',
     image: null,
     artists: [],
@@ -578,17 +576,6 @@ const ProductCreate = ({ genres, labels, artists }: PageProps) => {
                           <SelectItem value="out_of_stock">Hết hàng</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="is_featured">Sản phẩm nổi bật</Label>
-                      <Switch
-                        id="is_featured"
-                        checked={formData.is_featured}
-                        onCheckedChange={(checked) =>
-                          handleSwitchChange('is_featured', checked)
-                        }
-                      />
                     </div>
                   </CardContent>
                 </Card>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Collection;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,12 +11,19 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Temporarily show random products - will be replaced with collections system
-        $featuredProducts = Product::with('artists')
+        // Get products from the active featured collection
+        $featuredCollection = Collection::featured()
             ->active()
-            ->inRandomOrder()
-            ->limit(config('pagination.featured_products'))
-            ->get();
+            ->ordered()
+            ->first();
+
+        $featuredProducts = $featuredCollection
+            ? $featuredCollection->products()->with('artists')->get()
+            : Product::with('artists')
+                ->active()
+                ->inRandomOrder()
+                ->limit(config('pagination.featured_products'))
+                ->get();
 
         return Inertia::render('welcome', [
             'featuredProducts' => $featuredProducts,

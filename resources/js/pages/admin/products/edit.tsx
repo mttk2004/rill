@@ -38,7 +38,6 @@ interface Product {
   cost_price: string | null;
   stock_quantity: number;
   min_stock_level: number;
-  is_featured: boolean;
   status: 'active' | 'inactive' | 'out_of_stock';
   image_url: string | null;
   artists: Artist[];
@@ -64,7 +63,6 @@ interface FormData {
   cost_price: string;
   stock_quantity: string;
   min_stock_level: string;
-  is_featured: boolean;
   status: 'active' | 'inactive' | 'out_of_stock';
   image: File | null;
   artists: Array<{
@@ -107,7 +105,6 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
     cost_price: product.cost_price || '',
     stock_quantity: product.stock_quantity.toString(),
     min_stock_level: product.min_stock_level.toString(),
-    is_featured: product.is_featured,
     status: product.status,
     image: null,
     artists: product.artists.map((artist) => ({
@@ -205,7 +202,6 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
       submitData.append('cost_price', formData.cost_price);
       submitData.append('stock_quantity', formData.stock_quantity);
       submitData.append('min_stock_level', formData.min_stock_level);
-      submitData.append('is_featured', formData.is_featured ? '1' : '0');
       submitData.append('status', formData.status);
 
       // Add artists data
@@ -606,17 +602,6 @@ const ProductEdit = ({ product, genres, labels, artists }: PageProps) => {
                           <SelectItem value="out_of_stock">Hết hàng</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="is_featured">Sản phẩm nổi bật</Label>
-                      <Switch
-                        id="is_featured"
-                        checked={formData.is_featured}
-                        onCheckedChange={(checked) =>
-                          handleSwitchChange('is_featured', checked)
-                        }
-                      />
                     </div>
                   </CardContent>
                 </Card>
