@@ -213,13 +213,11 @@ class ProductController extends Controller
             ->limit(config('pagination.admin.recent_items'))
             ->get();
 
-        // If AJAX request, return JSON
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json([
-                'props' => [
-                    'product' => $product,
-                ],
-            ]);
+        // If AJAX request or Inertia request, return product data
+        if ($request->wantsJson() || $request->ajax() || $request->header('X-Inertia')) {
+            return Inertia::modal('admin/product-detail-dialog', [
+                'product' => $product,
+            ])->baseRoute('admin.products');
         }
 
         // Otherwise redirect to products list (we use dialog for details)

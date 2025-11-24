@@ -6,6 +6,7 @@ import { Edit, ArrowLeft, CheckCircle, XCircle, Clock, Calendar } from "lucide-r
 import { Head, Link } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import type { Product } from "@/types";
+import { formatVND } from "@/lib/utils";
 
 interface Collection {
   id: number;
@@ -245,23 +246,21 @@ export default function ShowCollection({ collection }: ShowCollectionProps) {
                         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300 font-bold">
                           {product.pivot.position + 1}
                         </div>
-                        {product.image_url && (
-                          <img
-                            src={product.image_url}
-                            alt={product.name}
-                            className="h-16 w-16 object-cover rounded"
-                          />
-                        )}
+                        <img
+                          src={product.image_url || '/placeholder.png'}
+                          alt={product.name}
+                          className="h-16 w-16 object-cover rounded"
+                        />
                         <div className="flex-1">
                           <div className="font-semibold">{product.name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {product.price.toLocaleString('vi-VN')}₫
+                            {formatVND(product.price)}
                           </div>
                           <div className="text-xs text-muted-foreground mt-1">
                             Tồn kho: {product.stock_quantity}
                           </div>
                         </div>
-                        <Link href={route('admin.products.show', product.id)}>
+                        <Link href={`/admin/products/${product.id}/edit`}>
                           <Button variant="ghost" size="sm">
                             Xem
                           </Button>
