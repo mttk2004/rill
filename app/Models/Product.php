@@ -267,4 +267,15 @@ class Product extends Model
     {
         return $this->hasMany(ProductReview::class);
     }
+
+    /**
+     * Get the collections that contain this product.
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class, 'collection_product')
+            ->withPivot('position')
+            ->withTimestamps()
+            ->orderBy('collection_product.position');
+    }
 }

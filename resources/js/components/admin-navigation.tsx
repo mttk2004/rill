@@ -23,6 +23,7 @@ const adminNavItems = [
   { name: "Khách hàng", href: "/admin/customers", icon: Users },
   { name: "Sản phẩm", href: "/admin/products", icon: Package },
   { name: "Nghệ sĩ", href: "/admin/artists", icon: Music },
+  { name: "Collections", href: "/admin/collections", icon: LayoutGrid },
   { name: "Voucher", href: "/admin/vouchers", icon: Ticket },
   { name: "Thống kê", href: "/admin/statistics", icon: BarChart3 },
   { name: "Cài đặt", href: "/admin/settings", icon: Settings },
