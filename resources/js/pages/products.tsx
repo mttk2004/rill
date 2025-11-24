@@ -66,7 +66,6 @@ export default function Products({ products: productsData, pagination: paginatio
   const labels = filters?.labels ? ["Tất cả", ...filters.labels] : ["Tất cả"];
   const artists = filters?.artists ? ["Tất cả", ...filters.artists] : ["Tất cả"];
   const sortOptions = filters?.sort_options || [
-    { value: 'featured', label: 'Nổi bật' },
     { value: 'newest', label: 'Mới nhất' },
     { value: 'price_asc', label: 'Giá: Thấp đến cao' },
     { value: 'price_desc', label: 'Giá: Cao đến thấp' },
