@@ -1,7 +1,7 @@
 import { AdminNavigation } from "@/components/admin-navigation";
 import { AdminStatsCards, StatCardData } from "@/components/admin/common/admin-stats-cards";
 import { Button } from "@/components/ui/button";
-import { Plus, Upload, Download, Package, CheckCircle, AlertTriangle, TrendingUp, Star } from "lucide-react";
+import { Plus, Upload, Download, Package, CheckCircle, AlertTriangle, TrendingUp } from "lucide-react";
 import { Head, Link, usePage } from "@inertiajs/react";
 import { toast } from 'react-toastify';
 import type { Paginator } from '@/types';
@@ -21,7 +21,6 @@ const AdminProducts = () => {
       active: number;
       out_of_stock: number;
       low_stock: number;
-      featured: number;
     };
     genres: string[];
     labels: string[];
@@ -49,8 +48,7 @@ const AdminProducts = () => {
     total: 0,
     active: 0,
     out_of_stock: 0,
-    low_stock: 0,
-    featured: 0
+    low_stock: 0
   };
 
   const genres = (page.genres as string[]) || [];
@@ -177,13 +175,6 @@ const AdminProducts = () => {
       icon: TrendingUp,
       gradient: 'from-amber-500 to-orange-500',
     },
-    {
-      title: 'Nổi bật',
-      value: stats.featured.toLocaleString(),
-      subtitle: `${stats.total > 0 ? ((stats.featured / stats.total) * 100).toFixed(1) : 0}% tổng số`,
-      icon: Star,
-      gradient: 'from-purple-500 to-pink-500',
-    },
   ];
 
   return (
@@ -223,7 +214,7 @@ const AdminProducts = () => {
             </div>
 
             {/* Stats Cards */}
-            <AdminStatsCards stats={statsCards} cols={{ default: 1, md: 3, xl: 5 }} />
+            <AdminStatsCards stats={statsCards} cols={{ default: 1, md: 2, xl: 4 }} />
 
             {/* Filters */}
             <ProductFilters
