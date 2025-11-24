@@ -7,14 +7,22 @@ interface SortOption {
   label: string;
 }
 
+interface Collection {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 interface ProductsFiltersProps {
   currentGenre?: string;
   currentLabel?: string;
   currentArtist?: string;
+  currentCollection?: string;
   currentSort?: string;
   genres: string[];
   labels: string[];
   artists: string[];
+  collections: Collection[];
   sortOptions: SortOption[];
   viewMode: 'grid' | 'list';
   onFilterChange: (key: string, value: string) => void;
@@ -25,10 +33,12 @@ export function ProductsFilters({
   currentGenre = 'all',
   currentLabel = 'all',
   currentArtist = 'all',
+  currentCollection = 'all',
   currentSort = 'newest',
   genres,
   labels,
   artists,
+  collections,
   sortOptions,
   viewMode,
   onFilterChange,
@@ -48,6 +58,12 @@ export function ProductsFilters({
   const getArtistDisplay = () => {
     if (!currentArtist || currentArtist === 'all') return 'Tất cả';
     return currentArtist;
+  };
+
+  const getCollectionDisplay = () => {
+    if (!currentCollection || currentCollection === 'all') return 'Tất cả';
+    const collection = collections.find(c => c.slug === currentCollection);
+    return collection?.name || 'Tất cả';
   };
 
   const getSortDisplay = () => {
@@ -116,6 +132,29 @@ export function ProductsFilters({
           </SelectContent>
         </Select>
       </div>
+
+      {collections.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+            Collection
+          </label>
+          <Select value={currentCollection} onValueChange={(value) => onFilterChange('collection', value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue>
+                {getCollectionDisplay()}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              {collections.map((collection) => (
+                <SelectItem key={collection.slug} value={collection.slug}>
+                  {collection.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-slate-700 dark:text-slate-300">

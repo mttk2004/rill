@@ -98,6 +98,14 @@ class ProductService
                 $artistQuery->where('name', $filters['artist']);
             });
         }
+
+        // Collection filter
+        if (!empty($filters['collection'])) {
+            $query->whereHas('collections', function ($collectionQuery) use ($filters) {
+                $collectionQuery->where('slug', $filters['collection'])
+                    ->where('is_active', true);
+            });
+        }
     }
 
     /**
@@ -157,6 +165,25 @@ class ProductService
                 ->pluck('name')
                 ->filter()
                 ->values()
+                ->toArray(),
+
+            'collections' => \DB::table('collections')
+                ->select('collections.id', 'collections.name', 'collections.slug')
+                ->join('collection_product', 'collections.id', '=', 'collection_product.collection_id')
+                ->join('products', 'collection_product.product_id', '=', 'products.id')
+                ->where('collections.is_active', true)
+                ->where('products.status', 'active')
+                ->whereNull('collections.deleted_at')
+                ->groupBy('collections.id', 'collections.name', 'collections.slug', 'collections.position')
+                ->orderBy('collections.position')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'slug' => $item->slug,
+                    ];
+                })
                 ->toArray(),
 
             'sort_options' => [

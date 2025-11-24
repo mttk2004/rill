@@ -21,6 +21,7 @@ interface ProductsProps extends ProductsPageData {
   genre?: string;
   label?: string;
   artist?: string;
+  collection?: string;
   sort?: string;
   page?: number;
 }
@@ -41,6 +42,7 @@ export default function Products({ products: productsData, pagination: paginatio
       genre: props.genre || '',
       label: props.label || '',
       artist: props.artist || '',
+      collection: props.collection || '',
       sort: props.sort || '',
     },
   });
@@ -65,6 +67,7 @@ export default function Products({ products: productsData, pagination: paginatio
   const genres = filters?.genres ? ["Tất cả", ...filters.genres] : ["Tất cả"];
   const labels = filters?.labels ? ["Tất cả", ...filters.labels] : ["Tất cả"];
   const artists = filters?.artists ? ["Tất cả", ...filters.artists] : ["Tất cả"];
+  const collections = filters?.collections || [];
   const sortOptions = filters?.sort_options || [
     { value: 'newest', label: 'Mới nhất' },
     { value: 'price_asc', label: 'Giá: Thấp đến cao' },
@@ -92,10 +95,12 @@ export default function Products({ products: productsData, pagination: paginatio
                     currentGenre={props.genre}
                     currentLabel={props.label}
                     currentArtist={props.artist}
+                    currentCollection={props.collection}
                     currentSort={props.sort}
                     genres={genres}
                     labels={labels}
                     artists={artists}
+                    collections={collections}
                     sortOptions={sortOptions}
                     viewMode={viewMode}
                     onFilterChange={handleFilterChange}
@@ -106,10 +111,12 @@ export default function Products({ products: productsData, pagination: paginatio
                     currentGenre={props.genre}
                     currentLabel={props.label}
                     currentArtist={props.artist}
+                    currentCollection={props.collection}
                     currentSort={props.sort}
                     genres={genres}
                     labels={labels}
                     artists={artists}
+                    collections={collections}
                     sortOptions={sortOptions}
                     onFilterChange={handleFilterChange}
                   />

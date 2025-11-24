@@ -8,14 +8,22 @@ interface SortOption {
   label: string;
 }
 
+interface Collection {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 interface ProductsFiltersMobileProps {
   currentGenre?: string;
   currentLabel?: string;
   currentArtist?: string;
+  currentCollection?: string;
   currentSort?: string;
   genres: string[];
   labels: string[];
   artists: string[];
+  collections: Collection[];
   sortOptions: SortOption[];
   onFilterChange: (key: string, value: string) => void;
 }
@@ -24,10 +32,12 @@ export function ProductsFiltersMobile({
   currentGenre = 'all',
   currentLabel = 'all',
   currentArtist = 'all',
+  currentCollection = 'all',
   currentSort = 'newest',
   genres,
   labels,
   artists,
+  collections,
   sortOptions,
   onFilterChange,
 }: ProductsFiltersMobileProps) {
@@ -45,6 +55,12 @@ export function ProductsFiltersMobile({
   const getArtistDisplay = () => {
     if (!currentArtist || currentArtist === 'all') return 'Tất cả';
     return currentArtist;
+  };
+
+  const getCollectionDisplay = () => {
+    if (!currentCollection || currentCollection === 'all') return 'Tất cả';
+    const collection = collections.find(c => c.slug === currentCollection);
+    return collection?.name || 'Tất cả';
   };
 
   const getSortDisplay = () => {
@@ -125,6 +141,29 @@ export function ProductsFiltersMobile({
                 </SelectContent>
               </Select>
             </div>
+
+            {collections.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                  Collection
+                </label>
+                <Select value={currentCollection} onValueChange={(value) => onFilterChange('collection', value)}>
+                  <SelectTrigger>
+                    <SelectValue>
+                      {getCollectionDisplay()}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tất cả</SelectItem>
+                    {collections.map((collection) => (
+                      <SelectItem key={collection.slug} value={collection.slug}>
+                        {collection.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-900 dark:text-slate-100">
