@@ -42,7 +42,6 @@ class CartController extends Controller
                         'price' => $item->product->price,
                         'image_url' => $item->product->image_url,
                         'stock_quantity' => $item->product->stock_quantity,
-                        'is_featured' => $item->product->is_featured,
                         'status' => $item->product->status,
                         'artists' => $item->product->artists->map(fn($artist) => [
                             'id' => $artist->id,

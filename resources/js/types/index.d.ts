@@ -112,14 +112,12 @@ export interface Product {
   sku: string;
   price: number;
   cost_price?: number;
-  compare_price?: number;
   stock_quantity: number;
   min_stock_level: number;
   genre: string;
   label: string;
   image?: string;
   image_url?: string;
-  is_featured: boolean;
   status: 'active' | 'inactive' | 'out_of_stock';
   meta_title?: string;
   meta_description?: string;

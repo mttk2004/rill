@@ -27,13 +27,11 @@ class Product extends Model
         'sku',
         'price',
         'cost_price',
-        'compare_price',
         'stock_quantity',
         'min_stock_level',
         'genre',
         'label',
         'image',
-        'is_featured',
         'status',
         'meta_title',
         'meta_description',
@@ -45,8 +43,6 @@ class Product extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'cost_price' => 'decimal:2',
-        'compare_price' => 'decimal:2',
-        'is_featured' => 'boolean',
     ];
 
     /**
@@ -130,13 +126,7 @@ class Product extends Model
         return $query->where('status', 'active');
     }
 
-    /**
-     * Scope to get only featured products.
-     */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
-    }
+
 
     /**
      * Scope to get products by genre.

@@ -57,13 +57,6 @@ class ProductAdminService
             $query->where('genre', $genre);
         }
 
-        // Featured filter
-        if ($featured === 'yes') {
-            $query->where('is_featured', true);
-        } elseif ($featured === 'no') {
-            $query->where('is_featured', false);
-        }
-
         // Stock filter
         if ($stock === 'low_stock') {
             $query->whereColumn('stock_quantity', '<=', 'min_stock_level')
@@ -143,7 +136,6 @@ class ProductAdminService
             'low_stock' => Product::whereColumn('stock_quantity', '<=', 'min_stock_level')
                 ->where('stock_quantity', '>', 0)
                 ->count(),
-            'featured' => Product::where('is_featured', true)->count(),
         ];
     }
 

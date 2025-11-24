@@ -170,13 +170,11 @@ class ProductService
             'slug' => $product->slug,
             'description' => $product->description,
             'price' => $product->price,
-            'compare_price' => $product->compare_price,
             'stock_quantity' => $product->stock_quantity,
             'genre' => $product->genre,
             'label' => $product->label,
             'image' => $product->image,
             'image_url' => $product->image_url,
-            'is_featured' => $product->is_featured,
             'status' => $product->status,
             'artists' => $product->artists->map(function ($artist) {
                 return [
@@ -196,9 +194,6 @@ class ProductService
                 ->toArray(),
             'in_stock' => $product->isInStock(),
             'low_stock' => $product->isLowStock(),
-            'discount_percentage' => $product->compare_price && $product->compare_price > $product->price
-                ? round((($product->compare_price - $product->price) / $product->compare_price) * 100)
-                : null,
             'reviews_count' => $product->reviews()->count(),
             'average_rating' => round($product->reviews()->avg('rating') ?? 0, 1),
         ];
@@ -318,13 +313,11 @@ class ProductService
                 'description' => $product->description,
                 'detailed_description' => $product->detailed_description,
                 'price' => $product->price,
-                'compare_price' => $product->compare_price,
                 'stock_quantity' => $product->stock_quantity,
                 'genre' => $product->genre,
                 'label' => $product->label,
                 'image' => $product->image,
                 'image_url' => $product->image_url,
-                'is_featured' => $product->is_featured,
                 'status' => $product->status,
                 'artists' => $product->artists->map(function ($artist) {
                     return [

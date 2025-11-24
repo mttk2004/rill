@@ -74,20 +74,9 @@ class CategoryController extends Controller
                     ];
                 });
 
-            // Get featured products count
-            $featuredCount = Product::where('status', 'active')
-                ->where('is_featured', true)
-                ->count();
-
             // Get new products count (products from last 30 days)
             $newCount = Product::where('status', 'active')
                 ->where('created_at', '>=', now()->subDays(30))
-                ->count();
-
-            // Get products on sale count (products with compare_price > price)
-            $saleCount = Product::where('status', 'active')
-                ->whereNotNull('compare_price')
-                ->whereColumn('compare_price', '>', 'price')
                 ->count();
 
             return response()->json([
@@ -96,19 +85,9 @@ class CategoryController extends Controller
                 'artists' => $artists,
                 'special' => [
                     [
-                        'name' => 'Sản phẩm nổi bật',
-                        'slug' => 'featured',
-                        'count' => (int) $featuredCount,
-                    ],
-                    [
                         'name' => 'Sản phẩm mới',
                         'slug' => 'new',
                         'count' => (int) $newCount,
-                    ],
-                    [
-                        'name' => 'Đang giảm giá',
-                        'slug' => 'sale',
-                        'count' => (int) $saleCount,
                     ],
                 ],
                 'success' => true,

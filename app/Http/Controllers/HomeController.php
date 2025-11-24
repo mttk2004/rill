@@ -10,8 +10,9 @@ class HomeController extends Controller
 {
     public function index()
     {
+        // Temporarily show random products - will be replaced with collections system
         $featuredProducts = Product::with('artists')
-            ->where('is_featured', true)
+            ->active()
             ->inRandomOrder()
             ->limit(config('pagination.featured_products'))
             ->get();
