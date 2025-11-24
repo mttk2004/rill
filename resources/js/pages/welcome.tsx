@@ -19,7 +19,7 @@ interface WelcomeProps {
 }
 
 const Welcome = ({ featuredProducts, featuredCollection }: WelcomeProps) => {
-  const { cart } = usePage<SharedData>().props;
+  const { cart, settings } = usePage<SharedData>().props;
   const { post } = useToastRouter();
 
   const cartItemProductIds = useMemo(() => new Set(cart.items.map(item => item.product.id)), [cart.items]);
@@ -44,7 +44,7 @@ const Welcome = ({ featuredProducts, featuredCollection }: WelcomeProps) => {
     {
       icon: Truck,
       title: "Miễn phí vận chuyển",
-      description: "Giao hàng miễn phí toàn quốc cho đơn hàng từ 500.000đ"
+      description: `Giao hàng miễn phí toàn quốc cho đơn hàng từ ${settings.shipping.free_threshold.toLocaleString('vi-VN')}₫`
     },
     {
       icon: Users,

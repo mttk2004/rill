@@ -64,6 +64,23 @@ export interface FlyoutCartItem {
   };
 }
 
+export interface Settings {
+  banner: {
+    enabled: boolean;
+    content: string;
+    type: string;
+  };
+  shipping: {
+    free_threshold: number;
+    estimate_min_days: number;
+    estimate_max_days: number;
+  };
+  policy: {
+    return_days: number;
+    return_condition: string;
+  };
+}
+
 export interface SharedData {
   name: string;
   quote: { message: string; author: string };
@@ -73,6 +90,7 @@ export interface SharedData {
     summary: CartSummary;
     items: FlyoutCartItem[];
   };
+  settings: Settings;
   flash?: {
     success?: string;
     error?: string;
