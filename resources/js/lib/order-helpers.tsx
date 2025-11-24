@@ -13,6 +13,7 @@ export interface AdminOrder {
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
   payment_status: 'pending' | 'completed' | 'failed' | 'refunded';
   subtotal: number;
+  shipping_fee: number;
   discount_amount: number;
   total_amount: number;
   notes: string | null;

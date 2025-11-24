@@ -191,8 +191,14 @@ export default function OrderDetail({ order: orderWrapper }: OrderDetailProps) {
                     {/* Order Summary */}
                     <div className="p-4 bg-muted/30 space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Tổng sản phẩm</span>
+                        <span className="text-muted-foreground">Tạm tính</span>
                         <span className="font-medium">{formatVND(order.subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Phí vận chuyển</span>
+                        <span className={`font-medium ${order.shipping_fee === 0 ? 'text-green-600' : ''}`}>
+                          {order.shipping_fee === 0 ? 'Miễn phí' : formatVND(order.shipping_fee)}
+                        </span>
                       </div>
                       {order.discount_amount > 0 && (
                         <div className="flex justify-between text-sm">

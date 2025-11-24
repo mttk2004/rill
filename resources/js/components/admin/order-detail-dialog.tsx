@@ -33,6 +33,9 @@ interface OrderDetail {
   id: string;
   order_number: string;
   status: string;
+  subtotal: number;
+  shipping_fee: number;
+  discount_amount: number;
   total_amount: number;
   placed_at: string;
   customer?: {
@@ -254,10 +257,31 @@ export const OrderDetailDialog = ({ order, isOpen, onClose }: OrderDetailDialogP
 
           <Separator />
 
-          {/* Total */}
-          <div className="flex items-center justify-between text-lg font-bold">
-            <span>Tổng cộng:</span>
-            <span className="text-primary">{formatVND(order.total_amount)}</span>
+          {/* Order Summary */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Tạm tính</span>
+              <span className="font-medium">{formatVND(order.subtotal)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">Phí vận chuyển</span>
+              <span className={`font-medium ${order.shipping_fee === 0 ? 'text-green-600' : ''}`}>
+                {order.shipping_fee === 0 ? 'Miễn phí' : formatVND(order.shipping_fee)}
+              </span>
+            </div>
+            {order.discount_amount > 0 && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Giảm giá</span>
+                <span className="font-medium text-red-600">
+                  -{formatVND(order.discount_amount)}
+                </span>
+              </div>
+            )}
+            <Separator />
+            <div className="flex items-center justify-between text-lg font-bold pt-2">
+              <span>Tổng cộng:</span>
+              <span className="text-primary">{formatVND(order.total_amount)}</span>
+            </div>
           </div>
         </div>
       </DialogContent>

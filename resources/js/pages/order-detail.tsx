@@ -610,52 +610,80 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
 
               {/* Actions */}
               <Card className="border border-slate-200 dark:border-slate-800">
-                <CardContent className="p-4 space-y-2">
-                  {order.payment_status === "completed" && (
-                    <>
-                      <a href={route('orders.invoice', { order: order.order_id })}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full justify-start"
-                        >
-                          <Download className="h-4 w-4 mr-2" />
-                          Tải hóa đơn
-                        </Button>
-                      </a>
-                    </>
-                  )}
-                  {order.status === "pending" && order.payment_status === "pending" && order.payment_method === "VNPAY" && (
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">
+                    Thao tác
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 space-y-2">
+                  {/* Download Invoice Button */}
+                  <a
+                    href={order.payment_status === "completed" ? route('orders.invoice', { order: order.order_id }) : undefined}
+                    className={order.payment_status !== "completed" ? 'pointer-events-none' : ''}
+                  >
                     <Button
-                      variant="default"
-                      size="sm"
-                      className="w-full justify-start bg-blue-600 hover:bg-blue-700"
-                      onClick={handleRetryPayment}
-                      disabled={isSubmitting}
-                    >
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      {isSubmitting ? 'Đang xử lý...' : 'Thanh toán lại'}
-                    </Button>
-                  )}
-                  {order.status === "pending" && (
-                    <Button
-                      variant="destructive"
+                      variant="outline"
                       size="sm"
                       className="w-full justify-start"
-                      onClick={() => setShowCancelDialog(true)}
+                      disabled={order.payment_status !== "completed"}
                     >
-                      <X className="h-4 w-4 mr-2" />
-                      Hủy đơn hàng
+                      <Download className="h-4 w-4 mr-2" />
+                      Tải hóa đơn
                     </Button>
+                  </a>
+                  {order.payment_status !== "completed" && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 pl-1">
+                      Hóa đơn chỉ khả dụng sau khi thanh toán
+                    </p>
                   )}
+
+                  {/* Retry Payment Button */}
                   <Button
-                    variant="outline"
+                    variant={order.status === "pending" && order.payment_status === "pending" && order.payment_method === "VNPAY" ? "default" : "outline"}
+                    size="sm"
+                    className={`w-full justify-start ${order.status === "pending" && order.payment_status === "pending" && order.payment_method === "VNPAY" ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
+                    onClick={handleRetryPayment}
+                    disabled={isSubmitting || !(order.status === "pending" && order.payment_status === "pending" && order.payment_method === "VNPAY")}
+                  >
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    {isSubmitting ? 'Đang xử lý...' : 'Thanh toán lại'}
+                  </Button>
+                  {!(order.status === "pending" && order.payment_status === "pending" && order.payment_method === "VNPAY") && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 pl-1">
+                      Chỉ dành cho đơn hàng VNPAY chưa thanh toán
+                    </p>
+                  )}
+
+                  {/* Cancel Order Button */}
+                  <Button
+                    variant={order.status === "pending" ? "destructive" : "outline"}
                     size="sm"
                     className="w-full justify-start"
+                    onClick={() => setShowCancelDialog(true)}
+                    disabled={order.status !== "pending"}
                   >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Liên hệ hỗ trợ
+                    <X className="h-4 w-4 mr-2" />
+                    Hủy đơn hàng
                   </Button>
+                  {order.status !== "pending" && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 pl-1">
+                      Chỉ có thể hủy đơn hàng đang chờ xác nhận
+                    </p>
+                  )}
+
+                  {/* Contact Support Button */}
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <a href="mailto:mttk2004@hotmail.com?subject=Hỗ trợ đơn hàng #${order.id}">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start hover:bg-amber-50 dark:hover:bg-amber-950/20 hover:border-amber-300 dark:hover:border-amber-700"
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Liên hệ hỗ trợ
+                      </Button>
+                    </a>
+                  </div>
                 </CardContent>
               </Card>
             </div>
