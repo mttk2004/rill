@@ -157,14 +157,17 @@ export default function CreateCollection({ products }: CreateCollectionProps) {
                   {/* Slug */}
                   <div className="space-y-2">
                     <Label htmlFor="slug">
-                      Slug <span className="text-red-500">*</span>
+                      Slug (tuỳ chọn)
                     </Label>
                     <Input
                       id="slug"
                       value={data.slug}
                       onChange={(e) => setData('slug', e.target.value)}
-                      placeholder="san-pham-noi-bat"
+                      placeholder="Để trống để tự động tạo từ tên"
                     />
+                    <p className="text-sm text-muted-foreground">
+                      Slug sẽ được tự động tạo từ tên nếu bỏ trống
+                    </p>
                     {errors.slug && (
                       <p className="text-sm text-red-600">{errors.slug}</p>
                     )}
