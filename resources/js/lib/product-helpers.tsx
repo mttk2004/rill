@@ -33,6 +33,11 @@ export type AdminProduct = {
   total_sold?: number;
   total_revenue?: number;
   reviews_count?: number;
+  collection?: {
+    id: number;
+    name: string;
+    type: string;
+  };
   recent_orders?: Array<{
     id: string;
     order_number: string;

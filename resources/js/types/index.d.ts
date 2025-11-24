@@ -145,6 +145,11 @@ export interface Product {
   discount_percentage?: number;
   reviews_count?: number;
   average_rating?: number;
+  collection?: {
+    id: number;
+    name: string;
+    type: string;
+  };
   created_at: string;
   updated_at: string;
   deleted_at?: string;

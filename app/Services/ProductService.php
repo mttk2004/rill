@@ -15,9 +15,24 @@ class ProductService
      */
     public function getProducts(array $filters = []): array
     {
-        $query = Product::with(['artists' => function ($query) {
-            $query->orderByPivot('sort_order');
-        }])->active(); // Only get active products
+        $query = Product::with([
+            'artists' => function ($query) {
+                $query->orderByPivot('sort_order');
+            },
+            'collections' => function ($query) {
+                $query->where('is_active', true)
+                    ->where(function ($q) {
+                        $q->whereNull('started_at')
+                            ->orWhere('started_at', '<=', now());
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('ended_at')
+                            ->orWhere('ended_at', '>=', now());
+                    })
+                    ->orderBy('display_order')
+                    ->limit(1);
+            }
+        ])->active(); // Only get active products
 
         // Apply filters
         $this->applyFilters($query, $filters);
@@ -164,6 +179,9 @@ class ProductService
      */
     protected function transformProduct(Product $product): array
     {
+        // Get first active collection if exists
+        $firstCollection = $product->collections->first();
+
         return [
             'id' => $product->id,
             'name' => $product->name,
@@ -176,6 +194,11 @@ class ProductService
             'image' => $product->image,
             'image_url' => $product->image_url,
             'status' => $product->status,
+            'collection' => $firstCollection ? [
+                'id' => $firstCollection->id,
+                'name' => $firstCollection->name,
+                'type' => $firstCollection->type,
+            ] : null,
             'artists' => $product->artists->map(function ($artist) {
                 return [
                     'id' => $artist->id,
@@ -208,9 +231,24 @@ class ProductService
         $artistIds = $product->artists->pluck('id')->toArray();
 
         // Build query for related products
-        $query = Product::with(['artists' => function ($query) {
-            $query->orderByPivot('sort_order');
-        }])
+        $query = Product::with([
+            'artists' => function ($query) {
+                $query->orderByPivot('sort_order');
+            },
+            'collections' => function ($query) {
+                $query->where('is_active', true)
+                    ->where(function ($q) {
+                        $q->whereNull('started_at')
+                            ->orWhere('started_at', '<=', now());
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('ended_at')
+                            ->orWhere('ended_at', '>=', now());
+                    })
+                    ->orderBy('display_order')
+                    ->limit(1);
+            }
+        ])
             ->active()
             ->where('id', '!=', $product->id);
 

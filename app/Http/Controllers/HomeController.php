@@ -18,7 +18,15 @@ class HomeController extends Controller
             ->first();
 
         $featuredProducts = $featuredCollection
-            ? $featuredCollection->products()->with('artists')->get()
+            ? $featuredCollection->products()->with('artists')->get()->map(function ($product) use ($featuredCollection) {
+                // Attach collection info to each product
+                $product->collection = [
+                    'id' => $featuredCollection->id,
+                    'name' => $featuredCollection->name,
+                    'type' => $featuredCollection->type,
+                ];
+                return $product;
+            })
             : Product::with('artists')
                 ->active()
                 ->inRandomOrder()
@@ -27,6 +35,12 @@ class HomeController extends Controller
 
         return Inertia::render('welcome', [
             'featuredProducts' => $featuredProducts,
+            'featuredCollection' => $featuredCollection ? [
+                'id' => $featuredCollection->id,
+                'name' => $featuredCollection->name,
+                'type' => $featuredCollection->type,
+                'description' => $featuredCollection->description,
+            ] : null,
         ]);
     }
 }

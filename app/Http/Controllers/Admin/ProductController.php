@@ -38,9 +38,24 @@ class ProductController extends Controller
         $query = $this->productService->buildProductQuery($filters);
 
         // Eager load relationships
-        $products = $query->with(['artists' => function ($q) {
-            $q->wherePivot('role', 'main')->orderByPivot('sort_order');
-        }])
+        $products = $query->with([
+            'artists' => function ($q) {
+                $q->wherePivot('role', 'main')->orderByPivot('sort_order');
+            },
+            'collections' => function ($query) {
+                $query->where('is_active', true)
+                    ->where(function ($q) {
+                        $q->whereNull('started_at')
+                            ->orWhere('started_at', '<=', now());
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('ended_at')
+                            ->orWhere('ended_at', '>=', now());
+                    })
+                    ->orderBy('display_order')
+                    ->limit(1);
+            }
+        ])
         ->withCount('orderItems')
         ->paginate($perPage)
         ->withQueryString();

@@ -10,9 +10,15 @@ import { useToastRouter } from '@/hooks/use-toast-router';
 
 interface WelcomeProps {
   featuredProducts: Product[];
+  featuredCollection: {
+    id: number;
+    name: string;
+    type: string;
+    description: string | null;
+  } | null;
 }
 
-const Welcome = ({ featuredProducts }: WelcomeProps) => {
+const Welcome = ({ featuredProducts, featuredCollection }: WelcomeProps) => {
   const { cart } = usePage<SharedData>().props;
   const { post } = useToastRouter();
 
@@ -157,10 +163,10 @@ const Welcome = ({ featuredProducts }: WelcomeProps) => {
 
               {/* Enhanced Title */}
               <h2 className="text-4xl lg:text-5xl font-extrabold mb-6 bg-gradient-to-r from-accent via-amber-500 to-accent bg-clip-text text-transparent">
-                Sản phẩm nổi bật
+                {featuredCollection?.name || 'Sản phẩm nổi bật'}
               </h2>
               <p className="text-muted-foreground text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed">
-                Những album kinh điển được yêu thích nhất bởi cộng đồng sưu tầm đĩa than
+                {featuredCollection?.description || 'Những album kinh điển được yêu thích nhất bởi cộng đồng sưu tầm đĩa than'}
               </p>
             </div>
 

@@ -119,6 +119,36 @@ class Product extends Model
     }
 
     /**
+     * Get the collections for the product.
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(Collection::class, 'collection_product')
+            ->withPivot('position')
+            ->withTimestamps()
+            ->orderByPivot('position');
+    }
+
+    /**
+     * Get the first active collection for this product (for badge display).
+     */
+    public function firstActiveCollection()
+    {
+        return $this->collections()
+            ->where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('started_at')
+                    ->orWhere('started_at', '<=', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('ended_at')
+                    ->orWhere('ended_at', '>=', now());
+            })
+            ->orderBy('display_order')
+            ->first();
+    }
+
+    /**
      * Scope to get only active products.
      */
     public function scopeActive($query)
@@ -266,16 +296,5 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(ProductReview::class);
-    }
-
-    /**
-     * Get the collections that contain this product.
-     */
-    public function collections(): BelongsToMany
-    {
-        return $this->belongsToMany(Collection::class, 'collection_product')
-            ->withPivot('position')
-            ->withTimestamps()
-            ->orderBy('collection_product.position');
     }
 }

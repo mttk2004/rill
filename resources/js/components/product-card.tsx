@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, Disc3, ShoppingCart } from "lucide-react";
+import { Star, Disc3, ShoppingCart, Sparkles } from "lucide-react";
 import { Link } from '@inertiajs/react';
 import { type Product } from '@/types';
 import { MouseEvent } from 'react';
 import { formatVND } from "@/lib/utils";
+import { getCollectionBadgeClasses } from "@/lib/collection-colors";
 
 interface ProductCardProps {
   product: Product;
@@ -46,6 +47,18 @@ export function ProductCard({
                 />
               ) : (
                 <Disc3 className="h-10 w-10 text-slate-300 animate-spin-slow group-hover:scale-110 transition-transform duration-300" />
+              )}
+
+              {/* Collection Badge */}
+              {product.collection && (
+                <div className="absolute top-2 left-2">
+                  <Badge
+                    className={`${getCollectionBadgeClasses(product.collection.id)} text-[10px] px-2 py-0.5 font-semibold shadow-sm backdrop-blur-sm flex items-center gap-1`}
+                  >
+                    <Sparkles className="w-2.5 h-2.5" />
+                    {product.collection.name}
+                  </Badge>
+                </div>
               )}
             </div>
           </Link>

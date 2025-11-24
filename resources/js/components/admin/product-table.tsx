@@ -1,9 +1,11 @@
 import { Link } from "@inertiajs/react";
-import { Eye, Edit, Trash2, RotateCcw, AlertTriangle } from "lucide-react";
+import { Eye, Edit, Trash2, RotateCcw, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { AdminTable, Column } from "@/components/admin/common/admin-table";
 import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, isLowStock } from "@/lib/product-helpers";
 import { formatVND } from '@/lib/utils';
+import { getCollectionBadgeClasses } from "@/lib/collection-colors";
 
 interface ProductTableProps {
   products: AdminProduct[];
@@ -26,11 +28,23 @@ export const ProductTable = ({
       className: "w-[350px]",
       render: (product) => (
         <div className="flex items-center gap-3">
-          <img
-            src={product.image_url || "/placeholder.png"}
-            alt={product.name}
-            className="w-16 h-16 object-cover rounded-lg"
-          />
+          <div className="relative">
+            <img
+              src={product.image_url || "/placeholder.png"}
+              alt={product.name}
+              className="w-16 h-16 object-cover rounded-lg"
+            />
+            {product.collection && (
+              <div className="absolute -top-1 -left-1">
+                <Badge
+                  className={`${getCollectionBadgeClasses(product.collection.id)} text-[8px] px-1 py-0.5 font-semibold shadow-sm backdrop-blur-sm flex items-center gap-0.5`}
+                >
+                  <Sparkles className="w-2 h-2" />
+                  {product.collection.name}
+                </Badge>
+              </div>
+            )}
+          </div>
           <div>
             <div className="font-medium">{product.name}</div>
             <div className="text-sm text-gray-500">

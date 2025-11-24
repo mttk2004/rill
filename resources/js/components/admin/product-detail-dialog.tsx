@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import { Package, DollarSign, TrendingUp, ShoppingCart, Calendar, Eye } from "lucide-react";
+import { Package, DollarSign, TrendingUp, ShoppingCart, Calendar, Eye, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, isLowStock } from "@/lib/product-helpers";
 import { formatVND } from '@/lib/utils';
+import { getCollectionBadgeClasses } from "@/lib/collection-colors";
 
 interface ProductDetailDialogProps {
   product: AdminProduct | null;
@@ -53,6 +54,17 @@ export const ProductDetailDialog = ({
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
                     <Package className="h-12 w-12 text-slate-400" />
+                  </div>
+                )}
+                {/* Collection Badge */}
+                {product.collection && (
+                  <div className="absolute top-1 left-1">
+                    <Badge
+                      className={`${getCollectionBadgeClasses(product.collection.id)} text-[9px] px-1.5 py-0.5 font-semibold shadow-sm backdrop-blur-sm flex items-center gap-1`}
+                    >
+                      <Sparkles className="w-2 h-2" />
+                      {product.collection.name}
+                    </Badge>
                   </div>
                 )}
               </div>
