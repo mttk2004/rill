@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Rill Design System - Modern Retro Vinyl Aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap');
 
 @plugin 'tailwindcss-animate';
 
@@ -60,7 +60,8 @@
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
   /* Font Family */
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-serif: 'Cormorant Garamond', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -180,7 +181,17 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Cormorant Garamond', ui-serif, Georgia, serif;
+    font-weight: 600;
   }
 
   /* Custom design system classes */
@@ -260,7 +271,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
   }
 }
 
@@ -471,7 +482,7 @@
 
 /* React Toastify Custom Styles */
 .custom-toast-container {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
 }
 
 .Toastify__toast {
