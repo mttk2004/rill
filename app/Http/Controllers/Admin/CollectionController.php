@@ -151,10 +151,10 @@ class CollectionController extends Controller
     public function show(string $id)
     {
         $collection = Collection::with(['products' => function ($query) {
-            $query->with('artists');
+            $query->with('artists')->orderBy('collection_product.position');
         }])->withCount('products')->findOrFail($id);
 
-        return response()->json([
+        return Inertia::render('admin/collections/show', [
             'collection' => $collection,
         ]);
     }

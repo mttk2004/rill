@@ -103,6 +103,23 @@ export interface Artist {
   sort_order?: number;
 }
 
+export interface Collection {
+  id: number;
+  name: string;
+  slug: string;
+  type: 'featured' | 'banner' | 'promotion' | 'curated';
+  description: string | null;
+  is_active: boolean;
+  started_at: string | null;
+  ended_at: string | null;
+  display_order: number;
+  products_count?: number;
+  products?: Array<Product & { pivot: { position: number } }>;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string | null;
+}
+
 export interface Product {
   id: string;
   name: string;
