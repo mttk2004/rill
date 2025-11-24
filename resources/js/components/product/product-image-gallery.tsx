@@ -91,7 +91,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
                   <span className="text-sm font-medium">Xem ảnh</span>
                 </div>
               </div>
-              
+
               {/* Collection Corner Sticker with Hover Effect */}
               {product.collection && (
                 <div className="absolute top-0 right-0 z-10">

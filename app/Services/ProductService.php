@@ -288,10 +288,16 @@ class ProductService
      */
     public function getDataForShowPage(Product $product, ?User $user): array
     {
-        // Load artists relationship
-        $product->load(['artists' => function ($query) {
-            $query->orderByPivot('sort_order');
-        }]);
+        // Load artists and collections relationships
+        $product->load([
+            'artists' => function ($query) {
+                $query->orderByPivot('sort_order');
+            },
+            'collections' => function ($query) {
+                $query->where('is_active', true)
+                    ->orderByPivot('position');
+            }
+        ]);
 
         // Get all reviews (auto-approved, no status filter needed)
         $reviews = $product->reviews()
@@ -370,6 +376,11 @@ class ProductService
                 'featured_artists' => $product->artists->where('pivot.role', 'featured')->values(),
                 'in_stock' => $product->isInStock(),
                 'low_stock' => $product->isLowStock(),
+                'collection' => $product->collections->first() ? [
+                    'id' => $product->collections->first()->id,
+                    'name' => $product->collections->first()->name,
+                    'type' => $product->collections->first()->type,
+                ] : null,
                 'reviews' => $reviews,
                 'reviews_count' => $reviewsCount,
                 'average_rating' => $averageRating,
