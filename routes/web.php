@@ -131,7 +131,7 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::delete('/vouchers/{id}', [App\Http\Controllers\Admin\VoucherController::class, 'destroy'])->name('admin.vouchers.destroy');
         Route::post('/vouchers/{id}/toggle-status', [App\Http\Controllers\Admin\VoucherController::class, 'toggleStatus'])->name('admin.vouchers.toggle-status');
 
-        Route::get('/collections', [App\Http\Controllers\Admin\CollectionController::class, 'index'])->name('admin.collections');
+        Route::get('/collections', [App\Http\Controllers\Admin\CollectionController::class, 'index'])->name('admin.collections.index');
         Route::get('/collections/create', [App\Http\Controllers\Admin\CollectionController::class, 'create'])->name('admin.collections.create');
         Route::post('/collections', [App\Http\Controllers\Admin\CollectionController::class, 'store'])->name('admin.collections.store');
         Route::get('/collections/{id}', [App\Http\Controllers\Admin\CollectionController::class, 'show'])->name('admin.collections.show');
