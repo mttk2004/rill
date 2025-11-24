@@ -44,7 +44,7 @@ export const ProductDetailDialog = ({
           <TabsContent value="info" className="space-y-4">
             <div className="flex items-start gap-6">
               {/* Product Image */}
-              <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 relative ring-4 ring-slate-100 dark:ring-slate-700">
+              <div className="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 relative ring-4 ring-slate-100 dark:ring-slate-700 group/product-img">
                 {product.image_url ? (
                   <img
                     src={product.image_url}
@@ -56,20 +56,25 @@ export const ProductDetailDialog = ({
                     <Package className="h-12 w-12 text-slate-400" />
                   </div>
                 )}
-                {/* Collection Badge */}
+                {/* Collection Corner Sticker with Hover Effect */}
                 {product.collection && (
-                  <div className="absolute top-1 left-1">
-                    <Badge
-                      className={`${getCollectionBadgeClasses(product.collection.id)} text-[9px] px-1.5 py-0.5 font-semibold shadow-sm backdrop-blur-sm flex items-center gap-1`}
+                  <div className="absolute top-0 right-0 z-10">
+                    <div
+                      className={`${getCollectionBadgeClasses(product.collection.id)} rounded-bl-xl shadow-lg transition-all duration-300 ease-out overflow-hidden`}
+                      style={{
+                        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 8px 0)'
+                      }}
                     >
-                      <Sparkles className="w-2 h-2" />
-                      {product.collection.name}
-                    </Badge>
+                      <div className="flex items-center gap-1.5 px-2 py-1.5 group-hover/product-img:px-3">
+                        <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="text-[11px] font-bold uppercase tracking-wide whitespace-nowrap max-w-0 group-hover/product-img:max-w-[200px] transition-all duration-300 ease-out overflow-hidden">
+                          {product.collection.name}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
-              </div>
-
-              {/* Basic Info */}
+              </div>              {/* Basic Info */}
               <div className="flex-1">
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                   {product.name}

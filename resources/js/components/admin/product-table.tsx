@@ -1,7 +1,6 @@
 import { Link } from "@inertiajs/react";
 import { Eye, Edit, Trash2, RotateCcw, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { AdminTable, Column } from "@/components/admin/common/admin-table";
 import { AdminProduct, getStatusBadge, calculateProfit, getMainArtist, isLowStock } from "@/lib/product-helpers";
 import { formatVND } from '@/lib/utils';
@@ -28,20 +27,27 @@ export const ProductTable = ({
       className: "w-[350px]",
       render: (product) => (
         <div className="flex items-center gap-3">
-          <div className="relative">
+          <div className="relative rounded-lg overflow-hidden group/product-img">
             <img
               src={product.image_url || "/placeholder.png"}
               alt={product.name}
-              className="w-16 h-16 object-cover rounded-lg"
+              className="w-16 h-16 object-cover"
             />
             {product.collection && (
-              <div className="absolute -top-1 -left-1">
-                <Badge
-                  className={`${getCollectionBadgeClasses(product.collection.id)} text-[8px] px-1 py-0.5 font-semibold shadow-sm backdrop-blur-sm flex items-center gap-0.5`}
+              <div className="absolute top-0 right-0 z-10">
+                <div
+                  className={`${getCollectionBadgeClasses(product.collection.id)} rounded-bl-lg shadow-md transition-all duration-300 ease-out overflow-hidden`}
+                  style={{
+                    clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 3px 0)'
+                  }}
                 >
-                  <Sparkles className="w-2 h-2" />
-                  {product.collection.name}
-                </Badge>
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 group-hover/product-img:px-2">
+                    <Sparkles className="w-2.5 h-2.5 flex-shrink-0" />
+                    <span className="text-[9px] font-bold uppercase tracking-wide whitespace-nowrap max-w-0 group-hover/product-img:max-w-[100px] transition-all duration-300 ease-out overflow-hidden">
+                      {product.collection.name}
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
           </div>

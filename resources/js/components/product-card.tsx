@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Disc3, ShoppingCart, Sparkles } from "lucide-react";
 import { Link } from '@inertiajs/react';
@@ -49,15 +48,22 @@ export function ProductCard({
                 <Disc3 className="h-10 w-10 text-slate-300 animate-spin-slow group-hover:scale-110 transition-transform duration-300" />
               )}
 
-              {/* Collection Badge */}
+              {/* Collection Corner Sticker with Hover Effect */}
               {product.collection && (
-                <div className="absolute top-2 left-2">
-                  <Badge
-                    className={`${getCollectionBadgeClasses(product.collection.id)} text-[10px] px-2 py-0.5 font-semibold shadow-sm backdrop-blur-sm flex items-center gap-1`}
+                <div className="absolute top-0 right-0 z-10">
+                  <div
+                    className={`${getCollectionBadgeClasses(product.collection.id)} rounded-bl-xl shadow-lg transition-all duration-300 ease-out overflow-hidden`}
+                    style={{
+                      clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 8px 0)'
+                    }}
                   >
-                    <Sparkles className="w-2.5 h-2.5" />
-                    {product.collection.name}
-                  </Badge>
+                    <div className="flex items-center gap-1.5 px-2 py-1.5 group-hover:px-3">
+                      <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="text-[11px] font-bold uppercase tracking-wide whitespace-nowrap max-w-0 group-hover:max-w-[200px] transition-all duration-300 ease-out overflow-hidden">
+                        {product.collection.name}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
