@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Head, useForm } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { useToastRouter } from "@/hooks/use-toast-router";
 import { X, Plus, Search, GripVertical } from "lucide-react";
 import type { Product } from "@/types";
 import {
@@ -121,7 +121,7 @@ function SortableProductItem({ product, index, onRemove }: SortableProductItemPr
 }
 
 export default function EditCollection({ collection, allProducts }: EditCollectionProps) {
-  const { data, setData, put, processing, errors } = useForm<CollectionForm>({
+  const { data, setData, processing, errors } = useForm<CollectionForm>({
     name: collection.name,
     slug: collection.slug,
     type: collection.type,
@@ -137,6 +137,7 @@ export default function EditCollection({ collection, allProducts }: EditCollecti
     products: collection.products.map((p) => ({ id: p.id, position: p.pivot.position })),
   });
 
+  const { put } = useToastRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<Product[]>(
     collection.products.sort((a, b) => a.pivot.position - b.pivot.position)
@@ -216,15 +217,15 @@ export default function EditCollection({ collection, allProducts }: EditCollecti
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    put(route('admin.collections.update', collection.id), {
-      onSuccess: () => {
-        toast.success('Collection đã được cập nhật thành công!');
-      },
-      onError: (errors) => {
-        toast.error('Có lỗi xảy ra khi cập nhật collection');
-        console.error('Validation errors:', errors);
-      },
-    });
+    put(
+      route('admin.collections.update', collection.id),
+      data as unknown as Record<string, unknown>,
+      {
+        pending: 'Đang cập nhật collection...',
+        success: 'Collection đã được cập nhật thành công!',
+        error: 'Có lỗi xảy ra khi cập nhật collection',
+      }
+    );
   };
 
   return (

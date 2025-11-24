@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Head, useForm } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { useToastRouter } from "@/hooks/use-toast-router";
 import { X, Plus, Search } from "lucide-react";
 import type { Product } from "@/types";
 
@@ -29,7 +29,7 @@ interface CollectionForm {
 }
 
 export default function CreateCollection({ products }: CreateCollectionProps) {
-  const { data, setData, post, processing, errors } = useForm<CollectionForm>({
+  const { data, setData, processing, errors } = useForm<CollectionForm>({
     name: '',
     slug: '',
     type: 'featured',
@@ -41,6 +41,7 @@ export default function CreateCollection({ products }: CreateCollectionProps) {
     products: [],
   });
 
+  const { post } = useToastRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
 
@@ -106,15 +107,15 @@ export default function CreateCollection({ products }: CreateCollectionProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('admin.collections.store'), {
-      onSuccess: () => {
-        toast.success('Collection đã được tạo thành công!');
-      },
-      onError: (errors) => {
-        toast.error('Có lỗi xảy ra khi tạo collection');
-        console.error('Validation errors:', errors);
-      },
-    });
+    post(
+      route('admin.collections.store'),
+      data as unknown as Record<string, unknown>,
+      {
+        pending: 'Đang tạo collection...',
+        success: 'Collection đã được tạo thành công!',
+        error: 'Có lỗi xảy ra khi tạo collection',
+      }
+    );
   };
 
   return (
