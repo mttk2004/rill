@@ -172,7 +172,6 @@ const ProductCreate = ({ genres, labels, artists }: PageProps) => {
       submitData.append('cost_price', formData.cost_price);
       submitData.append('stock_quantity', formData.stock_quantity);
       submitData.append('min_stock_level', formData.min_stock_level);
-      submitData.append('is_featured', formData.is_featured ? '1' : '0');
       submitData.append('status', formData.status);
 
       // Add artists data

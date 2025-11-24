@@ -49,14 +49,6 @@ export function ProductCard({
               )}
             </div>
           </Link>
-          {product.is_featured && (
-            <Badge
-              variant="secondary"
-              className="absolute top-2 left-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md text-[10px] px-1.5 py-0.5 border-0"
-            >
-              Nổi bật
-            </Badge>
-          )}
         </div>
 
         <div className={`p-3 ${viewMode === "list" ? "flex-1" : ""}`}>

@@ -36,7 +36,6 @@ interface CartItem {
     price: number;
     image_url: string | null;
     stock_quantity: number;
-    is_featured: boolean;
     status: string;
     artists: Array<{
       id: string;

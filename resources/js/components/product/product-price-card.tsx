@@ -7,28 +7,12 @@ interface ProductPriceCardProps {
 }
 
 export function ProductPriceCard({ product }: ProductPriceCardProps) {
-  const discountPercentage = product.compare_price
-    ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100)
-    : null;
-
   return (
     <div className="p-4 bg-muted/50 rounded-lg border space-y-3">
       <div className="flex items-baseline gap-2">
         <span className="text-3xl font-bold text-accent">
           {formatVND(product.price)}
         </span>
-        {product.compare_price && (
-          <>
-            <span className="text-lg text-muted-foreground line-through">
-              {formatVND(product.compare_price)}
-            </span>
-            {discountPercentage && (
-              <Badge variant="destructive" className="text-xs">
-                -{discountPercentage}%
-              </Badge>
-            )}
-          </>
-        )}
       </div>
 
       <div className="flex items-center gap-2">

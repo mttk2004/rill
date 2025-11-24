@@ -1,5 +1,5 @@
 import { Link } from "@inertiajs/react";
-import { Package, DollarSign, TrendingUp, ShoppingCart, Calendar, Star, Eye } from "lucide-react";
+import { Package, DollarSign, TrendingUp, ShoppingCart, Calendar, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,11 +55,6 @@ export const ProductDetailDialog = ({
                     <Package className="h-12 w-12 text-slate-400" />
                   </div>
                 )}
-                {product.is_featured && (
-                  <div className="absolute top-2 right-2 p-1.5 bg-amber-500 rounded-full">
-                    <Star className="h-4 w-4 text-white" />
-                  </div>
-                )}
               </div>
 
               {/* Basic Info */}
@@ -72,12 +67,6 @@ export const ProductDetailDialog = ({
                 </p>
                 <div className="flex items-center gap-2 mb-4 flex-wrap">
                   {getStatusBadge(product.status, product.deleted_at)}
-                  {product.is_featured && (
-                    <Badge className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0">
-                      <Star className="h-3 w-3 mr-1" />
-                      Nổi bật
-                    </Badge>
-                  )}
                 </div>
                 {product.description && (
                   <p className="text-sm text-slate-600 dark:text-slate-400">

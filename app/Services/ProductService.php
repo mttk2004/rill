@@ -108,8 +108,8 @@ class ProductService
                 break;
             case 'featured':
             default:
-                $query->orderBy('is_featured', 'desc')
-                      ->orderBy('created_at', 'desc');
+                // Sort by created_at desc (newest first) for featured products
+                $query->orderBy('created_at', 'desc');
                 break;
         }
     }

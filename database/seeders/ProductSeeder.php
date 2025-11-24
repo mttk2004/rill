@@ -28,7 +28,6 @@ Bản thu âm trong tuyển tập này giữ được chất mộc mạc, chân 
                 'genre' => 'Nhạc Trịnh',
                 'label' => 'Làng Văn',
                 'price' => 450000,
-                'is_featured' => true,
                 'stock_quantity' => 25,
             ],
             [
@@ -42,7 +41,6 @@ Sản phẩm này không chỉ là một đĩa nhạc giải trí mà còn là m
                 'genre' => 'Nhạc Trẻ',
                 'label' => 'Vafaco',
                 'price' => 380000,
-                'is_featured' => true,
                 'stock_quantity' => 30,
             ],
             [
@@ -56,7 +54,6 @@ Tuyển tập bao gồm những nhạc phẩm vàng son như "Biển Tình", "Xi
                 'genre' => 'Nhạc Trữ Tình',
                 'label' => 'TNCD',
                 'price' => 420000,
-                'is_featured' => true,
                 'stock_quantity' => 20,
             ],
             [
@@ -70,7 +67,6 @@ Với chất lượng thu âm đạt chuẩn audiophile, album tái hiện khôn
                 'genre' => 'Tân Cổ',
                 'label' => 'Phạm Duy Music',
                 'price' => 480000,
-                'is_featured' => false,
                 'stock_quantity' => 15,
             ],
             [
@@ -84,7 +80,6 @@ Sự đa dạng trong album thể hiện qua việc lựa chọn bài hát, từ
                 'genre' => 'Nhạc Trữ Tình',
                 'label' => 'Thúy Nga',
                 'price' => 350000,
-                'is_featured' => false,
                 'stock_quantity' => 18,
             ],
 
@@ -100,7 +95,6 @@ Sở hữu đĩa than `Abbey Road` là sở hữu một chương cuối hoàn h�
                 'genre' => 'Rock',
                 'label' => 'Apple Records',
                 'price' => 890000,
-                'is_featured' => true,
                 'stock_quantity' => 35,
             ],
             [
@@ -109,7 +103,6 @@ Sở hữu đĩa than `Abbey Road` là sở hữu một chương cuối hoàn h�
                 'genre' => 'Psychedelic Rock',
                 'label' => 'Parlophone',
                 'price' => 950000,
-                'is_featured' => true,
                 'stock_quantity' => 28,
             ],
             [
@@ -123,7 +116,6 @@ Sở hữu đĩa than `Abbey Road` là sở hữu một chương cuối hoàn h�
                 'genre' => 'Rock',
                 'label' => 'Parlophone',
                 'price' => 850000,
-                'is_featured' => false,
                 'stock_quantity' => 22,
             ],
             [
@@ -137,7 +129,6 @@ Người nghe sẽ đi từ sự ồn ào, gào thét của Proto-metal trong "H
                 'genre' => 'Rock',
                 'label' => 'Apple Records',
                 'price' => 1200000,
-                'is_featured' => false,
                 'stock_quantity' => 20,
             ],
 
@@ -153,7 +144,6 @@ Với bìa đĩa lăng kính tam giác tán sắc ánh sáng mang tính biểu t
                 'genre' => 'Progressive Rock',
                 'label' => 'Harvest Records',
                 'price' => 920000,
-                'is_featured' => true,
                 'stock_quantity' => 40,
             ],
             [
@@ -167,7 +157,6 @@ Album kép này đòi hỏi người nghe phải thưởng thức trọn vẹn �
                 'genre' => 'Progressive Rock',
                 'label' => 'Harvest Records',
                 'price' => 1100000,
-                'is_featured' => true,
                 'stock_quantity' => 30,
             ],
             [
@@ -181,7 +170,6 @@ Tác phẩm được bao bọc bởi hai phần của thiên trường ca "Shine
                 'genre' => 'Progressive Rock',
                 'label' => 'Harvest Records',
                 'price' => 880000,
-                'is_featured' => false,
                 'stock_quantity' => 25,
             ],
 
@@ -197,7 +185,6 @@ Sở hữu đĩa than `Led Zeppelin IV` là sở hữu một giáo trình mẫu 
                 'genre' => 'Hard Rock',
                 'label' => 'Atlantic Records',
                 'price' => 890000,
-                'is_featured' => true,
                 'stock_quantity' => 32,
             ],
             [
@@ -211,7 +198,6 @@ Bìa đĩa được thiết kế độc đáo với các cửa sổ cắt rỗng
                 'genre' => 'Hard Rock',
                 'label' => 'Swan Song',
                 'price' => 1150000,
-                'is_featured' => false,
                 'stock_quantity' => 18,
             ],
             [
@@ -225,7 +211,6 @@ Trên đĩa than, `Led Zeppelin II` (đặc biệt là các bản in đầu tiê
                 'genre' => 'Hard Rock',
                 'label' => 'Atlantic Records',
                 'price' => 850000,
-                'is_featured' => false,
                 'stock_quantity' => 28,
             ],
 
@@ -241,7 +226,6 @@ Bản Vinyl của album này tái hiện không gian sân khấu rộng lớn v�
                 'genre' => 'Rock',
                 'label' => 'EMI',
                 'price' => 920000,
-                'is_featured' => true,
                 'stock_quantity' => 35,
             ],
             [
@@ -255,7 +239,6 @@ Bìa đĩa với hình ảnh robot khổng lồ cầm trên tay các thành viê
                 'genre' => 'Rock',
                 'label' => 'EMI',
                 'price' => 880000,
-                'is_featured' => true,
                 'stock_quantity' => 40,
             ],
             [
@@ -269,7 +252,6 @@ Bìa đĩa với hình ảnh robot khổng lồ cầm trên tay các thành viê
                 'genre' => 'Rock',
                 'label' => 'EMI',
                 'price' => 850000,
-                'is_featured' => false,
                 'stock_quantity' => 24,
             ],
 
@@ -285,7 +267,6 @@ Nghe `Kind of Blue` trên đĩa than là cách tốt nhất để cảm nhận "
                 'genre' => 'Jazz',
                 'label' => 'Columbia Records',
                 'price' => 790000,
-                'is_featured' => true,
                 'stock_quantity' => 30,
             ],
             [
@@ -299,7 +280,6 @@ Tác phẩm trung tâm "Concierto de Aranjuez" dài 16 phút là một hành tr�
                 'genre' => 'Jazz',
                 'label' => 'Columbia Records',
                 'price' => 750000,
-                'is_featured' => false,
                 'stock_quantity' => 20,
             ],
             [
@@ -313,7 +293,6 @@ Bìa đĩa siêu thực (Surrealism) rực rỡ là sự phản chiếu hoàn h�
                 'genre' => 'Jazz Fusion',
                 'label' => 'Columbia Records',
                 'price' => 1200000,
-                'is_featured' => false,
                 'stock_quantity' => 15,
             ],
 
@@ -329,7 +308,6 @@ Tiếng kèn tenor của Coltrane trong album này đạt đến độ chín mu�
                 'genre' => 'Jazz',
                 'label' => 'Impulse!',
                 'price' => 820000,
-                'is_featured' => true,
                 'stock_quantity' => 25,
             ],
             [
@@ -343,7 +321,6 @@ Bìa đĩa với tông màu xanh dương và hình ảnh Coltrane đang trầm t
                 'genre' => 'Jazz',
                 'label' => 'Blue Note',
                 'price' => 780000,
-                'is_featured' => false,
                 'stock_quantity' => 22,
             ],
 
@@ -359,7 +336,6 @@ Sở hữu bộ đĩa than này giống như sở hữu một cuốn sách giáo
                 'genre' => 'Jazz Vocal',
                 'label' => 'Verve',
                 'price' => 750000,
-                'is_featured' => false,
                 'stock_quantity' => 18,
             ],
             [
@@ -373,7 +349,6 @@ Sở hữu bộ đĩa than này giống như sở hữu một cuốn sách giáo
                 'genre' => 'Jazz Vocal',
                 'label' => 'Verve',
                 'price' => 820000,
-                'is_featured' => true,
                 'stock_quantity' => 20,
             ],
 
@@ -389,7 +364,6 @@ Dù không mang nặng tính học thuật hay thử nghiệm như các album Ja
                 'genre' => 'Jazz',
                 'label' => 'Kapp Records',
                 'price' => 680000,
-                'is_featured' => false,
                 'stock_quantity' => 25,
             ],
 
@@ -405,7 +379,6 @@ Bìa đĩa hình em bé bơi theo tờ đô-la là một trong những hình ả
                 'genre' => 'Grunge',
                 'label' => 'DGC Records',
                 'price' => 850000,
-                'is_featured' => true,
                 'stock_quantity' => 45,
             ],
             [
@@ -419,7 +392,6 @@ Bìa đĩa hình em bé bơi theo tờ đô-la là một trong những hình ả
                 'genre' => 'Grunge',
                 'label' => 'DGC Records',
                 'price' => 880000,
-                'is_featured' => false,
                 'stock_quantity' => 30,
             ],
 
@@ -435,7 +407,6 @@ Album là sự mở rộng vĩ đại của cấu trúc nhạc Rock: những b�
                 'genre' => 'Alternative Rock',
                 'label' => 'Parlophone',
                 'price' => 890000,
-                'is_featured' => true,
                 'stock_quantity' => 35,
             ],
             [
@@ -449,7 +420,6 @@ Album là sự mở rộng vĩ đại của cấu trúc nhạc Rock: những b�
                 'genre' => 'Electronic Rock',
                 'label' => 'Parlophone',
                 'price' => 920000,
-                'is_featured' => false,
                 'stock_quantity' => 28,
             ],
             [
@@ -463,7 +433,6 @@ Album là sự mở rộng vĩ đại của cấu trúc nhạc Rock: những b�
                 'genre' => 'Alternative Rock',
                 'label' => 'Self-released',
                 'price' => 850000,
-                'is_featured' => false,
                 'stock_quantity' => 32,
             ],
 
@@ -479,7 +448,6 @@ Nghe `Trans-Europe Express` trên Vinyl là quay ngược thời gian về tươ
                 'genre' => 'Electronic',
                 'label' => 'Kling Klang',
                 'price' => 820000,
-                'is_featured' => true,
                 'stock_quantity' => 22,
             ],
             [
@@ -493,7 +461,6 @@ Bìa đĩa lấy cảm hứng từ nghệ thuật Constructivism (Kiến tạo) 
                 'genre' => 'Electronic',
                 'label' => 'Kling Klang',
                 'price' => 850000,
-                'is_featured' => false,
                 'stock_quantity' => 20,
             ],
             [
@@ -507,7 +474,6 @@ Cầm trên tay chiếc đĩa than `Autobahn`, với bìa đĩa vẽ biểu tư�
                 'genre' => 'Electronic',
                 'label' => 'Philips',
                 'price' => 790000,
-                'is_featured' => false,
                 'stock_quantity' => 18,
             ],
 
@@ -523,7 +489,6 @@ Trên định dạng Vinyl, `Discovery` mang lại năng lượng bùng nổ. Â
                 'genre' => 'Electronic',
                 'label' => 'Virgin Records',
                 'price' => 880000,
-                'is_featured' => true,
                 'stock_quantity' => 38,
             ],
             [
@@ -537,7 +502,6 @@ Kết quả là một kiệt tác âm thanh sang trọng, ấm áp và đầy t�
                 'genre' => 'Electronic',
                 'label' => 'Columbia Records',
                 'price' => 950000,
-                'is_featured' => true,
                 'stock_quantity' => 42,
             ],
             [
@@ -551,7 +515,6 @@ Sở hữu `Homework` trên đĩa than là sở hữu nguồn gốc của huyề
                 'genre' => 'Electronic',
                 'label' => 'Virgin Records',
                 'price' => 820000,
-                'is_featured' => false,
                 'stock_quantity' => 30,
             ],
 
@@ -562,7 +525,6 @@ Sở hữu `Homework` trên đĩa than là sở hữu nguồn gốc của huyề
                 'genre' => 'Big Beat',
                 'label' => 'Freestyle Dust',
                 'price' => 850000,
-                'is_featured' => true,
                 'stock_quantity' => 25,
             ],
             [
@@ -576,7 +538,6 @@ Bìa đĩa với hình ảnh đám đông giơ tay lên trời thể hiện chí
                 'genre' => 'Big Beat',
                 'label' => 'Freestyle Dust',
                 'price' => 880000,
-                'is_featured' => false,
                 'stock_quantity' => 22,
             ],
 
@@ -587,7 +548,6 @@ Bìa đĩa với hình ảnh đám đông giơ tay lên trời thể hiện chí
                 'genre' => 'Soul',
                 'label' => 'Tamla',
                 'price' => 820000,
-                'is_featured' => true,
                 'stock_quantity' => 28,
             ],
             [
@@ -596,7 +556,6 @@ Bìa đĩa với hình ảnh đám đông giơ tay lên trời thể hiện chí
                 'genre' => 'Soul',
                 'label' => 'Tamla',
                 'price' => 780000,
-                'is_featured' => false,
                 'stock_quantity' => 24,
             ],
 
@@ -612,7 +571,6 @@ Album ra mắt ở vị trí số 1 trên Billboard 200 và trụ vững ở đ�
                 'genre' => 'Soul',
                 'label' => 'Tamla',
                 'price' => 1150000,
-                'is_featured' => true,
                 'stock_quantity' => 30,
             ],
             [
@@ -626,7 +584,6 @@ Album đã giành giải Grammy Album của năm. Trên định dạng Vinyl, s�
                 'genre' => 'Soul',
                 'label' => 'Tamla',
                 'price' => 850000,
-                'is_featured' => false,
                 'stock_quantity' => 26,
             ],
             [
@@ -640,7 +597,6 @@ Bìa album với hình ảnh Stevie không đeo kính đen, nhìn xa xăm, thể
                 'genre' => 'Soul',
                 'label' => 'Tamla',
                 'price' => 820000,
-                'is_featured' => false,
                 'stock_quantity' => 28,
             ],
         ];
@@ -654,7 +610,6 @@ Bìa album với hình ảnh Stevie không đeo kính đen, nhìn xa xăm, thể
                 'genre' => $albumData['genre'],
                 'label' => $albumData['label'],
                 'price' => $albumData['price'],
-                'is_featured' => $albumData['is_featured'],
                 'stock_quantity' => $albumData['stock_quantity'],
                 'status' => 'active',
             ]);
