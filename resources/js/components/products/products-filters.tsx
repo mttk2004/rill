@@ -25,7 +25,7 @@ export function ProductsFilters({
   currentGenre = 'all',
   currentLabel = 'all',
   currentArtist = 'all',
-  currentSort = 'featured',
+  currentSort = 'newest',
   genres,
   labels,
   artists,
@@ -52,7 +52,7 @@ export function ProductsFilters({
 
   const getSortDisplay = () => {
     const option = sortOptions.find(opt => opt.value === currentSort);
-    return option?.label || 'Nổi bật';
+    return option?.label || 'Mới nhất';
   };
 
   return (

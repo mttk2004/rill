@@ -38,7 +38,7 @@ class ProductService
         $this->applyFilters($query, $filters);
 
         // Apply sorting
-        $this->applySorting($query, $filters['sort'] ?? 'featured');
+        $this->applySorting($query, $filters['sort'] ?? 'newest');
 
         // Get paginated results
         $perPage = config('pagination.products');
@@ -119,11 +119,7 @@ class ProductService
                 $query->orderBy('name', 'desc');
                 break;
             case 'newest':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'featured':
             default:
-                // Sort by created_at desc (newest first) for featured products
                 $query->orderBy('created_at', 'desc');
                 break;
         }
@@ -164,7 +160,6 @@ class ProductService
                 ->toArray(),
 
             'sort_options' => [
-                ['value' => 'featured', 'label' => 'Nổi bật'],
                 ['value' => 'newest', 'label' => 'Mới nhất'],
                 ['value' => 'price_asc', 'label' => 'Giá: Thấp đến cao'],
                 ['value' => 'price_desc', 'label' => 'Giá: Cao đến thấp'],
