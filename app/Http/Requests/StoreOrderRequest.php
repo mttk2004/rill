@@ -30,6 +30,7 @@ class StoreOrderRequest extends FormRequest
                 'exists:shipping_addresses,id,user_id,' . Auth::id(),
             ],
             'payment_method' => ['required', 'string', 'in:' . PaymentMethod::COD->value . ',' . PaymentMethod::VNPAY->value],
+            'voucher_code' => ['nullable', 'string', 'max:50'],
         ];
     }
 

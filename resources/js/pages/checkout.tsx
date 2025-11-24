@@ -214,6 +214,12 @@ export default function Checkout() {
   };
 
   const onSubmit = async (data: CheckoutFormValues) => {
+    // Add voucher code to data if applied
+    const orderData = {
+      ...data,
+      voucher_code: appliedVoucher?.code || null,
+    };
+
     // Nếu là VNPAY, cần xử lý khác
     if (data.payment_method === 'vnpay') {
       try {
@@ -227,7 +233,7 @@ export default function Checkout() {
             'X-CSRF-TOKEN': csrfToken,
             'Accept': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(orderData),
         });
 
         const result = await response.json();
@@ -247,10 +253,10 @@ export default function Checkout() {
         toast.error(errorMessage);
       }
     } else {
-      // COD: Sử dụng useToastRouter
+      // COD: Sử dụng useToastRouter với voucher code
       toastRouter.post(
         '/orders',
-        data,
+        orderData,
         {
           pending: 'Đang xử lý đơn hàng...',
           success: 'Đặt hàng thành công!',

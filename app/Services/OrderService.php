@@ -20,10 +20,12 @@ use Illuminate\Support\Str;
 class OrderService
 {
     protected $shippingService;
+    protected $voucherService;
 
-    public function __construct(ShippingService $shippingService)
+    public function __construct(ShippingService $shippingService, VoucherService $voucherService)
     {
         $this->shippingService = $shippingService;
+        $this->voucherService = $voucherService;
     }
 
     public function createOrderFromCart(User $user, array $data): Order
@@ -67,7 +69,22 @@ class OrderService
                 $estimatedWeight
             );
 
-            $discountAmount = 0; // TODO: Implement discount logic
+            // Process voucher discount if provided
+            $discountAmount = 0;
+            $voucher = null;
+            if (isset($data['voucher_code']) && !empty($data['voucher_code'])) {
+                $voucherResult = $this->voucherService->validateVoucher(
+                    $data['voucher_code'],
+                    (float) $subtotal,
+                    $user->id
+                );
+
+                if ($voucherResult->success) {
+                    $voucher = $voucherResult->data['voucher'];
+                    $discountAmount = $voucherResult->data['discount_amount'];
+                }
+            }
+
             $totalAmount = $subtotal + $shippingFee - $discountAmount;
 
             // Prepare address data
@@ -105,6 +122,11 @@ class OrderService
                 'payment_status' => PaymentStatus::PENDING,
                 'amount' => $totalAmount,
             ]);
+
+            // Apply voucher if used
+            if ($voucher) {
+                $this->voucherService->applyVoucher($voucher, $order, $user);
+            }
 
             // Clear the user's cart
             ShoppingCartItem::where('user_id', $user->id)->delete();
