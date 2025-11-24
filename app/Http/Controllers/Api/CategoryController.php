@@ -74,6 +74,27 @@ class CategoryController extends Controller
                     ];
                 });
 
+            // Get active collections with product counts
+            $collections = \DB::table('collection_product')
+                ->join('collections', 'collection_product.collection_id', '=', 'collections.id')
+                ->join('products', 'collection_product.product_id', '=', 'products.id')
+                ->select('collections.name', 'collections.slug')
+                ->selectRaw('COUNT(DISTINCT products.id) as count')
+                ->where('products.status', 'active')
+                ->where('collections.is_active', true)
+                ->whereNull('collections.deleted_at')
+                ->groupBy('collections.id', 'collections.name', 'collections.slug')
+                ->orderBy('collections.position')
+                ->limit(config('pagination.api.default'))
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'name' => $item->name,
+                        'slug' => $item->slug,
+                        'count' => (int) $item->count,
+                    ];
+                });
+
             // Get new products count (products from last 30 days)
             $newCount = Product::where('status', 'active')
                 ->where('created_at', '>=', now()->subDays(30))
@@ -83,6 +104,7 @@ class CategoryController extends Controller
                 'genres' => $genres,
                 'labels' => $labels,
                 'artists' => $artists,
+                'collections' => $collections,
                 'special' => [
                     [
                         'name' => 'Sản phẩm mới',

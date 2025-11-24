@@ -4,7 +4,7 @@ import { useCategoryMenu } from "@/hooks/use-category-menu";
 import { ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type MenuSection = "genres" | "labels" | "artists";
+type MenuSection = "genres" | "labels" | "artists" | "collections";
 
 export const ProductsFlyoutMenu = () => {
   const { data, loading } = useCategoryMenu();
@@ -26,6 +26,7 @@ export const ProductsFlyoutMenu = () => {
     { key: "genres" as MenuSection, label: "Danh mục", items: data.genres },
     { key: "labels" as MenuSection, label: "Hãng đĩa", items: data.labels },
     { key: "artists" as MenuSection, label: "Nghệ sĩ", items: data.artists },
+    { key: "collections" as MenuSection, label: "Collections", items: data.collections },
   ];
 
   const activeItems = data[activeSection] || [];
@@ -67,7 +68,7 @@ export const ProductsFlyoutMenu = () => {
           {activeItems.map((item) => (
             <Link
               key={item.slug}
-              href={`/products?${activeSection === "genres" ? "genre" : activeSection === "labels" ? "label" : "artist"}=${item.name}`}
+              href={`/products?${activeSection === "genres" ? "genre" : activeSection === "labels" ? "label" : activeSection === "artists" ? "artist" : "collection"}=${item.slug}`}
               className="group block"
             >
               <div className="py-2 px-3 rounded-md transition-all hover:bg-accent">

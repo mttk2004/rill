@@ -10,6 +10,7 @@ interface CategoryMenuData {
   genres: MenuCategory[];
   labels: MenuCategory[];
   artists: MenuCategory[];
+  collections: MenuCategory[];
   special: MenuCategory[];
 }
 
@@ -37,6 +38,9 @@ const defaultData: CategoryMenuData = {
     { name: 'The Beatles', slug: 'the-beatles', count: 0 },
     { name: 'Pink Floyd', slug: 'pink-floyd', count: 0 },
     { name: 'Led Zeppelin', slug: 'led-zeppelin', count: 0 },
+  ],
+  collections: [
+    { name: 'Sản phẩm nổi bật', slug: 'featured', count: 0 },
   ],
   special: [
     { name: 'Sản phẩm nổi bật', slug: 'featured', count: 0 },
