@@ -1,9 +1,10 @@
-import { Disc3, ZoomIn, ZoomOut, X, Maximize2 } from "lucide-react";
+import { Disc3, ZoomIn, ZoomOut, X, Maximize2, Sparkles } from "lucide-react";
 import { Product } from "@/types";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { getCollectionBadgeClasses } from "@/lib/collection-colors";
 
 interface ProductImageGalleryProps {
   product: Product;
@@ -90,6 +91,25 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
                   <span className="text-sm font-medium">Xem ảnh</span>
                 </div>
               </div>
+              
+              {/* Collection Corner Sticker with Hover Effect */}
+              {product.collection && (
+                <div className="absolute top-0 right-0 z-10">
+                  <div
+                    className={`${getCollectionBadgeClasses(product.collection.id)} rounded-bl-xl shadow-lg transition-all duration-300 ease-out overflow-hidden`}
+                    style={{
+                      clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 8px 0)'
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5 px-2 py-1.5 group-hover:px-3">
+                      <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="text-[11px] font-bold uppercase tracking-wide whitespace-nowrap max-w-0 group-hover:max-w-[200px] transition-all duration-300 ease-out overflow-hidden">
+                        {product.collection.name}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <div className="flex flex-col items-center justify-center text-muted-foreground">
