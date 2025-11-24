@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Head, useForm } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { X, Plus, Search } from "lucide-react";
 import type { Product } from "@/types";
 
@@ -107,7 +108,11 @@ export default function CreateCollection({ products }: CreateCollectionProps) {
     e.preventDefault();
     post(route('admin.collections.store'), {
       onSuccess: () => {
-        // Navigate handled by Inertia
+        toast.success('Collection đã được tạo thành công!');
+      },
+      onError: (errors) => {
+        toast.error('Có lỗi xảy ra khi tạo collection');
+        console.error('Validation errors:', errors);
       },
     });
   };
