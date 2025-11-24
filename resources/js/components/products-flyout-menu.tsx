@@ -65,24 +65,30 @@ export const ProductsFlyoutMenu = () => {
           {sections.find((s) => s.key === activeSection)?.label}
         </h3>
         <div className="grid grid-cols-4 gap-x-4 gap-y-3">
-          {activeItems.map((item) => (
-            <Link
-              key={item.slug}
-              href={`/products?${activeSection === "genres" ? "genre" : activeSection === "labels" ? "label" : activeSection === "artists" ? "artist" : "collection"}=${item.slug}`}
-              className="group block"
-            >
-              <div className="py-2 px-3 rounded-md transition-all hover:bg-accent">
-                <div className="font-medium text-sm text-foreground group-hover:text-white dark:group-hover:text-white transition-colors truncate">
-                  {item.name}
-                </div>
-                {item.count > 0 && (
-                  <div className="text-xs text-gray-500 group-hover:text-gray-200 mt-1">
-                    {item.count} sản phẩm
+          {activeItems.map((item) => {
+            // Use 'name' for genres, labels, artists; use 'slug' for collections
+            const paramValue = activeSection === "collections" ? item.slug : item.name;
+            const paramKey = activeSection === "genres" ? "genre" : activeSection === "labels" ? "label" : activeSection === "artists" ? "artist" : "collection";
+
+            return (
+              <Link
+                key={item.slug}
+                href={`/products?${paramKey}=${encodeURIComponent(paramValue)}`}
+                className="group block"
+              >
+                <div className="py-2 px-3 rounded-md transition-all hover:bg-accent">
+                  <div className="font-medium text-sm text-foreground group-hover:text-white dark:group-hover:text-white transition-colors truncate">
+                    {item.name}
                   </div>
-                )}
-              </div>
-            </Link>
-          ))}
+                  {item.count > 0 && (
+                    <div className="text-xs text-gray-500 group-hover:text-gray-200 mt-1">
+                      {item.count} sản phẩm
+                    </div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         {activeItems.length === 0 && (
