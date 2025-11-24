@@ -23,10 +23,10 @@ class OrderStatusHistoryFactory extends Factory
     {
         return [
             'order_id' => Order::factory(),
-            'status' => fake()->randomElement(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']),
-            'notes' => fake()->optional()->sentence(),
+            'status' => $this->faker->randomElement(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']),
+            'notes' => $this->faker->optional()->sentence(),
             'created_by' => User::factory(),
-            'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
+            'created_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
         ];
     }
 
@@ -86,7 +86,7 @@ class OrderStatusHistoryFactory extends Factory
     public function withNotes(): static
     {
         return $this->state(fn (array $attributes) => [
-            'notes' => fake()->sentence(),
+            'notes' => $this->faker->sentence(),
         ]);
     }
 }

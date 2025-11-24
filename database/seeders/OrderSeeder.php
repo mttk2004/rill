@@ -78,7 +78,7 @@ class OrderSeeder extends Seeder
             $shippingAddressData = [
                 'full_name' => $customer->name,
                 'phone' => '0987654321',
-                'address_line_1' => fake()->streetAddress(),
+                'address_line_1' => $this->faker->streetAddress(),
                 'province' => 'Hà Nội',
                 'district' => 'Hoàn Kiếm',
                 'ward' => 'Hàng Bài',

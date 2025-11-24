@@ -24,14 +24,14 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role' => 'customer',
-            'phone' => fake()->optional(0.7)->numerify('##########'), // Vietnamese phone format
-            'gender' => fake()->optional(0.6)->randomElement(['male', 'female', 'other']),
-            'date_of_birth' => fake()->optional(0.8)->dateTimeBetween('-60 years', '-18 years')?->format('Y-m-d'),
+            'phone' => $this->faker->optional(0.7)->numerify('##########'), // Vietnamese phone format
+            'gender' => $this->faker->optional(0.6)->randomElement(['male', 'female', 'other']),
+            'date_of_birth' => $this->faker->optional(0.8)->dateTimeBetween('-60 years', '-18 years')?->format('Y-m-d'),
             'avatar' => null, // Will be handled separately when implementing image uploads
             'is_active' => true,
             'remember_token' => Str::random(10),

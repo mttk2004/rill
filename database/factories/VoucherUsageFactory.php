@@ -31,8 +31,8 @@ class VoucherUsageFactory extends Factory
             'voucher_id' => Voucher::factory(),
             'user_id' => User::factory(),
             'order_id' => Order::factory(),
-            'discount_amount' => fake()->randomFloat(2, 10000, 100000),
-            'used_at' => fake()->dateTimeBetween('-6 months', 'now'),
+            'discount_amount' => $this->faker->randomFloat(2, 10000, 100000),
+            'used_at' => $this->faker->dateTimeBetween('-6 months', 'now'),
         ];
     }
 }
