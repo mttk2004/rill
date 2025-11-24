@@ -33,7 +33,7 @@ export function ProductsFilters({
   currentGenre = 'all',
   currentLabel = 'all',
   currentArtist = 'all',
-  currentCollection = 'all',
+  currentCollection,
   currentSort = 'newest',
   genres,
   labels,
@@ -44,6 +44,9 @@ export function ProductsFilters({
   onFilterChange,
   onViewModeChange,
 }: ProductsFiltersProps) {
+  // Normalize collection value
+  const collectionValue = currentCollection || 'all';
+
   // Get display values
   const getGenreDisplay = () => {
     if (!currentGenre || currentGenre === 'all') return 'Tất cả';
@@ -61,8 +64,8 @@ export function ProductsFilters({
   };
 
   const getCollectionDisplay = () => {
-    if (!currentCollection || currentCollection === 'all') return 'Tất cả';
-    const collection = collections.find(c => c.slug === currentCollection);
+    if (!collectionValue || collectionValue === 'all') return 'Tất cả';
+    const collection = collections.find(c => c.slug === collectionValue);
     return collection?.name || 'Tất cả';
   };
 
@@ -138,7 +141,7 @@ export function ProductsFilters({
           <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
             Collection
           </label>
-          <Select value={currentCollection} onValueChange={(value) => onFilterChange('collection', value)}>
+          <Select value={collectionValue} onValueChange={(value) => onFilterChange('collection', value === 'all' ? '' : value)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue>
                 {getCollectionDisplay()}

@@ -32,7 +32,7 @@ export function ProductsFiltersMobile({
   currentGenre = 'all',
   currentLabel = 'all',
   currentArtist = 'all',
-  currentCollection = 'all',
+  currentCollection,
   currentSort = 'newest',
   genres,
   labels,
@@ -41,6 +41,9 @@ export function ProductsFiltersMobile({
   sortOptions,
   onFilterChange,
 }: ProductsFiltersMobileProps) {
+  // Normalize collection value
+  const collectionValue = currentCollection || 'all';
+
   // Get display values
   const getGenreDisplay = () => {
     if (!currentGenre || currentGenre === 'all') return 'Tất cả';
@@ -58,8 +61,8 @@ export function ProductsFiltersMobile({
   };
 
   const getCollectionDisplay = () => {
-    if (!currentCollection || currentCollection === 'all') return 'Tất cả';
-    const collection = collections.find(c => c.slug === currentCollection);
+    if (!collectionValue || collectionValue === 'all') return 'Tất cả';
+    const collection = collections.find(c => c.slug === collectionValue);
     return collection?.name || 'Tất cả';
   };
 
@@ -147,7 +150,7 @@ export function ProductsFiltersMobile({
                 <label className="text-sm font-medium text-slate-900 dark:text-slate-100">
                   Collection
                 </label>
-                <Select value={currentCollection} onValueChange={(value) => onFilterChange('collection', value)}>
+                <Select value={collectionValue} onValueChange={(value) => onFilterChange('collection', value === 'all' ? '' : value)}>
                   <SelectTrigger>
                     <SelectValue>
                       {getCollectionDisplay()}
