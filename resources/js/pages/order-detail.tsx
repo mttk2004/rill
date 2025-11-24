@@ -69,6 +69,9 @@ interface Order {
   order_id: string; // Database primary key
   date: string;
   status: string;
+  subtotal: number;
+  shipping_fee: number;
+  discount_amount: number;
   total: number;
   delivered_date?: string;
   payment_method: string;
@@ -510,13 +513,23 @@ const OrderDetail = ({ order: orderProp }: OrderDetailProps) => {
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-600 dark:text-slate-400">Tạm tính</span>
                     <span className="font-medium text-slate-900 dark:text-white">
-                      {formatVND(order.total || 0)}
+                      {formatVND(order.subtotal || 0)}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-slate-600 dark:text-slate-400">Phí vận chuyển</span>
-                    <span className="font-medium text-green-600">Miễn phí</span>
+                    <span className={`font-medium ${order.shipping_fee === 0 ? 'text-green-600' : 'text-slate-900 dark:text-white'}`}>
+                      {order.shipping_fee === 0 ? 'Miễn phí' : formatVND(order.shipping_fee)}
+                    </span>
                   </div>
+                  {order.discount_amount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-600 dark:text-slate-400">Giảm giá</span>
+                      <span className="font-medium text-green-600">
+                        -{formatVND(order.discount_amount)}
+                      </span>
+                    </div>
+                  )}
                   <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold text-slate-900 dark:text-white">Tổng cộng</span>

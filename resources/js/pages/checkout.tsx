@@ -406,32 +406,44 @@ export default function Checkout() {
                         </div>
 
                         {/* Voucher suggestions */}
-                        {showVoucherSuggestions && availableVouchers.length > 0 && (
+                        {showVoucherSuggestions && (
                           <div className="space-y-2 max-h-64 overflow-y-auto">
-                            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-2">
-                              <Sparkles className="h-4 w-4 text-amber-500" />
-                              <span className="font-medium">Mã giảm giá khả dụng</span>
-                            </div>
-                            {availableVouchers.map((voucher) => (
-                              <button
-                                key={voucher.id}
-                                onClick={() => handleApplySuggestedVoucher(voucher)}
-                                className="w-full text-left p-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all"
-                              >
-                                <div className="flex justify-between items-start mb-1">
-                                  <span className="font-bold text-amber-600 dark:text-amber-400">{voucher.code}</span>
-                                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                    -{formatVND(voucher.discount_amount || 0)}
-                                  </Badge>
+                            {availableVouchers.length > 0 ? (
+                              <>
+                                <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-2">
+                                  <Sparkles className="h-4 w-4 text-amber-500" />
+                                  <span className="font-medium">Mã giảm giá khả dụng</span>
                                 </div>
-                                <p className="text-sm text-slate-700 dark:text-slate-300">{voucher.name}</p>
-                                {voucher.minimum_amount && (
-                                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                    Đơn tối thiểu: {formatVND(voucher.minimum_amount)}
+                                {availableVouchers.map((voucher) => (
+                                  <button
+                                    key={voucher.id}
+                                    onClick={() => handleApplySuggestedVoucher(voucher)}
+                                    className="w-full text-left p-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-amber-400 dark:hover:border-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all"
+                                  >
+                                    <div className="flex justify-between items-start mb-1">
+                                      <span className="font-bold text-amber-600 dark:text-amber-400">{voucher.code}</span>
+                                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                        -{formatVND(voucher.discount_amount || 0)}
+                                      </Badge>
+                                    </div>
+                                    <p className="text-sm text-slate-700 dark:text-slate-300">{voucher.name}</p>
+                                    {voucher.minimum_amount && (
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                        Đơn tối thiểu: {formatVND(voucher.minimum_amount)}
+                                      </p>
+                                    )}
+                                  </button>
+                                ))}
+                              </>
+                            ) : (
+                              !isLoadingVouchers && (
+                                <div className="p-4 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg">
+                                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    Không có mã giảm giá khả dụng cho đơn hàng này
                                   </p>
-                                )}
-                              </button>
-                            ))}
+                                </div>
+                              )
+                            )}
                           </div>
                         )}
 
