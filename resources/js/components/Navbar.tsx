@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
-// TODO: Remove react-router-dom - import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, router } from '@inertiajs/react';
 import { ShoppingBag, Menu, X, Search, User, ChevronDown } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { COLLECTIONS } from '../data';
@@ -31,7 +30,6 @@ const Navbar = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const { cartCount } = useShop();
-  const navigate = useNavigate();
 
   // Trigger bounce animation when cart count increases
   useEffect(() => {
@@ -45,7 +43,7 @@ const Navbar = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.visit(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
       setSearchQuery('');
     }
@@ -54,7 +52,7 @@ const Navbar = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setIsUserMenuOpen(false);
-    navigate('/');
+    router.visit('/');
   };
 
   const closeAllMenus = () => {

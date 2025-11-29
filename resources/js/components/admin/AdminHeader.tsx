@@ -1,14 +1,13 @@
 
 import React from 'react';
-import { Link } from '@inertiajs/react';
-// TODO: Remove react-router-dom - import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, router, usePage } from '@inertiajs/react';
 import { LogOut, LayoutGrid } from 'lucide-react';
 
 const AdminHeader = () => {
-  const navigate = useNavigate();
+  const { url } = usePage();
 
   const handleLogout = () => {
-    navigate('/login');
+    router.post('/logout');
   };
 
   const navItems = [
@@ -28,7 +27,7 @@ const AdminHeader = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-8">
-            <Link to="/admin" className="text-xl font-serif font-bold tracking-tight text-primary flex items-center gap-2">
+            <Link href="/admin" className="text-xl font-serif font-bold tracking-tight text-primary flex items-center gap-2">
               RILL<span className="text-accent">.</span> 
               <span className="text-[10px] uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-sans font-bold border border-gray-200">
                 Admin Panel
@@ -37,22 +36,25 @@ const AdminHeader = () => {
             
             {/* Nav */}
             <nav className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === '/admin'}
-                  className={({ isActive }) =>
-                    `px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              {navItems.map((item) => {
+                const isActive = item.path === '/admin' 
+                  ? url === '/admin' 
+                  : url.startsWith(item.path);
+                
+                return (
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       isActive
                         ? 'bg-primary/10 text-primary'
                         : 'text-gray-500 hover:bg-gray-50 hover:text-primary'
-                    }`
-                  }
-                >
-                  {item.name}
-                </NavLink>
-              ))}
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
 
