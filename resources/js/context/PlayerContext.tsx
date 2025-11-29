@@ -12,7 +12,7 @@ interface PlayerContextType {
   closePlayer: () => void;
 }
 
-const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
+const PlayerContext = createContext(undefined as unknown as PlayerContextType);
 
 export const PlayerProvider = ({ children }: { children?: React.ReactNode }) => {
   const [currentTrack, setCurrentTrack] = useState<Product | null>(null);

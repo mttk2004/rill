@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Package, Clock, CheckCircle, Truck, XCircle, Filter, ArrowUpDown } from 'lucide-react';
+import CustomerLayout from '@/layouts/customer-layout';
 import Button from '../components/Button';
 
 interface OrdersProps {
@@ -69,7 +70,7 @@ export default function Orders({ orders = [] }: OrdersProps) {
   }, [orders, filterStatus, sortOption]);
 
   return (
-    <>
+    <CustomerLayout>
       <Head title="Đơn hàng của tôi - Rill" />
       <div className="bg-gray-50 min-h-screen py-12">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -176,6 +177,6 @@ export default function Orders({ orders = [] }: OrdersProps) {
           )}
         </div>
       </div>
-    </>
+    </CustomerLayout>
   );
 }

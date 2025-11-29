@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { Artist, Collection } from '../../types';
 

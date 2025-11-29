@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle } from 'lucide-react';
+import CustomerLayout from '@/layouts/customer-layout';
 import Button from '../components/Button';
 
 interface OrderDetailProps {
@@ -79,7 +80,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   const isCancelled = order.status === 'cancelled';
 
   return (
-    <>
+    <CustomerLayout>
       <Head title={`Đơn hàng #${order.id} - Rill`} />
       <div className="bg-gray-50 min-h-screen py-12">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -254,6 +255,6 @@ export default function OrderDetail({ order }: OrderDetailProps) {
           </div>
         </div>
       </div>
-    </>
+    </CustomerLayout>
   );
 }

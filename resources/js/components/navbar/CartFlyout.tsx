@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link } from 'react-router-dom';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import Button from '../Button';

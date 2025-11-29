@@ -1,6 +1,7 @@
 import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { useShop } from '../context/ShopContext';
+import CustomerLayout from '@/layouts/customer-layout';
 import Button from '../components/Button';
 import { Trash2, ArrowLeft } from 'lucide-react';
 
@@ -9,7 +10,7 @@ export default function Cart() {
 
   if (cart.length === 0) {
     return (
-      <>
+      <CustomerLayout>
         <Head title="Giỏ hàng - Rill" />
         <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white px-4">
           <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">Giỏ hàng của bạn đang trống</h2>
@@ -18,12 +19,12 @@ export default function Cart() {
             <Button>Bắt đầu mua sắm</Button>
           </Link>
         </div>
-      </>
+      </CustomerLayout>
     );
   }
 
   return (
-    <>
+    <CustomerLayout>
       <Head title="Giỏ hàng - Rill" />
       <div className="bg-white min-h-screen py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -125,6 +126,6 @@ export default function Cart() {
           </div>
         </div>
       </div>
-    </>
+    </CustomerLayout>
   );
 }

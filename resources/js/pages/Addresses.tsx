@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import Button from '../components/Button';
+import CustomerLayout from '@/layouts/customer-layout';
 import AlertDialog from '../components/AlertDialog';
 import AddressFormDialog from '../components/address/AddressFormDialog';
 import AddressCard from '../components/address/AddressCard';
@@ -135,7 +136,7 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
   };
 
   return (
-    <>
+    <CustomerLayout>
       <Head title="Địa chỉ giao hàng - Rill" />
       <div className="bg-gray-50 min-h-screen py-12 relative">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -186,6 +187,6 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
           type="danger"
         />
       </div>
-    </>
+    </CustomerLayout>
   );
 }

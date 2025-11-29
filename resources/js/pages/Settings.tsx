@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import Button from '../components/Button';
+import CustomerLayout from '@/layouts/customer-layout';
 import { User, Lock, Bell, Shield, LogOut } from 'lucide-react';
 
 interface SettingsProps {
@@ -17,7 +18,7 @@ export default function Settings({ user }: SettingsProps) {
   ];
 
   return (
-    <>
+    <CustomerLayout>
       <Head title="Cài đặt tài khoản - Rill" />
       <div className="bg-gray-50 min-h-screen py-12">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -33,8 +34,8 @@ export default function Settings({ user }: SettingsProps) {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id
-                          ? 'bg-primary/5 text-primary'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-primary/5 text-primary'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                     >
                       <tab.icon size={18} />
@@ -159,6 +160,6 @@ export default function Settings({ user }: SettingsProps) {
           </div>
         </div>
       </div>
-    </>
+    </CustomerLayout>
   );
 }

@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import React from 'react';
+import CustomerLayout from '@/layouts/customer-layout';
 import Button from '../components/Button';
 import ProductCard from '../components/ProductCard';
 import Reveal from '../components/Reveal';
@@ -16,7 +17,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
   // Fallback to empty arrays if data not provided
 
   return (
-    <>
+    <CustomerLayout>
       <Head title="Trang chủ - Rill" />
       <div className="flex flex-col min-h-screen">
         {/* Hero Section - Keep CSS animation for immediate impact on load */}
@@ -203,6 +204,6 @@ export default function Home({ featuredProducts = [], collections = [], artists 
           </Reveal>
         </section>
       </div>
-    </>
+    </CustomerLayout>
   );
 }

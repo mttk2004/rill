@@ -6,6 +6,7 @@ import { usePlayer } from '../context/PlayerContext';
 import { Star, Truck, ShieldCheck, Play, Pause, Music, Loader2, Check } from 'lucide-react';
 import { flyToCart } from '../utils/cartAnimation';
 import type { Product, Artist, Review } from '@/types';
+import CustomerLayout from '@/layouts/customer-layout';
 
 // Imported Sub-components
 import QuantitySelector from '../components/product-detail/QuantitySelector';
@@ -99,7 +100,7 @@ export default function ProductDetail({
   const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price));
 
   return (
-    <>
+    <CustomerLayout>
       <Head title={`${product.name} - Rill`} />
       <div className="bg-white min-h-screen">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
@@ -268,7 +269,6 @@ export default function ProductDetail({
 
         </div>
       </div>
-    </div >
-      </>
-    );
+    </CustomerLayout>
+  );
 }

@@ -1,9 +1,10 @@
 import { Head } from '@inertiajs/react';
 import React from 'react';
+import CustomerLayout from '@/layouts/customer-layout';
 
 export default function About() {
   return (
-    <>
+    <CustomerLayout>
       <Head title="Về chúng tôi - Rill" />
       <div className="bg-white">
         {/* Hero */}
@@ -51,6 +52,6 @@ export default function About() {
           </div>
         </div>
       </div>
-    </>
+    </CustomerLayout>
   );
 }
