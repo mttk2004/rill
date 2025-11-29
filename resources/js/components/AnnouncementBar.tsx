@@ -11,7 +11,7 @@ const AnnouncementBar = () => {
       };
     };
   }>();
-  
+
   const { enabled: isEnabled, content, type } = props.settings?.banner || {};
 
   if (!isEnabled || !content) return null;
