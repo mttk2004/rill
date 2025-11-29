@@ -29,18 +29,34 @@ class ProductController extends Controller
 
         $result = $this->productService->getProducts($filters);
 
+        // Get active collection if filter is set
+        $activeCollection = null;
+        if (!empty($filters['collection'])) {
+            $activeCollection = \App\Models\Collection::where('slug', $filters['collection'])
+                ->where('is_active', true)
+                ->first(['id', 'name', 'slug', 'type', 'description']);
+        }
+
         return Inertia::render('ProductList', [
             'products' => $result['products'],
-            'filters' => $result['filters'],
+            'artists' => \App\Models\Artist::active()
+                ->whereHas('products', function ($query) {
+                    $query->where('status', 'active');
+                })
+                ->orderBy('name')
+                ->get(['id', 'name', 'slug', 'image']),
+            'availableGenres' => $result['filters']['genres'] ?? [],
+            'availableLabels' => $result['filters']['labels'] ?? [],
+            'activeCollection' => $activeCollection,
+            'filters' => [
+                'search' => $filters['search'] ?? null,
+                'genre' => $filters['genre'] ?? null,
+                'label' => $filters['label'] ?? null,
+                'artist' => $filters['artist'] ?? null,
+                'collection' => $filters['collection'] ?? null,
+                'sort' => $filters['sort'] ?? null,
+            ],
             'pagination' => $result['pagination'],
-            // Pass filter parameters to frontend
-            'search' => $filters['search'] ?? null,
-            'genre' => $filters['genre'] ?? null,
-            'label' => $filters['label'] ?? null,
-            'artist' => $filters['artist'] ?? null,
-            'collection' => $filters['collection'] ?? null,
-            'sort' => $filters['sort'] ?? null,
-            'page' => $filters['page'] ?? 1,
         ]);
     }
 
