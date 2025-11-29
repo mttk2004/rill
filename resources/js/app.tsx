@@ -7,6 +7,9 @@ import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { initializeTheme } from './hooks/use-appearance';
 import { Ziggy } from './ziggy';
+import { ShopProvider } from './context/ShopContext';
+import { PlayerProvider } from './context/PlayerContext';
+import { ToastProvider } from './context/ToastContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -20,22 +23,26 @@ createInertiaApp({
     const root = createRoot(el);
 
     root.render(
-      <>
-        <App {...props} />
-        <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={true}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          className="custom-toast-container"
-        />
-      </>
+      <ShopProvider>
+        <PlayerProvider>
+          <ToastProvider>
+            <App {...props} />
+            <ToastContainer
+              position="bottom-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={true}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              className="custom-toast-container"
+            />
+          </ToastProvider>
+        </PlayerProvider>
+      </ShopProvider>
     );
   },
   progress: {
