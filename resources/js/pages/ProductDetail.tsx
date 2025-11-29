@@ -107,9 +107,9 @@ export default function ProductDetail({
 
           {/* Breadcrumb */}
           <nav className="text-sm text-gray-500 mb-8 animate-fade-in">
-            <Link to="/" className="hover:text-primary">Trang chủ</Link>
+            <Link href="/" className="hover:text-primary">Trang chủ</Link>
             <span className="mx-2">/</span>
-            <Link to="/products" className="hover:text-primary">Cửa hàng</Link>
+            <Link href="/products" className="hover:text-primary">Cửa hàng</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900">{product.name}</span>
           </nav>
