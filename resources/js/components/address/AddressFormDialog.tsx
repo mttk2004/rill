@@ -91,10 +91,10 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
   const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const provinceId = parseInt(e.target.value);
     const province = provinces.find(p => p.ProvinceID === provinceId);
-    
+
     setSelectedProvinceId(provinceId);
     setSelectedDistrictId(null);
-    
+
     // Update formData with province name
     const syntheticEvent = {
       target: {
@@ -104,14 +104,24 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
       }
     } as React.ChangeEvent<HTMLInputElement>;
     onChange(syntheticEvent);
+
+    // Update formData with province ID
+    const idEvent = {
+      target: {
+        name: 'province_id',
+        value: provinceId.toString(),
+        type: 'text'
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChange(idEvent);
   };
 
   const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const districtId = parseInt(e.target.value);
     const district = districts.find(d => d.DistrictID === districtId);
-    
+
     setSelectedDistrictId(districtId);
-    
+
     // Update formData with district name
     const syntheticEvent = {
       target: {
@@ -121,11 +131,22 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
       }
     } as React.ChangeEvent<HTMLInputElement>;
     onChange(syntheticEvent);
+
+    // Update formData with district ID
+    const idEvent = {
+      target: {
+        name: 'district_id',
+        value: districtId.toString(),
+        type: 'text'
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChange(idEvent);
   };
 
   const handleWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const ward = wards.find(w => w.WardCode === e.target.value);
-    
+    const wardCode = e.target.value;
+    const ward = wards.find(w => w.WardCode === wardCode);
+
     // Update formData with ward name
     const syntheticEvent = {
       target: {
@@ -135,7 +156,19 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
       }
     } as React.ChangeEvent<HTMLInputElement>;
     onChange(syntheticEvent);
+
+    // Update formData with ward ID
+    const idEvent = {
+      target: {
+        name: 'ward_id',
+        value: wardCode,
+        type: 'text'
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChange(idEvent);
   };
+
+  console.log('AddressFormDialog render:', { isOpen, provinces: provinces.length, districts: districts.length, wards: wards.length });
 
   if (!isOpen) return null;
 

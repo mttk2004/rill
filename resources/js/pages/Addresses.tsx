@@ -16,8 +16,11 @@ interface UserAddress {
   address_line_1: string;
   address_line_2?: string;
   province: string;
+  province_id?: number;
   district: string;
+  district_id?: number;
   ward: string;
+  ward_id?: string;
   is_default: number;
 }
 
@@ -41,14 +44,18 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
     address_line_1: '',
     address_line_2: '',
     province: '',
+    province_id: undefined,
     district: '',
+    district_id: undefined,
     ward: '',
+    ward_id: undefined,
     is_default: 0
   });
 
   const { showToast } = useToast();
 
   const handleAddNew = () => {
+    console.log('=== handleAddNew called ===');
     setEditingAddress(null);
     setFormData({
       full_name: '',
@@ -56,10 +63,14 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
       address_line_1: '',
       address_line_2: '',
       province: '',
+      province_id: undefined,
       district: '',
+      district_id: undefined,
       ward: '',
+      ward_id: undefined,
       is_default: 0
     });
+    console.log('Setting isDialogOpen to true');
     setIsDialogOpen(true);
   };
 
@@ -110,26 +121,40 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== handleSubmit called ===');
+    console.log('Form data:', formData);
+    console.log('Editing address:', editingAddress);
 
     if (editingAddress) {
       // Update existing
+      console.log('Updating address...');
       router.put(`/addresses/${editingAddress.id}`, formData, {
         onSuccess: () => {
+          console.log('Update successful');
           setAddresses((prev) => prev.map((a) =>
             a.id === editingAddress.id ? { ...a, ...formData } as UserAddress : a
           ));
           showToast('Cập nhật địa chỉ thành công', 'success');
           setIsDialogOpen(false);
         },
+        onError: (errors) => {
+          console.error('Update failed:', errors);
+          showToast('Cập nhật thất bại: ' + (errors.message || 'Unknown error'), 'error');
+        },
       });
     } else {
       // Add new
+      console.log('Adding new address...');
       router.post('/addresses', formData, {
         onSuccess: () => {
-          // Backend will return new address, refresh page or update local state
+          console.log('Add successful');
           showToast('Thêm địa chỉ mới thành công', 'success');
           setIsDialogOpen(false);
           router.reload();
+        },
+        onError: (errors) => {
+          console.error('Add failed:', errors);
+          showToast('Thêm địa chỉ thất bại: ' + (errors.message || 'Unknown error'), 'error');
         },
       });
     }
