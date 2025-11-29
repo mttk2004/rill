@@ -28,8 +28,13 @@ interface AddressesProps {
   addresses: UserAddress[];
 }
 
-export default function Addresses({ addresses: initialAddresses = [] }: AddressesProps) {
-  const [addresses, setAddresses] = useState<UserAddress[]>(initialAddresses);
+export default function Addresses({ addresses: propsAddresses = [] }: AddressesProps) {
+  const [addresses, setAddresses] = useState<UserAddress[]>(propsAddresses);
+
+  // Sync with props when they change (from Inertia)
+  React.useEffect(() => {
+    setAddresses(propsAddresses);
+  }, [propsAddresses]);
 
   // Modal States
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -55,7 +60,6 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
   const { showToast } = useToast();
 
   const handleAddNew = () => {
-    console.log('=== handleAddNew called ===');
     setEditingAddress(null);
     setFormData({
       full_name: '',
@@ -70,7 +74,6 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
       ward_id: undefined,
       is_default: 0
     });
-    console.log('Setting isDialogOpen to true');
     setIsDialogOpen(true);
   };
 
@@ -121,16 +124,11 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('=== handleSubmit called ===');
-    console.log('Form data:', formData);
-    console.log('Editing address:', editingAddress);
 
     if (editingAddress) {
       // Update existing
-      console.log('Updating address...');
       router.put(`/addresses/${editingAddress.id}`, formData, {
         onSuccess: () => {
-          console.log('Update successful');
           setAddresses((prev) => prev.map((a) =>
             a.id === editingAddress.id ? { ...a, ...formData } as UserAddress : a
           ));
@@ -147,10 +145,9 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
       console.log('Adding new address...');
       router.post('/addresses', formData, {
         onSuccess: () => {
-          console.log('Add successful');
           showToast('Thêm địa chỉ mới thành công', 'success');
           setIsDialogOpen(false);
-          router.reload();
+          // Inertia will automatically update props.addresses, useEffect will sync state
         },
         onError: (errors) => {
           console.error('Add failed:', errors);
