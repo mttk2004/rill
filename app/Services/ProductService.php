@@ -45,9 +45,9 @@ class ProductService
         $products = $query->paginate($perPage);
 
         // Transform products for frontend
-        $transformedProducts = $products->through(function ($product) {
+        $transformedProducts = $products->map(function ($product) {
             return $this->transformProduct($product);
-        });
+        })->values()->toArray();
 
         return [
             'products' => $transformedProducts,
