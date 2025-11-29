@@ -1,34 +1,45 @@
-
 import React from 'react';
-import { Link } from '@inertiajs/react';
-// TODO: Remove react-router-dom - import { Link, useNavigate } from 'react-router-dom';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import Button from '../components/Button';
 import { useToast } from '../context/ToastContext';
 import { ShieldCheck, User } from 'lucide-react';
 
-const Login = () => {
+export default function Login() {
   const { showToast } = useToast();
-  const navigate = useNavigate();
+  
+  const { data, setData, post, processing } = useForm<{
+    email: string;
+    password: string;
+    remember: boolean;
+  }>({
+    email: '',
+    password: '',
+    remember: false,
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulation
-    showToast('Đăng nhập thành công! Chào mừng trở lại.', 'success');
-    navigate('/');
+    post('/login', {
+      onSuccess: () => {
+        showToast('Đăng nhập thành công! Chào mừng trở lại.', 'success');
+      },
+    });
   };
 
   const handleQuickLogin = (role: 'customer' | 'admin') => {
     if (role === 'admin') {
       showToast('Đăng nhập quyền Admin thành công', 'info');
-      navigate('/admin');
+      router.visit('/admin');
     } else {
       showToast('Đăng nhập quyền Khách hàng thành công', 'success');
-      navigate('/');
+      router.visit('/');
     }
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+    <>
+      <Head title="Đăng nhập - Rill" />
+      <div className="flex min-h-[80vh] items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-lg">
         <div className="text-center">
           <h2 className="font-serif text-3xl font-bold tracking-tight text-gray-900">Chào Mừng Trở Lại</h2>
@@ -68,6 +79,8 @@ const Login = () => {
                 type="email"
                 autoComplete="email"
                 required
+                value={data.email}
+                onChange={(e) => setData('email', e.target.value)}
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
                 placeholder="you@example.com"
               />
@@ -82,6 +95,8 @@ const Login = () => {
                 type="password"
                 autoComplete="current-password"
                 required
+                value={data.password}
+                onChange={(e) => setData('password', e.target.value)}
                 className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
                 placeholder="••••••••"
               />
@@ -94,6 +109,8 @@ const Login = () => {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
+                checked={data.remember}
+                onChange={(e) => setData('remember', e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
@@ -109,8 +126,8 @@ const Login = () => {
           </div>
 
           <div>
-            <Button fullWidth type="submit">
-              Đăng nhập
+            <Button fullWidth type="submit" disabled={processing}>
+              {processing ? 'Đang đăng nhập...' : 'Đăng nhập'}
             </Button>
           </div>
         </form>
@@ -136,13 +153,12 @@ const Login = () => {
 
         <p className="text-center text-sm text-gray-600">
            Chưa có tài khoản?{' '}
-           <Link to="/register" className="font-medium text-accent hover:text-primary">
+           <Link href="/register" className="font-medium text-accent hover:text-primary">
              Đăng ký ngay
            </Link>
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
-};
-
-export default Login;
+}
