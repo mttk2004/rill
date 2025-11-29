@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useShop } from '../context/ShopContext';
-import CustomerLayout from '@/layouts/customer-layout';
+import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { CheckCircle, CreditCard, MapPin, Ticket } from 'lucide-react';
 import type { Address } from '@/types';
@@ -49,7 +49,7 @@ export default function Checkout({ addresses = [] }: CheckoutProps) {
 
   if (cart.length === 0) {
     return (
-      <CustomerLayout>
+      <AppLayout>
         <Head title="Thanh toán - Rill" />
         <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
           <h2 className="mb-4 text-2xl font-bold text-gray-900">Giỏ hàng trống</h2>
@@ -57,12 +57,12 @@ export default function Checkout({ addresses = [] }: CheckoutProps) {
             <Button>Tiếp tục mua sắm</Button>
           </Link>
         </div>
-      </CustomerLayout>
+      </AppLayout>
     );
   }
 
   return (
-    <CustomerLayout>
+    <AppLayout>
       <Head title="Thanh toán - Rill" />
       <div className="bg-gray-50 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -265,6 +265,6 @@ export default function Checkout({ addresses = [] }: CheckoutProps) {
           </div>
         </div>
       </div>
-    </CustomerLayout>
+    </AppLayout>
   );
 }

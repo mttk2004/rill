@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import React, { useState, useMemo } from 'react';
-import CustomerLayout from '@/layouts/customer-layout';
+import AppLayout from '@/layouts/app-layout';
 import ProductCard from '../components/ProductCard';
 import { Filter, ArrowUpDown, X, Search, Disc } from 'lucide-react';
 import Button from '../components/Button';
@@ -108,7 +108,7 @@ export default function ProductList({
   };
 
   return (
-    <CustomerLayout>
+    <AppLayout>
       <Head title={`Sản phẩm${searchTerm ? ` - ${searchTerm}` : ''} - Rill`} />
       <div className="bg-white min-h-screen pt-10 pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -336,6 +336,6 @@ export default function ProductList({
           </div>
         </div>
       </div>
-    </CustomerLayout>
+    </AppLayout>
   );
 }

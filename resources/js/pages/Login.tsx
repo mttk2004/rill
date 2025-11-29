@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import Button from '../components/Button';
-import CustomerLayout from '@/layouts/customer-layout';
+import AppLayout from '@/layouts/app-layout';
 import { useToast } from '../context/ToastContext';
 import { ShieldCheck, User } from 'lucide-react';
 
@@ -38,7 +38,7 @@ export default function Login() {
   };
 
   return (
-    <CustomerLayout>
+    <AppLayout>
       <Head title="Đăng nhập - Rill" />
       <div className="flex min-h-[80vh] items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-lg">
@@ -160,6 +160,6 @@ export default function Login() {
           </p>
         </div>
       </div>
-    </CustomerLayout>
+    </AppLayout>
   );
 }

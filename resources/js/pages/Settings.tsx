@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import Button from '../components/Button';
-import CustomerLayout from '@/layouts/customer-layout';
+import AppLayout from '@/layouts/app-layout';
 import { User, Lock, Bell, Shield, LogOut } from 'lucide-react';
 
 interface SettingsProps {
@@ -18,7 +18,7 @@ export default function Settings({ user }: SettingsProps) {
   ];
 
   return (
-    <CustomerLayout>
+    <AppLayout>
       <Head title="Cài đặt tài khoản - Rill" />
       <div className="bg-gray-50 min-h-screen py-12">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -160,6 +160,6 @@ export default function Settings({ user }: SettingsProps) {
           </div>
         </div>
       </div>
-    </CustomerLayout>
+    </AppLayout>
   );
 }

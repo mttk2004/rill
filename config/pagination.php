@@ -14,7 +14,7 @@ return [
     'default' => 15,
 
     // Frontend pagination
-    'products' => 20,           // 5 columns × 4 rows
+    'products' => 12,           // 3 columns × 4 rows
     'orders' => 10,             // User order history
     'featured_products' => 5,   // Homepage featured section
 

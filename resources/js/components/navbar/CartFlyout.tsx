@@ -28,7 +28,7 @@ const CartFlyout: React.FC<CartFlyoutProps> = ({ isOpen }) => {
                     <img src={item.image || ''} alt={item.name} className="h-full w-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <Link to={`/products/${item.slug}`} className="text-sm font-medium text-gray-900 hover:text-accent truncate block">
+                    <Link href={`/products/${item.slug}`} className="text-sm font-medium text-gray-900 hover:text-accent truncate block">
                       {item.name}
                     </Link>
                     <p className="text-xs text-gray-500 mt-1">
@@ -53,10 +53,10 @@ const CartFlyout: React.FC<CartFlyoutProps> = ({ isOpen }) => {
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <Link to="/cart">
+                <Link href="/cart">
                   <Button fullWidth variant="outline" className="text-xs">Xem giỏ hàng</Button>
                 </Link>
-                <Link to="/checkout">
+                <Link href="/checkout">
                   <Button fullWidth variant="accent" className="text-xs">Thanh toán</Button>
                 </Link>
               </div>
@@ -66,7 +66,7 @@ const CartFlyout: React.FC<CartFlyoutProps> = ({ isOpen }) => {
           <div className="text-center py-8">
             <ShoppingBag size={48} className="mx-auto text-gray-200 mb-3" />
             <p className="text-gray-500 text-sm">Giỏ hàng của bạn đang trống</p>
-            <Link to="/products" className="mt-4 inline-block text-sm font-medium text-accent hover:underline">
+            <Link href="/products" className="mt-4 inline-block text-sm font-medium text-accent hover:underline">
               Mua sắm ngay
             </Link>
           </div>

@@ -37,28 +37,28 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onLogout }
       </div>
       <div className="py-1">
         <Link
-          to="/cart"
+          href="/cart"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >
           <ShoppingBag size={16} /> Giỏ hàng
         </Link>
         <Link
-          to="/addresses"
+          href="/addresses"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >
           <MapPin size={16} /> Địa chỉ
         </Link>
         <Link
-          to="/orders"
+          href="/orders"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >
           <FileText size={16} /> Lịch sử đơn hàng
         </Link>
         <Link
-          to="/settings"
+          href="/settings"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >

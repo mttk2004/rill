@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Phone, Mail, MessageCircle, ChevronDown, ChevronUp, HelpCircle, FileText, Truck, RotateCcw } from 'lucide-react';
 import Reveal from '../components/Reveal';
 import Button from '../components/Button';
-import CustomerLayout from '@/layouts/customer-layout';
+import AppLayout from '@/layouts/app-layout';
 
 // FAQ Item Component
 const FAQItem = ({ question, answer, isOpen, onClick }: { key?: any, question: string, answer: string, isOpen: boolean, onClick: () => void }) => {
@@ -59,7 +59,7 @@ const Support = () => {
   ];
 
   return (
-    <CustomerLayout>
+    <AppLayout>
       <Head title="Hỗ trợ - Rill" />
       <div className="bg-white min-h-screen">
         {/* Header */}
@@ -168,7 +168,7 @@ const Support = () => {
           </div>
         </div>
       </div>
-    </CustomerLayout>
+    </AppLayout>
   );
 }
 
