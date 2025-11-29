@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useShop } from '../context/ShopContext';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { CheckCircle, CreditCard, MapPin, Ticket } from 'lucide-react';
-import type { Address, SharedData } from '@/types';
 import axios from 'axios';
 
 interface Voucher {
@@ -18,14 +17,24 @@ interface Voucher {
   discount_amount: number | null;
 }
 
+interface Address {
+  id: number;
+  full_name: string;
+  phone: string;
+  address_line_1: string;
+  address_line_2?: string;
+  province: string;
+  district: string;
+  ward: string;
+  is_default: number;
+}
+
 interface CheckoutProps {
   addresses: Address[];
 }
 
 function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const { cart, cartTotal } = useShop();
-  const { props } = usePage<SharedData>();
-  const settings = props.settings;
   const defaultAddress = addresses.find(a => a.is_default === 1) || addresses[0];
   const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
 
@@ -44,20 +53,12 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const [shippingCost, setShippingCost] = useState(0);
   const [loadingShipping, setLoadingShipping] = useState(false);
 
-  // Logic for shipping cost using backend settings
-  const freeShippingThreshold = settings?.shipping?.free_threshold || 1000000;
   const finalTotal = cartTotal + shippingCost;
 
   // Fetch shipping cost when address changes
   useEffect(() => {
     const fetchShippingCost = async () => {
       if (!selectedAddress || cartTotal === 0) {
-        setShippingCost(0);
-        return;
-      }
-
-      // Check free shipping threshold first
-      if (cartTotal >= freeShippingThreshold) {
         setShippingCost(0);
         return;
       }
@@ -69,12 +70,10 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
           order_total: cartTotal
         });
 
-        if (response.data.success) {
-          setShippingCost(response.data.data.shipping_fee || 0);
-        }
+        const fee = response.data.shipping_fee ?? 0;
+        setShippingCost(fee);
       } catch (error) {
         console.error('Failed to fetch shipping cost:', error);
-        // Fallback to default shipping cost
         setShippingCost(35000);
       } finally {
         setLoadingShipping(false);
@@ -82,7 +81,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
     };
 
     fetchShippingCost();
-  }, [selectedAddress, cartTotal, freeShippingThreshold]);
+  }, [selectedAddress, cartTotal]);
 
   // Fetch available vouchers
   useEffect(() => {
