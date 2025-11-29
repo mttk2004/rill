@@ -22,6 +22,15 @@ interface ProductListProps {
     artist?: string;
     collection?: string;
     sort?: string;
+    page?: string;
+  };
+  pagination: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
   };
 }
 
@@ -31,19 +40,9 @@ export default function ProductList({
   availableGenres = [],
   availableLabels = [],
   activeCollection = null,
-  filters = {}
+  filters = {},
+  pagination
 }: ProductListProps) {
-  // DEBUG: Log props received
-  console.log('ProductList props:', {
-    products_count: products.length,
-    products_sample: products[0],
-    artists_count: artists.length,
-    availableGenres_count: availableGenres.length,
-    availableLabels_count: availableLabels.length,
-    filters,
-    activeCollection
-  });
-
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Accordion States
@@ -83,9 +82,17 @@ export default function ProductList({
       }
     });
 
+    // Scroll to top if changing page
+    const isPageChange = 'page' in newFilters;
+
     router.visit(`/products${params.toString() ? '?' + params.toString() : ''}`, {
       preserveState: true,
-      preserveScroll: true,
+      preserveScroll: !isPageChange,
+      onSuccess: () => {
+        if (isPageChange) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
     });
   };
 
@@ -257,6 +264,73 @@ export default function ProductList({
                     </Button>
                   </div>
                 </Reveal>
+              )}
+
+              {/* Pagination */}
+              {products.length > 0 && pagination.last_page > 1 && (
+                <div className="mt-12 flex justify-center">
+                  <nav className="flex items-center gap-2">
+                    {/* Previous Button */}
+                    <button
+                      onClick={() => updateFilters({ ...filters, page: String(pagination.current_page - 1) })}
+                      disabled={pagination.current_page === 1}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pagination.current_page === 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                        }`}
+                    >
+                      Trước
+                    </button>
+
+                    {/* Page Numbers */}
+                    {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map((page) => {
+                      // Show first page, last page, current page and adjacent pages
+                      const showPage =
+                        page === 1 ||
+                        page === pagination.last_page ||
+                        (page >= pagination.current_page - 1 && page <= pagination.current_page + 1);
+
+                      // Show ellipsis
+                      const showEllipsisBefore = page === pagination.current_page - 2 && pagination.current_page > 3;
+                      const showEllipsisAfter = page === pagination.current_page + 2 && pagination.current_page < pagination.last_page - 2;
+
+                      if (showEllipsisBefore || showEllipsisAfter) {
+                        return (
+                          <span key={page} className="px-2 text-gray-400">
+                            ...
+                          </span>
+                        );
+                      }
+
+                      if (!showPage) return null;
+
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => updateFilters({ ...filters, page: String(page) })}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pagination.current_page === page
+                            ? 'bg-primary text-white'
+                            : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                            }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
+
+                    {/* Next Button */}
+                    <button
+                      onClick={() => updateFilters({ ...filters, page: String(pagination.current_page + 1) })}
+                      disabled={pagination.current_page === pagination.last_page}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${pagination.current_page === pagination.last_page
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                        }`}
+                    >
+                      Sau
+                    </button>
+                  </nav>
+                </div>
               )}
             </div>
           </div>

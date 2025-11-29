@@ -245,15 +245,16 @@ class ProductService
     }
 
     /**
-     * Get related products based on same artist or genre.
+     * Get related products with priority: same artist → same label → same genre → random.
+     * Always returns exactly $limit products.
      */
-    public function getRelatedProducts(Product $product, int $limit = 6): array
+    public function getRelatedProducts(Product $product, int $limit = 8): array
     {
         // Get artist IDs from the current product
         $artistIds = $product->artists->pluck('id')->toArray();
 
-        // Build query for related products
-        $query = Product::with([
+        // Build base query for related products
+        $baseQuery = Product::with([
             'artists' => function ($query) {
                 $query->orderByPivot('sort_order');
             },
@@ -274,29 +275,63 @@ class ProductService
             ->active()
             ->where('id', '!=', $product->id);
 
+        $relatedProducts = collect();
+        $excludeIds = [$product->id];
+
         // Priority 1: Products with same artists
-        $sameArtistProducts = (clone $query)
-            ->whereHas('artists', function ($q) use ($artistIds) {
-                $q->whereIn('artists.id', $artistIds);
-            })
-            ->limit($limit)
-            ->get();
+        if (!empty($artistIds)) {
+            $needed = $limit - $relatedProducts->count();
+            $sameArtistProducts = (clone $baseQuery)
+                ->whereNotIn('id', $excludeIds)
+                ->whereHas('artists', function ($q) use ($artistIds) {
+                    $q->whereIn('artists.id', $artistIds);
+                })
+                ->inRandomOrder()
+                ->limit($needed)
+                ->get();
 
-        $relatedProducts = $sameArtistProducts;
+            $relatedProducts = $relatedProducts->merge($sameArtistProducts);
+            $excludeIds = array_merge($excludeIds, $sameArtistProducts->pluck('id')->toArray());
+        }
 
-        // If we don't have enough products, add products from same genre
+        // Priority 2: Products with same label
+        if ($relatedProducts->count() < $limit && $product->label) {
+            $needed = $limit - $relatedProducts->count();
+            $sameLabelProducts = (clone $baseQuery)
+                ->whereNotIn('id', $excludeIds)
+                ->where('label', $product->label)
+                ->inRandomOrder()
+                ->limit($needed)
+                ->get();
+
+            $relatedProducts = $relatedProducts->merge($sameLabelProducts);
+            $excludeIds = array_merge($excludeIds, $sameLabelProducts->pluck('id')->toArray());
+        }
+
+        // Priority 3: Products with same genre
         if ($relatedProducts->count() < $limit && $product->genre) {
             $needed = $limit - $relatedProducts->count();
-            $excludeIds = $relatedProducts->pluck('id')->toArray();
-            $excludeIds[] = $product->id;
-
-            $sameGenreProducts = (clone $query)
+            $sameGenreProducts = (clone $baseQuery)
                 ->whereNotIn('id', $excludeIds)
                 ->where('genre', $product->genre)
+                ->inRandomOrder()
                 ->limit($needed)
                 ->get();
 
             $relatedProducts = $relatedProducts->merge($sameGenreProducts);
+            $excludeIds = array_merge($excludeIds, $sameGenreProducts->pluck('id')->toArray());
+        }
+
+        // Priority 4: Random products to fill up to limit
+        if ($relatedProducts->count() < $limit) {
+            $needed = $limit - $relatedProducts->count();
+            $randomProducts = (clone $baseQuery)
+                ->whereNotIn('id', $excludeIds)
+                ->inRandomOrder()
+                ->limit($needed)
+                ->get();
+
+            $relatedProducts = $relatedProducts->merge($randomProducts);
         }
 
         // Transform products for frontend
