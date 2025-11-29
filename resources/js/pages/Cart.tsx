@@ -1,26 +1,31 @@
 import React from 'react';
+import { Head, Link } from '@inertiajs/react';
 import { useShop } from '../context/ShopContext';
-import { Link } from '@inertiajs/react';
 import Button from '../components/Button';
 import { Trash2, ArrowLeft } from 'lucide-react';
 
-const Cart = () => {
+export default function Cart() {
   const { cart, removeFromCart, updateQuantity, cartTotal } = useShop();
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white px-4">
+      <>
+        <Head title="Giỏ hàng - Rill" />
+        <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white px-4">
         <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">Giỏ hàng của bạn đang trống</h2>
         <p className="text-gray-500 mb-8">Có vẻ như bạn chưa thêm đĩa nhạc nào.</p>
-        <Link to="/products">
+        <Link href="/products">
           <Button>Bắt đầu mua sắm</Button>
         </Link>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="bg-white min-h-screen py-12">
+    <>
+      <Head title="Giỏ hàng - Rill" />
+      <div className="bg-white min-h-screen py-12">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-serif font-bold text-gray-900 mb-10">Giỏ Hàng</h1>
 
@@ -42,7 +47,7 @@ const Cart = () => {
                     <div>
                       <div className="flex justify-between text-base font-medium text-gray-900">
                         <h3>
-                          <Link to={`/products/${item.slug}`}>{item.name}</Link>
+                          <Link href={`/products/${item.slug}`}>{item.name}</Link>
                         </h3>
                         <p className="ml-4">
                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price) * item.quantity)}
@@ -77,7 +82,7 @@ const Cart = () => {
             </div>
             
             <div className="mt-6">
-              <Link to="/products" className="text-sm font-medium text-black hover:text-gray-700 flex items-center gap-2">
+              <Link href="/products" className="text-sm font-medium text-black hover:text-gray-700 flex items-center gap-2">
                  <ArrowLeft size={16} /> Tiếp tục mua sắm
               </Link>
             </div>
@@ -107,7 +112,7 @@ const Cart = () => {
               </div>
 
               <div className="mt-6">
-                <Link to="/checkout">
+                <Link href="/checkout">
                   <Button fullWidth>Tiến hành thanh toán</Button>
                 </Link>
               </div>
@@ -119,8 +124,7 @@ const Cart = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
-};
-
-export default Cart;
+}
