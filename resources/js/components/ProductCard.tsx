@@ -40,7 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
 
       // 3. Fly Animation (Wrapped in try-catch so it doesn't block adding to cart)
       try {
-        flyToCart(product.image, btnRect);
+        flyToCart(product.image || product.image_url || null, btnRect);
       } catch (animError) {
         console.error("Animation failed", animError);
       }
@@ -62,14 +62,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
     }
   };
 
-  const handlePlayClick = (e: any) => {
+  const handlePlayClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     playTrack(product);
   };
 
   // Get main artist from product.artists array
-  const mainArtist = artist || (product.artists && product.artists.length > 0 ? product.artists.find((a: any) => a.role === 'main') || product.artists[0] : undefined);
+  const mainArtist = artist || (product.artists && product.artists.length > 0 ? product.artists.find((a) => a.role === 'main') || product.artists[0] : undefined);
 
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">

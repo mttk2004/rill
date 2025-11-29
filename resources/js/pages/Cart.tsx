@@ -5,12 +5,12 @@ import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { Trash2, ArrowLeft } from 'lucide-react';
 
-export default function Cart() {
+function CartContent() {
   const { cart, removeFromCart, updateQuantity, cartTotal } = useShop();
 
   if (cart.length === 0) {
     return (
-      <AppLayout>
+      <>
         <Head title="Giỏ hàng - Rill" />
         <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white px-4">
           <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">Giỏ hàng của bạn đang trống</h2>
@@ -19,12 +19,12 @@ export default function Cart() {
             <Button>Bắt đầu mua sắm</Button>
           </Link>
         </div>
-      </AppLayout>
+      </>
     );
   }
 
   return (
-    <AppLayout>
+    <>
       <Head title="Giỏ hàng - Rill" />
       <div className="bg-white min-h-screen py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -37,24 +37,28 @@ export default function Cart() {
                 {cart.map((item) => (
                   <div key={item.id} className="flex py-6 border-b border-gray-100">
                     <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                      <img
-                        src={item.image || ''}
-                        alt={item.name}
-                        className="h-full w-full object-cover object-center"
-                      />
+                      {item.product?.image_url ? (
+                        <img
+                          src={item.product.image_url}
+                          alt={item.product?.name || 'Product'}
+                          className="h-full w-full object-cover object-center"
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-400">No Image</div>
+                      )}
                     </div>
 
                     <div className="ml-4 flex flex-1 flex-col">
                       <div>
                         <div className="flex justify-between text-base font-medium text-gray-900">
                           <h3>
-                            <Link href={`/products/${item.slug}`}>{item.name}</Link>
+                            <Link href={`/products/${item.product?.slug || '#'}`}>{item.product?.name || 'Unnamed Product'}</Link>
                           </h3>
                           <p className="ml-4">
-                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price) * item.quantity)}
+                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.unit_price) * item.quantity)}
                           </p>
                         </div>
-                        <p className="mt-1 text-sm text-gray-500">{item.genre}</p>
+                        <p className="mt-1 text-sm text-gray-500">Đơn giá: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.unit_price)}</p>
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
                         <div className="flex items-center border border-gray-200 rounded">
@@ -126,6 +130,14 @@ export default function Cart() {
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+export default function Cart() {
+  return (
+    <AppLayout>
+      <CartContent />
     </AppLayout>
   );
 }

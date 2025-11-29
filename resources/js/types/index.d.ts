@@ -157,6 +157,7 @@ export interface Product {
   label: string;
   image?: string;
   image_url?: string;
+  preview_url?: string | null;
   status: 'active' | 'inactive' | 'out_of_stock';
   meta_title?: string;
   meta_description?: string;

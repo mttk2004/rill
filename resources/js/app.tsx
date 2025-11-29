@@ -7,7 +7,6 @@ import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import { initializeTheme } from './hooks/use-appearance';
 import { Ziggy } from './ziggy';
-import { ShopProvider } from './context/ShopContext';
 import { PlayerProvider } from './context/PlayerContext';
 import { ToastProvider } from './context/ToastContext';
 
@@ -24,24 +23,22 @@ createInertiaApp({
 
     root.render(
       <ToastProvider>
-        <ShopProvider>
-          <PlayerProvider>
-            <App {...props} />
-            <ToastContainer
-              position="bottom-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={true}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-              className="custom-toast-container"
-            />
-          </PlayerProvider>
-        </ShopProvider>
+        <PlayerProvider>
+          <App {...props} />
+          <ToastContainer
+            position="bottom-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            className="custom-toast-container"
+          />
+        </PlayerProvider>
       </ToastProvider>
     );
   },

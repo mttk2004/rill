@@ -1,13 +1,15 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { CartItem, Product } from '../types';
+import React, { createContext, useContext, useMemo } from 'react';
+import { Product, FlyoutCartItem } from '../types';
 import { useToast } from './ToastContext';
+import { router, usePage } from '@inertiajs/react';
+import type { SharedData } from '@/types';
 
 interface ShopContextType {
-  cart: CartItem[];
+  cart: FlyoutCartItem[];
   addToCart: (product: Product, quantity: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (cartItemId: number) => void;
+  updateQuantity: (cartItemId: number, quantity: number) => void;
   clearCart: () => void;
   cartTotal: number;
   cartCount: number;
@@ -15,44 +17,62 @@ interface ShopContextType {
 
 const ShopContext = createContext(undefined as unknown as ShopContextType | undefined);
 
-export const ShopProvider = ({ children }: { children?: any }) => {
-  const [cart, setCart] = useState([] as CartItem[]);
+export const ShopProvider = ({ children }: { children?: React.ReactNode }) => {
   const { showToast } = useToast();
+  const { cart: cartData } = usePage<SharedData>().props;
+
+  // Get cart items from shared data
+  const cart = useMemo(() => cartData?.items || [], [cartData?.items]);
 
   const addToCart = (product: Product, quantity: number) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
-        );
+    router.post('/cart/add', {
+      product_id: product.id,
+      quantity: quantity,
+    }, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showToast(`Đã thêm "${product.name}" vào giỏ hàng`, 'success');
+      },
+      onError: (errors) => {
+        showToast(errors.message || 'Không thể thêm vào giỏ hàng', 'error');
       }
-      return [...prev, { ...product, quantity }];
     });
-    
-    showToast(`Đã thêm "${product.name}" vào giỏ hàng`, 'success');
   };
 
-  const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
-    showToast('Đã xóa sản phẩm khỏi giỏ hàng', 'info');
+  const removeFromCart = (cartItemId: number) => {
+    router.delete(`/cart/${cartItemId}`, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showToast('Đã xóa sản phẩm khỏi giỏ hàng', 'info');
+      },
+    });
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (cartItemId: number, quantity: number) => {
     if (quantity < 1) return;
-    setCart((prev) =>
-      prev.map((item) => (item.id === productId ? { ...item, quantity } : item))
-    );
+    router.patch(`/cart/${cartItemId}`, {
+      quantity: quantity,
+    }, {
+      preserveScroll: true,
+    });
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    router.delete('/cart/clear', {
+      preserveScroll: true,
+      onSuccess: () => {
+        showToast('Đã xóa toàn bộ giỏ hàng', 'info');
+      },
+    });
+  };
 
-  const cartTotal = cart.reduce((sum, item) => {
-    const price = typeof item.price === 'string' ? parseFloat(item.price) : item.price;
-    return sum + (price || 0) * item.quantity;
-  }, 0);
+  const cartTotal = useMemo(() => {
+    return cartData?.summary?.total_amount || 0;
+  }, [cartData?.summary?.total_amount]);
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = useMemo(() => {
+    return cartData?.summary?.items_count || 0;
+  }, [cartData?.summary?.items_count]);
 
   return (
     <ShopContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount }}>

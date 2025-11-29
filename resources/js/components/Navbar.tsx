@@ -23,7 +23,7 @@ const Navbar = () => {
   const collections = props.collections || [];
   const user = props.auth?.user || null;
   const isLoggedIn = !!user;
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [isCartHovered, setIsCartHovered] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
