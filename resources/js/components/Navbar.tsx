@@ -21,10 +21,10 @@ const Navbar = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isCollectionHovered, setIsCollectionHovered] = useState(false);
   const [isBouncing, setIsBouncing] = useState(false);
-  
+
   // Product Mega Menu States
   const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
-  
+
   // Mock auth state - Default to true for demo purposes
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
@@ -66,14 +66,14 @@ const Navbar = () => {
       <AnnouncementBar />
       <nav className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/90 backdrop-blur-md">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
-          
+
           {/* Search Overlay */}
-          <SearchOverlay 
-            isOpen={isSearchOpen} 
-            onClose={() => setIsSearchOpen(false)} 
-            searchQuery={searchQuery} 
-            setSearchQuery={setSearchQuery} 
-            onSearch={handleSearch} 
+          <SearchOverlay
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={handleSearch}
           />
 
           {!isSearchOpen && (
@@ -91,21 +91,20 @@ const Navbar = () => {
                   <NavLink
                     to="/"
                     className={({ isActive }) =>
-                      `text-sm font-medium transition-colors hover:text-accent ${
-                        isActive ? 'text-primary' : 'text-gray-500'
+                      `text-sm font-medium transition-colors hover:text-accent ${isActive ? 'text-primary' : 'text-gray-500'
                       }`
                     }
                   >
                     Trang chủ
                   </NavLink>
-                  
+
                   {/* Products Mega Menu */}
-                  <div 
+                  <div
                     className="relative group h-full flex items-center"
                     onMouseEnter={() => setIsProductMenuOpen(true)}
                     onMouseLeave={() => setIsProductMenuOpen(false)}
                   >
-                    <Link 
+                    <Link
                       to="/products"
                       className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-accent ${isProductMenuOpen ? 'text-primary' : 'text-gray-500'}`}
                       onClick={closeAllMenus}
@@ -117,7 +116,7 @@ const Navbar = () => {
                   </div>
 
                   {/* Collection Dropdown */}
-                  <div 
+                  <div
                     className="relative group h-full flex items-center"
                     onMouseEnter={() => setIsCollectionHovered(true)}
                     onMouseLeave={() => setIsCollectionHovered(false)}
@@ -125,13 +124,13 @@ const Navbar = () => {
                     <button className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-accent ${isCollectionHovered ? 'text-primary' : 'text-gray-500'}`}>
                       Bộ sưu tập <ChevronDown size={14} />
                     </button>
-                    
+
                     {/* Dropdown Menu */}
                     {isCollectionHovered && (
                       <div className="absolute left-0 top-full w-56 rounded-xl border border-gray-100 bg-white shadow-xl animate-in fade-in slide-in-from-top-1 duration-200 pt-2 z-50">
                         <div className="py-2">
                           {COLLECTIONS.map((col) => (
-                            <Link 
+                            <Link
                               key={col.id}
                               to={`/products?collection=${col.slug}`}
                               className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
@@ -148,8 +147,7 @@ const Navbar = () => {
                   <NavLink
                     to="/about"
                     className={({ isActive }) =>
-                      `text-sm font-medium transition-colors hover:text-accent ${
-                        isActive ? 'text-primary' : 'text-gray-500'
+                      `text-sm font-medium transition-colors hover:text-accent ${isActive ? 'text-primary' : 'text-gray-500'
                       }`
                     }
                   >
@@ -158,8 +156,7 @@ const Navbar = () => {
                   <NavLink
                     to="/support"
                     className={({ isActive }) =>
-                      `text-sm font-medium transition-colors hover:text-accent ${
-                        isActive ? 'text-primary' : 'text-gray-500'
+                      `text-sm font-medium transition-colors hover:text-accent ${isActive ? 'text-primary' : 'text-gray-500'
                       }`
                     }
                   >
@@ -170,7 +167,7 @@ const Navbar = () => {
 
               {/* Desktop Icons & Actions */}
               <div className="hidden md:flex items-center gap-6">
-                <button 
+                <button
                   onClick={() => setIsSearchOpen(true)}
                   className="text-gray-500 hover:text-primary transition-colors"
                 >
@@ -180,13 +177,13 @@ const Navbar = () => {
                 {isLoggedIn ? (
                   <>
                     {/* Cart with Flyout */}
-                    <div 
+                    <div
                       className="relative z-50 h-full flex items-center"
                       onMouseEnter={() => setIsCartHovered(true)}
                       onMouseLeave={() => setIsCartHovered(false)}
                     >
-                      <Link 
-                        to="/cart" 
+                      <Link
+                        to="/cart"
                         id="cart-icon-desktop"
                         className={`relative text-gray-500 hover:text-primary transition-colors py-4 ${isBouncing ? 'animate-cart-bounce' : ''}`}
                       >
@@ -203,17 +200,17 @@ const Navbar = () => {
 
                     {/* User Dropdown */}
                     <div className="relative">
-                      <button 
+                      <button
                         onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                         className={`text-gray-500 hover:text-primary transition-colors ${isUserMenuOpen ? 'text-primary' : ''}`}
                       >
                         <User size={20} />
                       </button>
 
-                      <UserDropdown 
-                        isOpen={isUserMenuOpen} 
-                        onClose={() => setIsUserMenuOpen(false)} 
-                        onLogout={handleLogout} 
+                      <UserDropdown
+                        isOpen={isUserMenuOpen}
+                        onClose={() => setIsUserMenuOpen(false)}
+                        onLogout={handleLogout}
                       />
                     </div>
                   </>
@@ -223,7 +220,7 @@ const Navbar = () => {
                       <Button variant="ghost" className="px-4 py-2 h-auto">Đăng nhập</Button>
                     </Link>
                     <Link to="/register">
-                       <Button variant="primary" className="px-4 py-2 h-auto shadow-none">Đăng ký</Button>
+                      <Button variant="primary" className="px-4 py-2 h-auto shadow-none">Đăng ký</Button>
                     </Link>
                   </div>
                 )}
@@ -231,16 +228,16 @@ const Navbar = () => {
 
               {/* Mobile menu button & Icons */}
               <div className="flex md:hidden items-center gap-4">
-                 <button 
+                <button
                   onClick={() => setIsSearchOpen(true)}
                   className="text-gray-500 hover:text-primary transition-colors"
                 >
                   <Search size={20} />
                 </button>
-                
+
                 {isLoggedIn && (
-                  <Link 
-                    to="/cart" 
+                  <Link
+                    to="/cart"
                     id="cart-icon-mobile"
                     className={`relative text-gray-500 hover:text-primary ${isBouncing ? 'animate-cart-bounce' : ''}`}
                   >
@@ -265,12 +262,12 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu */}
-        <MobileMenu 
-          isOpen={isOpen} 
+        <MobileMenu
+          isOpen={isOpen}
           isSearchOpen={isSearchOpen}
-          onClose={() => setIsOpen(false)} 
-          isLoggedIn={isLoggedIn} 
-          onLogout={handleLogout} 
+          onClose={() => setIsOpen(false)}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
         />
       </nav>
     </>

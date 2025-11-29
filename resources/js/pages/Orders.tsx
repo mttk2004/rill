@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { Package, ChevronRight, Clock, CheckCircle, Truck, XCircle, Filter, ArrowUpDown } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, XCircle, Filter, ArrowUpDown } from 'lucide-react';
 import Button from '../components/Button';
-import type { Order } from '@/types';
 
 interface OrdersProps {
-  orders: Order[];
+  orders: any[];
 }
 
 export default function Orders({ orders = [] }: OrdersProps) {
@@ -67,7 +66,7 @@ export default function Orders({ orders = [] }: OrdersProps) {
     });
 
     return result;
-  }, [filterStatus, sortOption]);
+  }, [orders, filterStatus, sortOption]);
 
   return (
     <>
@@ -118,7 +117,7 @@ export default function Orders({ orders = [] }: OrdersProps) {
               {filterStatus !== 'all' ? (
                 <button onClick={() => setFilterStatus('all')} className="text-primary font-medium hover:underline">Xóa bộ lọc</button>
               ) : (
-                <Link to="/products">
+                <Link href="/products">
                   <Button>Mua sắm ngay</Button>
                 </Link>
               )}
@@ -144,7 +143,7 @@ export default function Orders({ orders = [] }: OrdersProps) {
                     <div className="flex flex-col md:flex-row gap-6">
                       {/* Item Preview */}
                       <div className="flex-1 space-y-4">
-                        {order.items.map((item, idx) => (
+                        {order.items.map((item: any, idx: number) => (
                           <div key={idx} className="flex gap-4">
                             <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-100">
                               {item.product_image && <img src={item.product_image} alt={item.product_name} className="h-full w-full object-cover" />}

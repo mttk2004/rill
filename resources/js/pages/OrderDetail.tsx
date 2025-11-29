@@ -2,10 +2,9 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle } from 'lucide-react';
 import Button from '../components/Button';
-import type { Order } from '@/types';
 
 interface OrderDetailProps {
-  order: Order;
+  order: any;
 }
 
 export default function OrderDetail({ order }: OrderDetailProps) {
@@ -166,8 +165,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   <span className="text-sm font-normal text-gray-500">{order.items.length} món</span>
                 </div>
                 <div className="divide-y divide-gray-100">
-                  {order.items.map((item, idx) => {
-                    const product = PRODUCTS.find(p => p.id === item.product_id);
+                  {order.items.map((item: any, idx: number) => {
+                    const product = item; // Product info already in item
                     return (
                       <div key={idx} className="p-6 flex gap-4 hover:bg-gray-50 transition-colors">
                         <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-200">
@@ -177,7 +176,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                           <div className="flex justify-between items-start">
                             <div>
                               <h3 className="font-medium text-gray-900">{item.product_name}</h3>
-                              <Link to={`/products/${product?.slug || '#'}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>
+                              <Link href={`/products/${item.product_slug || '#'}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>
                             </div>
                             <p className="font-bold text-gray-900">
                               {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.unit_price * item.quantity)}
