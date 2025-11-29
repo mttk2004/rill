@@ -13,7 +13,7 @@ interface ShopContextType {
   cartCount: number;
 }
 
-const ShopContext = createContext(undefined as unknown as ShopContextType | undefined);
+const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export const ShopProvider = ({ children }: { children?: any }) => {
   const [cart, setCart] = useState([] as CartItem[]);
