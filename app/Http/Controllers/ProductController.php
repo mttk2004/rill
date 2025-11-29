@@ -29,7 +29,7 @@ class ProductController extends Controller
 
         $result = $this->productService->getProducts($filters);
 
-        return Inertia::render('products', [
+        return Inertia::render('ProductList', [
             'products' => $result['products'],
             'filters' => $result['filters'],
             'pagination' => $result['pagination'],
@@ -51,6 +51,6 @@ class ProductController extends Controller
     {
         $data = $this->productService->getDataForShowPage($product, auth()->user());
 
-        return Inertia::render('product-detail', $data);
+        return Inertia::render('ProductDetail', $data);
     }
 }

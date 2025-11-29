@@ -26,7 +26,7 @@ class CartController extends Controller
         $cartItems = $this->cartService->getCartItems();
         $cartSummary = $this->cartService->getCartSummary();
 
-        return Inertia::render('cart', [
+        return Inertia::render('Cart', [
             'cartItems' => $cartItems->map(function ($item) {
                 return [
                     'id' => $item->id,

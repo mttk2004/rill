@@ -32,7 +32,7 @@ class AddressController extends Controller
         $user = Auth::user();
         $addresses = $this->addressService->getUserAddresses($user);
 
-        return Inertia::render('addresses/index', [
+        return Inertia::render('Addresses', [
             'addresses' => $addresses,
         ]);
     }

@@ -30,11 +30,11 @@ Route::get('/cart/summary', [App\Http\Controllers\CartController::class, 'summar
 Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add.public');
 
 Route::get('/about', function () {
-    return Inertia::render('about');
+    return Inertia::render('About');
 })->name('about');
 
 Route::get('/support', function () {
-    return Inertia::render('support');
+    return Inertia::render('Support');
 })->name('support');
 
 // VNPAY Return URL - Phải đặt ngoài middleware auth vì VNPAY redirect từ external site

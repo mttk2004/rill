@@ -33,7 +33,7 @@ class HomeController extends Controller
                 ->limit(config('pagination.featured_products'))
                 ->get();
 
-        return Inertia::render('welcome', [
+        return Inertia::render('Home', [
             'featuredProducts' => $featuredProducts,
             'featuredCollection' => $featuredCollection ? [
                 'id' => $featuredCollection->id,

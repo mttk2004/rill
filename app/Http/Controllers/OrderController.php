@@ -41,7 +41,7 @@ class OrderController extends Controller
             ->paginate(config('pagination.orders'))
             ->withQueryString();
 
-        return Inertia::render('orders', [
+        return Inertia::render('Orders', [
             'orders' => $orders,
             'filters' => $request->only(['status']),
         ]);
@@ -65,7 +65,7 @@ class OrderController extends Controller
             }
         ]);
 
-        return Inertia::render('order-detail', [
+        return Inertia::render('OrderDetail', [
             'order' => new OrderResource($order),
         ]);
     }

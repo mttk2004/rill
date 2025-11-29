@@ -27,7 +27,7 @@ class ProfileController extends Controller
             $userData['date_of_birth'] = $user->date_of_birth->format('Y-m-d');
         }
 
-        return Inertia::render('settings/profile', [
+        return Inertia::render('Settings', [
             'user' => $userData,
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),

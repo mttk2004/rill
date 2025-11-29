@@ -39,10 +39,10 @@ class CheckoutController extends Controller
             'total_amount' => $cartItems->sum(fn($item) => $item->total_price),
         ];
 
-        return Inertia::render('checkout', [
+        return Inertia::render('Checkout', [
             'cartItems' => $cartItems,
             'cartSummary' => $cartSummary,
-            'shippingAddresses' => $shippingAddresses,
+            'addresses' => $shippingAddresses,
             'defaultShippingAddress' => $shippingAddresses->firstWhere('is_default', true) ?? $shippingAddresses->first(),
         ]);
     }
