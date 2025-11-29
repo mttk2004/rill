@@ -1,10 +1,18 @@
 import React from 'react';
-import { CONFIGS } from '../data';
+import { usePage } from '@inertiajs/react';
 
 const AnnouncementBar = () => {
-  const isEnabled = CONFIGS.find(c => c.key === 'banner_enabled')?.value === '1';
-  const content = CONFIGS.find(c => c.key === 'banner_content')?.value;
-  const type = CONFIGS.find(c => c.key === 'banner_type')?.value;
+  const { props } = usePage<{
+    settings: {
+      banner: {
+        enabled: boolean;
+        content: string;
+        type: string;
+      };
+    };
+  }>();
+  
+  const { enabled: isEnabled, content, type } = props.settings?.banner || {};
 
   if (!isEnabled || !content) return null;
 
