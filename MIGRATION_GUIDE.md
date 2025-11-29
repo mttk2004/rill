@@ -16,7 +16,7 @@
 #### Components requiring adaptation:
 
 **Navigation Components:**
-- [ ] `Navbar.tsx` - Remove `useNavigate`, `NavLink` 
+- [ ] `Navbar.tsx` - Remove `useNavigate`, `NavLink`
 - [ ] `navbar/MegaMenu.tsx` - Already using Link ✅
 - [ ] `navbar/MobileMenu.tsx` - Remove `NavLink`
 - [ ] `navbar/UserDropdown.tsx` - Already using Link ✅
