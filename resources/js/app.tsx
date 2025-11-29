@@ -23,9 +23,9 @@ createInertiaApp({
     const root = createRoot(el);
 
     root.render(
-      <ShopProvider>
-        <PlayerProvider>
-          <ToastProvider>
+      <ToastProvider>
+        <ShopProvider>
+          <PlayerProvider>
             <App {...props} />
             <ToastContainer
               position="bottom-right"
@@ -40,9 +40,9 @@ createInertiaApp({
               theme="light"
               className="custom-toast-container"
             />
-          </ToastProvider>
-        </PlayerProvider>
-      </ShopProvider>
+          </PlayerProvider>
+        </ShopProvider>
+      </ToastProvider>
     );
   },
   progress: {
