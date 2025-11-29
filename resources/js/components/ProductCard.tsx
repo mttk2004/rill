@@ -74,9 +74,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
   return (
     <Link href={`/products/${product.slug}`} className="group block h-full">
       <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100 mb-4">
-        {product.image ? (
+        {(product.image_url || product.image) ? (
           <img
-            src={product.image}
+            src={product.image_url || product.image}
             alt={product.name}
             className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
