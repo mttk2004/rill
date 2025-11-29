@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import { ShoppingBag, Menu, X, Search, User, ChevronDown } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
-import { COLLECTIONS } from '../data';
 import AnnouncementBar from './AnnouncementBar';
 import Button from './Button';
+import type { Collection } from '@/types';
 
 // Sub-components
 import MegaMenu from './navbar/MegaMenu';
@@ -15,6 +15,10 @@ import MobileMenu from './navbar/MobileMenu';
 import SearchOverlay from './navbar/SearchOverlay';
 
 const Navbar = () => {
+  const { props } = usePage<{
+    collections: Collection[];
+  }>();
+  const collections = props.collections || [];
   const [isOpen, setIsOpen] = useState(false);
   const [isCartHovered, setIsCartHovered] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -53,7 +57,7 @@ const Navbar = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setIsUserMenuOpen(false);
-    navigate('/');
+    router.visit('/');
   };
 
   const closeAllMenus = () => {
@@ -81,7 +85,7 @@ const Navbar = () => {
             <div className="flex h-16 items-center justify-between">
               {/* Logo */}
               <div className="flex-shrink-0">
-                <Link to="/" className="text-2xl font-serif font-bold tracking-tight text-primary">
+                <Link href="/" className="text-2xl font-serif font-bold tracking-tight text-primary">
                   RILL<span className="text-accent">.</span>
                 </Link>
               </div>
@@ -128,7 +132,7 @@ const Navbar = () => {
                     {isCollectionHovered && (
                       <div className="absolute left-0 top-full w-56 rounded-xl border border-gray-100 bg-white shadow-xl animate-in fade-in slide-in-from-top-1 duration-200 pt-2 z-50">
                         <div className="py-2">
-                          {COLLECTIONS.map((col) => (
+                          {collections.map((col) => (
                             <Link
                               key={col.id}
                               href={`/products?collection=${col.slug}`}
@@ -178,7 +182,7 @@ const Navbar = () => {
                       onMouseLeave={() => setIsCartHovered(false)}
                     >
                       <Link
-                        to="/cart"
+                        href="/cart"
                         id="cart-icon-desktop"
                         className={`relative text-gray-500 hover:text-primary transition-colors py-4 ${isBouncing ? 'animate-cart-bounce' : ''}`}
                       >
@@ -211,10 +215,10 @@ const Navbar = () => {
                   </>
                 ) : (
                   <div className="flex items-center gap-3">
-                    <Link to="/login">
+                    <Link href="/login">
                       <Button variant="ghost" className="px-4 py-2 h-auto">Đăng nhập</Button>
                     </Link>
-                    <Link to="/register">
+                    <Link href="/register">
                       <Button variant="primary" className="px-4 py-2 h-auto shadow-none">Đăng ký</Button>
                     </Link>
                   </div>
@@ -232,7 +236,7 @@ const Navbar = () => {
 
                 {isLoggedIn && (
                   <Link
-                    to="/cart"
+                    href="/cart"
                     id="cart-icon-mobile"
                     className={`relative text-gray-500 hover:text-primary ${isBouncing ? 'animate-cart-bounce' : ''}`}
                   >

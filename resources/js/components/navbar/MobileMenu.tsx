@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { MapPin, FileText, Settings, LogOut } from 'lucide-react';
 import Button from '../Button';
-import { COLLECTIONS } from '../../data';
+import type { Collection } from '@/types';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -20,7 +20,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   isLoggedIn,
   onLogout,
 }) => {
-  const { url } = usePage();
+  const { url, props } = usePage<{
+    collections: Collection[];
+  }>();
+  const collections = props.collections || [];
 
   if (!isOpen || isSearchOpen) return null;
 
@@ -45,7 +48,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         <div className="px-3 py-2 text-gray-700 font-medium">
           Bộ sưu tập
           <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-100 pl-2">
-            {COLLECTIONS.map((col) => (
+            {collections.map((col) => (
               <Link
                 key={col.id}
                 href={`/products?collection=${col.slug}`}

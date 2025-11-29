@@ -92,6 +92,12 @@ class HandleInertiaRequests extends Middleware
                     ],
                 ];
             },
+            'collections' => function () {
+                return \App\Models\Collection::active()
+                    ->ordered()
+                    ->take(10)
+                    ->get(['id', 'name', 'slug', 'type']);
+            },
         ];
     }
 }

@@ -33,8 +33,23 @@ class HomeController extends Controller
                 ->limit(config('pagination.featured_products'))
                 ->get();
 
+        // Get active collections for display
+        $collections = Collection::active()
+            ->ordered()
+            ->take(6)
+            ->get(['id', 'name', 'slug', 'type', 'description']);
+
+        // Get featured artists
+        $artists = \App\Models\Artist::active()
+            ->withCount('products')
+            ->orderBy('products_count', 'desc')
+            ->take(10)
+            ->get(['id', 'name', 'slug', 'image', 'country']);
+
         return Inertia::render('Home', [
             'featuredProducts' => $featuredProducts,
+            'collections' => $collections,
+            'artists' => $artists,
             'featuredCollection' => $featuredCollection ? [
                 'id' => $featuredCollection->id,
                 'name' => $featuredCollection->name,
