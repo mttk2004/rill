@@ -68,8 +68,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
     playTrack(product);
   };
 
+  // Get main artist from product.artists array
+  const mainArtist = artist || (product.artists && product.artists.length > 0 ? product.artists.find((a: any) => a.role === 'main') || product.artists[0] : undefined);
+
   return (
-    <Link to={`/products/${product.slug}`} className="group block h-full">
+    <Link href={`/products/${product.slug}`} className="group block h-full">
       <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100 mb-4">
         {product.image ? (
           <img
@@ -89,8 +92,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
           <button
             onClick={handlePlayClick}
             className={`absolute bottom-3 left-3 lg:bottom-4 lg:left-4 z-20 rounded-full p-2.5 lg:p-3 shadow-lg transition-all duration-300 hover:scale-110 ${isThisPlaying
-                ? 'bg-accent text-white translate-y-0'
-                : 'bg-white text-gray-900 translate-y-0 lg:translate-y-full group-hover:translate-y-0'
+              ? 'bg-accent text-white translate-y-0'
+              : 'bg-white text-gray-900 translate-y-0 lg:translate-y-full group-hover:translate-y-0'
               }`}
             aria-label={isThisPlaying ? "Tạm dừng" : "Nghe thử"}
           >
@@ -129,8 +132,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
         <h3 className={`text-base font-semibold transition-colors line-clamp-1 ${isThisPlaying ? 'text-accent' : 'text-gray-900 group-hover:text-primary'}`}>
           {product.name}
         </h3>
-        {artist && (
-          <p className="text-sm text-gray-500">{artist.name}</p>
+        {mainArtist && (
+          <p className="text-sm text-gray-500">{mainArtist.name}</p>
         )}
         <p className="text-sm font-medium text-gray-900">
           {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}
