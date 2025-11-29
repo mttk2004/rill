@@ -11,27 +11,16 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Get products from the active featured collection
-        $featuredCollection = Collection::featured()
-            ->active()
-            ->ordered()
-            ->first();
-
-        $featuredProducts = $featuredCollection
-            ? $featuredCollection->products()->with('artists')->get()->map(function ($product) use ($featuredCollection) {
-                // Attach collection info to each product
-                $product->collection = [
-                    'id' => $featuredCollection->id,
-                    'name' => $featuredCollection->name,
-                    'type' => $featuredCollection->type,
-                ];
-                return $product;
-            })
-            : Product::with('artists')
-                ->active()
-                ->inRandomOrder()
-                ->limit(config('pagination.featured_products'))
-                ->get();
+        // Get 8 best-selling products based on order items
+        $featuredProducts = Product::query()
+            ->with('artists')
+            ->where('status', 'active')
+            ->withCount(['orderItems as total_sold' => function ($query) {
+                $query->selectRaw('COALESCE(SUM(quantity), 0)');
+            }])
+            ->orderBy('total_sold', 'desc')
+            ->take(8)
+            ->get();
 
         // Get active collections for display
         $collections = Collection::active()
@@ -50,12 +39,6 @@ class HomeController extends Controller
             'featuredProducts' => $featuredProducts,
             'collections' => $collections,
             'artists' => $artists,
-            'featuredCollection' => $featuredCollection ? [
-                'id' => $featuredCollection->id,
-                'name' => $featuredCollection->name,
-                'type' => $featuredCollection->type,
-                'description' => $featuredCollection->description,
-            ] : null,
         ]);
     }
 }
