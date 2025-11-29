@@ -50,7 +50,7 @@ export const ShopProvider = ({ children }: { children?: React.ReactNode }) => {
 
   const updateQuantity = (cartItemId: number, quantity: number) => {
     if (quantity < 1) return;
-    router.patch(`/cart/${cartItemId}`, {
+    router.put(`/cart/${cartItemId}`, {
       quantity: quantity,
     }, {
       preserveScroll: true,
