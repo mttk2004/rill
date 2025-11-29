@@ -168,16 +168,20 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                   {cart.map((item) => (
                     <div key={item.id} className="flex gap-4">
                       <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded border border-gray-200">
-                        <img src={item.image || ''} alt={item.name} className="h-full w-full object-cover" />
+                        {item.product?.image_url ? (
+                          <img src={item.product.image_url} alt={item.product?.name || 'Product'} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="h-full w-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between">
-                          <h4 className="text-sm font-medium text-gray-900 line-clamp-1">{item.name}</h4>
+                          <h4 className="text-sm font-medium text-gray-900 line-clamp-1">{item.product?.name || 'Unnamed Product'}</h4>
                           <p className="text-sm font-medium text-gray-900">
-                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price) * item.quantity)}
+                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.unit_price) * item.quantity)}
                           </p>
                         </div>
-                        <p className="text-xs text-gray-500">{item.quantity} x {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.price))}</p>
+                        <p className="text-xs text-gray-500">{item.quantity} x {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.unit_price))}</p>
                       </div>
                     </div>
                   ))}
