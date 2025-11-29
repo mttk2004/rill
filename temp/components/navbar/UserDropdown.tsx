@@ -1,16 +1,15 @@
 
 import React, { useRef, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link } from 'react-router-dom';
 import { ShoppingBag, MapPin, FileText, Settings, LogOut } from 'lucide-react';
 
 interface UserDropdownProps {
   isOpen: boolean;
   onClose: () => void;
   onLogout: () => void;
-  user: any;
 }
 
-const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onLogout, user }) => {
+const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onLogout }) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,33 +32,33 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onLogout, 
   return (
     <div ref={menuRef} className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-100 bg-white shadow-xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
       <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
-        <p className="text-sm font-bold text-gray-900">{user?.name || 'Người dùng'}</p>
-        <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
+        <p className="text-sm font-bold text-gray-900">Nguyễn Văn A</p>
+        <p className="text-xs text-gray-500 truncate">nguyenvana@example.com</p>
       </div>
       <div className="py-1">
         <Link
-          href="/cart"
+          to="/cart"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >
           <ShoppingBag size={16} /> Giỏ hàng
         </Link>
         <Link
-          href="/addresses"
+          to="/addresses"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >
           <MapPin size={16} /> Địa chỉ
         </Link>
         <Link
-          href="/orders"
+          to="/orders"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >
           <FileText size={16} /> Lịch sử đơn hàng
         </Link>
         <Link
-          href="/settings"
+          to="/settings"
           className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
           onClick={onClose}
         >

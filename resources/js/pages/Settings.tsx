@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import Button from '../components/Button';
 import AppLayout from '@/layouts/app-layout';
 import { User, Lock, Bell, Shield, LogOut } from 'lucide-react';
+import type { SharedData } from '@/types';
 
-interface SettingsProps {
-  user: any;
-}
-
-export default function Settings({ user }: SettingsProps) {
+export default function Settings() {
+  const { auth } = usePage<SharedData>().props;
+  const user = auth?.user;
   const [activeTab, setActiveTab] = useState('profile');
 
   const tabs = [
@@ -62,7 +61,7 @@ export default function Settings({ user }: SettingsProps) {
                   <form className="space-y-6">
                     <div className="flex items-center gap-6 mb-6">
                       <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-2xl font-bold">
-                        A
+                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                       </div>
                       <div>
                         <Button variant="outline" size="sm" type="button">Thay đổi ảnh đại diện</Button>
@@ -73,15 +72,15 @@ export default function Settings({ user }: SettingsProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
-                        <input type="text" defaultValue="Nguyễn Văn A" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                        <input type="text" defaultValue={user?.name || ''} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                        <input type="tel" defaultValue="0987654321" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                        <input type="tel" defaultValue={user?.phone || ''} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
                       </div>
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" defaultValue="nguyenvana@example.com" disabled className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed" />
+                        <input type="email" defaultValue={user?.email || ''} disabled className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed" />
                         <p className="text-xs text-gray-500 mt-1">Liên hệ CSKH để thay đổi email.</p>
                       </div>
                     </div>
