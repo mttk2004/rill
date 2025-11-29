@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, User, Lock, Mail, Phone, Eye, Package, Clock, CheckCircle, Truck, XCircle, ChevronRight } from 'lucide-react';
 import { USERS, ORDERS } from '../../../data';
 import { User as UserType, Order } from '../../../types';

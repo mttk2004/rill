@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { Product, Artist } from '../../types';
 import ProductCard from '../ProductCard';
 

@@ -1,6 +1,6 @@
 
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { ChevronRight, Music, Tag, Mic2 } from 'lucide-react';
 import { PRODUCTS, ARTISTS } from '../../data';
 

@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { NavLink, Link } from 'react-router-dom';
 import { MapPin, FileText, Settings, LogOut } from 'lucide-react';
 import Button from '../Button';
 import { COLLECTIONS } from '../../data';

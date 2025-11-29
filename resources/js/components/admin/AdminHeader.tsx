@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { LogOut, LayoutGrid } from 'lucide-react';
 
 const AdminHeader = () => {

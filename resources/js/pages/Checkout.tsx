@@ -4,7 +4,7 @@ import { useShop } from '../context/ShopContext';
 import Button from '../components/Button';
 import { ADDRESSES } from '../data';
 import { CheckCircle, CreditCard, MapPin, Ticket } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 
 const AVAILABLE_VOUCHERS = [
   { code: 'RILLWELCOME', discount: '10%', desc: 'Giảm 10% cho đơn đầu tiên' },

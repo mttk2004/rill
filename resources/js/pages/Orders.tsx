@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { ORDERS } from '../data';
 import { Package, ChevronRight, Clock, CheckCircle, Truck, XCircle, Filter, ArrowUpDown } from 'lucide-react';
 import Button from '../components/Button';

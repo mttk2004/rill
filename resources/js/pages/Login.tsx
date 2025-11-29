@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import { useToast } from '../context/ToastContext';
 import { ShieldCheck, User } from 'lucide-react';

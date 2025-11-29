@@ -6,7 +6,8 @@ import {
   DollarSign, ShoppingBag, Users, Package, 
   Plus, Calendar, AlertTriangle, Clock, ChevronRight, Tag, CheckCircle, Trophy, Music, TrendingUp, Settings
 } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { useNavigate, Link } from 'react-router-dom';
 import { useDashboard } from '../../hooks/useDashboard';
 import StatCard from '../../components/admin/StatCard';
 import { formatCurrency, formatDate } from '../../utils/format';

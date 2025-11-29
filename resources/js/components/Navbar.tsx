@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Menu, X, Search, User, ChevronDown } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { COLLECTIONS } from '../data';

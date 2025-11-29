@@ -7,7 +7,7 @@ import AlertDialog from '../components/AlertDialog';
 import AddressFormDialog from '../components/address/AddressFormDialog';
 import AddressCard from '../components/address/AddressCard';
 import { Plus, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { useToast } from '../context/ToastContext';
 
 const Addresses = () => {

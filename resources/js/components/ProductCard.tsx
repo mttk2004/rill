@@ -4,7 +4,7 @@ import { Product, Artist } from '../types';
 import { ShoppingCart, Play, Loader2, Check } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { usePlayer } from '../context/PlayerContext';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { flyToCart } from '../utils/cartAnimation';
 
 interface ProductCardProps {

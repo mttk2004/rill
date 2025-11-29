@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { useParams, Link } from 'react-router-dom';
 import { PRODUCTS, ARTISTS, REVIEWS } from '../data';
 import Button from '../components/Button';
 import { useShop } from '../context/ShopContext';

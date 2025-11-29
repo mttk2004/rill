@@ -1,7 +1,8 @@
 
 
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { useParams, Link } from 'react-router-dom';
 import { ORDERS, PRODUCTS } from '../data';
 import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle } from 'lucide-react';
 import Button from '../components/Button';

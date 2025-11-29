@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
+// TODO: Remove react-router-dom - import { Link, useNavigate } from 'react-router-dom';
 import { PRODUCTS, ARTISTS } from '../../../data';
 import { Product } from '../../../types';
 import { 
