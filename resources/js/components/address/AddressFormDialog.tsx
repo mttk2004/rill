@@ -1,8 +1,24 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import Button from '../Button';
 import { UserAddress } from '../../types';
+import axios from 'axios';
+
+interface Province {
+  ProvinceID: number;
+  ProvinceName: string;
+}
+
+interface District {
+  DistrictID: number;
+  DistrictName: string;
+}
+
+interface Ward {
+  WardCode: string;
+  WardName: string;
+}
 
 interface AddressFormDialogProps {
   isOpen: boolean;
@@ -21,6 +37,106 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
   onChange,
   isEditing
 }) => {
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [wards, setWards] = useState<Ward[]>([]);
+  const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
+  const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
+
+  // Fetch provinces on mount
+  useEffect(() => {
+    if (isOpen) {
+      axios.get('/api/provinces')
+        .then(response => {
+          if (response.data.success) {
+            setProvinces(response.data.data);
+          }
+        })
+        .catch(error => console.error('Failed to fetch provinces:', error));
+    }
+  }, [isOpen]);
+
+  // Fetch districts when province changes
+  useEffect(() => {
+    if (selectedProvinceId) {
+      axios.get('/api/districts', { params: { province_id: selectedProvinceId } })
+        .then(response => {
+          if (response.data.success) {
+            setDistricts(response.data.data);
+            setWards([]);
+          }
+        })
+        .catch(error => console.error('Failed to fetch districts:', error));
+    } else {
+      setDistricts([]);
+      setWards([]);
+    }
+  }, [selectedProvinceId]);
+
+  // Fetch wards when district changes
+  useEffect(() => {
+    if (selectedDistrictId) {
+      axios.get('/api/wards', { params: { district_id: selectedDistrictId } })
+        .then(response => {
+          if (response.data.success) {
+            setWards(response.data.data);
+          }
+        })
+        .catch(error => console.error('Failed to fetch wards:', error));
+    } else {
+      setWards([]);
+    }
+  }, [selectedDistrictId]);
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const provinceId = parseInt(e.target.value);
+    const province = provinces.find(p => p.ProvinceID === provinceId);
+    
+    setSelectedProvinceId(provinceId);
+    setSelectedDistrictId(null);
+    
+    // Update formData with province name
+    const syntheticEvent = {
+      target: {
+        name: 'province',
+        value: province?.ProvinceName || '',
+        type: 'text'
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChange(syntheticEvent);
+  };
+
+  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const districtId = parseInt(e.target.value);
+    const district = districts.find(d => d.DistrictID === districtId);
+    
+    setSelectedDistrictId(districtId);
+    
+    // Update formData with district name
+    const syntheticEvent = {
+      target: {
+        name: 'district',
+        value: district?.DistrictName || '',
+        type: 'text'
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChange(syntheticEvent);
+  };
+
+  const handleWardChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const ward = wards.find(w => w.WardCode === e.target.value);
+    
+    // Update formData with ward name
+    const syntheticEvent = {
+      target: {
+        name: 'ward',
+        value: ward?.WardName || '',
+        type: 'text'
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChange(syntheticEvent);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -94,39 +210,55 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tỉnh / Thành</label>
-              <input
-                type="text"
+              <select
                 name="province"
-                value={formData.province || ''}
-                onChange={onChange}
+                value={selectedProvinceId || ''}
+                onChange={handleProvinceChange}
                 required
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                placeholder="Hồ Chí Minh"
-              />
+              >
+                <option value="">Chọn Tỉnh/Thành</option>
+                {provinces.map(province => (
+                  <option key={province.ProvinceID} value={province.ProvinceID}>
+                    {province.ProvinceName}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Quận / Huyện</label>
-              <input
-                type="text"
+              <select
                 name="district"
-                value={formData.district || ''}
-                onChange={onChange}
+                value={selectedDistrictId || ''}
+                onChange={handleDistrictChange}
                 required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                placeholder="Quận 1"
-              />
+                disabled={!selectedProvinceId}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">Chọn Quận/Huyện</option>
+                {districts.map(district => (
+                  <option key={district.DistrictID} value={district.DistrictID}>
+                    {district.DistrictName}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Phường / Xã</label>
-              <input
-                type="text"
+              <select
                 name="ward"
-                value={formData.ward || ''}
-                onChange={onChange}
+                onChange={handleWardChange}
                 required
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                placeholder="Bến Nghé"
-              />
+                disabled={!selectedDistrictId}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">Chọn Phường/Xã</option>
+                {wards.map(ward => (
+                  <option key={ward.WardCode} value={ward.WardCode}>
+                    {ward.WardName}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

@@ -87,7 +87,7 @@ export default function Addresses({ addresses: initialAddresses = [] }: Addresse
   };
 
   const handleSetDefault = (id: string) => {
-    router.post(`/addresses/${id}/set-default`, {}, {
+    router.put(`/addresses/${id}/set-default`, {}, {
       onSuccess: () => {
         setAddresses((prev) =>
           prev.map((addr) => ({
