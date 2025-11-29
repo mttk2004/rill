@@ -98,6 +98,37 @@ class HandleInertiaRequests extends Middleware
                     ->take(10)
                     ->get(['id', 'name', 'slug', 'type']);
             },
+            'menuData' => function () {
+                // Get unique genres and labels from active products
+                $genres = \App\Models\Product::query()
+                    ->where('status', 'active')
+                    ->whereNotNull('genre')
+                    ->distinct()
+                    ->pluck('genre')
+                    ->sort()
+                    ->values();
+
+                $labels = \App\Models\Product::query()
+                    ->where('status', 'active')
+                    ->whereNotNull('label')
+                    ->distinct()
+                    ->pluck('label')
+                    ->sort()
+                    ->values();
+
+                // Get featured artists with product count
+                $artists = \App\Models\Artist::active()
+                    ->withCount('products')
+                    ->orderBy('products_count', 'desc')
+                    ->take(12)
+                    ->get(['id', 'name', 'slug', 'image']);
+
+                return [
+                    'genres' => $genres,
+                    'labels' => $labels,
+                    'artists' => $artists,
+                ];
+            },
         ];
     }
 }

@@ -117,8 +117,12 @@ export interface Artist {
   id: string;
   name: string;
   slug: string;
+  image?: string;
+  image_url?: string;
+  country?: string;
   role?: string;
   sort_order?: number;
+  products_count?: number;
 }
 
 export interface Collection {

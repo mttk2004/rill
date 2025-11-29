@@ -1,8 +1,8 @@
 
-import React, { useMemo, useState } from 'react';
-import { Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight, Music, Tag, Mic2 } from 'lucide-react';
-import { PRODUCTS, ARTISTS } from '../../data';
+import type { Artist } from '@/types';
 
 interface MegaMenuProps {
   isOpen: boolean;
@@ -12,10 +12,15 @@ interface MegaMenuProps {
 const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
   const [activeCategory, setActiveCategory] = useState<'genre' | 'label' | 'artist'>('genre');
 
-  // Data Extraction
-  const uniqueGenres = useMemo(() => Array.from(new Set(PRODUCTS.map(p => p.genre))).sort(), []);
-  const uniqueLabels = useMemo(() => Array.from(new Set(PRODUCTS.map(p => p.label))).sort(), []);
-  const featuredArtists = useMemo(() => ARTISTS.slice(0, 12), []);
+  const { props } = usePage<{
+    menuData: {
+      genres: string[];
+      labels: string[];
+      artists: Artist[];
+    };
+  }>();
+
+  const { genres = [], labels = [], artists = [] } = props.menuData || {};
 
   if (!isOpen) return null;
 
@@ -26,8 +31,8 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
         <div className="flex flex-col">
           <button
             className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${activeCategory === 'genre'
-                ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
+              ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
               }`}
             onMouseEnter={() => setActiveCategory('genre')}
           >
@@ -36,8 +41,8 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
           </button>
           <button
             className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${activeCategory === 'label'
-                ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
+              ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
               }`}
             onMouseEnter={() => setActiveCategory('label')}
           >
@@ -46,8 +51,8 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
           </button>
           <button
             className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${activeCategory === 'artist'
-                ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
+              ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
               }`}
             onMouseEnter={() => setActiveCategory('artist')}
           >
@@ -65,16 +70,16 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
             {activeCategory === 'label' && 'Hãng đĩa nổi bật'}
             {activeCategory === 'artist' && 'Nghệ sĩ hàng đầu'}
           </h3>
-          <Link to="/products" onClick={closeMenu} className="text-xs font-medium text-primary hover:underline flex items-center">
+          <Link href="/products" onClick={closeMenu} className="text-xs font-medium text-primary hover:underline flex items-center">
             Xem tất cả <ChevronRight size={12} />
           </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-          {activeCategory === 'genre' && uniqueGenres.map(genre => (
+          {activeCategory === 'genre' && genres.map(genre => (
             <Link
               key={genre}
-              to={`/products?genre=${encodeURIComponent(genre)}`}
+              href={`/products?genre=${encodeURIComponent(genre)}`}
               className="text-sm text-gray-600 hover:text-primary hover:translate-x-1 transition-all py-1 flex items-center gap-2"
               onClick={closeMenu}
             >
@@ -83,10 +88,10 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
             </Link>
           ))}
 
-          {activeCategory === 'label' && uniqueLabels.map(label => (
+          {activeCategory === 'label' && labels.map(label => (
             <Link
               key={label}
-              to={`/products?label=${encodeURIComponent(label)}`}
+              href={`/products?label=${encodeURIComponent(label)}`}
               className="text-sm text-gray-600 hover:text-primary hover:translate-x-1 transition-all py-1 flex items-center gap-2"
               onClick={closeMenu}
             >
@@ -95,15 +100,15 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
             </Link>
           ))}
 
-          {activeCategory === 'artist' && featuredArtists.map(artist => (
+          {activeCategory === 'artist' && artists.map(artist => (
             <Link
               key={artist.id}
-              to={`/products?artist=${artist.slug}`}
+              href={`/products?artist=${artist.slug}`}
               className="text-sm text-gray-600 hover:text-primary hover:translate-x-1 transition-all py-1 flex items-center gap-2"
               onClick={closeMenu}
             >
-              {artist.image ? (
-                <img src={artist.image} alt="" className="w-6 h-6 rounded-full object-cover border border-gray-100" />
+              {artist.image_url ? (
+                <img src={artist.image_url} alt="" className="w-6 h-6 rounded-full object-cover border border-gray-100" />
               ) : (
                 <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[8px] font-bold text-gray-500">
                   {artist.name.charAt(0)}
