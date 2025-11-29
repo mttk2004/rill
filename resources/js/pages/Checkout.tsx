@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useShop } from '../context/ShopContext';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { CheckCircle, CreditCard, MapPin, Ticket } from 'lucide-react';
-import type { Address } from '@/types';
+import type { Address, SharedData } from '@/types';
+import axios from 'axios';
 
-const AVAILABLE_VOUCHERS = [
-  { code: 'RILLWELCOME', discount: '10%', desc: 'Giảm 10% cho đơn đầu tiên' },
-  { code: 'FREESHIP', discount: '35k', desc: 'Miễn phí vận chuyển' },
-  { code: 'VINYLLOVER', discount: '50k', desc: 'Giảm 50k cho đơn từ 1 triệu' }
-];
+interface Voucher {
+  id: number;
+  code: string;
+  name: string;
+  description: string;
+  value: number;
+  minimum_amount: number | null;
+  maximum_discount: number | null;
+  discount_amount: number | null;
+}
 
 interface CheckoutProps {
   addresses: Address[];
@@ -18,7 +24,10 @@ interface CheckoutProps {
 
 function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const { cart, cartTotal } = useShop();
+  const { props } = usePage<SharedData>();
+  const settings = props.settings;
   const defaultAddress = addresses.find(a => a.is_default === 1) || addresses[0];
+  const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
 
   const { data, setData, post, processing } = useForm<{
     address_id: number | null;
@@ -33,9 +42,30 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const [selectedAddress, setSelectedAddress] = useState(defaultAddress?.id || null);
   const [isVoucherFocused, setIsVoucherFocused] = useState(false);
 
-  // Logic for shipping cost
-  const shippingCost = cartTotal >= 3000000 ? 0 : 35000;
+  // Logic for shipping cost using backend settings
+  const freeShippingThreshold = settings?.shipping?.free_threshold || 1000000;
+  const shippingCost = cartTotal >= freeShippingThreshold ? 0 : 35000;
   const finalTotal = cartTotal + shippingCost;
+
+  // Fetch available vouchers
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      try {
+        const response = await axios.get('/api/vouchers/available', {
+          params: { order_total: cartTotal }
+        });
+        if (response.data.success && response.data.data.vouchers) {
+          setAvailableVouchers(response.data.data.vouchers);
+        }
+      } catch (error) {
+        console.error('Failed to fetch vouchers:', error);
+      }
+    };
+
+    if (cartTotal > 0) {
+      fetchVouchers();
+    }
+  }, [cartTotal]);
 
   const handleApplyVoucher = (code: string) => {
     setData('voucher_code', code);
@@ -214,20 +244,28 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                       <div className="px-3 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
                         Mã giảm giá dành cho bạn
                       </div>
-                      {AVAILABLE_VOUCHERS.map((v) => (
-                        <button
-                          key={v.code}
-                          className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group"
-                          onClick={() => handleApplyVoucher(v.code)}
-                          type="button"
-                        >
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="font-bold text-primary group-hover:text-accent">{v.code}</span>
-                            <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{v.discount}</span>
-                          </div>
-                          <p className="text-xs text-gray-500">{v.desc}</p>
-                        </button>
-                      ))}
+                      {availableVouchers.length > 0 ? (
+                        availableVouchers.map((v) => (
+                          <button
+                            key={v.code}
+                            className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group"
+                            onClick={() => handleApplyVoucher(v.code)}
+                            type="button"
+                          >
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="font-bold text-primary group-hover:text-accent">{v.code}</span>
+                              <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                {v.discount_amount ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(v.discount_amount) : `${v.value}%`}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-500">{v.description}</p>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-3 py-4 text-center text-sm text-gray-500">
+                          Không có mã giảm giá khả dụng
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
