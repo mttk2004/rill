@@ -41,11 +41,48 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
 
   const [selectedAddress, setSelectedAddress] = useState(defaultAddress?.id || null);
   const [isVoucherFocused, setIsVoucherFocused] = useState(false);
+  const [shippingCost, setShippingCost] = useState(0);
+  const [loadingShipping, setLoadingShipping] = useState(false);
 
   // Logic for shipping cost using backend settings
   const freeShippingThreshold = settings?.shipping?.free_threshold || 1000000;
-  const shippingCost = cartTotal >= freeShippingThreshold ? 0 : 35000;
   const finalTotal = cartTotal + shippingCost;
+
+  // Fetch shipping cost when address changes
+  useEffect(() => {
+    const fetchShippingCost = async () => {
+      if (!selectedAddress || cartTotal === 0) {
+        setShippingCost(0);
+        return;
+      }
+
+      // Check free shipping threshold first
+      if (cartTotal >= freeShippingThreshold) {
+        setShippingCost(0);
+        return;
+      }
+
+      setLoadingShipping(true);
+      try {
+        const response = await axios.post('/checkout/shipping-fee', {
+          address_id: selectedAddress,
+          order_total: cartTotal
+        });
+
+        if (response.data.success) {
+          setShippingCost(response.data.data.shipping_fee || 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch shipping cost:', error);
+        // Fallback to default shipping cost
+        setShippingCost(35000);
+      } finally {
+        setLoadingShipping(false);
+      }
+    };
+
+    fetchShippingCost();
+  }, [selectedAddress, cartTotal, freeShippingThreshold]);
 
   // Fetch available vouchers
   useEffect(() => {
@@ -277,7 +314,9 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Phí vận chuyển</span>
-                    {shippingCost === 0 ? (
+                    {loadingShipping ? (
+                      <span className="text-gray-400">Đang tính...</span>
+                    ) : shippingCost === 0 ? (
                       <span className="font-medium text-green-600">Miễn phí</span>
                     ) : (
                       <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(shippingCost)}</span>
