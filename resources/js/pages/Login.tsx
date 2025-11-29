@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import Button from '../components/Button';
 import AppLayout from '@/layouts/app-layout';
 import { useToast } from '../context/ToastContext';
@@ -29,11 +29,17 @@ export default function Login() {
 
   const handleQuickLogin = (role: 'customer' | 'admin') => {
     if (role === 'admin') {
-      showToast('Đăng nhập quyền Admin thành công', 'info');
-      router.visit('/admin');
+      setData({
+        email: 'admin@rill.local',
+        password: 'password',
+        remember: false,
+      });
     } else {
-      showToast('Đăng nhập quyền Khách hàng thành công', 'success');
-      router.visit('/');
+      setData({
+        email: 'nguyenvananh@gmail.com',
+        password: 'password',
+        remember: false,
+      });
     }
   };
 
