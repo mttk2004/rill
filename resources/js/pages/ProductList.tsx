@@ -33,6 +33,17 @@ export default function ProductList({
   activeCollection = null,
   filters = {}
 }: ProductListProps) {
+  // DEBUG: Log props received
+  console.log('ProductList props:', {
+    products_count: products.length,
+    products_sample: products[0],
+    artists_count: artists.length,
+    availableGenres_count: availableGenres.length,
+    availableLabels_count: availableLabels.length,
+    filters,
+    activeCollection
+  });
+
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
   // Accordion States
@@ -228,7 +239,6 @@ export default function ProductList({
                     <Reveal key={product.id} delay={index * 0.05} threshold={0.05}>
                       <ProductCard
                         product={product}
-                        artist={artists.find(a => a.id === product.artist_id)}
                       />
                     </Reveal>
                   ))}

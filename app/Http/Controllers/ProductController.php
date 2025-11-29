@@ -37,14 +37,27 @@ class ProductController extends Controller
                 ->first(['id', 'name', 'slug', 'type', 'description']);
         }
 
+        $artists = \App\Models\Artist::active()
+            ->whereHas('products', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'image']);
+
+        // DEBUG: Log data being sent to frontend
+        \Log::info('ProductController::index - Data being sent to frontend:', [
+            'products_count' => count($result['products']),
+            'products_sample' => count($result['products']) > 0 ? $result['products'][0] : null,
+            'artists_count' => $artists->count(),
+            'availableGenres_count' => count($result['filters']['genres'] ?? []),
+            'availableLabels_count' => count($result['filters']['labels'] ?? []),
+            'filters' => $filters,
+            'pagination' => $result['pagination'],
+        ]);
+
         return Inertia::render('ProductList', [
             'products' => $result['products'],
-            'artists' => \App\Models\Artist::active()
-                ->whereHas('products', function ($query) {
-                    $query->where('status', 'active');
-                })
-                ->orderBy('name')
-                ->get(['id', 'name', 'slug', 'image']),
+            'artists' => $artists,
             'availableGenres' => $result['filters']['genres'] ?? [],
             'availableLabels' => $result['filters']['labels'] ?? [],
             'activeCollection' => $activeCollection,
