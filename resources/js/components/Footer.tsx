@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
 const Footer = () => {
@@ -55,9 +55,9 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4 text-white">Đăng ký nhận tin</h4>
             <p className="text-sm text-gray-300 mb-4">Đăng ký để nhận thông báo về sản phẩm mới và ưu đãi độc quyền.</p>
             <form className="flex gap-2" onSubmit={(e) => e.preventDefault()}>
-              <input 
-                type="email" 
-                placeholder="Nhập email của bạn" 
+              <input
+                type="email"
+                placeholder="Nhập email của bạn"
                 className="bg-white/10 border-none rounded px-3 py-2 text-sm w-full focus:ring-1 focus:ring-accent text-white placeholder:text-gray-400"
               />
               <button type="submit" className="bg-white text-primary px-4 py-2 rounded text-sm font-bold hover:bg-gray-100 transition-colors">

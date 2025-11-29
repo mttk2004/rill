@@ -1,6 +1,6 @@
 
 import React, { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { ChevronRight, Music, Tag, Mic2 } from 'lucide-react';
 import { PRODUCTS, ARTISTS } from '../../data';
 
@@ -25,33 +25,30 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
       <div className="col-span-4 bg-gray-50 py-4 border-r border-gray-100">
         <div className="flex flex-col">
           <button
-            className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${
-              activeCategory === 'genre'
+            className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${activeCategory === 'genre'
                 ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
                 : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
-            }`}
+              }`}
             onMouseEnter={() => setActiveCategory('genre')}
           >
             <span className="flex items-center gap-3"><Music size={16} /> Thể loại</span>
             {activeCategory === 'genre' && <ChevronRight size={14} />}
           </button>
           <button
-            className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${
-              activeCategory === 'label'
+            className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${activeCategory === 'label'
                 ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
                 : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
-            }`}
+              }`}
             onMouseEnter={() => setActiveCategory('label')}
           >
             <span className="flex items-center gap-3"><Tag size={16} /> Hãng đĩa</span>
             {activeCategory === 'label' && <ChevronRight size={14} />}
           </button>
           <button
-            className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${
-              activeCategory === 'artist'
+            className={`flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors ${activeCategory === 'artist'
                 ? 'bg-white text-primary border-l-4 border-primary shadow-sm'
                 : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 border-l-4 border-transparent'
-            }`}
+              }`}
             onMouseEnter={() => setActiveCategory('artist')}
           >
             <span className="flex items-center gap-3"><Mic2 size={16} /> Nghệ sĩ</span>

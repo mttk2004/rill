@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { Link, usePage } from '@inertiajs/react';
 import { MapPin, FileText, Settings, LogOut } from 'lucide-react';
 import Button from '../Button';
 import { COLLECTIONS } from '../../data';
@@ -20,33 +20,27 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   isLoggedIn,
   onLogout,
 }) => {
+  const { url } = usePage();
+
   if (!isOpen || isSearchOpen) return null;
 
   return (
     <div className="md:hidden bg-white border-t border-gray-100 animate-in slide-in-from-top-5 duration-200">
       <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${
-              isActive ? 'text-primary bg-gray-50' : 'text-gray-700'
-            }`
-          }
+        <Link
+          href="/"
+          className={`block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${url === '/' ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
           onClick={onClose}
         >
           Trang chủ
-        </NavLink>
-        <NavLink
-          to="/products"
-          className={({ isActive }) =>
-            `block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${
-              isActive ? 'text-primary bg-gray-50' : 'text-gray-700'
-            }`
-          }
+        </Link>
+        <Link
+          href="/products"
+          className={`block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${url.startsWith('/products') ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
           onClick={onClose}
         >
           Sản phẩm
-        </NavLink>
+        </Link>
 
         <div className="px-3 py-2 text-gray-700 font-medium">
           Bộ sưu tập
@@ -54,7 +48,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             {COLLECTIONS.map((col) => (
               <Link
                 key={col.id}
-                to={`/products?collection=${col.slug}`}
+                href={`/products?collection=${col.slug}`}
                 className="block text-sm text-gray-600 hover:text-primary py-1"
                 onClick={onClose}
               >
@@ -64,28 +58,20 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </div>
         </div>
 
-        <NavLink
-          to="/about"
-          className={({ isActive }) =>
-            `block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${
-              isActive ? 'text-primary bg-gray-50' : 'text-gray-700'
-            }`
-          }
+        <Link
+          href="/about"
+          className={`block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${url === '/about' ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
           onClick={onClose}
         >
           Giới thiệu
-        </NavLink>
-        <NavLink
-          to="/support"
-          className={({ isActive }) =>
-            `block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${
-              isActive ? 'text-primary bg-gray-50' : 'text-gray-700'
-            }`
-          }
+        </Link>
+        <Link
+          href="/support"
+          className={`block rounded-md px-3 py-2 text-base font-medium hover:bg-gray-50 hover:text-primary ${url === '/support' ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
           onClick={onClose}
         >
           Hỗ trợ
-        </NavLink>
+        </Link>
 
         <div className="border-t border-gray-100 my-2 pt-2">
           {isLoggedIn ? (
@@ -94,21 +80,21 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Tài khoản</span>
               </div>
               <Link
-                to="/addresses"
+                href="/addresses"
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary"
                 onClick={onClose}
               >
                 <MapPin size={18} /> Sổ địa chỉ
               </Link>
               <Link
-                to="/orders"
+                href="/orders"
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary"
                 onClick={onClose}
               >
                 <FileText size={18} /> Lịch sử đơn hàng
               </Link>
               <Link
-                to="/settings"
+                href="/settings"
                 className="flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary"
                 onClick={onClose}
               >
@@ -126,10 +112,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </>
           ) : (
             <div className="flex flex-col gap-2 px-3 mt-2">
-              <Link to="/login" onClick={onClose}>
+              <Link href="/login" onClick={onClose}>
                 <Button fullWidth variant="ghost">Đăng nhập</Button>
               </Link>
-              <Link to="/register" onClick={onClose}>
+              <Link href="/register" onClick={onClose}>
                 <Button fullWidth>Đăng ký</Button>
               </Link>
             </div>

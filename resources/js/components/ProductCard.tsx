@@ -4,7 +4,7 @@ import { Product, Artist } from '../types';
 import { ShoppingCart, Play, Loader2, Check } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { usePlayer } from '../context/PlayerContext';
-import { Link } from 'react-router-dom';
+import { Link } from '@inertiajs/react';
 import { flyToCart } from '../utils/cartAnimation';
 
 interface ProductCardProps {
@@ -15,7 +15,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
   const { addToCart } = useShop();
   const { playTrack, currentTrack, isPlaying } = usePlayer();
-  
+
   const [btnState, setBtnState] = useState<'idle' | 'loading' | 'success'>('idle');
 
   const isCurrentTrack = currentTrack?.id === product.id;
@@ -24,7 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
   const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation(); // Prevent navigating to product detail
-    
+
     // Prevent double clicks
     if (btnState !== 'idle') return;
 
@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
 
     // 2. Loading State
     setBtnState('loading');
-    
+
     try {
       // Simulate processing delay
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -50,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
 
       // 5. Success State
       setBtnState('success');
-      
+
       // 6. Reset
       setTimeout(() => {
         setBtnState('idle');
@@ -83,24 +83,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
             <span className="text-sm">Chưa có ảnh</span>
           </div>
         )}
-        
+
         {/* Play Button - Only shows if preview_url exists */}
         {product.preview_url && (
-           <button
+          <button
             onClick={handlePlayClick}
-            className={`absolute bottom-3 left-3 lg:bottom-4 lg:left-4 z-20 rounded-full p-2.5 lg:p-3 shadow-lg transition-all duration-300 hover:scale-110 ${
-              isThisPlaying 
-                ? 'bg-accent text-white translate-y-0' 
+            className={`absolute bottom-3 left-3 lg:bottom-4 lg:left-4 z-20 rounded-full p-2.5 lg:p-3 shadow-lg transition-all duration-300 hover:scale-110 ${isThisPlaying
+                ? 'bg-accent text-white translate-y-0'
                 : 'bg-white text-gray-900 translate-y-0 lg:translate-y-full group-hover:translate-y-0'
-            }`}
+              }`}
             aria-label={isThisPlaying ? "Tạm dừng" : "Nghe thử"}
           >
             {isThisPlaying ? (
-               <div className="flex items-center gap-1">
-                  <span className="block h-3 w-1 bg-white animate-[music-bar_0.6s_ease-in-out_infinite]"></span>
-                  <span className="block h-4 w-1 bg-white animate-[music-bar_0.6s_ease-in-out_0.2s_infinite]"></span>
-                  <span className="block h-2 w-1 bg-white animate-[music-bar_0.6s_ease-in-out_0.4s_infinite]"></span>
-               </div>
+              <div className="flex items-center gap-1">
+                <span className="block h-3 w-1 bg-white animate-[music-bar_0.6s_ease-in-out_infinite]"></span>
+                <span className="block h-4 w-1 bg-white animate-[music-bar_0.6s_ease-in-out_0.2s_infinite]"></span>
+                <span className="block h-2 w-1 bg-white animate-[music-bar_0.6s_ease-in-out_0.4s_infinite]"></span>
+              </div>
             ) : (
               <Play size={20} fill="currentColor" className="ml-0.5" />
             )}
