@@ -45,9 +45,12 @@ export function formatRelativeTime(timestamp: string | Date): string {
     return `${diffMinutes} phút trước`;
   } else if (diffHours < 24) {
     return `${diffHours} giờ trước`;
-  } else if (diffDays < 7) {
+  } else if (diffDays < 30) {
     return `${diffDays} ngày trước`;
+  } else if (diffDays < 365) {
+    const diffMonths = Math.floor(diffDays / 30);
+    return `${diffMonths} tháng trước`;
   } else {
-    return formatDate(date, false);
+    return formatDate(date, true);
   }
 }
