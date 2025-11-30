@@ -1,43 +1,52 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { Package, Clock, CheckCircle, Truck, XCircle, Filter, ArrowUpDown } from 'lucide-react';
+import { Package, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 
 interface OrderItem {
-  id: number;
-  title: string;
-  artist_name: string;
-  price: number;
-  unit_price: number;
-  image_url: string | null;
+  id: string;
+  product_name: string;
+  product_image: string | null;
   quantity: number;
-  sku: string;
-  slug: string | null;
+  unit_price: string;
+  total_price: string;
 }
 
 interface Order {
   id: string;
-  order_id: string;
   order_number: string;
-  date: string;
   status: string;
-  subtotal: number;
-  shipping_fee: number;
-  discount_amount: number;
-  total: number;
-  payment_method: string;
-  payment_status: string;
+  total_amount: string;
+  placed_at: string;
   items: OrderItem[];
 }
 
-interface OrdersProps {
-  orders: Order[];
+interface PaginatedOrders {
+  data: Order[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
 }
 
-export default function Orders({ orders = [] }: OrdersProps) {
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [sortOption, setSortOption] = useState('newest');
+interface OrdersProps {
+  orders: PaginatedOrders;
+  filters?: {
+    status?: string;
+  };
+}
+
+export default function Orders({ orders }: OrdersProps) {
+  const ordersList = orders.data || [];
+
+  // Debug logs
+  console.log('Orders prop:', orders);
+  console.log('Orders data:', ordersList);
+  if (ordersList.length > 0) {
+    console.log('First order:', ordersList[0]);
+    console.log('First order items:', ordersList[0].items);
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -69,33 +78,6 @@ export default function Orders({ orders = [] }: OrdersProps) {
     }
   };
 
-  // Filter and Sort Logic
-  const filteredAndSortedOrders = useMemo(() => {
-    let result = [...orders];
-
-    // Filter
-    if (filterStatus !== 'all') {
-      result = result.filter(order => order.status === filterStatus);
-    }
-
-    // Sort
-    result.sort((a, b) => {
-      switch (sortOption) {
-        case 'oldest':
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        case 'price_high':
-          return b.total - a.total;
-        case 'price_low':
-          return a.total - b.total;
-        case 'newest':
-        default:
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-      }
-    });
-
-    return result;
-  }, [orders, filterStatus, sortOption]);
-
   return (
     <AppLayout>
       <Head title="Đơn hàng của tôi - Rill" />
@@ -103,62 +85,23 @@ export default function Orders({ orders = [] }: OrdersProps) {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl font-bold text-gray-900 mb-8">Lịch Sử Đơn Hàng</h1>
 
-          {/* Filters and Sort Toolbar */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <Filter size={18} className="text-gray-500" />
-              <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Trạng thái:</span>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="block w-full rounded-lg border-gray-300 bg-gray-50 py-2 pl-3 pr-8 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="all">Tất cả</option>
-                <option value="pending">Chờ xác nhận</option>
-                <option value="processing">Đang xử lý</option>
-                <option value="shipping">Đang vận chuyển</option>
-                <option value="delivered">Hoàn thành</option>
-                <option value="cancelled">Đã hủy</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <ArrowUpDown size={18} className="text-gray-500" />
-              <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Sắp xếp:</span>
-              <select
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-                className="block w-full rounded-lg border-gray-300 bg-gray-50 py-2 pl-3 pr-8 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="newest">Mới nhất</option>
-                <option value="oldest">Cũ nhất</option>
-                <option value="price_high">Giá giảm dần</option>
-                <option value="price_low">Giá tăng dần</option>
-              </select>
-            </div>
-          </div>
-
-          {filteredAndSortedOrders.length === 0 ? (
+          {ordersList.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
               <Package size={48} className="mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500 mb-6">Không tìm thấy đơn hàng nào phù hợp.</p>
-              {filterStatus !== 'all' ? (
-                <button onClick={() => setFilterStatus('all')} className="text-primary font-medium hover:underline">Xóa bộ lọc</button>
-              ) : (
-                <Link href="/products">
-                  <Button>Mua sắm ngay</Button>
-                </Link>
-              )}
+              <p className="text-gray-500 mb-6">Bạn chưa có đơn hàng nào.</p>
+              <Link href="/products">
+                <Button>Mua sắm ngay</Button>
+              </Link>
             </div>
           ) : (
             <div className="space-y-6">
-              {filteredAndSortedOrders.map((order) => (
+              {ordersList.map((order: Order) => (
                 <div key={order.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group">
                   {/* Header */}
                   <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 transition-colors group-hover:bg-gray-100/50">
                     <div className="flex items-center gap-4">
                       <span className="font-bold text-gray-900">#{order.order_number}</span>
-                      <span className="text-sm text-gray-500 border-l border-gray-300 pl-4">{new Date(order.date).toLocaleDateString('vi-VN')}</span>
+                      <span className="text-sm text-gray-500 border-l border-gray-300 pl-4">{new Date(order.placed_at).toLocaleDateString('vi-VN')}</span>
                     </div>
                     <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${getStatusColor(order.status)}`}>
                       {getStatusIcon(order.status)}
@@ -174,10 +117,10 @@ export default function Orders({ orders = [] }: OrdersProps) {
                         {order.items.map((item: OrderItem, idx: number) => (
                           <div key={idx} className="flex gap-4">
                             <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-100">
-                              {item.image_url && <img src={item.image_url} alt={item.title} className="h-full w-full object-cover" />}
+                              {item.product_image && <img src={item.product_image} alt={item.product_name} className="h-full w-full object-cover" />}
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900 line-clamp-1">{item.title}</p>
+                              <p className="font-medium text-gray-900 line-clamp-1">{item.product_name}</p>
                               <p className="text-sm text-gray-500">Số lượng: {item.quantity}</p>
                             </div>
                           </div>
@@ -188,9 +131,9 @@ export default function Orders({ orders = [] }: OrdersProps) {
                       <div className="flex flex-col items-end justify-center border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 min-w-[200px]">
                         <p className="text-sm text-gray-500 mb-1">Tổng thành tiền</p>
                         <p className="text-lg font-bold text-primary mb-4">
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total)}
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(parseFloat(order.total_amount))}
                         </p>
-                        <Link href={`/orders/${order.order_number}`}>
+                        <Link href={`/orders/${order.id}`}>
                           <Button variant="outline" className="text-sm w-full md:w-auto">
                             Xem chi tiết
                           </Button>

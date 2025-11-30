@@ -41,6 +41,22 @@ class OrderController extends Controller
             ->paginate(config('pagination.orders'))
             ->withQueryString();
 
+        // Debug log only - không thay đổi logic
+        \Log::info('OrderController::index - Orders data being sent:', [
+            'total' => $orders->total(),
+            'first_order' => $orders->first() ? [
+                'id' => $orders->first()->id,
+                'order_number' => $orders->first()->order_number,
+                'total_amount' => $orders->first()->total_amount,
+                'placed_at' => $orders->first()->placed_at,
+                'items_count' => $orders->first()->items->count(),
+                'first_item' => $orders->first()->items->first() ? [
+                    'product_name' => $orders->first()->items->first()->product_name,
+                    'quantity' => $orders->first()->items->first()->quantity,
+                ] : null,
+            ] : null,
+        ]);
+
         return Inertia::render('Orders', [
             'orders' => $orders,
             'filters' => $request->only(['status']),
@@ -65,8 +81,36 @@ class OrderController extends Controller
             }
         ]);
 
+        // Debug log only - không thay đổi logic
+        \Log::info('OrderController::show - Order data being sent:', [
+            'order_id' => $order->id,
+            'order_number' => $order->order_number,
+            'total_amount' => $order->total_amount,
+            'placed_at' => $order->placed_at,
+            'status' => $order->status,
+            'shipping_address' => $order->shipping_address,
+            'items_count' => $order->items->count(),
+            'first_item' => $order->items->first() ? [
+                'product_name' => $order->items->first()->product_name,
+                'product_image' => $order->items->first()->product_image,
+                'quantity' => $order->items->first()->quantity,
+                'unit_price' => $order->items->first()->unit_price,
+            ] : null,
+            'payment' => $order->payment ? [
+                'method' => $order->payment->payment_method,
+                'status' => $order->payment->payment_status,
+            ] : null,
+            'status_histories_count' => $order->statusHistories->count(),
+            'status_histories' => $order->statusHistories->map(fn($h) => [
+                'status' => $h->status,
+                'created_at' => $h->created_at,
+                'notes' => $h->notes,
+                'created_by' => $h->createdBy?->name,
+            ])->toArray(),
+        ]);
+
         return Inertia::render('OrderDetail', [
-            'order' => new OrderResource($order),
+            'order' => $order,
         ]);
     }
 

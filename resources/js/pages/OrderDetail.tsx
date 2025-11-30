@@ -5,39 +5,55 @@ import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 
 interface OrderItem {
-  id: number;
-  title: string;
-  artist_name: string;
-  price: number;
-  unit_price: number;
-  image_url: string | null;
+  id: string;
+  product_name: string;
+  product_image: string | null;
+  product_slug: string | null;
   quantity: number;
-  sku: string;
-  slug: string | null;
+  unit_price: string;
+  total_price: string;
 }
 
 interface ShippingAddress {
-  name: string;
+  id: string;
+  full_name: string;
   phone: string;
-  address: string;
-  notes?: string;
+  address_line_1: string;
+  address_line_2: string | null;
+  ward: string;
+  district: string;
+  province: string;
+}
+
+interface Payment {
+  payment_method: string | { [key: string]: string };
+  payment_status: string | { [key: string]: string };
+}
+
+interface StatusHistory {
+  status: string;
+  created_at: string;
+  notes: string | null;
+  created_by: {
+    id: string;
+    name: string;
+  } | null;
 }
 
 interface Order {
   id: string;
-  order_id: string;
   order_number: string;
-  date: string;
-  status: string;
-  subtotal: number;
-  shipping_fee: number;
-  discount_amount: number;
-  total: number;
-  payment_method: string;
-  payment_status: string;
+  status: string | { [key: string]: string };
+  subtotal: string;
+  shipping_fee: string;
+  discount_amount: string;
+  total_amount: string;
+  placed_at: string;
   tracking_number?: string;
   items: OrderItem[];
   shipping_address: ShippingAddress;
+  payment?: Payment;
+  status_histories?: StatusHistory[];
 }
 
 interface OrderDetailProps {
@@ -45,6 +61,10 @@ interface OrderDetailProps {
 }
 
 export default function OrderDetail({ order }: OrderDetailProps) {
+  // Debug log
+  console.log('OrderDetail - order prop:', order);
+  console.log('OrderDetail - order.items:', order.items);
+  console.log('OrderDetail - order.status_histories:', order.status_histories);
 
   // Definition of steps with specific colors
   const steps = [
@@ -59,15 +79,15 @@ export default function OrderDetail({ order }: OrderDetailProps) {
       id: 'processing',
       label: 'Đang xử lý',
       icon: CreditCard,
-      activeColor: 'bg-indigo-600 text-white shadow-indigo-200',
-      textColor: 'text-indigo-700'
+      activeColor: 'bg-purple-600 text-white shadow-purple-200',
+      textColor: 'text-purple-700'
     },
     {
       id: 'shipping',
       label: 'Đang giao',
       icon: Truck,
-      activeColor: 'bg-amber-500 text-white shadow-amber-200',
-      textColor: 'text-amber-700'
+      activeColor: 'bg-orange-500 text-white shadow-orange-200',
+      textColor: 'text-orange-700'
     },
     {
       id: 'delivered',
@@ -78,39 +98,60 @@ export default function OrderDetail({ order }: OrderDetailProps) {
     },
   ];
 
-  const currentStepIndex = steps.findIndex(s => s.id === order.status);
+  // Map status_histories to steps with real data
+  const statusMap: { [key: string]: string } = {
+    pending: 'pending',
+    confirmed: 'processing',
+    shipped: 'shipping',
+    delivered: 'delivered',
+  };
 
-  // Helper to mock timestamps based on created_at for demo purposes
-  const getStepTime = (stepId: string, index: number) => {
-    // Only show time if this step is completed or active
-    if (index > currentStepIndex && order.status !== 'cancelled') return null;
+  // Find current step based on order status
+  const currentStatus = typeof order.status === 'string' ? order.status : Object.values(order.status)[0];
+  const currentStepIndex = steps.findIndex(s => s.id === statusMap[currentStatus]);
 
-    // In a real app, these dates come from the backend.
-    // Here we generate fake progression dates.
-    const date = new Date(order.date);
+  // Helper to get real timestamp from status_histories
+  const getStepTime = (stepId: string) => {
+    if (!order.status_histories) return null;
 
-    if (stepId === 'pending') {
-      return date.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
-    }
+    // Map step id back to status
+    const reverseMap: { [key: string]: string } = {
+      pending: 'pending',
+      processing: 'confirmed',
+      shipping: 'shipped',
+      delivered: 'delivered',
+    };
 
-    if (stepId === 'processing' && index <= currentStepIndex) {
-      date.setHours(date.getHours() + 2); // Processing 2 hours later
-      return date.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
-    }
+    const statusToFind = reverseMap[stepId];
+    const history = order.status_histories.find(h => h.status === statusToFind);
 
-    if (stepId === 'shipping' && index <= currentStepIndex) {
-      date.setDate(date.getDate() + 1); // Shipping next day
-      date.setHours(9, 30);
-      return date.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
-    }
-
-    if (stepId === 'delivered' && index <= currentStepIndex) {
-      date.setDate(date.getDate() + 3); // Delivered 3 days later
-      date.setHours(14, 15);
-      return date.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+    if (history) {
+      return new Date(history.created_at).toLocaleString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit'
+      });
     }
 
     return null;
+  };
+
+  // Helper to get notes from status_histories
+  const getStepNotes = (stepId: string) => {
+    if (!order.status_histories) return null;
+
+    const reverseMap: { [key: string]: string } = {
+      pending: 'pending',
+      processing: 'confirmed',
+      shipping: 'shipped',
+      delivered: 'delivered',
+    };
+
+    const statusToFind = reverseMap[stepId];
+    const history = order.status_histories.find(h => h.status === statusToFind);
+
+    return history?.notes || null;
   };
 
   const isCancelled = order.status === 'cancelled';
@@ -132,7 +173,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                 <h1 className="font-serif text-3xl font-bold text-gray-900">Chi Tiết Đơn Hàng</h1>
                 {isCancelled && <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full">ĐÃ HỦY</span>}
               </div>
-              <p className="text-gray-500 mt-1">Mã đơn: <span className="font-mono font-medium text-gray-900">#{order.order_number}</span> - {new Date(order.date).toLocaleDateString('vi-VN')}</p>
+              <p className="text-gray-500 mt-1">Mã đơn: <span className="font-mono font-medium text-gray-900">#{order.order_number}</span> - {new Date(order.placed_at).toLocaleDateString('vi-VN')}</p>
             </div>
             {order.tracking_number && (
               <div className="px-4 py-2 bg-white rounded-lg border border-gray-200 text-sm shadow-sm">
@@ -148,7 +189,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                 {steps.map((step, idx) => {
                   const isCompleted = idx <= currentStepIndex;
                   const Icon = step.icon;
-                  const time = getStepTime(step.id, idx);
+                  const time = getStepTime(step.id);
 
                   // Determine styles
                   let circleClass = 'bg-gray-100 text-gray-400';
@@ -175,6 +216,11 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                         <span className="mt-1 text-xs font-medium text-gray-500 bg-gray-50 px-2 py-0.5 rounded">{time}</span>
                       )}
 
+                      {/* Notes */}
+                      {isCompleted && getStepNotes(step.id) && (
+                        <p className="mt-2 text-xs text-gray-600 text-center max-w-[120px] line-clamp-2">{getStepNotes(step.id)}</p>
+                      )}
+
                       {/* Connector Line */}
                       {idx !== steps.length - 1 && (
                         <div className="absolute top-6 left-[50%] w-full h-[3px] -z-10 bg-gray-100">
@@ -197,23 +243,23 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                 <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 font-semibold text-gray-900 flex justify-between">
                   <span>Sản phẩm</span>
-                  <span className="text-sm font-normal text-gray-500">{order.items.length} món</span>
+                  <span className="text-sm font-normal text-gray-500">{order.items?.length || 0} món</span>
                 </div>
                 <div className="divide-y divide-gray-100">
-                  {order.items.map((item: OrderItem, idx: number) => {
+                  {order.items?.map((item: OrderItem, idx: number) => {
                     return (
                       <div key={idx} className="p-6 flex gap-4 hover:bg-gray-50 transition-colors">
                         <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-200">
-                          {item.image_url && <img src={item.image_url} alt={item.title} className="h-full w-full object-cover" />}
+                          {item.product_image && <img src={item.product_image} alt={item.product_name} className="h-full w-full object-cover" />}
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-start">
                             <div>
-                              <h3 className="font-medium text-gray-900">{item.title}</h3>
-                              {item.slug && <Link href={`/products/${item.slug}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>}
+                              <h3 className="font-medium text-gray-900">{item.product_name}</h3>
+                              {item.product_slug && <Link href={`/products/${item.product_slug}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>}
                             </div>
                             <p className="font-bold text-gray-900">
-                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
+                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(parseFloat(item.total_price))}
                             </p>
                           </div>
                           <p className="text-sm text-gray-500 mt-1 bg-gray-100 inline-block px-2 py-0.5 rounded text-xs">x{item.quantity}</p>
@@ -227,21 +273,21 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <div className="flex justify-between mb-3 text-sm text-gray-600">
                   <span>Tổng tiền hàng</span>
-                  <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.subtotal)}</span>
+                  <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(parseFloat(order.subtotal))}</span>
                 </div>
                 <div className="flex justify-between mb-3 text-sm text-gray-600">
                   <span>Phí vận chuyển</span>
-                  <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.shipping_fee)}</span>
+                  <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(parseFloat(order.shipping_fee))}</span>
                 </div>
-                {order.discount_amount > 0 && (
+                {parseFloat(order.discount_amount) > 0 && (
                   <div className="flex justify-between mb-3 text-sm text-green-600 font-medium">
                     <span>Giảm giá</span>
-                    <span>-{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.discount_amount)}</span>
+                    <span>-{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(parseFloat(order.discount_amount))}</span>
                   </div>
                 )}
                 <div className="flex justify-between pt-4 border-t border-gray-100 text-lg font-bold text-gray-900">
                   <span>Tổng thanh toán</span>
-                  <span className="text-primary text-xl">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total)}</span>
+                  <span className="text-primary text-xl">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(parseFloat(order.total_amount))}</span>
                 </div>
               </div>
             </div>
@@ -253,10 +299,12 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   <MapPin size={18} className="text-accent" /> Địa chỉ nhận hàng
                 </h3>
                 <div className="text-sm text-gray-600 space-y-1.5">
-                  <p className="font-bold text-gray-900 text-base">{order.shipping_address.name}</p>
+                  <p className="font-bold text-gray-900 text-base">{order.shipping_address.full_name}</p>
                   <p className="text-gray-500">{order.shipping_address.phone}</p>
-                  <p>{order.shipping_address.address}</p>
-                  {order.shipping_address.notes && <p className="italic text-gray-500">Ghi chú: {order.shipping_address.notes}</p>}
+                  <p>{order.shipping_address.address_line_1}</p>
+                  {order.shipping_address.address_line_2 && <p>{order.shipping_address.address_line_2}</p>}
+                  <p>{order.shipping_address.ward}, {order.shipping_address.district}</p>
+                  <p className="font-medium text-gray-800">{order.shipping_address.province}</p>
                 </div>
               </div>
 
@@ -265,11 +313,11 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   <CreditCard size={18} className="text-accent" /> Thanh toán
                 </h3>
                 <div className="text-sm text-gray-600">
-                  {order.payment_method ? (
+                  {order.payment ? (
                     <>
-                      <p className="mb-2">Phương thức: <span className="font-medium text-gray-900">{order.payment_method}</span></p>
-                      <p className={`text-xs font-bold inline-block px-2.5 py-1 rounded border ${order.payment_status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
-                        {order.payment_status === 'pending' ? 'CHƯA THANH TOÁN' : 'ĐÃ THANH TOÁN'}
+                      <p className="mb-2">Phương thức: <span className="font-medium text-gray-900">{typeof order.payment.payment_method === 'string' ? order.payment.payment_method : Object.values(order.payment.payment_method)[0].toUpperCase()}</span></p>
+                      <p className={`text-xs font-bold inline-block px-2.5 py-1 rounded border ${(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
+                        {(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'pending' ? 'CHƯA THANH TOÁN' : 'ĐÃ THANH TOÁN'}
                       </p>
                     </>
                   ) : (
