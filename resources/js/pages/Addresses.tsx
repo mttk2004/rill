@@ -21,7 +21,7 @@ interface UserAddress {
   district_id?: number;
   ward: string;
   ward_id?: string;
-  is_default: number;
+  is_default: boolean;
 }
 
 interface AddressesProps {
@@ -54,7 +54,7 @@ export default function Addresses({ addresses: propsAddresses = [] }: AddressesP
     district_id: undefined,
     ward: '',
     ward_id: undefined,
-    is_default: 0
+    is_default: false
   });
 
   const { showToast } = useToast();
@@ -72,7 +72,7 @@ export default function Addresses({ addresses: propsAddresses = [] }: AddressesP
       district_id: undefined,
       ward: '',
       ward_id: undefined,
-      is_default: 0
+      is_default: false
     });
     setIsDialogOpen(true);
   };
@@ -106,7 +106,7 @@ export default function Addresses({ addresses: propsAddresses = [] }: AddressesP
         setAddresses((prev) =>
           prev.map((addr) => ({
             ...addr,
-            is_default: addr.id === id ? 1 : 0
+            is_default: addr.id === id
           }))
         );
         showToast('Đã đặt làm địa chỉ mặc định', 'success');
@@ -118,7 +118,7 @@ export default function Addresses({ addresses: propsAddresses = [] }: AddressesP
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? (checked ? 1 : 0) : value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 

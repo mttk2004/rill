@@ -220,3 +220,19 @@ export interface ProductsPageData {
   filters: ProductFilters;
   pagination: Pagination;
 }
+
+export interface UserAddress {
+  id: string;
+  user_id: string;
+  full_name: string;
+  phone: string;
+  address_line_1: string;
+  address_line_2?: string;
+  province: string;
+  province_id?: number;
+  district: string;
+  district_id?: number;
+  ward: string;
+  ward_id?: string;
+  is_default: boolean;
+}

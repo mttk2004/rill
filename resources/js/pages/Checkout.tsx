@@ -4,6 +4,7 @@ import { useShop } from '../context/ShopContext';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { CheckCircle, CreditCard, MapPin, Ticket } from 'lucide-react';
+import type { UserAddress } from '@/types';
 import axios from 'axios';
 
 interface Voucher {
@@ -17,29 +18,17 @@ interface Voucher {
   discount_amount: number | null;
 }
 
-interface Address {
-  id: number;
-  full_name: string;
-  phone: string;
-  address_line_1: string;
-  address_line_2?: string;
-  province: string;
-  district: string;
-  ward: string;
-  is_default: number;
-}
-
 interface CheckoutProps {
-  addresses: Address[];
+  addresses: UserAddress[];
 }
 
 function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const { cart, cartTotal } = useShop();
-  const defaultAddress = addresses.find(a => a.is_default === 1) || addresses[0];
+  const defaultAddress = addresses.find(a => a.is_default) || addresses[0];
   const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
 
   const { data, setData, post, processing } = useForm<{
-    address_id: number | null;
+    address_id: string | null;
     payment_method: 'cod' | 'vnpay';
     voucher_code: string;
   }>({
@@ -48,7 +37,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
     voucher_code: '',
   });
 
-  const [selectedAddress, setSelectedAddress] = useState(defaultAddress?.id || null);
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(defaultAddress?.id || null);
   const [isVoucherFocused, setIsVoucherFocused] = useState(false);
   const [shippingCost, setShippingCost] = useState(0);
   const [loadingShipping, setLoadingShipping] = useState(false);
@@ -171,7 +160,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                         </div>
                         <p className="mt-1 text-sm text-gray-600">{addr.address_line_1}</p>
                         <p className="text-sm text-gray-600">{addr.ward}, {addr.district}, {addr.province}</p>
-                        {addr.is_default === 1 && (
+                        {addr.is_default && (
                           <span className="mt-2 inline-block rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">Mặc định</span>
                         )}
                       </div>

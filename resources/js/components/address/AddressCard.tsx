@@ -15,7 +15,7 @@ const AddressCard: React.FC<AddressCardProps> = ({ addr, onEdit, onDelete, onSet
     <div
       className={`relative overflow-hidden rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md border ${addr.is_default ? 'border-primary ring-1 ring-primary/20' : 'border-gray-100'}`}
     >
-      {addr.is_default === 1 && (
+      {addr.is_default && (
         <div className="absolute right-0 top-0 rounded-bl-xl bg-primary px-3 py-1 text-xs font-bold text-white flex items-center gap-1">
           <CheckCircle size={12} /> Mặc định
         </div>
@@ -52,7 +52,7 @@ const AddressCard: React.FC<AddressCardProps> = ({ addr, onEdit, onDelete, onSet
           <Trash2 size={14} /> Xóa
         </button>
 
-        {addr.is_default !== 1 && (
+        {!addr.is_default && (
           <button
             onClick={() => onSetDefault(addr.id)}
             className="ml-auto text-xs font-medium text-primary hover:text-primaryHover hover:underline transition-colors"
