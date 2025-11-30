@@ -28,11 +28,11 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
 
   const { data, setData, post, processing } = useForm<{
-    address_id: string | null;
+    shipping_address_id: string | null;
     payment_method: 'cod' | 'vnpay';
     voucher_code: string;
   }>({
-    address_id: defaultAddress?.id || null,
+    shipping_address_id: defaultAddress?.id || null,
     payment_method: 'cod',
     voucher_code: '',
   });
@@ -99,7 +99,33 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post('/checkout');
+
+    // Validate address selected
+    if (!data.shipping_address_id) {
+      alert('Vui lòng chọn địa chỉ giao hàng');
+      return;
+    }
+
+    post('/checkout', {
+      onSuccess: (page) => {
+        // For VNPAY: Backend returns JSON with payment_url in props
+        const paymentUrl = page.props.payment_url as string | undefined;
+        if (paymentUrl) {
+          // VNPAY: Redirect to payment URL
+          window.location.href = paymentUrl;
+        }
+        // COD: Inertia handles redirect automatically to thank-you page
+      },
+      onError: (errors) => {
+        console.error('Checkout error:', errors);
+        const errorObj = errors as Record<string, string>;
+        if (errorObj.stock) {
+          alert(errorObj.stock);
+        } else {
+          alert('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
+      }
+    });
   };
 
   if (cart.length === 0) {
@@ -150,7 +176,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                         checked={selectedAddress === addr.id}
                         onChange={() => {
                           setSelectedAddress(addr.id);
-                          setData('address_id', addr.id);
+                          setData('shipping_address_id', addr.id);
                         }}
                       />
                       <div className="flex-1">
