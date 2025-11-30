@@ -12,9 +12,16 @@ interface Order {
   created_at: string;
 }
 
+interface VnpayResponse {
+  response_code: string;
+  message: string;
+  transaction_no?: string;
+  is_success: boolean;
+}
+
 interface ThankYouProps {
   order: Order;
-  vnpayResponse?: Record<string, string>;
+  vnpayResponse?: VnpayResponse;
 }
 
 export default function ThankYou({ order, vnpayResponse }: ThankYouProps) {
@@ -23,8 +30,8 @@ export default function ThankYou({ order, vnpayResponse }: ThankYouProps) {
     currency: 'VND'
   }).format(order.total_amount);
 
-  const isVnpaySuccess = vnpayResponse && vnpayResponse.vnp_ResponseCode === '00';
-  const isVnpayFailed = vnpayResponse && vnpayResponse.vnp_ResponseCode !== '00';
+  const isVnpaySuccess = vnpayResponse?.is_success === true;
+  const isVnpayFailed = vnpayResponse && !vnpayResponse.is_success;
 
   return (
     <AppLayout>
@@ -118,8 +125,13 @@ export default function ThankYou({ order, vnpayResponse }: ThankYouProps) {
               <div className="mt-6 rounded-lg bg-red-50 p-4 text-sm text-red-800">
                 <p className="font-medium">❌ Thanh toán VNPAY thất bại</p>
                 <p className="mt-1 text-red-700">
-                  Mã lỗi: {vnpayResponse.vnp_ResponseCode}
+                  {vnpayResponse.message}
                 </p>
+                {vnpayResponse.response_code && (
+                  <p className="mt-1 text-xs text-red-600">
+                    Mã lỗi: {vnpayResponse.response_code}
+                  </p>
+                )}
               </div>
             )}
           </div>
