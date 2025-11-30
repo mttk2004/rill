@@ -245,4 +245,8 @@ export interface Review {
   comment: string;
   user_name?: string;
   created_at: string;
+  user?: {
+    name: string;
+    avatar_url: string | null;
+  };
 }

@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { User, Star } from 'lucide-react';
 import { Review } from '../../types';
 import Button from '../Button';
@@ -11,10 +11,6 @@ interface ReviewListProps {
 }
 
 const ReviewList: React.FC<ReviewListProps> = ({ reviews, averageRating }) => {
-  useEffect(() => {
-    console.log(reviews);
-
-  }, [reviews]);
 
   return (
     <div className="border-t border-gray-100 pt-16 mb-20 animate-fade-in-up">
