@@ -79,11 +79,16 @@ export default function Settings() {
       return;
     }
 
-    // Submit with avatar file
-    profileForm.setData('avatar', file);
-    profileForm.post('/settings/profile', {
+    // Submit with avatar file using PATCH method
+    const formData = new FormData();
+    formData.append('avatar', file);
+    formData.append('name', profileForm.data.name);
+    formData.append('phone', profileForm.data.phone);
+    formData.append('email', profileForm.data.email);
+    formData.append('_method', 'PATCH');
+
+    router.post('/settings/profile', formData, {
       preserveScroll: true,
-      forceFormData: true,
       onSuccess: () => {
         showToast('Cập nhật ảnh đại diện thành công', 'success');
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -218,11 +223,11 @@ export default function Settings() {
                   <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-lg">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu hiện tại</label>
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         value={passwordForm.data.current_password}
                         onChange={e => passwordForm.setData('current_password', e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" 
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                       />
                       {passwordForm.errors.current_password && (
                         <p className="text-xs text-red-600 mt-1">{passwordForm.errors.current_password}</p>
@@ -230,11 +235,11 @@ export default function Settings() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         value={passwordForm.data.password}
                         onChange={e => passwordForm.setData('password', e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" 
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                       />
                       {passwordForm.errors.password && (
                         <p className="text-xs text-red-600 mt-1">{passwordForm.errors.password}</p>
@@ -242,11 +247,11 @@ export default function Settings() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu mới</label>
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         value={passwordForm.data.password_confirmation}
                         onChange={e => passwordForm.setData('password_confirmation', e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" 
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                       />
                     </div>
 

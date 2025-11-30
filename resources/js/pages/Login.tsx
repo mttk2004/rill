@@ -24,6 +24,15 @@ export default function Login() {
       onSuccess: () => {
         showToast('Đăng nhập thành công! Chào mừng trở lại.', 'success');
       },
+      onError: (errors) => {
+        if (errors.email) {
+          showToast(errors.email, 'error');
+        } else if (errors.password) {
+          showToast(errors.password, 'error');
+        } else {
+          showToast('Thông tin đăng nhập không chính xác', 'error');
+        }
+      },
     });
   };
 
@@ -139,26 +148,7 @@ export default function Login() {
             </div>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-2 text-gray-500">Hoặc tiếp tục với</span>
-              </div>
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button className="flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-                Google
-              </button>
-              <button className="flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-                Facebook
-              </button>
-            </div>
-          </div>
-
-          <p className="text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-600">
             Chưa có tài khoản?{' '}
             <Link href="/register" className="font-medium text-accent hover:text-primary">
               Đăng ký ngay
