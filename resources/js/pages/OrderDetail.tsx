@@ -1,9 +1,10 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle, Star, Download } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { formatDate } from '../utils/date';
+import { useToast } from '../context/ToastContext';
 
 interface OrderItem {
   id: string;
@@ -13,6 +14,15 @@ interface OrderItem {
   quantity: number;
   unit_price: string;
   total_price: string;
+  product?: {
+    id: string;
+    slug: string;
+    reviews?: Array<{
+      id: string;
+      rating: number;
+      comment: string;
+    }>;
+  };
 }
 
 interface ShippingAddress {
@@ -62,6 +72,42 @@ interface OrderDetailProps {
 }
 
 export default function OrderDetail({ order }: OrderDetailProps) {
+  const { showToast } = useToast();
+  const [reviewingProduct, setReviewingProduct] = useState<{ id: string; name: string; slug: string } | null>(null);
+
+  const reviewForm = useForm({
+    rating: 5,
+    comment: '',
+  });
+
+  const handleReviewSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewingProduct) return;
+
+    reviewForm.post(`/products/${reviewingProduct.slug}/reviews`, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showToast('Đánh giá sản phẩm thành công!', 'success');
+        setReviewingProduct(null);
+        reviewForm.reset();
+      },
+      onError: (errors) => {
+        if (errors.comment) {
+          showToast(errors.comment, 'error');
+        } else {
+          showToast('Đánh giá thất bại, vui lòng thử lại', 'error');
+        }
+      },
+    });
+  };
+
+  const canDownloadInvoice = order.payment &&
+    (typeof order.payment.payment_status === 'string'
+      ? order.payment.payment_status === 'completed'
+      : Object.values(order.payment.payment_status)[0] === 'completed');
+
+  const isDelivered = (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'delivered';
+
   // Definition of steps with specific colors
   const steps = [
     {
@@ -238,6 +284,9 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                 </div>
                 <div className="divide-y divide-gray-100">
                   {order.items?.map((item: OrderItem, idx: number) => {
+                    const hasReviewed = item.product?.reviews && item.product.reviews.length > 0;
+                    const canReview = isDelivered && !hasReviewed;
+
                     return (
                       <div key={idx} className="p-6 flex gap-4 hover:bg-gray-50 transition-colors">
                         <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-200">
@@ -245,9 +294,24 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-start">
-                            <div>
+                            <div className="flex-1">
                               <h3 className="font-medium text-gray-900">{item.product_name}</h3>
-                              {item.product_slug && <Link href={`/products/${item.product_slug}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>}
+                              <div className="flex items-center gap-3 mt-1">
+                                {item.product_slug && <Link href={`/products/${item.product_slug}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>}
+                                {canReview && item.product && (
+                                  <button
+                                    onClick={() => setReviewingProduct({ id: item.product!.id, name: item.product_name, slug: item.product!.slug })}
+                                    className="text-xs text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1"
+                                  >
+                                    <Star size={12} /> Đánh giá
+                                  </button>
+                                )}
+                                {hasReviewed && (
+                                  <span className="text-xs text-green-600 flex items-center gap-1">
+                                    <CheckCircle size={12} /> Đã đánh giá
+                                  </span>
+                                )}
+                              </div>
                             </div>
                             <p className="font-bold text-gray-900">
                               {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(parseFloat(item.total_price))}
@@ -318,13 +382,90 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               </div>
 
               <div className="space-y-3">
-                <Button fullWidth variant="primary">Mua lại đơn hàng</Button>
+                <Button
+                  fullWidth
+                  variant="primary"
+                  disabled={!canDownloadInvoice}
+                  className="flex items-center justify-center gap-2"
+                >
+                  <Download size={18} />
+                  {canDownloadInvoice ? 'Tải hóa đơn' : 'Chưa thể tải hóa đơn'}
+                </Button>
                 <Button fullWidth variant="outline">Yêu cầu hỗ trợ</Button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      {reviewingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Đánh giá sản phẩm</h3>
+            <p className="text-sm text-gray-600 mb-6">{reviewingProduct.name}</p>
+
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => reviewForm.setData('rating', star)}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        size={32}
+                        className={`${star <= reviewForm.data.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'} transition-colors`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nhận xét (tối thiểu 10 ký tự)</label>
+                <textarea
+                  value={reviewForm.data.comment}
+                  onChange={(e) => reviewForm.setData('comment', e.target.value)}
+                  rows={4}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+                  required
+                  minLength={10}
+                />
+                {reviewForm.errors.comment && (
+                  <p className="text-xs text-red-600 mt-1">{reviewForm.errors.comment}</p>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setReviewingProduct(null);
+                    reviewForm.reset();
+                  }}
+                  fullWidth
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={reviewForm.processing}
+                  fullWidth
+                >
+                  {reviewForm.processing ? 'Đang gửi...' : 'Gửi đánh giá'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }
