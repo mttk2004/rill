@@ -1,6 +1,6 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { Package, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Package, Clock, CheckCircle, Truck, XCircle, Filter } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { formatDate } from '../utils/date';
@@ -38,8 +38,27 @@ interface OrdersProps {
   };
 }
 
-export default function Orders({ orders }: OrdersProps) {
+export default function Orders({ orders, filters }: OrdersProps) {
   const ordersList = orders.data || [];
+  const currentStatus = filters?.status || 'all';
+
+  const handleFilterChange = (status: string) => {
+    const params = status === 'all' ? {} : { status };
+    router.get('/orders', params, {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  };
+
+  const statusFilters = [
+    { value: 'all', label: 'Tất cả', icon: Package },
+    { value: 'pending', label: 'Chờ xác nhận', icon: Clock },
+    { value: 'processing', label: 'Đang xử lý', icon: Clock },
+    { value: 'shipping', label: 'Đang vận chuyển', icon: Truck },
+    { value: 'delivered', label: 'Đã giao', icon: CheckCircle },
+    { value: 'cancelled', label: 'Đã hủy', icon: XCircle },
+  ];
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
@@ -76,6 +95,33 @@ export default function Orders({ orders }: OrdersProps) {
       <div className="bg-gray-50 min-h-screen py-12">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl font-bold text-gray-900 mb-8">Lịch Sử Đơn Hàng</h1>
+
+          {/* Status Filter */}
+          <div className="mb-6 bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Filter size={18} className="text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Lọc theo trạng thái:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {statusFilters.map((filter) => {
+                const Icon = filter.icon;
+                const isActive = currentStatus === filter.value;
+                return (
+                  <button
+                    key={filter.value}
+                    onClick={() => handleFilterChange(filter.value)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isActive
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      }`}
+                  >
+                    <Icon size={16} />
+                    {filter.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {ordersList.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
@@ -135,6 +181,35 @@ export default function Orders({ orders }: OrdersProps) {
                   </div>
                 </div>
               ))}
+
+              {/* Pagination */}
+              {orders.last_page > 1 && (
+                <div className="mt-8 flex justify-center">
+                  <nav className="flex items-center gap-2">
+                    {orders.current_page > 1 && (
+                      <Link
+                        href={`/orders?page=${orders.current_page - 1}${currentStatus !== 'all' ? `&status=${currentStatus}` : ''}`}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        Trước
+                      </Link>
+                    )}
+
+                    <span className="px-4 py-2 text-sm text-gray-700">
+                      Trang {orders.current_page} / {orders.last_page}
+                    </span>
+
+                    {orders.current_page < orders.last_page && (
+                      <Link
+                        href={`/orders?page=${orders.current_page + 1}${currentStatus !== 'all' ? `&status=${currentStatus}` : ''}`}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        Sau
+                      </Link>
+                    )}
+                  </nav>
+                </div>
+              )}
             </div>
           )}
         </div>
