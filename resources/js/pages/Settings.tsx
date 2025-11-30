@@ -1,14 +1,98 @@
-import React, { useState } from 'react';
-import { Head, router, usePage } from '@inertiajs/react';
+import React, { useState, useRef } from 'react';
+import { Head, router, usePage, useForm } from '@inertiajs/react';
 import Button from '../components/Button';
 import AppLayout from '@/layouts/app-layout';
-import { User, Lock, Bell, Shield, LogOut } from 'lucide-react';
+import { User, Lock, Bell, LogOut } from 'lucide-react';
 import type { SharedData } from '@/types';
+import { useToast } from '../context/ToastContext';
 
 export default function Settings() {
   const { auth } = usePage<SharedData>().props;
   const user = auth?.user;
   const [activeTab, setActiveTab] = useState('profile');
+  const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Profile form
+  const profileForm = useForm<{
+    name: string;
+    phone: string;
+    email: string;
+    avatar?: File;
+  }>({
+    name: user?.name || '',
+    phone: (user?.phone as string) || '',
+    email: user?.email || '',
+  });
+
+  // Password form
+  const passwordForm = useForm({
+    current_password: '',
+    password: '',
+    password_confirmation: '',
+  });
+
+  const handleProfileSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    profileForm.patch('/settings/profile', {
+      preserveScroll: true,
+      onSuccess: () => {
+        showToast('Cập nhật thông tin thành công', 'success');
+      },
+      onError: () => {
+        showToast('Cập nhật thất bại, vui lòng thử lại', 'error');
+      },
+    });
+  };
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    passwordForm.put('/settings/password', {
+      preserveScroll: true,
+      onSuccess: () => {
+        passwordForm.reset();
+        showToast('Đổi mật khẩu thành công', 'success');
+      },
+      onError: () => {
+        showToast('Đổi mật khẩu thất bại, vui lòng kiểm tra lại', 'error');
+      },
+    });
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size (500KB max)
+    if (file.size > 500 * 1024) {
+      showToast('Ảnh không được vượt quá 500KB', 'error');
+      return;
+    }
+
+    // Validate file type
+    if (!['image/jpeg', 'image/png', 'image/jpg', 'image/gif'].includes(file.type)) {
+      showToast('Chỉ chấp nhận file JPG, PNG hoặc GIF', 'error');
+      return;
+    }
+
+    // Submit with avatar file
+    profileForm.setData('avatar', file);
+    profileForm.post('/settings/profile', {
+      preserveScroll: true,
+      forceFormData: true,
+      onSuccess: () => {
+        showToast('Cập nhật ảnh đại diện thành công', 'success');
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      },
+      onError: () => {
+        showToast('Cập nhật ảnh thất bại, vui lòng thử lại', 'error');
+      },
+    });
+  };
 
   const tabs = [
     { id: 'profile', label: 'Hồ sơ', icon: User },
@@ -58,35 +142,71 @@ export default function Settings() {
               {activeTab === 'profile' && (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-in fade-in duration-300">
                   <h2 className="text-xl font-bold text-gray-900 mb-6">Thông tin cá nhân</h2>
-                  <form className="space-y-6">
+                  <form onSubmit={handleProfileSubmit} className="space-y-6">
                     <div className="flex items-center gap-6 mb-6">
-                      <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-2xl font-bold">
-                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-400 text-2xl font-bold overflow-hidden">
+                        {user?.avatar_url ? (
+                          <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          user?.name?.charAt(0)?.toUpperCase() || 'U'
+                        )}
                       </div>
                       <div>
-                        <Button variant="outline" size="sm" type="button">Thay đổi ảnh đại diện</Button>
-                        <p className="text-xs text-gray-500 mt-2">JPG, GIF hoặc PNG. Tối đa 2MB.</p>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/jpg,image/gif"
+                          onChange={handleAvatarChange}
+                          className="hidden"
+                        />
+                        <Button variant="outline" size="sm" type="button" onClick={handleAvatarClick}>
+                          Thay đổi ảnh đại diện
+                        </Button>
+                        <p className="text-xs text-gray-500 mt-2">JPG, GIF hoặc PNG. Tối đa 500KB.</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
-                        <input type="text" defaultValue={user?.name || ''} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                        <input
+                          type="text"
+                          value={profileForm.data.name}
+                          onChange={e => profileForm.setData('name', e.target.value)}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                        {profileForm.errors.name && (
+                          <p className="text-xs text-red-600 mt-1">{profileForm.errors.name}</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
-                        <input type="tel" defaultValue={user?.phone || ''} className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                        <input
+                          type="tel"
+                          value={profileForm.data.phone}
+                          onChange={e => profileForm.setData('phone', e.target.value)}
+                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        />
+                        {profileForm.errors.phone && (
+                          <p className="text-xs text-red-600 mt-1">{profileForm.errors.phone}</p>
+                        )}
                       </div>
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" defaultValue={user?.email || ''} disabled className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed" />
+                        <input
+                          type="email"
+                          value={profileForm.data.email}
+                          disabled
+                          className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 cursor-not-allowed"
+                        />
                         <p className="text-xs text-gray-500 mt-1">Liên hệ CSKH để thay đổi email.</p>
                       </div>
                     </div>
 
                     <div className="pt-4 border-t border-gray-100 flex justify-end">
-                      <Button type="button">Lưu thay đổi</Button>
+                      <Button type="submit" disabled={profileForm.processing}>
+                        {profileForm.processing ? 'Đang lưu...' : 'Lưu thay đổi'}
+                      </Button>
                     </div>
                   </form>
                 </div>
@@ -95,22 +215,45 @@ export default function Settings() {
               {activeTab === 'security' && (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-in fade-in duration-300">
                   <h2 className="text-xl font-bold text-gray-900 mb-6">Bảo mật & Mật khẩu</h2>
-                  <form className="space-y-6 max-w-lg">
+                  <form onSubmit={handlePasswordSubmit} className="space-y-6 max-w-lg">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu hiện tại</label>
-                      <input type="password" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                      <input 
+                        type="password" 
+                        value={passwordForm.data.current_password}
+                        onChange={e => passwordForm.setData('current_password', e.target.value)}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" 
+                      />
+                      {passwordForm.errors.current_password && (
+                        <p className="text-xs text-red-600 mt-1">{passwordForm.errors.current_password}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
-                      <input type="password" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                      <input 
+                        type="password" 
+                        value={passwordForm.data.password}
+                        onChange={e => passwordForm.setData('password', e.target.value)}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" 
+                      />
+                      {passwordForm.errors.password && (
+                        <p className="text-xs text-red-600 mt-1">{passwordForm.errors.password}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu mới</label>
-                      <input type="password" className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" />
+                      <input 
+                        type="password" 
+                        value={passwordForm.data.password_confirmation}
+                        onChange={e => passwordForm.setData('password_confirmation', e.target.value)}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" 
+                      />
                     </div>
 
                     <div className="pt-4 border-t border-gray-100 flex justify-end">
-                      <Button type="button">Cập nhật mật khẩu</Button>
+                      <Button type="submit" disabled={passwordForm.processing}>
+                        {passwordForm.processing ? 'Đang cập nhật...' : 'Cập nhật mật khẩu'}
+                      </Button>
                     </div>
                   </form>
                 </div>
