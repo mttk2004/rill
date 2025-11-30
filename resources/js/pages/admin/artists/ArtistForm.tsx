@@ -53,7 +53,6 @@ const ArtistForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting Artist:", formData);
     if (isEditMode) {
       showToast(`Đã cập nhật nghệ sĩ "${formData.name}"`, 'success');
     } else {
@@ -63,7 +62,7 @@ const ArtistForm = () => {
   };
 
   const commonCountries = [
-    "Việt Nam", "United States", "United Kingdom", "France", "Germany", 
+    "Việt Nam", "United States", "United Kingdom", "France", "Germany",
     "Japan", "South Korea", "China", "Australia", "Canada"
   ];
 
@@ -95,7 +94,7 @@ const ArtistForm = () => {
         <div className="md:col-span-2 space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-               <User size={20} className="text-primary"/> Thông tin chung
+              <User size={20} className="text-primary" /> Thông tin chung
             </h3>
             <div className="space-y-4">
               <div>
@@ -127,7 +126,7 @@ const ArtistForm = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Quốc gia (Country)</label>
                 <div className="relative">
-                   <input
+                  <input
                     type="text"
                     name="country"
                     value={formData.country || ''}
@@ -139,7 +138,7 @@ const ArtistForm = () => {
                   <Globe className="absolute right-3 top-2.5 text-gray-400" size={18} />
                 </div>
                 <datalist id="countries">
-                   {commonCountries.map(c => <option key={c} value={c} />)}
+                  {commonCountries.map(c => <option key={c} value={c} />)}
                 </datalist>
               </div>
 
@@ -160,7 +159,7 @@ const ArtistForm = () => {
 
         {/* Right Column: Image */}
         <div className="space-y-6">
-           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4">Hình ảnh</h3>
             <div className="mb-4">
               <div className="aspect-square rounded-full border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center text-gray-400 relative overflow-hidden group hover:border-primary hover:text-primary transition-colors cursor-pointer w-48 h-48 mx-auto">
@@ -192,13 +191,13 @@ const ArtistForm = () => {
               />
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-             <h3 className="text-lg font-bold text-gray-900 mb-4">Trạng thái</h3>
-             <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                <input type="checkbox" defaultChecked className="w-5 h-5 text-primary rounded focus:ring-primary" />
-                <span className="text-gray-900 font-medium">Đang hoạt động</span>
-             </label>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Trạng thái</h3>
+            <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+              <input type="checkbox" defaultChecked className="w-5 h-5 text-primary rounded focus:ring-primary" />
+              <span className="text-gray-900 font-medium">Đang hoạt động</span>
+            </label>
           </div>
         </div>
       </form>

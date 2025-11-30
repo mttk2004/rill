@@ -168,8 +168,6 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
     onChange(idEvent);
   };
 
-  console.log('AddressFormDialog render:', { isOpen, provinces: provinces.length, districts: districts.length, wards: wards.length });
-
   if (!isOpen) return null;
 
   return (

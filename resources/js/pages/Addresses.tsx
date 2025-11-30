@@ -141,8 +141,6 @@ export default function Addresses({ addresses: propsAddresses = [] }: AddressesP
         },
       });
     } else {
-      // Add new
-      console.log('Adding new address...');
       router.post('/addresses', formData, {
         onSuccess: () => {
           showToast('Thêm địa chỉ mới thành công', 'success');

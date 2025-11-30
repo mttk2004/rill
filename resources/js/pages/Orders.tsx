@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Package, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
+import { formatDate } from '../utils/date';
 
 interface OrderItem {
   id: string;
@@ -39,15 +40,6 @@ interface OrdersProps {
 
 export default function Orders({ orders }: OrdersProps) {
   const ordersList = orders.data || [];
-
-  // Debug logs
-  console.log('Orders prop:', orders);
-  console.log('Orders data:', ordersList);
-  if (ordersList.length > 0) {
-    console.log('First order:', ordersList[0]);
-    console.log('First order items:', ordersList[0].items);
-  }
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
@@ -101,7 +93,7 @@ export default function Orders({ orders }: OrdersProps) {
                   <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 transition-colors group-hover:bg-gray-100/50">
                     <div className="flex items-center gap-4">
                       <span className="font-bold text-gray-900">#{order.order_number}</span>
-                      <span className="text-sm text-gray-500 border-l border-gray-300 pl-4">{new Date(order.placed_at).toLocaleDateString('vi-VN')}</span>
+                      <span className="text-sm text-gray-500 border-l border-gray-300 pl-4">{formatDate(order.placed_at)}</span>
                     </div>
                     <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${getStatusColor(order.status)}`}>
                       {getStatusIcon(order.status)}

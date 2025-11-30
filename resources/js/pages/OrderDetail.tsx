@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
+import { formatDate } from '../utils/date';
 
 interface OrderItem {
   id: string;
@@ -61,11 +62,6 @@ interface OrderDetailProps {
 }
 
 export default function OrderDetail({ order }: OrderDetailProps) {
-  // Debug log
-  console.log('OrderDetail - order prop:', order);
-  console.log('OrderDetail - order.items:', order.items);
-  console.log('OrderDetail - order.status_histories:', order.status_histories);
-
   // Definition of steps with specific colors
   const steps = [
     {
@@ -126,12 +122,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
     const history = order.status_histories.find(h => h.status === statusToFind);
 
     if (history) {
-      return new Date(history.created_at).toLocaleString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        day: '2-digit',
-        month: '2-digit'
-      });
+      return formatDate(history.created_at);
     }
 
     return null;
@@ -173,7 +164,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                 <h1 className="font-serif text-3xl font-bold text-gray-900">Chi Tiết Đơn Hàng</h1>
                 {isCancelled && <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full">ĐÃ HỦY</span>}
               </div>
-              <p className="text-gray-500 mt-1">Mã đơn: <span className="font-mono font-medium text-gray-900">#{order.order_number}</span> - {new Date(order.placed_at).toLocaleDateString('vi-VN')}</p>
+              <p className="text-gray-500 mt-1">Mã đơn: <span className="font-mono font-medium text-gray-900">#{order.order_number}</span> - {formatDate(order.placed_at, false)}</p>
             </div>
             {order.tracking_number && (
               <div className="px-4 py-2 bg-white rounded-lg border border-gray-200 text-sm shadow-sm">
