@@ -16,7 +16,6 @@ import RelatedProducts from '../components/product-detail/RelatedProducts';
 
 interface ProductDetailProps {
   product: Product;
-  artist?: Artist;
   reviews: Review[];
   relatedProducts: Product[];
   averageRating: number;
@@ -24,7 +23,6 @@ interface ProductDetailProps {
 
 function ProductDetailContent({
   product,
-  artist,
   reviews = [],
   relatedProducts = [],
   averageRating = 5
@@ -120,7 +118,7 @@ function ProductDetailContent({
             <div className="space-y-4 animate-zoom-in">
               <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden relative group shadow-sm">
                 <img
-                  src={product.image || ''}
+                  src={product.image_url || ''}
                   alt={product.name}
                   className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isThisPlaying ? 'animate-[spin_6s_linear_infinite]' : ''}`}
                 />
@@ -147,8 +145,10 @@ function ProductDetailContent({
             {/* Info */}
             <div className="flex flex-col animate-slide-in-right">
               <div className="mb-2">
-                {artist && (
-                  <span className="text-sm font-medium text-accent tracking-wide uppercase">{artist.name}</span>
+                {product.artists && product.artists.length > 0 && (
+                  <span className="text-sm font-medium text-accent tracking-wide uppercase">
+                    {product.artists.map((a: Artist) => a.name).join(', ')}
+                  </span>
                 )}
               </div>
               <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">{product.name}</h1>

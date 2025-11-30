@@ -425,6 +425,7 @@ class ProductService
                         'id' => $artist->id,
                         'name' => $artist->name,
                         'slug' => $artist->slug,
+                        'image' => $artist->image,
                         'role' => $artist->pivot->role,
                         'sort_order' => $artist->pivot->sort_order,
                     ];
@@ -438,12 +439,11 @@ class ProductService
                     'name' => $product->collections->first()->name,
                     'type' => $product->collections->first()->type,
                 ] : null,
-                'reviews' => $reviews,
-                'reviews_count' => $reviewsCount,
-                'average_rating' => $averageRating,
                 'user_can_review' => $userCanReview,
                 'user_review' => $userReview,
             ],
+            'reviews' => $reviews,
+            'averageRating' => $averageRating,
             'relatedProducts' => $relatedProducts,
         ];
     }

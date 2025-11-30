@@ -29,6 +29,11 @@ class OrderItem extends Model
         'total_price' => 'decimal:2',
     ];
 
+    protected $appends = [
+        'product_image',
+        'product_slug',
+    ];
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
@@ -37,5 +42,21 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * Get product image from related product
+     */
+    public function getProductImageAttribute(): ?string
+    {
+        return $this->product?->image_url;
+    }
+
+    /**
+     * Get product slug from related product
+     */
+    public function getProductSlugAttribute(): ?string
+    {
+        return $this->product?->slug;
     }
 }
