@@ -97,7 +97,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
     setIsVoucherFocused(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate address selected
@@ -106,16 +106,38 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
       return;
     }
 
-    post('/checkout', {
-      onSuccess: (page) => {
-        // For VNPAY: Backend returns JSON with payment_url in props
-        const paymentUrl = page.props.payment_url as string | undefined;
-        if (paymentUrl) {
-          // VNPAY: Redirect to payment URL
-          window.location.href = paymentUrl;
+    // For VNPAY: Use axios because backend returns JSON
+    if (data.payment_method === 'vnpay') {
+      setData('voucher_code', data.voucher_code); // Trigger processing state
+      try {
+        const response = await axios.post('/orders', {
+          shipping_address_id: data.shipping_address_id,
+          payment_method: data.payment_method,
+          voucher_code: data.voucher_code || null,
+        });
+
+        if (response.data.payment_url) {
+          // Redirect to VNPAY
+          window.location.href = response.data.payment_url;
         }
-        // COD: Inertia handles redirect automatically to thank-you page
-      },
+      } catch (error: unknown) {
+        console.error('Checkout error:', error);
+        if (axios.isAxiosError(error) && error.response?.data) {
+          const errorData = error.response.data;
+          if (errorData.message) {
+            alert(errorData.message);
+          } else {
+            alert('Có lỗi xảy ra. Vui lòng thử lại.');
+          }
+        } else {
+          alert('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
+      }
+      return;
+    }
+
+    // For COD: Use Inertia post (backend does redirect)
+    post('/orders', {
       onError: (errors) => {
         console.error('Checkout error:', errors);
         const errorObj = errors as Record<string, string>;
