@@ -4,8 +4,35 @@ import { Package, Clock, CheckCircle, Truck, XCircle, Filter, ArrowUpDown } from
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 
+interface OrderItem {
+  id: number;
+  title: string;
+  artist_name: string;
+  price: number;
+  unit_price: number;
+  image_url: string | null;
+  quantity: number;
+  sku: string;
+  slug: string | null;
+}
+
+interface Order {
+  id: string;
+  order_id: string;
+  order_number: string;
+  date: string;
+  status: string;
+  subtotal: number;
+  shipping_fee: number;
+  discount_amount: number;
+  total: number;
+  payment_method: string;
+  payment_status: string;
+  items: OrderItem[];
+}
+
 interface OrdersProps {
-  orders: any[];
+  orders: Order[];
 }
 
 export default function Orders({ orders = [] }: OrdersProps) {
@@ -55,14 +82,14 @@ export default function Orders({ orders = [] }: OrdersProps) {
     result.sort((a, b) => {
       switch (sortOption) {
         case 'oldest':
-          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
         case 'price_high':
-          return b.total_amount - a.total_amount;
+          return b.total - a.total;
         case 'price_low':
-          return a.total_amount - b.total_amount;
+          return a.total - b.total;
         case 'newest':
         default:
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
       }
     });
 
@@ -130,8 +157,8 @@ export default function Orders({ orders = [] }: OrdersProps) {
                   {/* Header */}
                   <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 transition-colors group-hover:bg-gray-100/50">
                     <div className="flex items-center gap-4">
-                      <span className="font-bold text-gray-900">#{order.id}</span>
-                      <span className="text-sm text-gray-500 border-l border-gray-300 pl-4">{order.created_at}</span>
+                      <span className="font-bold text-gray-900">#{order.order_number}</span>
+                      <span className="text-sm text-gray-500 border-l border-gray-300 pl-4">{new Date(order.date).toLocaleDateString('vi-VN')}</span>
                     </div>
                     <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${getStatusColor(order.status)}`}>
                       {getStatusIcon(order.status)}
@@ -144,13 +171,13 @@ export default function Orders({ orders = [] }: OrdersProps) {
                     <div className="flex flex-col md:flex-row gap-6">
                       {/* Item Preview */}
                       <div className="flex-1 space-y-4">
-                        {order.items.map((item: any, idx: number) => (
+                        {order.items.map((item: OrderItem, idx: number) => (
                           <div key={idx} className="flex gap-4">
                             <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-100">
-                              {item.product_image && <img src={item.product_image} alt={item.product_name} className="h-full w-full object-cover" />}
+                              {item.image_url && <img src={item.image_url} alt={item.title} className="h-full w-full object-cover" />}
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900 line-clamp-1">{item.product_name}</p>
+                              <p className="font-medium text-gray-900 line-clamp-1">{item.title}</p>
                               <p className="text-sm text-gray-500">Số lượng: {item.quantity}</p>
                             </div>
                           </div>
@@ -161,9 +188,9 @@ export default function Orders({ orders = [] }: OrdersProps) {
                       <div className="flex flex-col items-end justify-center border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6 min-w-[200px]">
                         <p className="text-sm text-gray-500 mb-1">Tổng thành tiền</p>
                         <p className="text-lg font-bold text-primary mb-4">
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total_amount)}
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total)}
                         </p>
-                        <Link href={`/orders/${order.id}`}>
+                        <Link href={`/orders/${order.order_number}`}>
                           <Button variant="outline" className="text-sm w-full md:w-auto">
                             Xem chi tiết
                           </Button>
