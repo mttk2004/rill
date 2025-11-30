@@ -53,8 +53,8 @@ export default function Orders({ orders, filters }: OrdersProps) {
   const statusFilters = [
     { value: 'all', label: 'Tất cả', icon: Package },
     { value: 'pending', label: 'Chờ xác nhận', icon: Clock },
-    { value: 'processing', label: 'Đang xử lý', icon: Clock },
-    { value: 'shipping', label: 'Đang vận chuyển', icon: Truck },
+    { value: 'confirmed', label: 'Đang xử lý', icon: Clock },
+    { value: 'shipped', label: 'Đang vận chuyển', icon: Truck },
     { value: 'delivered', label: 'Đã giao', icon: CheckCircle },
     { value: 'cancelled', label: 'Đã hủy', icon: XCircle },
   ];
@@ -62,8 +62,8 @@ export default function Orders({ orders, filters }: OrdersProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-      case 'processing': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'shipping': return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'confirmed': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'shipped': return 'bg-amber-100 text-amber-800 border-amber-200';
       case 'cancelled': return 'bg-red-100 text-red-700 border-red-200';
       default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
@@ -72,8 +72,8 @@ export default function Orders({ orders, filters }: OrdersProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'delivered': return 'Giao hàng thành công';
-      case 'processing': return 'Đang xử lý';
-      case 'shipping': return 'Đang vận chuyển';
+      case 'confirmed': return 'Đang xử lý';
+      case 'shipped': return 'Đang vận chuyển';
       case 'cancelled': return 'Đã hủy';
       default: return 'Chờ xác nhận';
     }
@@ -82,8 +82,8 @@ export default function Orders({ orders, filters }: OrdersProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'delivered': return <CheckCircle size={14} />;
-      case 'processing': return <Clock size={14} />;
-      case 'shipping': return <Truck size={14} />;
+      case 'confirmed': return <Clock size={14} />;
+      case 'shipped': return <Truck size={14} />;
       case 'cancelled': return <XCircle size={14} />;
       default: return <Clock size={14} />;
     }
@@ -111,8 +111,8 @@ export default function Orders({ orders, filters }: OrdersProps) {
                     key={filter.value}
                     onClick={() => handleFilterChange(filter.value)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isActive
-                        ? 'bg-primary text-white border-primary'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                      ? 'bg-primary text-white border-primary'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                       }`}
                   >
                     <Icon size={16} />
