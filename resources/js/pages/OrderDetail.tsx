@@ -75,10 +75,63 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   const { showToast } = useToast();
   const [reviewingProduct, setReviewingProduct] = useState<{ id: string; name: string; slug: string } | null>(null);
 
-  const reviewForm = useForm({
+  const reviewForm = useForm<{
+    rating: number;
+    comment: string;
+    images?: File[];
+  }>({
     rating: 5,
     comment: '',
+    images: [],
   });
+
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    // Validate: max 5 images
+    if (selectedImages.length + files.length > 5) {
+      showToast('Chỉ được tải tối đa 5 ảnh', 'error');
+      return;
+    }
+
+    // Validate: each image max 512KB
+    const invalidFiles = files.filter(f => f.size > 512 * 1024);
+    if (invalidFiles.length > 0) {
+      showToast('Mỗi ảnh không được vượt quá 512KB', 'error');
+      return;
+    }
+
+    // Validate: only images
+    const nonImages = files.filter(f => !f.type.startsWith('image/'));
+    if (nonImages.length > 0) {
+      showToast('Chỉ chấp nhận file ảnh', 'error');
+      return;
+    }
+
+    const newImages = [...selectedImages, ...files];
+    setSelectedImages(newImages);
+    reviewForm.setData('images', newImages);
+
+    // Create previews
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    setSelectedImages(newImages);
+    setImagePreviews(newPreviews);
+    reviewForm.setData('images', newImages);
+  };
 
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,14 +139,19 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
     reviewForm.post(`/products/${reviewingProduct.slug}/reviews`, {
       preserveScroll: true,
+      forceFormData: true,
       onSuccess: () => {
         showToast('Đánh giá sản phẩm thành công!', 'success');
         setReviewingProduct(null);
+        setSelectedImages([]);
+        setImagePreviews([]);
         reviewForm.reset();
       },
       onError: (errors) => {
         if (errors.comment) {
           showToast(errors.comment, 'error');
+        } else if (errors.images) {
+          showToast(typeof errors.images === 'string' ? errors.images : 'Lỗi tải ảnh', 'error');
         } else {
           showToast('Đánh giá thất bại, vui lòng thử lại', 'error');
         }
@@ -400,8 +458,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
       {/* Review Modal */}
       {reviewingProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-xl">
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Đánh giá sản phẩm</h3>
             <p className="text-sm text-gray-600 mb-6">{reviewingProduct.name}</p>
 
@@ -441,12 +499,64 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                 )}
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hình ảnh (tùy chọn, tối đa 5 ảnh, mỗi ảnh ≤ 512KB)
+                </label>
+
+                {/* Image Previews */}
+                {imagePreviews.length > 0 && (
+                  <div className="grid grid-cols-5 gap-2 mb-3">
+                    {imagePreviews.map((preview, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={preview}
+                          alt={`Preview ${idx + 1}`}
+                          className="w-full h-16 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(idx)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Upload Button */}
+                {selectedImages.length < 5 && (
+                  <label className="flex items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-gray-50 transition-colors">
+                    <div className="text-center">
+                      <svg className="mx-auto h-8 w-8 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <p className="mt-1 text-xs text-gray-500">Nhấn để chọn ảnh</p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/jpg,image/webp"
+                      multiple
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                  </label>
+                )}
+                {reviewForm.errors.images && (
+                  <p className="text-xs text-red-600 mt-1">{reviewForm.errors.images}</p>
+                )}
+              </div>
+
               <div className="flex gap-3 pt-4">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => {
                     setReviewingProduct(null);
+                    setSelectedImages([]);
+                    setImagePreviews([]);
                     reviewForm.reset();
                   }}
                   fullWidth
