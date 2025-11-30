@@ -5,7 +5,8 @@ import { useShop } from '../context/ShopContext';
 import { usePlayer } from '../context/PlayerContext';
 import { Star, Truck, ShieldCheck, Play, Pause, Music, Loader2, Check } from 'lucide-react';
 import { flyToCart } from '../utils/cartAnimation';
-import type { Product, Artist, Review } from '@/types';
+import type { Product, Artist } from '@/types';
+import type { Review } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 
 // Imported Sub-components
@@ -21,7 +22,7 @@ interface ProductDetailProps {
   averageRating: number;
 }
 
-export default function ProductDetail({
+function ProductDetailContent({
   product,
   artist,
   reviews = [],
@@ -63,7 +64,7 @@ export default function ProductDetail({
 
       // 3. Fly animation (Safe execution)
       try {
-        flyToCart(product.image, startRect);
+        flyToCart(product.image || null, startRect);
       } catch (animError) {
         console.error("Animation failed", animError);
       }
@@ -100,7 +101,7 @@ export default function ProductDetail({
   const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price));
 
   return (
-    <AppLayout>
+    <>
       <Head title={`${product.name} - Rill`} />
       <div className="bg-white min-h-screen">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
@@ -269,6 +270,14 @@ export default function ProductDetail({
 
         </div>
       </div>
+    </>
+  );
+}
+
+export default function ProductDetail(props: ProductDetailProps) {
+  return (
+    <AppLayout>
+      <ProductDetailContent {...props} />
     </AppLayout>
   );
 }
