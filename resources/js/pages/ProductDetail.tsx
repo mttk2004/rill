@@ -146,9 +146,16 @@ function ProductDetailContent({
             <div className="flex flex-col animate-slide-in-right">
               <div className="mb-2">
                 {product.artists && product.artists.length > 0 && (
-                  <span className="text-sm font-medium text-accent tracking-wide uppercase">
-                    {product.artists.map((a: Artist) => a.name).join(', ')}
-                  </span>
+                  <div className="text-sm font-medium text-accent tracking-wide uppercase">
+                    {product.artists.map((a: Artist, idx: number) => (
+                      <span key={a.id}>
+                        <Link href={`/products?artist=${encodeURIComponent(a.name)}`} className="hover:underline">
+                          {a.name}
+                        </Link>
+                        {idx < product.artists.length - 1 && ', '}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
               <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">{product.name}</h1>
@@ -181,11 +188,15 @@ function ProductDetailContent({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Thể loại</span>
-                  <span className="font-medium text-gray-900">{product.genre}</span>
+                  <Link href={`/products?genre=${encodeURIComponent(product.genre)}`} className="font-medium text-gray-900 hover:text-primary transition-colors">
+                    {product.genre}
+                  </Link>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Hãng phát hành</span>
-                  <span className="font-medium text-gray-900">{product.label}</span>
+                  <Link href={`/products?label=${encodeURIComponent(product.label)}`} className="font-medium text-gray-900 hover:text-primary transition-colors">
+                    {product.label}
+                  </Link>
                 </div>
               </div>
 

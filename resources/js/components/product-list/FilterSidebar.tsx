@@ -70,11 +70,10 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
             <button
               key={genre}
               onClick={() => onGenreChange(genre)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                selectedGenre === genre
+              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${selectedGenre === genre
                   ? 'bg-primary text-white border-primary shadow-sm'
                   : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-              }`}
+                }`}
             >
               {genre === 'all' ? 'Tất cả' : genre}
             </button>
@@ -91,9 +90,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 pr-2">
           <button
             onClick={() => onArtistChange('all')}
-            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${
-              selectedArtist === 'all' ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
-            }`}
+            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedArtist === 'all' ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+              }`}
           >
             <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${selectedArtist === 'all' ? 'border-primary' : 'border-gray-300'}`}>
               {selectedArtist === 'all' && <div className="h-2 w-2 rounded-full bg-primary" />}
@@ -103,13 +101,12 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
           {artists.map(artist => (
             <button
               key={artist.id}
-              onClick={() => onArtistChange(artist.id)}
-              className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${
-                selectedArtist === artist.id ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
-              }`}
+              onClick={() => onArtistChange(artist.name)}
+              className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedArtist === artist.name ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+                }`}
             >
-              <div className={`h-4 w-4 rounded-full border flex items-center justify-center flex-shrink-0 ${selectedArtist === artist.id ? 'border-primary' : 'border-gray-300'}`}>
-                {selectedArtist === artist.id && <div className="h-2 w-2 rounded-full bg-primary" />}
+              <div className={`h-4 w-4 rounded-full border flex items-center justify-center flex-shrink-0 ${selectedArtist === artist.name ? 'border-primary' : 'border-gray-300'}`}>
+                {selectedArtist === artist.name && <div className="h-2 w-2 rounded-full bg-primary" />}
               </div>
               <span className="truncate">{artist.name}</span>
             </button>
@@ -126,9 +123,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 pr-2">
           <button
             onClick={() => onLabelChange('all')}
-            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${
-              selectedLabel === 'all' ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
-            }`}
+            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedLabel === 'all' ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+              }`}
           >
             <div className={`flex h-4 w-4 items-center justify-center rounded border ${selectedLabel === 'all' ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
               {selectedLabel === 'all' && <Check size={10} />}
@@ -140,9 +136,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               <button
                 key={label}
                 onClick={() => onLabelChange(label)}
-                className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${
-                  selectedLabel === label ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedLabel === label ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 <div className={`flex h-4 w-4 items-center justify-center rounded border ${selectedLabel === label ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
                   {selectedLabel === label && <Check size={10} />}

@@ -55,7 +55,7 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
           onClick={() => setSelectedArtist('all')}
           className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-200"
         >
-          Nghệ sĩ: {availableArtists.find(a => a.id === selectedArtist)?.name} <X size={12} />
+          Nghệ sĩ: {selectedArtist} <X size={12} />
         </button>
       )}
       {selectedLabel !== 'all' && (
