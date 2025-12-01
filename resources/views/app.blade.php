@@ -43,7 +43,7 @@
 
   {{-- Supabase Storage Config for JavaScript --}}
   <script>
-    window.supabaseUrl = "{{ config('filesystems.disks.supabase.endpoint') }}";
+    window.supabaseUrl = "{{ env('SUPABASE_URL') }}";
     window.supabaseBucket = "{{ config('filesystems.disks.supabase.bucket') }}";
   </script>
 
