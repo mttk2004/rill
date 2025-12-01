@@ -157,8 +157,12 @@
           <td class="text-right">{{ number_format($order->subtotal, 0, ',', '.') }} ₫</td>
         </tr>
         <tr>
+          <td>Phí vận chuyển:</td>
+          <td class="text-right">{{ number_format($order->shipping_fee, 0, ',', '.') }} ₫</td>
+        </tr>
+        <tr>
           <td>Giảm giá:</td>
-          <td class="text-right">{{ number_format($order->discount_amount, 0, ',', '.') }} ₫</td>
+          <td class="text-right">-{{ number_format($order->discount_amount, 0, ',', '.') }} ₫</td>
         </tr>
         <tr>
           <td><strong>Tổng thanh toán:</strong></td>
