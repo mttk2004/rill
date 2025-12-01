@@ -278,7 +278,7 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
                           <Eye size={18} />
                         </button>
                         <button
-                          onClick={() => router.visit(`/admin/products/${product.id}`)}
+                          onClick={() => router.visit(`/admin/products/${product.id}/edit`)}
                           className="p-1.5 text-amber-600 hover:bg-amber-50 rounded"
                           title="Chỉnh sửa"
                         >
@@ -366,8 +366,8 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
                       router.get(`/admin/products?${params.toString()}`, {}, { preserveState: true, preserveScroll: false });
                     }}
                     className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${page === productsPagination.current_page
-                        ? 'bg-primary text-white border-primary'
-                        : 'bg-white hover:bg-gray-50 text-gray-700'
+                      ? 'bg-primary text-white border-primary'
+                      : 'bg-white hover:bg-gray-50 text-gray-700'
                       }`}
                   >
                     {page}

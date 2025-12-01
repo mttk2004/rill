@@ -118,7 +118,7 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('admin/products/create', [
+        return Inertia::render('admin/products/ProductForm', [
             'genres' => $genres,
             'labels' => $labels,
             'artists' => $artists,
@@ -163,11 +163,8 @@ class ProductController extends Controller
             $validated['artists'] ?? null
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Tạo sản phẩm mới thành công',
-            'product' => $product,
-        ]);
+        return redirect()->route('admin.products')
+            ->with('success', 'Tạo sản phẩm mới thành công');
     }
 
     /**
@@ -213,15 +210,10 @@ class ProductController extends Controller
             ->limit(config('pagination.admin.recent_items'))
             ->get();
 
-        // If AJAX request or Inertia request, return product data
-        if ($request->wantsJson() || $request->ajax() || $request->header('X-Inertia')) {
-            return Inertia::modal('admin/product-detail-dialog', [
-                'product' => $product,
-            ])->baseRoute('admin.products');
-        }
-
-        // Otherwise redirect to products list (we use dialog for details)
-        return redirect()->route('admin.products');
+        // Return product data for detail dialog (opened from frontend)
+        return response()->json([
+            'product' => $product,
+        ]);
     }
 
     /**
@@ -252,7 +244,7 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('admin/products/edit', [
+        return Inertia::render('admin/products/ProductForm', [
             'product' => $product,
             'genres' => $genres,
             'labels' => $labels,
@@ -267,6 +259,13 @@ class ProductController extends Controller
     {
         $product = Product::withTrashed()->findOrFail($id);
 
+        // Debug: Log incoming request data
+        \Log::info('Product update request', [
+            'id' => $id,
+            'all_data' => $request->all(),
+            'has_file' => $request->hasFile('image'),
+        ]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
@@ -274,6 +273,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'cost_price' => 'nullable|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
+            'min_stock_level' => 'nullable|integer|min:0',
             'genre' => 'nullable|string|max:100',
             'label' => 'required|string|max:100',
             'status' => 'required|in:active,inactive,out_of_stock',
@@ -307,11 +307,8 @@ class ProductController extends Controller
             $validated['artists'] ?? null
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Cập nhật sản phẩm thành công',
-            'product' => $product->fresh(),
-        ]);
+        return redirect()->route('admin.products')
+            ->with('success', 'Cập nhật sản phẩm thành công');
     }
 
     /**

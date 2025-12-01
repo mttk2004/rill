@@ -27,7 +27,7 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
   const { showToast } = useToast();
   const isEditMode = Boolean(product);
 
-  const { data, setData, post, put, processing, errors } = useForm({
+  const { data, setData, post, processing } = useForm({
     name: product?.name || '',
     slug: product?.slug || '',
     sku: product?.sku || '',
@@ -53,10 +53,22 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
   // Local state for new artist entry
   const [selectedArtistId, setSelectedArtistId] = useState('');
   const [selectedRole, setSelectedRole] = useState<ArtistRole>('main');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setData(name as keyof typeof data, value);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      // @ts-expect-error - Inertia handles File objects correctly
+      setData('image', file);
+    }
   };
 
   const handleSlugGen = () => {
@@ -105,26 +117,39 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('Form data before submit:', data);
+    console.log('Is edit mode:', isEditMode);
+
     if (isEditMode && product) {
-      put(`/admin/products/${product.id}`, {
+      // Use router.post with _method for file uploads (PUT doesn't support multipart/form-data)
+      router.post(`/admin/products/${product.id}`, {
+        ...data,
+        _method: 'put',
+      }, {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: () => {
           showToast(`Đã cập nhật sản phẩm "${data.name}"`, 'success');
-          router.visit('/admin/products');
         },
-        onError: () => {
-          showToast('Có lỗi xảy ra khi cập nhật sản phẩm', 'error');
+        onError: (errors: Record<string, string>) => {
+          console.error('Update errors:', errors);
+          console.error('Form data at error:', data);
+          const firstError = Object.values(errors)[0];
+          showToast(firstError || 'Có lỗi xảy ra khi cập nhật sản phẩm', 'error');
         },
       });
     } else {
       post('/admin/products', {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: () => {
           showToast(`Đã tạo sản phẩm mới "${data.name}"`, 'success');
-          router.visit('/admin/products');
         },
-        onError: () => {
-          showToast('Có lỗi xảy ra khi tạo sản phẩm', 'error');
+        onError: (errors: Record<string, string>) => {
+          console.error('Create errors:', errors);
+          console.error('Form data at error:', data);
+          const firstError = Object.values(errors)[0];
+          showToast(firstError || 'Có lỗi xảy ra khi tạo sản phẩm', 'error');
         },
       });
     }
@@ -364,9 +389,13 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
               <h3 className="text-lg font-bold text-gray-900 mb-4">Hình ảnh</h3>
               <div className="mb-4">
                 <div className="aspect-square rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center text-gray-400 relative overflow-hidden group hover:border-primary hover:text-primary transition-colors cursor-pointer">
-                  {data.image ? (
+                  {imagePreview || data.image ? (
                     <>
-                      <img src={getImageUrl(data.image) || ''} alt="Preview" className="w-full h-full object-cover" />
+                      <img
+                        src={imagePreview || getImageUrl(data.image) || ''}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span className="text-white text-sm font-medium">Thay đổi ảnh</span>
                       </div>
@@ -377,7 +406,12 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
                       <span className="text-sm font-medium">Tải ảnh lên</span>
                     </>
                   )}
-                  <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
                 </div>
               </div>
               <div>
