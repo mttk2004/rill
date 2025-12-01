@@ -46,7 +46,7 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, averageRating }) => {
                 <span className="text-xs text-gray-400">{formatRelativeTime(review.created_at)}</span>
               </div>
               <p className="text-gray-600 text-sm leading-relaxed">
-                "{review.comment}"
+                {review.comment}
               </p>
             </div>
           ))}
