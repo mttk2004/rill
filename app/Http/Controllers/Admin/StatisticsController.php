@@ -158,6 +158,42 @@ class StatisticsController extends Controller
                 ];
             });
 
+        // Low stock products
+        $lowStockProducts = Product::whereColumn('stock_quantity', '<=', 'min_stock_level')
+            ->orWhere(function ($query) {
+                $query->where('stock_quantity', '<=', 5)
+                      ->whereNull('min_stock_level');
+            })
+            ->select('id', 'name', 'slug', 'image', 'stock_quantity', 'min_stock_level')
+            ->orderBy('stock_quantity')
+            ->limit(5)
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'image' => $product->image,
+                    'stock_quantity' => $product->stock_quantity,
+                    'min_stock_level' => $product->min_stock_level ?? 5,
+                ];
+            });
+
+        // Pending orders
+        $pendingOrders = Order::where('status', OrderStatus::PENDING)
+            ->orderByDesc('placed_at')
+            ->limit(5)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'created_at' => $order->placed_at->toISOString(),
+                    'shipping_address' => [
+                        'full_name' => $order->shipping_full_name,
+                    ],
+                ];
+            });
+
         // Recent orders
         $recentOrders = Order::with(['user', 'items.product', 'payment'])
             ->orderByDesc('placed_at')
@@ -167,12 +203,12 @@ class StatisticsController extends Controller
                 return [
                     'id' => $order->id,
                     'order_number' => $order->order_number,
-                    'customer' => $order->user ? $order->user->name : 'N/A',
-                    'items_count' => $order->items->count(),
                     'total_amount' => $order->total_amount,
                     'status' => $order->status->value,
-                    'payment_status' => $order->payment ? $order->payment->payment_status->value : PaymentStatus::PENDING->value,
-                    'placed_at' => $order->placed_at->format('Y-m-d'),
+                    'created_at' => $order->placed_at->toISOString(),
+                    'shipping_address' => [
+                        'full_name' => $order->shipping_full_name,
+                    ],
                 ];
             });
 
@@ -195,13 +231,20 @@ class StatisticsController extends Controller
                 ];
             });
 
-        return Inertia::render('admin/statistics', [
-            'stats' => $stats,
-            'dailyRevenue' => $dailyRevenue,
-            'ordersByStatus' => $ordersByStatus,
+        return Inertia::render('admin/Dashboard', [
+            'dashboardStats' => [
+                'revenue' => $stats['revenue']['value'],
+                'newOrders' => $stats['orders']['value'],
+                'customers' => $stats['customers']['value'],
+                'lowStock' => $lowStockProducts->count(),
+            ],
             'topProducts' => $topProducts,
+            'genreData' => [], // TODO: Implement genre revenue data
+            'trendingArtists' => [], // TODO: Implement trending artists data
+            'lowStockProducts' => $lowStockProducts,
+            'pendingOrders' => $pendingOrders,
             'recentOrders' => $recentOrders,
-            'revenueByPaymentMethod' => $revenueByPaymentMethod,
+            'revenueData' => $dailyRevenue,
             'dateRange' => [
                 'start' => $startDate->format('Y-m-d'),
                 'end' => $endDate->format('Y-m-d'),

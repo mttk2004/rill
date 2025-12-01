@@ -6,43 +6,89 @@ import {
   DollarSign, ShoppingBag, Users, Package,
   Plus, Calendar, AlertTriangle, Clock, ChevronRight, Tag, CheckCircle, Trophy, Music, TrendingUp, Settings
 } from 'lucide-react';
-import { Link, router } from '@inertiajs/react';
-import { useDashboard } from '../../hooks/useDashboard';
+import { Link, router, usePage } from '@inertiajs/react';
 import StatCard from '../../components/admin/StatCard';
 import { formatCurrency, formatDate } from '../../utils/format';
 
-// Static Data for Chart (Can also be moved to service if dynamic)
-const REVENUE_DATA = [
-  { name: 'T1', value: 4000 },
-  { name: 'T2', value: 3000 },
-  { name: 'T3', value: 5000 },
-  { name: 'T4', value: 2780 },
-  { name: 'T5', value: 1890 },
-  { name: 'T6', value: 2390 },
-  { name: 'T7', value: 3490 },
-  { name: 'T8', value: 4200 },
-  { name: 'T9', value: 5100 },
-  { name: 'T10', value: 6000 },
-  { name: 'T11', value: 7500 },
-  { name: 'T12', value: 8200 },
-];
-
 const CHART_COLORS = ['#1B4D3E', '#d4af37', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-const Dashboard = () => {
-  const [timeRange, setTimeRange] = useState('week');
+interface DashboardProps {
+  dashboardStats: {
+    revenue: number;
+    newOrders: number;
+    customers: number;
+    lowStock: number;
+  };
+  topProducts: Array<{
+    id: string;
+    name: string;
+    sku: string;
+    sales: number;
+    revenue: number;
+  }>;
+  genreData: Array<{
+    name: string;
+    value: number;
+  }>;
+  trendingArtists: Array<{
+    id: string;
+    name: string;
+    country: string;
+    sales: number;
+    image?: string;
+  }>;
+  lowStockProducts: Array<{
+    id: string;
+    name: string;
+    image?: string;
+    stock_quantity: number;
+    min_stock_level: number;
+  }>;
+  pendingOrders: Array<{
+    id: string;
+    order_number: string;
+    created_at: string;
+    shipping_address: {
+      full_name: string;
+    };
+  }>;
+  recentOrders: Array<{
+    id: string;
+    order_number: string;
+    total_amount: number;
+    status: string;
+    created_at: string;
+    shipping_address: {
+      full_name: string;
+    };
+  }>;
+  revenueData: Array<{
+    date: string;
+    revenue: number;
+    orders: number;
+  }>;
+}
 
-  // Use custom hook to fetch data (Simulating Inertia Props)
+const Dashboard = () => {
+  const { props } = usePage<DashboardProps>();
   const {
-    stats,
+    dashboardStats,
     topProducts,
     genreData,
     trendingArtists,
     lowStockProducts,
     pendingOrders,
     recentOrders,
-    loading
-  } = useDashboard(timeRange);
+    revenueData
+  } = props;
+
+  const [timeRange, setTimeRange] = useState('week');
+
+  // Transform revenue data for chart
+  const chartData = revenueData.map(item => ({
+    name: new Date(item.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+    value: item.revenue
+  }));
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
@@ -67,10 +113,6 @@ const Dashboard = () => {
       </span>
     );
   };
-
-  if (loading) {
-    return <div className="p-8 text-center">Đang tải dữ liệu...</div>;
-  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -134,7 +176,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Tổng Doanh Thu"
-          value={formatCurrency(stats.revenue)}
+          value={formatCurrency(dashboardStats.revenue)}
           trend="12.5%"
           trendUp={true}
           icon={DollarSign}
@@ -142,7 +184,7 @@ const Dashboard = () => {
         />
         <StatCard
           title="Đơn Hàng Mới"
-          value={stats.newOrders}
+          value={dashboardStats.newOrders}
           trend="8.2%"
           trendUp={true}
           icon={ShoppingBag}
@@ -150,7 +192,7 @@ const Dashboard = () => {
         />
         <StatCard
           title="Khách Hàng"
-          value={stats.customers}
+          value={dashboardStats.customers}
           trend="2.1%"
           trendUp={false}
           icon={Users}
@@ -158,7 +200,7 @@ const Dashboard = () => {
         />
         <StatCard
           title="Sản Phẩm Tồn Kho"
-          value={stats.lowStock}
+          value={dashboardStats.lowStock}
           trend="Cảnh báo"
           trendUp={false}
           icon={Package}
@@ -181,7 +223,7 @@ const Dashboard = () => {
           </div>
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={REVENUE_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#1B4D3E" stopOpacity={0.1} />
