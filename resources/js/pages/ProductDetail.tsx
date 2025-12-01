@@ -40,15 +40,18 @@ function ProductDetailContent({
   const [deleteReviewId, setDeleteReviewId] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   const reviewForm = useForm<{
     rating: number;
     comment: string;
     images?: File[];
+    existing_images?: string[];
   }>({
     rating: 5,
     comment: '',
     images: [],
+    existing_images: [],
   });
 
   const isCurrentTrack = currentTrack?.id === product.id;
@@ -299,10 +302,13 @@ function ProductDetailContent({
             currentUserId={auth?.user?.id}
             onEditReview={(review) => {
               setEditingReview(review);
+              const existingImgs = review.images || [];
+              setExistingImages(existingImgs);
               reviewForm.setData({
                 rating: review.rating,
                 comment: review.comment,
                 images: [],
+                existing_images: existingImgs,
               });
               setSelectedImages([]);
               setImagePreviews([]);
@@ -333,6 +339,7 @@ function ProductDetailContent({
                   setEditingReview(null);
                   setSelectedImages([]);
                   setImagePreviews([]);
+                  setExistingImages([]);
                   reviewForm.reset();
                 },
                 onError: (errors) => {
@@ -374,6 +381,14 @@ function ProductDetailContent({
                   required
                   minLength={10}
                 />
+                {reviewForm.data.comment.length > 0 && reviewForm.data.comment.length < 10 && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Nhận xét phải có ít nhất 10 ký tự (còn {10 - reviewForm.data.comment.length} ký tự)
+                  </p>
+                )}
+                {reviewForm.errors.comment && (
+                  <p className="text-xs text-red-600 mt-1">{reviewForm.errors.comment}</p>
+                )}
               </div>
 
               <div>
@@ -381,6 +396,36 @@ function ProductDetailContent({
                   Hình ảnh (tùy chọn, tối đa 5 ảnh, mỗi ảnh ≤ 512KB)
                 </label>
 
+                {/* Existing images */}
+                {existingImages.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-500 mb-2">Ảnh hiện tại:</p>
+                    <div className="grid grid-cols-5 gap-2">
+                      {existingImages.map((img, idx) => (
+                        <div key={idx} className="relative group">
+                          <img
+                            src={img}
+                            alt={`Existing ${idx + 1}`}
+                            className="w-full h-16 object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newExisting = existingImages.filter((_, i) => i !== idx);
+                              setExistingImages(newExisting);
+                              reviewForm.setData('existing_images', newExisting);
+                            }}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* New image previews */}
                 {imagePreviews.length > 0 && (
                   <div className="grid grid-cols-5 gap-2 mb-3">
                     {imagePreviews.map((preview, idx) => (
@@ -408,15 +453,16 @@ function ProductDetailContent({
                   </div>
                 )}
 
-                {selectedImages.length < 5 && (
+                {(selectedImages.length + existingImages.length) < 5 && (
                   <input
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={(e) => {
                       const files = Array.from(e.target.files || []);
-                      if (selectedImages.length + files.length > 5) {
-                        showToast('Chỉ được tải tối đa 5 ảnh', 'error');
+                      const totalImages = selectedImages.length + existingImages.length + files.length;
+                      if (totalImages > 5) {
+                        showToast('Tổng số ảnh không được vượt quá 5', 'error');
                         return;
                       }
                       const invalidFiles = files.filter(f => f.size > 512 * 1024);
@@ -449,6 +495,7 @@ function ProductDetailContent({
                     setEditingReview(null);
                     setSelectedImages([]);
                     setImagePreviews([]);
+                    setExistingImages([]);
                     reviewForm.reset();
                   }}
                 >
@@ -476,6 +523,7 @@ function ProductDetailContent({
           if (deleteReviewId) {
             router.delete(`/reviews/${deleteReviewId}`, {
               preserveScroll: true,
+              preserveState: false,
               onSuccess: () => {
                 showToast('Đã xóa đánh giá', 'success');
                 setDeleteReviewId(null);

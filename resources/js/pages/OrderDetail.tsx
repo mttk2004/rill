@@ -508,6 +508,11 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   required
                   minLength={10}
                 />
+                {reviewForm.data.comment.length > 0 && reviewForm.data.comment.length < 10 && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Nhận xét phải có ít nhất 10 ký tự (còn {10 - reviewForm.data.comment.length} ký tự)
+                  </p>
+                )}
                 {reviewForm.errors.comment && (
                   <p className="text-xs text-red-600 mt-1">{reviewForm.errors.comment}</p>
                 )}
