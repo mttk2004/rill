@@ -90,6 +90,11 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
     // Admin management routes
     Route::prefix('admin')->group(function () {
+        // Redirect /admin to /admin/dashboard
+        Route::get('/', function () {
+            return redirect()->route('admin.dashboard');
+        });
+
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
         Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings');
