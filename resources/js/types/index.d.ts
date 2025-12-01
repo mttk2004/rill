@@ -253,6 +253,7 @@ export interface Review {
   images?: string[];
   user_name?: string;
   created_at: string;
+  updated_at?: string;
   user?: {
     id?: number;
     name: string;

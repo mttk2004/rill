@@ -58,7 +58,14 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCan
                     </div>
                   </div>
                 </div>
-                <span className="text-xs text-gray-400">{formatRelativeTime(review.created_at)}</span>
+                <div className="flex flex-col items-end gap-0.5">
+                  <span className="text-xs text-gray-400">
+                    {formatRelativeTime(review.updated_at || review.created_at)}
+                  </span>
+                  {review.updated_at && review.updated_at !== review.created_at && (
+                    <span className="text-[10px] text-gray-400 italic">(đã chỉnh sửa)</span>
+                  )}
+                </div>
               </div>
               <p className="text-gray-600 text-sm leading-relaxed">
                 {review.comment}
