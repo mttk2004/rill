@@ -23,6 +23,7 @@ interface DashboardProps {
     id: string;
     name: string;
     sku: string;
+    image?: string;
     sales: number;
     revenue: number;
   }>;
@@ -85,10 +86,14 @@ const Dashboard = () => {
   const [timeRange, setTimeRange] = useState('week');
 
   // Transform revenue data for chart
-  const chartData = revenueData.map(item => ({
-    name: new Date(item.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
-    value: item.revenue
-  }));
+  const chartData = revenueData.map(item => {
+    const date = new Date(item.date);
+    return {
+      name: date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' }),
+      value: item.revenue,
+      fullDate: date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })
+    };
+  });
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
@@ -231,8 +236,17 @@ const Dashboard = () => {
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#9ca3af' }}
+                  tickFormatter={(value) => formatCurrency(value).replace(/₫/, '').trim() + 'đ'}
+                />
+                <Tooltip
+                  contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                  formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
+                  labelFormatter={(label, payload) => payload?.[0]?.payload?.fullDate || label}
+                />
                 <CartesianGrid vertical={false} stroke="#f3f4f6" />
                 <Area type="monotone" dataKey="value" stroke="#1B4D3E" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
@@ -304,15 +318,15 @@ const Dashboard = () => {
                         </div>
                         <div className="min-w-0">
                           <p className="font-bold text-gray-900 truncate max-w-[200px]">{product.name}</p>
-                          <p className="text-xs text-gray-500">{product.artist_id ? 'Nghệ sĩ chính' : 'Various'}</p>
+                          <p className="text-xs text-gray-500">{product.sku}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 font-bold text-xs">{product.sold}</span>
+                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 font-bold text-xs">{product.sales}</span>
                     </td>
                     <td className="px-6 py-4 text-right font-bold text-primary">
-                      {formatCurrency(Number(product.price) * product.sold)}
+                      {formatCurrency(product.revenue)}
                     </td>
                   </tr>
                 )) : (

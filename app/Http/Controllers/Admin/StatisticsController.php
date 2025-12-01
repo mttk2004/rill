@@ -135,28 +135,32 @@ class StatisticsController extends Controller
         $topProducts = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->whereBetween('orders.placed_at', [$startDate, $endDate])
+            // ->whereBetween('orders.placed_at', [$startDate, $endDate])
             ->where('orders.status', '!=', OrderStatus::CANCELLED->value)
             ->select(
                 'products.id',
                 'products.name',
                 'products.sku',
+                'products.image',
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 DB::raw('SUM(order_items.total_price) as total_revenue')
             )
-            ->groupBy('products.id', 'products.name', 'products.sku')
+            ->groupBy('products.id', 'products.name', 'products.sku', 'products.image')
             ->orderByDesc('total_revenue')
-            ->limit(10)
+            ->limit(5)
             ->get()
             ->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'name' => $item->name,
                     'sku' => $item->sku,
+                    'image' => $item->image,
                     'sales' => (int) $item->total_quantity,
                     'revenue' => (float) $item->total_revenue,
                 ];
             });
+
+        \Log::info('Top Products Query Result', ['count' => $topProducts->count(), 'data' => $topProducts->toArray()]);
 
         // Low stock products
         $lowStockProducts = Product::whereColumn('stock_quantity', '<=', 'min_stock_level')
@@ -189,7 +193,7 @@ class StatisticsController extends Controller
                     'order_number' => $order->order_number,
                     'created_at' => $order->placed_at->toISOString(),
                     'shipping_address' => [
-                        'full_name' => $order->shipping_full_name,
+                        'full_name' => $order->shipping_address['full_name'] ?? 'N/A',
                     ],
                 ];
             });
@@ -203,8 +207,8 @@ class StatisticsController extends Controller
                 \Log::info('Recent Order Data', [
                     'id' => $order->id,
                     'order_number' => $order->order_number,
-                    'shipping_full_name' => $order->shipping_full_name,
-                    'has_shipping_name' => !empty($order->shipping_full_name),
+                    'shipping_address' => $order->shipping_address,
+                    'full_name' => $order->shipping_address['full_name'] ?? null,
                 ]);
 
                 return [
@@ -214,7 +218,7 @@ class StatisticsController extends Controller
                     'status' => $order->status->value,
                     'created_at' => $order->placed_at->toISOString(),
                     'shipping_address' => [
-                        'full_name' => $order->shipping_full_name ?? 'N/A',
+                        'full_name' => $order->shipping_address['full_name'] ?? 'N/A',
                     ],
                 ];
             });
@@ -238,6 +242,60 @@ class StatisticsController extends Controller
                 ];
             });
 
+        // Revenue by genre
+        $genreRevenue = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            // ->whereBetween('orders.placed_at', [$startDate, $endDate])
+            ->where('orders.status', '!=', OrderStatus::CANCELLED->value)
+            ->whereNotNull('products.genre')
+            ->select(
+                'products.genre',
+                DB::raw('SUM(order_items.total_price) as total_revenue')
+            )
+            ->groupBy('products.genre')
+            ->orderByDesc('total_revenue')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => ucfirst($item->genre),
+                    'value' => (float) $item->total_revenue,
+                ];
+            });
+
+        \Log::info('Genre Revenue Query Result', ['count' => $genreRevenue->count(), 'data' => $genreRevenue->toArray()]);
+
+        // Trending artists (by sales volume)
+        $trendingArtists = DB::table('order_items')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('artist_product', 'products.id', '=', 'artist_product.product_id')
+            ->join('artists', 'artist_product.artist_id', '=', 'artists.id')
+            // ->whereBetween('orders.placed_at', [$startDate, $endDate])
+            ->where('orders.status', '!=', OrderStatus::CANCELLED->value)
+            ->select(
+                'artists.id',
+                'artists.name',
+                'artists.country',
+                'artists.image',
+                DB::raw('SUM(order_items.quantity) as total_sales')
+            )
+            ->groupBy('artists.id', 'artists.name', 'artists.country', 'artists.image')
+            ->orderByDesc('total_sales')
+            ->limit(5)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'country' => $item->country ?? 'N/A',
+                    'sales' => (int) $item->total_sales,
+                    'image' => $item->image,
+                ];
+            });
+
+        \Log::info('Trending Artists Query Result', ['count' => $trendingArtists->count(), 'data' => $trendingArtists->toArray()]);
+
         return Inertia::render('admin/Dashboard', [
             'dashboardStats' => [
                 'revenue' => $stats['revenue']['value'],
@@ -246,8 +304,8 @@ class StatisticsController extends Controller
                 'lowStock' => $lowStockProducts->count(),
             ],
             'topProducts' => $topProducts,
-            'genreData' => [], // TODO: Implement genre revenue data
-            'trendingArtists' => [], // TODO: Implement trending artists data
+            'genreData' => $genreRevenue,
+            'trendingArtists' => $trendingArtists,
             'lowStockProducts' => $lowStockProducts,
             'pendingOrders' => $pendingOrders,
             'recentOrders' => $recentOrders,
