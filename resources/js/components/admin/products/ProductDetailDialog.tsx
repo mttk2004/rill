@@ -1,14 +1,12 @@
 
 import React from 'react';
 import { X, Package, Tag, DollarSign, Layers, Image as ImageIcon, FileText, Globe, User } from 'lucide-react';
-import { Product, Artist } from '../../../types';
-import { ARTISTS } from '../../../data';
+import { Product } from '../../../types';
 
 interface ProductDetailDialogProps {
   isOpen: boolean;
   onClose: () => void;
   product: Product | null;
-  artist?: Artist; // Deprecated prop, will verify
 }
 
 const ProductDetailDialog: React.FC<ProductDetailDialogProps> = ({ isOpen, onClose, product }) => {
@@ -35,10 +33,6 @@ const ProductDetailDialog: React.FC<ProductDetailDialogProps> = ({ isOpen, onClo
       case 'out_of_stock': return 'Hết hàng';
       default: return status;
     }
-  };
-
-  const getArtistName = (id: string) => {
-    return ARTISTS.find(a => a.id === id)?.name || 'Unknown';
   };
 
   return (
@@ -124,23 +118,23 @@ const ProductDetailDialog: React.FC<ProductDetailDialogProps> = ({ isOpen, onClo
 
               {/* Artists */}
               <div>
-                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <User size={20} className="text-primary" /> Nghệ sĩ
-                 </h3>
-                 <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                    {product.artists && product.artists.length > 0 ? (
-                       <div className="flex flex-wrap gap-2">
-                          {product.artists.map((a, idx) => (
-                             <span key={idx} className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-gray-200 text-sm text-gray-700 shadow-sm">
-                                <span className="font-medium mr-2">{getArtistName(a.artist_id)}</span>
-                                <span className="text-[10px] uppercase bg-gray-100 px-1.5 rounded text-gray-500 tracking-wide">{a.role}</span>
-                             </span>
-                          ))}
-                       </div>
-                    ) : (
-                       <p className="text-sm text-gray-500">Chưa có thông tin nghệ sĩ</p>
-                    )}
-                 </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <User size={20} className="text-primary" /> Nghệ sĩ
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  {product.artists && product.artists.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {product.artists.map((artist: any, idx: number) => (
+                        <span key={idx} className="inline-flex items-center px-3 py-1 rounded-full bg-white border border-gray-200 text-sm text-gray-700 shadow-sm">
+                          <span className="font-medium mr-2">{artist.name}</span>
+                          <span className="text-[10px] uppercase bg-gray-100 px-1.5 rounded text-gray-500 tracking-wide">{artist.pivot?.role || 'main'}</span>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">Chưa có thông tin nghệ sĩ</p>
+                  )}
+                </div>
               </div>
 
               {/* Inventory & Classification */}
@@ -217,7 +211,7 @@ const ProductDetailDialog: React.FC<ProductDetailDialogProps> = ({ isOpen, onClo
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end">
-          <button 
+          <button
             onClick={onClose}
             className="px-6 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm"
           >

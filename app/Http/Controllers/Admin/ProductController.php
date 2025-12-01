@@ -86,7 +86,7 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('admin/products/index', [
+        return Inertia::render('admin/products/ProductList', [
             'products' => $products,
             'stats' => $stats,
             'genres' => $genres,
