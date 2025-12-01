@@ -24,7 +24,7 @@ class HomeController extends Controller
 
         // Get active collections for display
         $collections = Collection::active()
-            ->ordered()
+            ->orderBy('name')
             ->take(6)
             ->get(['id', 'name', 'slug', 'type', 'description']);
 
