@@ -54,6 +54,12 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
   const [selectedArtistId, setSelectedArtistId] = useState('');
   const [selectedRole, setSelectedRole] = useState<ArtistRole>('main');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isCustomGenre, setIsCustomGenre] = useState(
+    product?.genre ? !genres.includes(product.genre) : false
+  );
+  const [isCustomLabel, setIsCustomLabel] = useState(
+    product?.label ? !labels.includes(product.label) : false
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -128,11 +134,18 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
     console.log('Is edit mode:', isEditMode);
 
     if (isEditMode && product) {
+      // Prepare data for update
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateData: Record<string, any> = { ...data, _method: 'put' };
+
+      // If image is a string (not a File), it means user didn't upload a new image
+      // Remove it from the payload to avoid validation error
+      if (typeof data.image === 'string') {
+        delete updateData.image;
+      }
+
       // Use router.post with _method for file uploads (PUT doesn't support multipart/form-data)
-      router.post(`/admin/products/${product.id}`, {
-        ...data,
-        _method: 'put',
-      }, {
+      router.post(`/admin/products/${product.id}`, updateData, {
         preserveScroll: true,
         forceFormData: true,
         onSuccess: () => {
@@ -463,33 +476,93 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Thể loại</label>
-                  <input
-                    type="text"
-                    name="genre"
-                    value={data.genre}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                    placeholder="Rock, Jazz..."
-                    list="genres"
-                  />
-                  <datalist id="genres">
-                    {genres.map(g => <option key={g} value={g} />)}
-                  </datalist>
+                  {!isCustomGenre ? (
+                    <div className="flex gap-2">
+                      <select
+                        name="genre"
+                        value={data.genre && genres.includes(data.genre) ? data.genre : ''}
+                        onChange={(e) => {
+                          if (e.target.value === '__custom__') {
+                            setIsCustomGenre(true);
+                            setData('genre', '');
+                          } else {
+                            setData('genre', e.target.value);
+                          }
+                        }}
+                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                      >
+                        <option value="">-- Chọn thể loại --</option>
+                        {genres.map(g => <option key={g} value={g}>{g}</option>)}
+                        <option value="__custom__">✏️ Nhập thể loại khác...</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        name="genre"
+                        value={data.genre}
+                        onChange={handleChange}
+                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                        placeholder="Nhập thể loại mới..."
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomGenre(false)}
+                        className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100"
+                        title="Chọn từ danh sách"
+                      >
+                        Chọn có sẵn
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Hãng phát hành</label>
-                  <input
-                    type="text"
-                    name="label"
-                    value={data.label}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                    placeholder="Sony Music..."
-                    list="labels"
-                  />
-                  <datalist id="labels">
-                    {labels.map(l => <option key={l} value={l} />)}
-                  </datalist>
+                  {!isCustomLabel ? (
+                    <div className="flex gap-2">
+                      <select
+                        name="label"
+                        value={data.label && labels.includes(data.label) ? data.label : ''}
+                        onChange={(e) => {
+                          if (e.target.value === '__custom__') {
+                            setIsCustomLabel(true);
+                            setData('label', '');
+                          } else {
+                            setData('label', e.target.value);
+                          }
+                        }}
+                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                        required
+                      >
+                        <option value="">-- Chọn hãng phát hành --</option>
+                        {labels.map(l => <option key={l} value={l}>{l}</option>)}
+                        <option value="__custom__">✏️ Nhập hãng khác...</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        name="label"
+                        value={data.label}
+                        onChange={handleChange}
+                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                        placeholder="Nhập hãng phát hành mới..."
+                        required
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomLabel(false)}
+                        className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100"
+                        title="Chọn từ danh sách"
+                      >
+                        Chọn có sẵn
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

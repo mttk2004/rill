@@ -38,7 +38,7 @@ interface ProductListProps {
   };
 }
 
-const ProductList = ({ products: productsPagination, filters, stats, genres }: ProductListProps) => {
+const ProductList = ({ products: productsPagination, filters, genres }: ProductListProps) => {
   const { showToast } = useToast();
 
   // State for filters - initialize from backend
