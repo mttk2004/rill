@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { ARTISTS } from '../../../data';
 import { Artist } from '../../../types';
-import { 
+import {
   Plus, Search, Globe
 } from 'lucide-react';
 import Button from '../../../components/Button';
@@ -12,7 +12,6 @@ import { useToast } from '../../../context/ToastContext';
 import ArtistCard from '../../../components/admin/artists/ArtistCard';
 
 const ArtistList = () => {
-  const navigate = useNavigate();
   const { showToast } = useToast();
 
   const [artists, setArtists] = useState<Artist[]>(ARTISTS);
@@ -32,8 +31,8 @@ const ArtistList = () => {
     // Search
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(a => 
-        a.name.toLowerCase().includes(lowerQuery) || 
+      items = items.filter(a =>
+        a.name.toLowerCase().includes(lowerQuery) ||
         (a.slug && a.slug.toLowerCase().includes(lowerQuery))
       );
     }
@@ -99,19 +98,19 @@ const ArtistList = () => {
       {/* List Grid - Updated to 3 columns */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredArtists.map((artist) => (
-          <ArtistCard 
-            key={artist.id} 
-            artist={artist} 
+          <ArtistCard
+            key={artist.id}
+            artist={artist}
             onEdit={() => navigate(`/admin/artists/${artist.id}`)}
             onDelete={setDeleteId}
           />
         ))}
       </div>
-      
+
       {filteredArtists.length === 0 && (
-         <div className="text-center py-12">
-            <p className="text-gray-500">Không tìm thấy nghệ sĩ nào.</p>
-         </div>
+        <div className="text-center py-12">
+          <p className="text-gray-500">Không tìm thấy nghệ sĩ nào.</p>
+        </div>
       )}
 
       <AlertDialog

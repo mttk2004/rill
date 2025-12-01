@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { COLLECTIONS } from '../../../data';
 import { Collection } from '../../../types';
 import { Plus, Search, Filter, Edit2, Trash2, Layers, MoreVertical } from 'lucide-react';
@@ -9,7 +9,6 @@ import AlertDialog from '../../../components/AlertDialog';
 import { useToast } from '../../../context/ToastContext';
 
 const CollectionList = () => {
-  const navigate = useNavigate();
   const { showToast } = useToast();
 
   const [collections, setCollections] = useState<Collection[]>(COLLECTIONS);
@@ -22,8 +21,8 @@ const CollectionList = () => {
 
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(c => 
-        c.name.toLowerCase().includes(lowerQuery) || 
+      items = items.filter(c =>
+        c.name.toLowerCase().includes(lowerQuery) ||
         c.slug.toLowerCase().includes(lowerQuery)
       );
     }
@@ -63,7 +62,7 @@ const CollectionList = () => {
           <h1 className="text-2xl font-serif font-bold text-gray-900">Quản lý Bộ sưu tập</h1>
           <p className="text-sm text-gray-500 mt-1">Tổ chức và hiển thị sản phẩm theo nhóm</p>
         </div>
-        <Button className="flex items-center gap-2" onClick={() => navigate('/admin/collections/create')}>
+        <Button className="flex items-center gap-2" onClick={() => router.visit('/admin/collections/create')}>
           <Plus size={18} /> Tạo bộ sưu tập
         </Button>
       </div>
@@ -125,29 +124,28 @@ const CollectionList = () => {
                     {getTypeBadge(collection.type)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        collection.is_active 
-                        ? 'bg-green-50 text-green-700' 
-                        : 'bg-gray-100 text-gray-500'
-                     }`}>
-                        {collection.is_active ? 'Active' : 'Inactive'}
-                     </span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${collection.is_active
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-gray-100 text-gray-500'
+                      }`}>
+                      {collection.is_active ? 'Active' : 'Inactive'}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                     {collection.display_order}
+                    {collection.display_order}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
-                        onClick={() => navigate(`/admin/collections/${collection.id}`)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" 
+                      <button
+                        onClick={() => router.visit(`/admin/collections/${collection.id}`)}
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                         title="Chỉnh sửa"
                       >
                         <Edit2 size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => setDeleteId(collection.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded" 
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                         title="Xóa"
                       >
                         <Trash2 size={18} />

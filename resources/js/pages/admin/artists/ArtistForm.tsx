@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save, UploadCloud, Globe, FileText, User } from 'lucide-react';
 import { ARTISTS } from '../../../data';
 import { Artist } from '../../../types';
@@ -8,8 +8,8 @@ import { useToast } from '../../../context/ToastContext';
 import Button from '../../../components/Button';
 
 const ArtistForm = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { props } = usePage<{ id?: string }>();
+  const id = props.id;
   const { showToast } = useToast();
   const isEditMode = Boolean(id);
 
@@ -30,10 +30,10 @@ const ArtistForm = () => {
         setFormData(artist);
       } else {
         showToast('Không tìm thấy nghệ sĩ', 'error');
-        navigate('/admin/artists');
+        router.visit('/admin/artists');
       }
     }
-  }, [isEditMode, id, navigate, showToast]);
+  }, [isEditMode, id, showToast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -58,7 +58,7 @@ const ArtistForm = () => {
     } else {
       showToast(`Đã thêm nghệ sĩ mới "${formData.name}"`, 'success');
     }
-    navigate('/admin/artists');
+    router.visit('/admin/artists');
   };
 
   const commonCountries = [
@@ -70,7 +70,7 @@ const ArtistForm = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/admin/artists')} className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
+          <button onClick={() => router.visit('/admin/artists')} className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -80,7 +80,7 @@ const ArtistForm = () => {
           </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={() => navigate('/admin/artists')} className="h-10 px-4 py-2">
+          <Button variant="secondary" onClick={() => router.visit('/admin/artists')} className="h-10 px-4 py-2">
             Hủy bỏ
           </Button>
           <Button onClick={handleSubmit} className="h-10 px-4 py-2 flex items-center gap-2">

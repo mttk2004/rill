@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { router, usePage } from '@inertiajs/react';
 import { ArrowLeft, Save, Image as ImageIcon, UploadCloud, Plus, Trash2, User } from 'lucide-react';
 import { PRODUCTS, ARTISTS } from '../../../data';
 import { Product, ArtistRole, ProductArtist } from '../../../types';
@@ -8,8 +8,8 @@ import { useToast } from '../../../context/ToastContext';
 import Button from '../../../components/Button';
 
 const ProductForm = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { props } = usePage<{ id?: string }>();
+  const id = props.id;
   const { showToast } = useToast();
   const isEditMode = Boolean(id);
 
@@ -43,10 +43,10 @@ const ProductForm = () => {
         setFormData({ ...product, artists: product.artists || [] });
       } else {
         showToast('Không tìm thấy sản phẩm', 'error');
-        navigate('/admin/products');
+        router.visit('/admin/products');
       }
     }
-  }, [isEditMode, id, navigate, showToast]);
+  }, [isEditMode, id, showToast]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -104,7 +104,7 @@ const ProductForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Sync deprecated artist_id with the first 'main' artist for compatibility
     const mainArtist = formData.artists?.find(a => a.role === 'main') || formData.artists?.[0];
     const submissionData = {
@@ -119,7 +119,7 @@ const ProductForm = () => {
     } else {
       showToast(`Đã tạo sản phẩm mới "${formData.name}"`, 'success');
     }
-    navigate('/admin/products');
+    router.visit('/admin/products');
   };
 
   return (
@@ -127,7 +127,7 @@ const ProductForm = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/admin/products')} className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
+          <button onClick={() => router.visit('/admin/products')} className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
             <ArrowLeft size={20} />
           </button>
           <div>
@@ -140,7 +140,7 @@ const ProductForm = () => {
           </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={() => navigate('/admin/products')} className="h-10 px-4 py-2">
+          <Button variant="secondary" onClick={() => router.visit('/admin/products')} className="h-10 px-4 py-2">
             Hủy bỏ
           </Button>
           <Button onClick={handleSubmit} className="h-10 px-4 py-2 flex items-center gap-2">
@@ -194,74 +194,73 @@ const ProductForm = () => {
                   />
                 </div>
               </div>
-              
+
               {/* Artists Section - UPDATED */}
               <div className="border rounded-lg p-4 bg-gray-50 border-gray-200">
-                 <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                    <User size={16} /> Nghệ sĩ tham gia
-                 </h4>
-                 
-                 {/* Add Artist Form */}
-                 <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                    <div className="flex-1">
-                       <select
-                          value={selectedArtistId}
-                          onChange={(e) => setSelectedArtistId(e.target.value)}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                       >
-                          <option value="">-- Chọn nghệ sĩ --</option>
-                          {ARTISTS.map(artist => (
-                             <option key={artist.id} value={artist.id}>{artist.name}</option>
-                          ))}
-                       </select>
-                    </div>
-                    <div className="w-full sm:w-40">
-                       <select
-                          value={selectedRole}
-                          onChange={(e) => setSelectedRole(e.target.value as ArtistRole)}
-                          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                       >
-                          <option value="main">Main (Chính)</option>
-                          <option value="featured">Featured (Hợp tác)</option>
-                          <option value="composer">Composer (Sáng tác)</option>
-                          <option value="producer">Producer (Sản xuất)</option>
-                       </select>
-                    </div>
-                    <button
-                       type="button"
-                       onClick={handleAddArtist}
-                       className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary flex items-center justify-center gap-1"
-                    >
-                       <Plus size={16} /> Thêm
-                    </button>
-                 </div>
+                <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <User size={16} /> Nghệ sĩ tham gia
+                </h4>
 
-                 {/* Artist List */}
-                 {formData.artists && formData.artists.length > 0 ? (
-                    <div className="space-y-2">
-                       {formData.artists.map((artistLink, idx) => (
-                          <div key={`${artistLink.artist_id}-${idx}`} className="flex items-center justify-between bg-white p-2 rounded border border-gray-200 text-sm">
-                             <div className="flex items-center gap-3">
-                                <span className="font-medium text-gray-900">{getArtistName(artistLink.artist_id)}</span>
-                                <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${
-                                   artistLink.role === 'main' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-500'
-                                }`}>
-                                   {artistLink.role}
-                                </span>
-                             </div>
-                             <button
-                                type="button"
-                                onClick={() => handleRemoveArtist(artistLink.artist_id)}
-                                className="text-gray-400 hover:text-red-500 p-1"
-                             >
-                                <Trash2 size={14} />
-                             </button>
-                          </div>
-                       ))}
-                    </div>
-                 ) : (
-                    <p className="text-xs text-gray-500 text-center py-2">Chưa có nghệ sĩ nào được chọn.</p>
-                 )}
+                {/* Add Artist Form */}
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                  <div className="flex-1">
+                    <select
+                      value={selectedArtistId}
+                      onChange={(e) => setSelectedArtistId(e.target.value)}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                    >
+                      <option value="">-- Chọn nghệ sĩ --</option>
+                      {ARTISTS.map(artist => (
+                        <option key={artist.id} value={artist.id}>{artist.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="w-full sm:w-40">
+                    <select
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value as ArtistRole)}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                    >
+                      <option value="main">Main (Chính)</option>
+                      <option value="featured">Featured (Hợp tác)</option>
+                      <option value="composer">Composer (Sáng tác)</option>
+                      <option value="producer">Producer (Sản xuất)</option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddArtist}
+                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary flex items-center justify-center gap-1"
+                  >
+                    <Plus size={16} /> Thêm
+                  </button>
+                </div>
+
+                {/* Artist List */}
+                {formData.artists && formData.artists.length > 0 ? (
+                  <div className="space-y-2">
+                    {formData.artists.map((artistLink, idx) => (
+                      <div key={`${artistLink.artist_id}-${idx}`} className="flex items-center justify-between bg-white p-2 rounded border border-gray-200 text-sm">
+                        <div className="flex items-center gap-3">
+                          <span className="font-medium text-gray-900">{getArtistName(artistLink.artist_id)}</span>
+                          <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${artistLink.role === 'main' ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                            {artistLink.role}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveArtist(artistLink.artist_id)}
+                          className="text-gray-400 hover:text-red-500 p-1"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500 text-center py-2">Chưa có nghệ sĩ nào được chọn.</p>
+                )}
               </div>
 
               <div>

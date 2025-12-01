@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { VOUCHERS } from '../../../data';
 import { Voucher } from '../../../types';
-import { 
+import {
   Plus, Search, Filter, Edit2, Trash2, Tag, Calendar, Percent, User, AlignLeft, DollarSign
 } from 'lucide-react';
 import Button from '../../../components/Button';
@@ -11,7 +11,6 @@ import AlertDialog from '../../../components/AlertDialog';
 import { useToast } from '../../../context/ToastContext';
 
 const VoucherList = () => {
-  const navigate = useNavigate();
   const { showToast } = useToast();
 
   const [vouchers, setVouchers] = useState<Voucher[]>(VOUCHERS);
@@ -23,7 +22,7 @@ const VoucherList = () => {
   const getVoucherStatus = (v: Voucher) => {
     const now = new Date();
     const endDate = new Date(v.valid_to);
-    
+
     if (v.is_active === 0) return 'inactive';
     if (endDate < now) return 'expired';
     if (v.usage_limit && v.used_count >= v.usage_limit) return 'out_of_stock';
@@ -35,8 +34,8 @@ const VoucherList = () => {
 
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(v => 
-        v.code.toLowerCase().includes(lowerQuery) || 
+      items = items.filter(v =>
+        v.code.toLowerCase().includes(lowerQuery) ||
         (v.name && v.name.toLowerCase().includes(lowerQuery)) ||
         (v.description && v.description.toLowerCase().includes(lowerQuery))
       );
@@ -89,7 +88,7 @@ const VoucherList = () => {
           <h1 className="text-2xl font-serif font-bold text-gray-900">Quản lý mã giảm giá</h1>
           <p className="text-sm text-gray-500 mt-1">Tạo và quản lý các chương trình khuyến mãi</p>
         </div>
-        <Button className="flex items-center gap-2" onClick={() => navigate('/admin/vouchers/create')}>
+        <Button className="flex items-center gap-2" onClick={() => router.visit('/admin/vouchers/create')}>
           <Plus size={18} /> Tạo mã mới
         </Button>
       </div>
@@ -145,27 +144,27 @@ const VoucherList = () => {
 
               <div className="space-y-4 mb-4">
                 <div>
-                   <h4 className="font-medium text-gray-900 text-sm line-clamp-1 flex items-center gap-1.5 mb-1">
-                      <AlignLeft size={14} className="text-gray-400"/> {voucher.name}
-                   </h4>
-                   <p className="text-sm text-gray-600 line-clamp-2 min-h-[40px] pl-5">{voucher.description}</p>
+                  <h4 className="font-medium text-gray-900 text-sm line-clamp-1 flex items-center gap-1.5 mb-1">
+                    <AlignLeft size={14} className="text-gray-400" /> {voucher.name}
+                  </h4>
+                  <p className="text-sm text-gray-600 line-clamp-2 min-h-[40px] pl-5">{voucher.description}</p>
                 </div>
-                
+
                 <div className="bg-gray-50 rounded-lg p-3 space-y-2">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 flex items-center gap-1.5"><DollarSign size={14}/> Giá trị giảm:</span>
+                    <span className="text-gray-500 flex items-center gap-1.5"><DollarSign size={14} /> Giá trị giảm:</span>
                     <span className="font-bold text-primary">
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(voucher.value)}
                     </span>
                   </div>
 
-                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 flex items-center gap-1.5"><User size={14}/> Giới hạn/User:</span>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-500 flex items-center gap-1.5"><User size={14} /> Giới hạn/User:</span>
                     <span className="font-medium text-gray-900">{voucher.usage_limit_per_user || '∞'}</span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 flex items-center gap-1.5"><Calendar size={14}/> Hạn dùng:</span>
+                    <span className="text-gray-500 flex items-center gap-1.5"><Calendar size={14} /> Hạn dùng:</span>
                     <span className="font-medium text-gray-900">{formatDate(voucher.valid_to)}</span>
                   </div>
                 </div>
@@ -177,8 +176,8 @@ const VoucherList = () => {
                   <span>Tổng: <b>{voucher.usage_limit || '∞'}</b></span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-1.5">
-                  <div 
-                    className="bg-primary h-1.5 rounded-full transition-all duration-500" 
+                  <div
+                    className="bg-primary h-1.5 rounded-full transition-all duration-500"
                     style={{ width: voucher.usage_limit ? `${Math.min((voucher.used_count / voucher.usage_limit) * 100, 100)}%` : '0%' }}
                   ></div>
                 </div>
@@ -186,14 +185,14 @@ const VoucherList = () => {
             </div>
 
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2 mt-auto">
-              <button 
-                onClick={() => navigate(`/admin/vouchers/${voucher.id}`)}
+              <button
+                onClick={() => router.visit(`/admin/vouchers/${voucher.id}`)}
                 className="p-2 text-gray-600 hover:text-primary hover:bg-white rounded-lg transition-colors border border-transparent hover:border-gray-200"
                 title="Chỉnh sửa"
               >
                 <Edit2 size={18} />
               </button>
-              <button 
+              <button
                 onClick={() => setDeleteId(voucher.id)}
                 className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-gray-200"
                 title="Xóa"

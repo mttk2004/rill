@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { USERS } from '../../../data';
 import { User } from '../../../types';
-import { 
+import {
   Plus, Search, Filter, Eye, Trash2, User as UserIcon, Mail, Phone, CheckCircle
 } from 'lucide-react';
 import Button from '../../../components/Button';
@@ -11,7 +11,6 @@ import AlertDialog from '../../../components/AlertDialog';
 import { useToast } from '../../../context/ToastContext';
 
 const CustomerList = () => {
-  const navigate = useNavigate();
   const { showToast } = useToast();
 
   // Filter out admins initially
@@ -26,8 +25,8 @@ const CustomerList = () => {
     // Search
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(u => 
-        u.name.toLowerCase().includes(lowerQuery) || 
+      items = items.filter(u =>
+        u.name.toLowerCase().includes(lowerQuery) ||
         u.email.toLowerCase().includes(lowerQuery) ||
         (u.phone && u.phone.includes(lowerQuery))
       );
@@ -125,8 +124,8 @@ const CustomerList = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col text-sm text-gray-500 space-y-1">
                       <div className="flex items-center gap-2">
-                        <Mail size={14} /> 
-                        {user.email} 
+                        <Mail size={14} />
+                        {user.email}
                         {user.email_verified_at && <CheckCircle size={12} className="text-green-500" title="Đã xác thực" />}
                       </div>
                       {user.phone && (
@@ -137,11 +136,10 @@ const CustomerList = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.is_active 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.is_active
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                      }`}>
                       {user.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
@@ -150,16 +148,16 @@ const CustomerList = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                      <button
                         onClick={() => navigate(`/admin/customers/${user.id}`)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" 
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                         title="Xem chi tiết"
                       >
                         <Eye size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => setDeleteId(user.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded" 
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                         title="Xóa"
                       >
                         <Trash2 size={18} />

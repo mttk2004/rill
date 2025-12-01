@@ -1,12 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
-import { Link } from '@inertiajs/react';
-// TODO: Remove react-router-dom - import { Link, useNavigate } from 'react-router-dom';
+import { Link, router } from '@inertiajs/react';
 import { PRODUCTS, ARTISTS } from '../../../data';
 import { Product } from '../../../types';
-import { 
-  Plus, Search, Filter, ArrowUpDown, MoreVertical, 
-  Eye, Edit2, Trash2, AlertCircle 
+import {
+  Plus, Search, Filter, ArrowUpDown, MoreVertical,
+  Eye, Edit2, Trash2, AlertCircle
 } from 'lucide-react';
 import Button from '../../../components/Button';
 import ProductDetailDialog from '../../../components/admin/products/ProductDetailDialog';
@@ -14,15 +13,14 @@ import AlertDialog from '../../../components/AlertDialog';
 import { useToast } from '../../../context/ToastContext';
 
 const ProductList = () => {
-  const navigate = useNavigate();
   const { showToast } = useToast();
-  
+
   // State
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' } | null>(null);
-  
+
   // Modal State
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -34,8 +32,8 @@ const ProductList = () => {
     // Search
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(p => 
-        p.name.toLowerCase().includes(lowerQuery) || 
+      items = items.filter(p =>
+        p.name.toLowerCase().includes(lowerQuery) ||
         p.sku.toLowerCase().includes(lowerQuery)
       );
     }
@@ -50,12 +48,12 @@ const ProductList = () => {
       items.sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
-        
+
         // Handle numeric strings like price
         if (sortConfig.key === 'price' || sortConfig.key === 'stock_quantity') {
-           const numA = Number(aValue);
-           const numB = Number(bValue);
-           return sortConfig.direction === 'asc' ? numA - numB : numB - numA;
+          const numA = Number(aValue);
+          const numB = Number(bValue);
+          return sortConfig.direction === 'asc' ? numA - numB : numB - numA;
         }
 
         if ((aValue ?? '') < (bValue ?? '')) return sortConfig.direction === 'asc' ? -1 : 1;
@@ -87,18 +85,18 @@ const ProductList = () => {
   // Updated to handle multiple artists
   const getMainArtistsName = (product: Product) => {
     if (product.artists && product.artists.length > 0) {
-        const mainArtists = product.artists
-            .filter(a => a.role === 'main')
-            .map(a => ARTISTS.find(artist => artist.id === a.artist_id)?.name);
-        
-        if (mainArtists.length > 0) return mainArtists.join(', ');
-        // Fallback to any artist if no main role
-        return ARTISTS.find(artist => artist.id === product.artists![0].artist_id)?.name || '---';
+      const mainArtists = product.artists
+        .filter(a => a.role === 'main')
+        .map(a => ARTISTS.find(artist => artist.id === a.artist_id)?.name);
+
+      if (mainArtists.length > 0) return mainArtists.join(', ');
+      // Fallback to any artist if no main role
+      return ARTISTS.find(artist => artist.id === product.artists![0].artist_id)?.name || '---';
     }
-    
+
     // Fallback to legacy artist_id if artists array is empty
     if (product.artist_id) {
-        return ARTISTS.find(a => a.id === product.artist_id)?.name || '---';
+      return ARTISTS.find(a => a.id === product.artist_id)?.name || '---';
     }
 
     return '---';
@@ -130,7 +128,7 @@ const ProductList = () => {
           <h1 className="text-2xl font-serif font-bold text-gray-900">Quản lý sản phẩm</h1>
           <p className="text-sm text-gray-500 mt-1">Danh sách tất cả đĩa than trong hệ thống</p>
         </div>
-        <Button className="flex items-center gap-2" onClick={() => navigate('/admin/products/create')}>
+        <Button className="flex items-center gap-2" onClick={() => router.visit('/admin/products/create')}>
           <Plus size={18} /> Thêm sản phẩm
         </Button>
       </div>
@@ -174,20 +172,20 @@ const ProductList = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Hình ảnh</th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
                   onClick={() => handleSort('name')}
                 >
                   <div className="flex items-center gap-1">Tên sản phẩm <ArrowUpDown size={14} /></div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
                   onClick={() => handleSort('stock_quantity')}
                 >
                   <div className="flex items-center gap-1">Tồn kho <ArrowUpDown size={14} /></div>
                 </th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
                   onClick={() => handleSort('price')}
                 >
@@ -229,23 +227,23 @@ const ProductList = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                      <button
                         onClick={() => setDetailProduct(product)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" 
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                         title="Xem chi tiết"
                       >
                         <Eye size={18} />
                       </button>
-                      <button 
-                        onClick={() => navigate(`/admin/products/${product.id}`)}
-                        className="p-1.5 text-amber-600 hover:bg-amber-50 rounded" 
+                      <button
+                        onClick={() => router.visit(`/admin/products/${product.id}`)}
+                        className="p-1.5 text-amber-600 hover:bg-amber-50 rounded"
                         title="Chỉnh sửa"
                       >
                         <Edit2 size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => setDeleteId(product.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded" 
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                         title="Xóa"
                       >
                         <Trash2 size={18} />
@@ -279,7 +277,7 @@ const ProductList = () => {
       </div>
 
       {/* Detail Dialog */}
-      <ProductDetailDialog 
+      <ProductDetailDialog
         isOpen={!!detailProduct}
         onClose={() => setDetailProduct(null)}
         product={detailProduct}

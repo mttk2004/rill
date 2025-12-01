@@ -1,16 +1,14 @@
 
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { router } from '@inertiajs/react';
 import { ORDERS } from '../../../data';
 import { Order, OrderStatus } from '../../../types';
-import { 
-  Search, Filter, Eye, ArrowUpDown, Package, Clock, CheckCircle, Truck, XCircle, CreditCard 
+import {
+  Search, Filter, Eye, ArrowUpDown, Package, Clock, CheckCircle, Truck, XCircle, CreditCard
 } from 'lucide-react';
 import Button from '../../../components/Button';
 
 const OrderList = () => {
-  const navigate = useNavigate();
-  
   // State
   const [orders, setOrders] = useState<Order[]>(ORDERS);
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,8 +23,8 @@ const OrderList = () => {
     // Search
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(o => 
-        o.order_number.toLowerCase().includes(lowerQuery) || 
+      items = items.filter(o =>
+        o.order_number.toLowerCase().includes(lowerQuery) ||
         o.shipping_address.full_name.toLowerCase().includes(lowerQuery) ||
         o.shipping_address.phone.includes(lowerQuery)
       );
@@ -49,27 +47,27 @@ const OrderList = () => {
         const aValue = a[sortConfig.key];
         // @ts-ignore
         const bValue = b[sortConfig.key];
-        
+
         // Custom sort for Total Amount (Number)
         if (sortConfig.key === 'total_amount') {
-           return sortConfig.direction === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue);
+          return sortConfig.direction === 'asc' ? Number(aValue) - Number(bValue) : Number(bValue) - Number(aValue);
         }
 
         // Custom sort for Placed At (Date)
         if (sortConfig.key === 'placed_at') {
-            const dateA = new Date(aValue as string).getTime();
-            const dateB = new Date(bValue as string).getTime();
-            return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
+          const dateA = new Date(aValue as string).getTime();
+          const dateB = new Date(bValue as string).getTime();
+          return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
         }
-        
+
         // Default String sort
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
     } else {
-        // Default sort by created_at desc (Newest first)
-        items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      // Default sort by created_at desc (Newest first)
+      items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
 
     return items;
@@ -92,11 +90,11 @@ const OrderList = () => {
       cancelled: 'bg-red-100 text-red-800 border-red-200'
     };
     const icons = {
-        pending: <Clock size={12} className="mr-1" />,
-        confirmed: <Package size={12} className="mr-1" />,
-        shipped: <Truck size={12} className="mr-1" />,
-        delivered: <CheckCircle size={12} className="mr-1" />,
-        cancelled: <XCircle size={12} className="mr-1" />
+      pending: <Clock size={12} className="mr-1" />,
+      confirmed: <Package size={12} className="mr-1" />,
+      shipped: <Truck size={12} className="mr-1" />,
+      delivered: <CheckCircle size={12} className="mr-1" />,
+      cancelled: <XCircle size={12} className="mr-1" />
     };
     const labels = {
       pending: 'Chờ xác nhận',
@@ -105,7 +103,7 @@ const OrderList = () => {
       delivered: 'Đã giao',
       cancelled: 'Đã hủy'
     };
-    
+
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${styles[status]}`}>
         {icons[status]} {labels[status]}
@@ -176,22 +174,22 @@ const OrderList = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã đơn</th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 group"
                   onClick={() => handleSort('placed_at')}
                 >
                   <div className="flex items-center gap-1">
-                    Ngày đặt 
+                    Ngày đặt
                     <ArrowUpDown size={14} className={`transition-opacity ${sortConfig?.key === 'placed_at' ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'}`} />
                   </div>
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Khách hàng</th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700 group"
                   onClick={() => handleSort('total_amount')}
                 >
                   <div className="flex items-center gap-1">
-                    Tổng tiền 
+                    Tổng tiền
                     <ArrowUpDown size={14} className={`transition-opacity ${sortConfig?.key === 'total_amount' ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'}`} />
                   </div>
                 </th>
@@ -204,8 +202,8 @@ const OrderList = () => {
               {filteredOrders.length > 0 ? filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-bold text-primary hover:underline cursor-pointer" onClick={() => navigate(`/admin/orders/${order.id}`)}>
-                        {order.order_number}
+                    <span className="text-sm font-bold text-primary hover:underline cursor-pointer" onClick={() => router.visit(`/admin/orders/${order.id}`)}>
+                      {order.order_number}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -219,24 +217,23 @@ const OrderList = () => {
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.total_amount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                     <span className={`text-xs font-bold px-2 py-1 rounded uppercase border ${
-                         order.payment?.payment_status === 'completed' 
-                         ? 'bg-green-50 text-green-700 border-green-100' 
-                         : 'bg-yellow-50 text-yellow-700 border-yellow-100'
-                     }`}>
-                         {order.payment?.payment_method}
-                     </span>
+                    <span className={`text-xs font-bold px-2 py-1 rounded uppercase border ${order.payment?.payment_status === 'completed'
+                      ? 'bg-green-50 text-green-700 border-green-100'
+                      : 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                      }`}>
+                      {order.payment?.payment_method}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(order.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button 
-                        onClick={() => navigate(`/admin/orders/${order.id}`)}
-                        className="text-gray-400 hover:text-primary p-2 rounded-full hover:bg-gray-100" 
-                        title="Xem chi tiết"
+                    <button
+                      onClick={() => router.visit(`/admin/orders/${order.id}`)}
+                      className="text-gray-400 hover:text-primary p-2 rounded-full hover:bg-gray-100"
+                      title="Xem chi tiết"
                     >
-                        <Eye size={18} />
+                      <Eye size={18} />
                     </button>
                   </td>
                 </tr>
