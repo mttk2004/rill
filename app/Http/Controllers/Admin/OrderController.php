@@ -107,8 +107,14 @@ class OrderController extends Controller
             ->first()
             ->toArray();
 
-        return Inertia::render('admin/orders/index', [
-            'orders' => OrderAdminResource::collection($orders),
+        return Inertia::render('admin/orders/OrderList', [
+            'orders' => [
+                'data' => OrderAdminResource::collection($orders->items())->resolve(),
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+            ],
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'payment_status', 'sort']) + [
                 'search' => '',
@@ -162,7 +168,7 @@ class OrderController extends Controller
         }
 
         // Render detail page
-        return Inertia::render('admin/orders/edit', [
+        return Inertia::render('admin/orders/OrderDetail', [
             'order' => $orderResource,
         ]);
     }    /**
