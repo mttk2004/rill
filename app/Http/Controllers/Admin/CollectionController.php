@@ -105,7 +105,7 @@ class CollectionController extends Controller
                 'artists' => $product->artists->pluck('name')->join(', '),
             ]);
 
-        return Inertia::render('admin/collections/create', [
+        return Inertia::render('admin/collections/CollectionForm', [
             'products' => $products,
         ]);
     }
@@ -145,9 +145,7 @@ class CollectionController extends Controller
             $collection->products()->sync($syncData);
         }
 
-        return redirect()
-            ->route('admin.collections.index')
-            ->with('success', 'Collection đã được tạo thành công!');
+        return redirect()->route('admin.collections.index');
     }
 
     /**
@@ -187,7 +185,7 @@ class CollectionController extends Controller
                 'artists' => $product->artists->pluck('name')->join(', '),
             ]);
 
-        return Inertia::render('admin/collections/edit', [
+        return Inertia::render('admin/collections/CollectionForm', [
             'collection' => $collection,
             'allProducts' => $allProducts,
         ]);
@@ -225,9 +223,7 @@ class CollectionController extends Controller
             $collection->products()->sync($syncData);
         }
 
-        return redirect()
-            ->route('admin.collections.index')
-            ->with('success', 'Collection đã được cập nhật thành công!');
+        return redirect()->route('admin.collections.index');
     }
 
     /**
