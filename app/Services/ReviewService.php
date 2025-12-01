@@ -157,13 +157,30 @@ class ReviewService
         try {
             // Delete associated images if any
             if (!empty($review->images)) {
+                $supabaseUrl = env('SUPABASE_URL');
+                $bucket = env('SUPABASE_BUCKET');
+                $baseUrl = "{$supabaseUrl}/storage/v1/object/public/{$bucket}/";
+
                 foreach ($review->images as $imagePath) {
-                    // Remove storage/app/public prefix to get the actual path
-                    $path = str_replace('storage/', 'public/', $imagePath);
-                    Storage::delete($path);
+                    try {
+                        // If it's a full URL, extract the path
+                        if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+                            if (str_starts_with($imagePath, $baseUrl)) {
+                                $path = str_replace($baseUrl, '', $imagePath);
+                                Storage::disk('supabase')->delete($path);
+                            }
+                        } else {
+                            // If it's already a path, delete directly
+                            Storage::disk('supabase')->delete($imagePath);
+                        }
+                    } catch (\Exception $e) {
+                        // Log but don't fail if image deletion fails
+                        Log::warning("Failed to delete review image: {$imagePath}. Error: " . $e->getMessage());
+                    }
                 }
             }
 
+            // Delete the review (soft delete)
             $review->delete();
 
             return ServiceResponse::success('Đánh giá của bạn đã được xóa.');
