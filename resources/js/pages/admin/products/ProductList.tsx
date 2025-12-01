@@ -287,9 +287,10 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
                           <Eye size={18} />
                         </button>
                         <button
-                          onClick={() => router.visit(`/admin/products/${product.id}/edit`)}
-                          className="p-1.5 text-amber-600 hover:bg-amber-50 rounded"
-                          title="Chỉnh sửa"
+                          onClick={() => !product.deleted_at && router.visit(`/admin/products/${product.id}/edit`)}
+                          disabled={!!product.deleted_at}
+                          className={`p-1.5 rounded ${product.deleted_at ? 'text-gray-300 cursor-not-allowed' : 'text-amber-600 hover:bg-amber-50'}`}
+                          title={product.deleted_at ? 'Không thể chỉnh sửa sản phẩm đã xóa' : 'Chỉnh sửa'}
                         >
                           <Edit2 size={18} />
                         </button>

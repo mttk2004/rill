@@ -82,6 +82,13 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
     }
   };
 
+  const handleSkuGen = () => {
+    // Generate SKU format: VINYL-XXXXXX (6 random alphanumeric chars)
+    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const sku = `VINYL-${randomStr}`;
+    setData('sku', sku);
+  };
+
   const handleAddArtist = () => {
     if (!selectedArtistId) {
       showToast('Vui lòng chọn nghệ sĩ', 'info');
@@ -206,15 +213,25 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">SKU (Mã hàng)</label>
-                    <input
-                      type="text"
-                      name="sku"
-                      value={data.sku}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-mono"
-                      placeholder="VINYL-XXXXXX"
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        name="sku"
+                        value={data.sku}
+                        onChange={handleChange}
+                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none font-mono"
+                        placeholder="VINYL-XXXXXX"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSkuGen}
+                        className="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary whitespace-nowrap"
+                        title="Tạo SKU tự động"
+                      >
+                        Tự động
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Slug (URL)</label>

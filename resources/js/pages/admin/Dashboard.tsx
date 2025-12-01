@@ -10,6 +10,7 @@ import { Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import StatCard from '../../components/admin/StatCard';
 import { formatCurrency, formatDate } from '../../utils/format';
+import { getImageUrl } from '../../utils/image';
 
 const CHART_COLORS = ['#1B4D3E', '#d4af37', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -426,7 +427,11 @@ const Dashboard = () => {
               {lowStockProducts.length > 0 ? lowStockProducts.map(product => (
                 <div key={product.id} className="flex items-center gap-3 pb-3 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 p-2 -mx-2 rounded-lg transition-colors">
                   <div className="h-10 w-10 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
-                    {product.image && <img src={product.image} alt="" className="h-full w-full object-cover" />}
+                    {product.image ? (
+                      <img src={getImageUrl(product.image) || ''} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs">No Img</div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-gray-900 truncate">{product.name}</p>
@@ -435,7 +440,7 @@ const Dashboard = () => {
                       <span className="text-[10px] text-gray-400">Min: {product.min_stock_level || 5}</span>
                     </div>
                   </div>
-                  <button onClick={() => router.visit(`/admin/products/${product.id}`)} className="p-2 text-gray-400 hover:text-primary hover:bg-white rounded-lg border border-transparent hover:border-gray-200 shadow-none hover:shadow-sm transition-all">
+                  <button onClick={() => router.visit(`/admin/products/${product.id}/edit`)} className="p-2 text-gray-400 hover:text-primary hover:bg-white rounded-lg border border-transparent hover:border-gray-200 shadow-none hover:shadow-sm transition-all">
                     <ChevronRight size={16} />
                   </button>
                 </div>
