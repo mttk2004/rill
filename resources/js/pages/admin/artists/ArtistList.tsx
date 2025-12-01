@@ -37,7 +37,7 @@ interface ArtistListProps {
   };
 }
 
-const ArtistList = ({ artists, stats, countries, filters }: ArtistListProps) => {
+const ArtistList = ({ artists, countries, filters }: ArtistListProps) => {
   const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState(filters?.search || '');
   const [filterCountry, setFilterCountry] = useState(filters?.country || 'all');

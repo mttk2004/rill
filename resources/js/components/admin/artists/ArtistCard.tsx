@@ -34,16 +34,15 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete, onRes
           </div>
           <p className="text-xs text-gray-400 mt-1 font-mono truncate">{artist.slug}</p>
         </div>
-        
+
         {/* Status Dot */}
-        <span 
-          className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${
-            isDeleted ? 'bg-red-500' : 'bg-green-500'
-          }`} 
+        <span
+          className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${isDeleted ? 'bg-red-500' : 'bg-green-500'
+            }`}
           title={isDeleted ? 'Đã xóa' : 'Đang hoạt động'}
         ></span>
       </div>
-      
+
       <div className="px-5 pb-4 flex-1">
         <p className="text-sm text-gray-600 line-clamp-2 h-10 leading-relaxed">
           {artist.description || 'Chưa có mô tả.'}
@@ -56,32 +55,32 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete, onRes
           ID: {artist.id.slice(-4)}
         </span>
         <div className="flex gap-2">
-            {!isDeleted ? (
-              <>
-                <button 
-                    onClick={() => onEdit(artist.id)}
-                    className="p-2 text-gray-500 hover:text-primary hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
-                    title="Chỉnh sửa"
-                >
-                    <Edit2 size={16} />
-                </button>
-                <button 
-                    onClick={() => onDelete(artist.id)}
-                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
-                    title="Xóa"
-                >
-                    <Trash2 size={16} />
-                </button>
-              </>
-            ) : (
-              <button 
-                  onClick={() => onRestore(artist.id)}
-                  className="p-2 text-gray-500 hover:text-green-600 hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
-                  title="Khôi phục"
+          {!isDeleted ? (
+            <>
+              <button
+                onClick={() => onEdit(artist.id)}
+                className="p-2 text-gray-500 hover:text-primary hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+                title="Chỉnh sửa"
               >
-                  <RotateCcw size={16} />
+                <Edit2 size={16} />
               </button>
-            )}
+              <button
+                onClick={() => onDelete(artist.id)}
+                className="p-2 text-gray-500 hover:text-red-600 hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+                title="Xóa"
+              >
+                <Trash2 size={16} />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => onRestore(artist.id)}
+              className="p-2 text-gray-500 hover:text-green-600 hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+              title="Khôi phục"
+            >
+              <RotateCcw size={16} />
+            </button>
+          )}
         </div>
       </div>
     </div>
