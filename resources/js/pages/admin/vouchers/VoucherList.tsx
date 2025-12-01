@@ -52,7 +52,7 @@ interface VoucherListProps {
   };
 }
 
-const VoucherList = ({ vouchers, filters, stats }: VoucherListProps) => {
+const VoucherList = ({ vouchers, filters }: VoucherListProps) => {
   const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
   const [filterStatus, setFilterStatus] = useState(filters.status || 'all');
@@ -91,12 +91,14 @@ const VoucherList = ({ vouchers, filters, stats }: VoucherListProps) => {
   // Helper to determine logical status
   const getVoucherStatus = (v: Voucher) => {
     const now = new Date();
+    const startDate = new Date(v.valid_from);
     const endDate = new Date(v.valid_to);
 
     // Check if inactive (handle both 0 and false)
     if (!v.is_active || v.is_active === 0) return 'inactive';
     if (endDate < now) return 'expired';
     if (v.usage_limit && v.used_count >= v.usage_limit) return 'exhausted';
+    if (startDate > now) return 'upcoming';
     return 'active';
   };
 
@@ -128,6 +130,8 @@ const VoucherList = ({ vouchers, filters, stats }: VoucherListProps) => {
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Ngừng hoạt động</span>;
       case 'exhausted':
         return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Hết lượt dùng</span>;
+      case 'upcoming':
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Sắp diễn ra</span>;
       default:
         return null;
     }
