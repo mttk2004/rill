@@ -36,7 +36,7 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
   const [searchQuery, setSearchQuery] = useState(filters?.search || '');
   const [filterType, setFilterType] = useState(filters?.type || 'all');
   const [filterStatus, setFilterStatus] = useState(filters?.status || 'all');
-  const [sortBy, setSortBy] = useState(filters?.sort || 'display_order');
+  const [sortBy, setSortBy] = useState(filters?.sort || 'name_asc');
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   // Debounce search query
@@ -49,7 +49,7 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
     if (debouncedSearch) params.search = debouncedSearch;
     if (filterType !== 'all') params.type = filterType;
     if (filterStatus !== 'all') params.status = filterStatus;
-    if (sortBy !== 'display_order') params.sort = sortBy;
+    if (sortBy !== 'name_asc') params.sort = sortBy;
 
     router.get('/admin/collections', params, {
       preserveState: true,
@@ -143,7 +143,6 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
               onChange={(e) => setSortBy(e.target.value)}
               className="block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
             >
-              <option value="display_order">Thứ tự hiển thị</option>
               <option value="name_asc">Tên A-Z</option>
               <option value="name_desc">Tên Z-A</option>
               <option value="newest">Mới nhất</option>
@@ -161,7 +160,6 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên bộ sưu tập</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thứ tự</th>
                   <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
@@ -186,13 +184,10 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
                         {collection.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {collection.display_order}
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => router.visit(`/admin/collections/${collection.id}`)}
+                          onClick={() => router.visit(`/admin/collections/${collection.id}/edit`)}
                           className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                           title="Chỉnh sửa"
                         >
@@ -210,7 +205,7 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center">
                         <Layers size={48} className="text-gray-300 mb-3" />
                         <p>Không tìm thấy bộ sưu tập nào.</p>

@@ -21,9 +21,6 @@ class Collection extends Model
         'type',
         'description',
         'is_active',
-        'started_at',
-        'ended_at',
-        'display_order',
     ];
 
     /**

@@ -43,7 +43,7 @@ class CollectionController extends Controller
         }
 
         // Sorting
-        $sort = $request->get('sort', 'display_order');
+        $sort = $request->get('sort', 'name_asc');
         switch ($sort) {
             case 'name_asc':
                 $query->orderBy('name', 'asc');
@@ -58,7 +58,7 @@ class CollectionController extends Controller
                 $query->orderBy('created_at', 'asc');
                 break;
             default:
-                $query->orderBy('display_order');
+                $query->orderBy('name', 'asc');
                 break;
         }
 
@@ -69,9 +69,6 @@ class CollectionController extends Controller
             'total' => Collection::count(),
             'active' => Collection::where('is_active', true)->count(),
             'featured' => Collection::where('type', 'featured')->count(),
-            'expired' => Collection::where('is_active', true)
-                ->where('ended_at', '<', now())
-                ->count(),
         ];
 
         return Inertia::render('admin/collections/CollectionList', [
@@ -81,7 +78,7 @@ class CollectionController extends Controller
                 'search' => $request->get('search', ''),
                 'type' => $request->get('type', 'all'),
                 'status' => $request->get('status', 'all'),
-                'sort' => $request->get('sort', 'display_order'),
+                'sort' => $request->get('sort', 'name_asc'),
             ],
         ]);
     }

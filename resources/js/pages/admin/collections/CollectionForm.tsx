@@ -28,7 +28,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 // Sortable Row Component
-const SortableRow = ({ item, product, onRemove, onPositionChange }: {
+const SortableRow = ({ item, product, onRemove }: {
   item: { product_id: string; position: number },
   product: Product,
   onRemove: (id: string) => void,
@@ -192,9 +192,6 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
     type: string;
     description: string;
     is_active: boolean;
-    display_order: number;
-    started_at: string;
-    ended_at: string;
     products: Array<{ id: string; position: number }>;
   }>({
     name: collection?.name || '',
@@ -202,9 +199,6 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
     type: collection?.type || 'featured',
     description: collection?.description || '',
     is_active: collection?.is_active ?? true,
-    display_order: collection?.display_order || 0,
-    started_at: collection?.started_at || '',
-    ended_at: collection?.ended_at || '',
     products: collection?.products?.map(p => ({
       id: p.id,
       position: p.pivot?.position || 0
@@ -313,11 +307,6 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
         },
       });
     }
-  };
-
-  const toInputDate = (isoString?: string | null) => {
-    if (!isoString) return '';
-    return isoString.slice(0, 16);
   };
 
   return (
@@ -482,41 +471,6 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
                     <option value={1}>Hoạt động (Active)</option>
                     <option value={0}>Ẩn (Inactive)</option>
                   </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Thứ tự hiển thị</label>
-                  <input
-                    type="number"
-                    name="display_order"
-                    value={data.display_order}
-                    onChange={handleChange}
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                    min="0"
-                  />
-                </div>
-
-                <div className="pt-4 border-t border-gray-100">
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>
-                    <input
-                      type="datetime-local"
-                      name="started_at"
-                      value={toInputDate(data.started_at)}
-                      onChange={(e) => setData('started_at', e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ngày kết thúc</label>
-                    <input
-                      type="datetime-local"
-                      name="ended_at"
-                      value={toInputDate(data.ended_at)}
-                      onChange={(e) => setData('ended_at', e.target.value)}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                    />
-                  </div>
                 </div>
               </div>
             </div>
