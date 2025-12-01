@@ -4,28 +4,16 @@ import { User, Star, Edit2, Trash2 } from 'lucide-react';
 import { Review } from '../../types';
 import Button from '../Button';
 import { formatRelativeTime } from '../../utils/date';
-import { router } from '@inertiajs/react';
-import { useToast } from '../../context/ToastContext';
 
 interface ReviewListProps {
   reviews: Review[];
   averageRating: number;
   currentUserId?: number;
   onEditReview?: (review: Review) => void;
+  onDeleteReview?: (reviewId: number) => void;
 }
 
-const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, onEditReview }) => {
-  const { showToast } = useToast();
-
-  const handleDeleteReview = (reviewId: number) => {
-    if (confirm('Bạn có chắc muốn xóa đánh giá này không?')) {
-      router.delete(`/reviews/${reviewId}`, {
-        preserveScroll: true,
-        onSuccess: () => showToast('Đã xóa đánh giá', 'success'),
-        onError: () => showToast('Không thể xóa đánh giá', 'error'),
-      });
-    }
-  };
+const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, onEditReview, onDeleteReview }) => {
 
   return (
     <div className="border-t border-gray-100 pt-16 mb-20 animate-fade-in-up">
@@ -63,6 +51,18 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, onEditR
               <p className="text-gray-600 text-sm leading-relaxed">
                 {review.comment}
               </p>
+              {review.images && review.images.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mt-3">
+                  {review.images.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`Review image ${idx + 1}`}
+                      className="w-full h-20 object-cover rounded-lg border border-gray-200"
+                    />
+                  ))}
+                </div>
+              )}
               {currentUserId && review.user?.id === currentUserId && (
                 <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200">
                   {onEditReview && (
@@ -74,7 +74,7 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, onEditR
                     </button>
                   )}
                   <button
-                    onClick={() => handleDeleteReview(review.id)}
+                    onClick={() => onDeleteReview?.(review.id)}
                     className="flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-medium"
                   >
                     <Trash2 size={14} /> Xóa

@@ -1,13 +1,15 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import React, { useState } from 'react';
 import Button from '../components/Button';
 import { useShop } from '../context/ShopContext';
 import { usePlayer } from '../context/PlayerContext';
+import { useToast } from '../context/ToastContext';
 import { Star, Truck, ShieldCheck, Play, Pause, Music, Loader2, Check } from 'lucide-react';
 import { flyToCart } from '../utils/cartAnimation';
 import type { Product, Artist } from '@/types';
 import type { Review } from '@/types';
 import AppLayout from '@/layouts/app-layout';
+import AlertDialog from '../components/AlertDialog';
 
 // Imported Sub-components
 import QuantitySelector from '../components/product-detail/QuantitySelector';
@@ -31,8 +33,23 @@ function ProductDetailContent({
 }: ProductDetailProps) {
   const { addToCart } = useShop();
   const { playTrack, currentTrack, isPlaying } = usePlayer();
+  const { showToast } = useToast();
   const [qty, setQty] = useState(1);
   const [btnState, setBtnState] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [editingReview, setEditingReview] = useState<Review | null>(null);
+  const [deleteReviewId, setDeleteReviewId] = useState<number | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  const reviewForm = useForm<{
+    rating: number;
+    comment: string;
+    images?: File[];
+  }>({
+    rating: 5,
+    comment: '',
+    images: [],
+  });
 
   const isCurrentTrack = currentTrack?.id === product.id;
   const isThisPlaying = isCurrentTrack && isPlaying;
@@ -281,9 +298,16 @@ function ProductDetailContent({
             averageRating={averageRating}
             currentUserId={auth?.user?.id}
             onEditReview={(review) => {
-              // TODO: Implement review editing modal
-              console.log('Edit review:', review);
+              setEditingReview(review);
+              reviewForm.setData({
+                rating: review.rating,
+                comment: review.comment,
+                images: [],
+              });
+              setSelectedImages([]);
+              setImagePreviews([]);
             }}
+            onDeleteReview={(reviewId) => setDeleteReviewId(reviewId)}
           />
 
           {/* Refactored Related Products */}
@@ -291,6 +315,181 @@ function ProductDetailContent({
 
         </div>
       </div>
+
+      {/* Review Edit Modal */}
+      {editingReview && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Chỉnh sửa đánh giá</h3>
+            <p className="text-sm text-gray-600 mb-6">{product.name}</p>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              reviewForm.post(`/products/${product.slug}/reviews`, {
+                preserveScroll: true,
+                forceFormData: true,
+                onSuccess: () => {
+                  showToast('Đã cập nhật đánh giá', 'success');
+                  setEditingReview(null);
+                  setSelectedImages([]);
+                  setImagePreviews([]);
+                  reviewForm.reset();
+                },
+                onError: (errors) => {
+                  if (errors.comment) {
+                    showToast(errors.comment, 'error');
+                  } else {
+                    showToast('Cập nhật thất bại', 'error');
+                  }
+                },
+              });
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Đánh giá của bạn</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => reviewForm.setData('rating', star)}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        size={32}
+                        className={`${star <= reviewForm.data.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'} transition-colors`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nhận xét (tối thiểu 10 ký tự)</label>
+                <textarea
+                  value={reviewForm.data.comment}
+                  onChange={(e) => reviewForm.setData('comment', e.target.value)}
+                  rows={4}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+                  required
+                  minLength={10}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hình ảnh (tùy chọn, tối đa 5 ảnh, mỗi ảnh ≤ 512KB)
+                </label>
+
+                {imagePreviews.length > 0 && (
+                  <div className="grid grid-cols-5 gap-2 mb-3">
+                    {imagePreviews.map((preview, idx) => (
+                      <div key={idx} className="relative group">
+                        <img
+                          src={preview}
+                          alt={`Preview ${idx + 1}`}
+                          className="w-full h-16 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = selectedImages.filter((_, i) => i !== idx);
+                            const newPreviews = imagePreviews.filter((_, i) => i !== idx);
+                            setSelectedImages(newImages);
+                            setImagePreviews(newPreviews);
+                            reviewForm.setData('images', newImages);
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {selectedImages.length < 5 && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (selectedImages.length + files.length > 5) {
+                        showToast('Chỉ được tải tối đa 5 ảnh', 'error');
+                        return;
+                      }
+                      const invalidFiles = files.filter(f => f.size > 512 * 1024);
+                      if (invalidFiles.length > 0) {
+                        showToast('Mỗi ảnh không được vượt quá 512KB', 'error');
+                        return;
+                      }
+                      const newImages = [...selectedImages, ...files];
+                      setSelectedImages(newImages);
+                      reviewForm.setData('images', newImages);
+                      files.forEach(file => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setImagePreviews(prev => [...prev, reader.result as string]);
+                        };
+                        reader.readAsDataURL(file);
+                      });
+                    }}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                  />
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  fullWidth
+                  onClick={() => {
+                    setEditingReview(null);
+                    setSelectedImages([]);
+                    setImagePreviews([]);
+                    reviewForm.reset();
+                  }}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  fullWidth
+                  disabled={reviewForm.processing || reviewForm.data.comment.length < 10}
+                >
+                  {reviewForm.processing ? 'Đang cập nhật...' : 'Cập nhật đánh giá'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        isOpen={deleteReviewId !== null}
+        onClose={() => setDeleteReviewId(null)}
+        onConfirm={() => {
+          if (deleteReviewId) {
+            router.delete(`/reviews/${deleteReviewId}`, {
+              preserveScroll: true,
+              onSuccess: () => {
+                showToast('Đã xóa đánh giá', 'success');
+                setDeleteReviewId(null);
+              },
+              onError: () => showToast('Không thể xóa đánh giá', 'error'),
+            });
+          }
+        }}
+        title="Xóa đánh giá"
+        description="Bạn có chắc muốn xóa đánh giá này không? Hành động này không thể hoàn tác."
+        type="danger"
+        confirmText="Xóa"
+        cancelText="Hủy"
+      />
     </>
   );
 }
