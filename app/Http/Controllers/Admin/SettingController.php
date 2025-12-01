@@ -21,7 +21,7 @@ class SettingController extends Controller
     {
         $settings = $this->settingService->getAll();
 
-        return Inertia::render('admin/settings', [
+        return Inertia::render('admin/Settings', [
             'settings' => $settings->groupBy('group')->map(function ($group) {
                 return $group->keyBy('key')->map(function ($setting) {
                     return [
