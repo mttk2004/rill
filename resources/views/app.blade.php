@@ -41,6 +41,12 @@
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
+  {{-- Supabase Storage Config for JavaScript --}}
+  <script>
+    window.supabaseUrl = "{{ config('filesystems.disks.supabase.endpoint') }}";
+    window.supabaseBucket = "{{ config('filesystems.disks.supabase.bucket') }}";
+  </script>
+
   @viteReactRefresh
   @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
   @inertiaHead

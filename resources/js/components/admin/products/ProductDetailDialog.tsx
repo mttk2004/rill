@@ -2,6 +2,7 @@
 import React from 'react';
 import { X, Package, Tag, DollarSign, Layers, Image as ImageIcon, FileText, Globe, User } from 'lucide-react';
 import { Product } from '../../../types';
+import { getImageUrl } from '../../../utils/image';
 
 interface ProductDetailDialogProps {
   isOpen: boolean;
@@ -56,7 +57,7 @@ const ProductDetailDialog: React.FC<ProductDetailDialogProps> = ({ isOpen, onClo
             <div className="w-full lg:w-1/3 space-y-6">
               <div className="aspect-square rounded-xl border border-gray-200 overflow-hidden bg-gray-50 relative">
                 {product.image ? (
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                  <img src={getImageUrl(product.image) || ''} alt={product.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400">
                     <ImageIcon size={48} className="mb-2" />

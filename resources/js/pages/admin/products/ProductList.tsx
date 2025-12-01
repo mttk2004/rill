@@ -6,6 +6,7 @@ import {
   Plus, Search, Filter, ArrowUpDown,
   Eye, Edit2, Trash2, AlertCircle
 } from 'lucide-react';
+import { getImageUrl } from '../../../utils/image';
 import Button from '../../../components/Button';
 import ProductDetailDialog from '../../../components/admin/products/ProductDetailDialog';
 import AlertDialog from '../../../components/AlertDialog';
@@ -229,7 +230,7 @@ const ProductList = ({ products: productsPagination, filters: _filters }: Produc
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="h-12 w-12 rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
                         {product.image ? (
-                          <img src={product.image} alt="" className="h-full w-full object-cover" />
+                          <img src={getImageUrl(product.image) || ''} alt="" className="h-full w-full object-cover" />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs">No Img</div>
                         )}

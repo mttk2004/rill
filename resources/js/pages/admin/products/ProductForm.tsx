@@ -6,6 +6,7 @@ import { Product, Artist } from '../../../types';
 import { useToast } from '../../../context/ToastContext';
 import Button from '../../../components/Button';
 import AdminLayout from '../../../components/admin/AdminLayout';
+import { getImageUrl } from '../../../utils/image';
 
 type ArtistRole = 'main' | 'featured' | 'composer' | 'producer';
 
@@ -365,7 +366,7 @@ const ProductForm = ({ product, genres, labels, artists }: ProductFormProps) => 
                 <div className="aspect-square rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center text-gray-400 relative overflow-hidden group hover:border-primary hover:text-primary transition-colors cursor-pointer">
                   {data.image ? (
                     <>
-                      <img src={data.image} alt="Preview" className="w-full h-full object-cover" />
+                      <img src={getImageUrl(data.image) || ''} alt="Preview" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span className="text-white text-sm font-medium">Thay đổi ảnh</span>
                       </div>
