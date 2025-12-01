@@ -102,7 +102,7 @@ class ArtistController extends Controller
             'total_products' => DB::table('artist_product')->count(),
         ];
 
-        return Inertia::render('admin/artists/index', [
+        return Inertia::render('admin/artists/ArtistList', [
             'artists' => $artists,
             'stats' => $stats,
             'countries' => $countries,
