@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
         // Role-based redirect after login
         $user = $request->user();
         $intendedRoute = match($user->role) {
-            'admin' => route('dashboard', absolute: false),
+            'admin' => route('admin.dashboard', absolute: false),
             'customer' => route('products', absolute: false),
             default => route('products', absolute: false),
         };

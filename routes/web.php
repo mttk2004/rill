@@ -83,14 +83,14 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
 // Admin routes
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-    // Redirect dashboard to admin statistics
+    // Redirect /dashboard to /admin/dashboard
     Route::get('dashboard', function () {
-        return redirect()->route('admin.statistics');
+        return redirect()->route('admin.dashboard');
     })->name('dashboard');
 
     // Admin management routes
     Route::prefix('admin')->group(function () {
-        Route::get('/statistics', [App\Http\Controllers\Admin\StatisticsController::class, 'index'])->name('admin.statistics');
+        Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
         Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings');
         Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
-class StatisticsController extends Controller
+class DashboardController extends Controller
 {
     public function index(Request $request)
     {
