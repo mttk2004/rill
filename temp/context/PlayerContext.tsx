@@ -23,7 +23,7 @@ export const PlayerProvider = ({ children }: { children?: React.ReactNode }) => 
     // Create audio element only once
     audioRef.current = new Audio();
     audioRef.current.addEventListener('ended', () => setIsPlaying(false));
-
+    
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -33,16 +33,15 @@ export const PlayerProvider = ({ children }: { children?: React.ReactNode }) => 
   }, []);
 
   const playTrack = (product: Product) => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !product.preview_url) return;
 
     if (currentTrack?.id === product.id) {
       togglePlay();
       return;
     }
 
-    // New track - use a shared preview URL for all products
-    const previewUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-    audioRef.current.src = previewUrl;
+    // New track
+    audioRef.current.src = product.preview_url;
     audioRef.current.play().catch(e => console.log("Playback error", e));
     setCurrentTrack(product);
     setIsPlaying(true);
@@ -73,7 +72,7 @@ export const PlayerProvider = ({ children }: { children?: React.ReactNode }) => 
   const closePlayer = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      audioRef.current.currentTime = 0; 
     }
     setIsPlaying(false);
     setCurrentTrack(null);

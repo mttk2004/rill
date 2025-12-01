@@ -163,16 +163,14 @@ function ProductDetailContent({
                   className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${isThisPlaying ? 'animate-[spin_6s_linear_infinite]' : ''}`}
                 />
 
-                {product.preview_url && (
-                  <button
-                    onClick={handlePlayClick}
-                    className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]"
-                  >
-                    <div className="h-20 w-20 rounded-full bg-white/90 text-primary flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
-                      {isThisPlaying ? <Pause size={40} fill="currentColor" /> : <Play size={40} fill="currentColor" className="ml-2" />}
-                    </div>
-                  </button>
-                )}
+                <button
+                  onClick={handlePlayClick}
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]"
+                >
+                  <div className="h-20 w-20 rounded-full bg-white/90 text-primary flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+                    {isThisPlaying ? <Pause size={40} fill="currentColor" /> : <Play size={40} fill="currentColor" className="ml-2" />}
+                  </div>
+                </button>
 
                 {isThisPlaying && (
                   <div className="absolute top-4 right-4 z-20 bg-accent text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2 animate-bounce">
@@ -275,28 +273,26 @@ function ProductDetailContent({
                     </button>
                   </div>
 
-                  {product.preview_url && (
-                    <Button
-                      variant="outline"
-                      onClick={handlePlayClick}
-                      className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 h-[48px] ${isThisPlaying ? 'border-accent text-accent bg-accent/5' : ''}`}
-                    >
-                      {isThisPlaying ? (
-                        <>
-                          <div className="flex items-center gap-1 h-4">
-                            <span className="block h-2 w-0.5 bg-accent animate-[music-bar_0.6s_ease-in-out_infinite]"></span>
-                            <span className="block h-3 w-0.5 bg-accent animate-[music-bar_0.6s_ease-in-out_0.2s_infinite]"></span>
-                            <span className="block h-1.5 w-0.5 bg-accent animate-[music-bar_0.6s_ease-in-out_0.4s_infinite]"></span>
-                          </div>
-                          Đang phát
-                        </>
-                      ) : (
-                        <>
-                          <Play size={18} /> Nghe thử
-                        </>
-                      )}
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    onClick={handlePlayClick}
+                    className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 h-[48px] ${isThisPlaying ? 'border-accent text-accent bg-accent/5' : ''}`}
+                  >
+                    {isThisPlaying ? (
+                      <>
+                        <div className="flex items-center gap-1 h-4">
+                          <span className="block h-2 w-0.5 bg-accent animate-[music-bar_0.6s_ease-in-out_infinite]"></span>
+                          <span className="block h-3 w-0.5 bg-accent animate-[music-bar_0.6s_ease-in-out_0.2s_infinite]"></span>
+                          <span className="block h-1.5 w-0.5 bg-accent animate-[music-bar_0.6s_ease-in-out_0.4s_infinite]"></span>
+                        </div>
+                        Đang phát
+                      </>
+                    ) : (
+                      <>
+                        <Play size={18} /> Nghe thử
+                      </>
+                    )}
+                  </Button>
                 </div>
               </div>
 
