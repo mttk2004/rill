@@ -218,10 +218,9 @@ class OrderController extends Controller
 
         // Business rules validation
         if ($oldStatus === OrderStatus::DELIVERED && $newStatus !== OrderStatus::CANCELLED->value) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Không thể thay đổi trạng thái của đơn hàng đã giao',
-            ], 422);
+            return back()->withErrors([
+                'status' => 'Không thể thay đổi trạng thái của đơn hàng đã giao',
+            ]);
         }
 
         if ($oldStatus === OrderStatus::CANCELLED && $newStatus !== OrderStatus::CANCELLED->value) {
@@ -242,10 +241,6 @@ class OrderController extends Controller
             $order->delete();
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Trạng thái đơn hàng đã được cập nhật thành công',
-            'order' => $order->fresh(),
-        ]);
+        return back();
     }
 }
