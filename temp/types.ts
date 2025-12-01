@@ -67,6 +67,7 @@ export interface Collection {
   started_at: string | null;
   ended_at: string | null;
   display_order: number;
+  products_count?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -155,7 +156,7 @@ export interface Order {
   created_at: string;
   updated_at: string;
   tracking_number?: string;
-  
+
   // Relations (for UI)
   items: OrderItem[];
   histories?: OrderStatusHistory[];

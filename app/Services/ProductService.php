@@ -21,15 +21,7 @@ class ProductService
             },
             'collections' => function ($query) {
                 $query->where('is_active', true)
-                    ->where(function ($q) {
-                        $q->whereNull('started_at')
-                            ->orWhere('started_at', '<=', now());
-                    })
-                    ->where(function ($q) {
-                        $q->whereNull('ended_at')
-                            ->orWhere('ended_at', '>=', now());
-                    })
-                    ->orderBy('display_order')
+                    ->orderBy('name')
                     ->limit(1);
             }
         ])->active(); // Only get active products
@@ -168,14 +160,14 @@ class ProductService
                 ->toArray(),
 
             'collections' => \DB::table('collections')
-                ->select('collections.id', 'collections.name', 'collections.slug', 'collections.display_order')
+                ->select('collections.id', 'collections.name', 'collections.slug')
                 ->join('collection_product', 'collections.id', '=', 'collection_product.collection_id')
                 ->join('products', 'collection_product.product_id', '=', 'products.id')
                 ->where('collections.is_active', true)
                 ->where('products.status', 'active')
                 ->whereNull('collections.deleted_at')
-                ->groupBy('collections.id', 'collections.name', 'collections.slug', 'collections.display_order')
-                ->orderBy('collections.display_order')
+                ->groupBy('collections.id', 'collections.name', 'collections.slug')
+                ->orderBy('collections.name')
                 ->get()
                 ->map(function ($item) {
                     return [
@@ -260,15 +252,7 @@ class ProductService
             },
             'collections' => function ($query) {
                 $query->where('is_active', true)
-                    ->where(function ($q) {
-                        $q->whereNull('started_at')
-                            ->orWhere('started_at', '<=', now());
-                    })
-                    ->where(function ($q) {
-                        $q->whereNull('ended_at')
-                            ->orWhere('ended_at', '>=', now());
-                    })
-                    ->orderBy('display_order')
+                    ->orderBy('name')
                     ->limit(1);
             }
         ])

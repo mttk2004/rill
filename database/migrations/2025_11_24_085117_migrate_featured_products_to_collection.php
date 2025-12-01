@@ -34,7 +34,6 @@ return new class extends Migration
             'type' => 'featured',
             'description' => 'Các sản phẩm nổi bật được chọn lọc',
             'is_active' => true,
-            'display_order' => 0,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

@@ -44,15 +44,7 @@ class ProductController extends Controller
             },
             'collections' => function ($query) {
                 $query->where('is_active', true)
-                    ->where(function ($q) {
-                        $q->whereNull('started_at')
-                            ->orWhere('started_at', '<=', now());
-                    })
-                    ->where(function ($q) {
-                        $q->whereNull('ended_at')
-                            ->orWhere('ended_at', '>=', now());
-                    })
-                    ->orderBy('display_order')
+                    ->orderBy('name')
                     ->limit(1);
             }
         ])

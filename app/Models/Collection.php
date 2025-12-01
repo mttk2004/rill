@@ -28,9 +28,6 @@ class Collection extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
-        'started_at' => 'datetime',
-        'ended_at' => 'datetime',
-        'display_order' => 'integer',
     ];
 
     /**
@@ -69,15 +66,7 @@ class Collection extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)
-            ->where(function ($q) {
-                $q->whereNull('started_at')
-                    ->orWhere('started_at', '<=', now());
-            })
-            ->where(function ($q) {
-                $q->whereNull('ended_at')
-                    ->orWhere('ended_at', '>=', now());
-            });
+        return $query->where('is_active', true);
     }
 
     /**
@@ -121,33 +110,11 @@ class Collection extends Model
     }
 
     /**
-     * Scope to order by display order.
-     */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('display_order');
-    }
-
-    /**
-     * Check if collection is currently active (time-based).
+     * Check if collection is currently active.
      */
     public function isCurrentlyActive(): bool
     {
-        if (!$this->is_active) {
-            return false;
-        }
-
-        $now = now();
-
-        if ($this->started_at && $this->started_at->isAfter($now)) {
-            return false;
-        }
-
-        if ($this->ended_at && $this->ended_at->isBefore($now)) {
-            return false;
-        }
-
-        return true;
+        return $this->is_active;
     }
 
     /**

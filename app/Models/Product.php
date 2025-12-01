@@ -136,15 +136,7 @@ class Product extends Model
     {
         return $this->collections()
             ->where('is_active', true)
-            ->where(function ($query) {
-                $query->whereNull('started_at')
-                    ->orWhere('started_at', '<=', now());
-            })
-            ->where(function ($query) {
-                $query->whereNull('ended_at')
-                    ->orWhere('ended_at', '>=', now());
-            })
-            ->orderBy('display_order')
+            ->orderBy('name')
             ->first();
     }
 

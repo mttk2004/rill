@@ -22,7 +22,6 @@ class CollectionSeeder extends Seeder
                 'type' => 'featured',
                 'description' => 'Các sản phẩm nổi bật được chọn lọc',
                 'is_active' => true,
-                'display_order' => 0,
             ]
         );
 
@@ -53,7 +52,6 @@ class CollectionSeeder extends Seeder
             'type' => 'promotion',
             'description' => 'Các sản phẩm đang được giảm giá',
             'is_active' => false, // Inactive by default
-            'display_order' => 1,
         ]);
 
         $this->command->info('Created promotional collection (inactive)');

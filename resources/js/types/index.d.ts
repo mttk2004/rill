@@ -135,9 +135,6 @@ export interface Collection {
   type: 'featured' | 'banner' | 'promotion' | 'curated';
   description: string | null;
   is_active: boolean;
-  started_at: string | null;
-  ended_at: string | null;
-  display_order: number;
   products_count?: number;
   products?: Array<Product & { pivot: { position: number } }>;
   created_at: string;

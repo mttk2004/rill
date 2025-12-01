@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { COLLECTIONS } from '../../../data';
 import { Collection } from '../../../types';
-import { Plus, Search, Filter, Edit2, Trash2, Layers, MoreVertical } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, Layers } from 'lucide-react';
 import Button from '../../../components/Button';
 import AlertDialog from '../../../components/AlertDialog';
 import { useToast } from '../../../context/ToastContext';
@@ -22,8 +22,8 @@ const CollectionList = () => {
 
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(c => 
-        c.name.toLowerCase().includes(lowerQuery) || 
+      items = items.filter(c =>
+        c.name.toLowerCase().includes(lowerQuery) ||
         c.slug.toLowerCase().includes(lowerQuery)
       );
     }
@@ -107,6 +107,7 @@ const CollectionList = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên bộ sưu tập</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số sản phẩm</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thứ tự</th>
                 <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
               </tr>
@@ -125,29 +126,34 @@ const CollectionList = () => {
                     {getTypeBadge(collection.type)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        collection.is_active 
-                        ? 'bg-green-50 text-green-700' 
-                        : 'bg-gray-100 text-gray-500'
-                     }`}>
-                        {collection.is_active ? 'Active' : 'Inactive'}
-                     </span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${collection.is_active
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-gray-100 text-gray-500'
+                      }`}>
+                      {collection.is_active ? 'Active' : 'Inactive'}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                     {collection.display_order}
+                    <span className="inline-flex items-center gap-1">
+                      <Layers size={14} className="text-gray-400" />
+                      {collection.products_count || 0}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {collection.display_order}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                      <button
                         onClick={() => navigate(`/admin/collections/${collection.id}`)}
-                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded" 
+                        className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
                         title="Chỉnh sửa"
                       >
                         <Edit2 size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => setDeleteId(collection.id)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded" 
+                        className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                         title="Xóa"
                       >
                         <Trash2 size={18} />
@@ -157,7 +163,7 @@ const CollectionList = () => {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center justify-center">
                       <Layers size={48} className="text-gray-300 mb-3" />
                       <p>Không tìm thấy bộ sưu tập nào.</p>
