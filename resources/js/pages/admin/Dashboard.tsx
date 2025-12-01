@@ -290,10 +290,10 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Grid Row 2: Top Products & Genre Distribution */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
         {/* Top Selling Products */}
-        <div className="lg:col-span-2 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-sm overflow-hidden flex flex-col">
           <div className="px-6 py-5 border-b border-gray-100/50 flex items-center justify-between">
             <h3 className="font-bold text-gray-900 flex items-center gap-2">
               <Trophy size={20} className="text-accent" /> Top sản phẩm bán chạy
@@ -338,7 +338,7 @@ const Dashboard = () => {
         </div>
 
         {/* Revenue by Genre */}
-        <div className="lg:col-span-1 bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-sm p-6 flex flex-col">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-sm p-6 flex flex-col">
           <div className="mb-4">
             <h3 className="font-bold text-gray-900 flex items-center gap-2">
               <Music size={20} className="text-blue-500" /> Doanh thu theo thể loại
@@ -349,10 +349,10 @@ const Dashboard = () => {
               <PieChart>
                 <Pie
                   data={genreData}
-                  cx="50%"
+                  cx="45%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius={50}
+                  outerRadius={70}
                   paddingAngle={5}
                   dataKey="value"
                 >
@@ -364,7 +364,13 @@ const Dashboard = () => {
                   formatter={(value: number) => formatCurrency(value)}
                   contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                 />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                <Legend
+                  layout="vertical"
+                  verticalAlign="middle"
+                  align="right"
+                  iconType="circle"
+                  wrapperStyle={{ fontSize: '11px', paddingLeft: '10px', maxWidth: '35%' }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>

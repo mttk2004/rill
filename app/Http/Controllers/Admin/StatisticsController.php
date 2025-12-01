@@ -242,8 +242,8 @@ class StatisticsController extends Controller
                 ];
             });
 
-        // Revenue by genre
-        $genreRevenue = DB::table('order_items')
+        // Revenue by genre (top 9 + others)
+        $allGenres = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             // ->whereBetween('orders.placed_at', [$startDate, $endDate])
@@ -255,13 +255,26 @@ class StatisticsController extends Controller
             )
             ->groupBy('products.genre')
             ->orderByDesc('total_revenue')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'name' => ucfirst($item->genre),
-                    'value' => (float) $item->total_revenue,
-                ];
-            });
+            ->get();
+
+        // Take top 9 genres
+        $topGenres = $allGenres->take(9)->map(function ($item) {
+            return [
+                'name' => ucfirst($item->genre),
+                'value' => (float) $item->total_revenue,
+            ];
+        });
+
+        // Sum remaining genres as "Khác"
+        $othersRevenue = $allGenres->skip(9)->sum('total_revenue');
+        if ($othersRevenue > 0) {
+            $topGenres->push([
+                'name' => 'Khác',
+                'value' => (float) $othersRevenue,
+            ]);
+        }
+
+        $genreRevenue = $topGenres;
 
         \Log::info('Genre Revenue Query Result', ['count' => $genreRevenue->count(), 'data' => $genreRevenue->toArray()]);
 
