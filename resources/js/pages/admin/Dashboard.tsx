@@ -368,20 +368,23 @@ const Dashboard = () => {
             <Link href="/admin/orders" className="text-xs text-primary hover:underline font-medium">Tất cả</Link>
           </div>
           <div className="space-y-3">
-            {pendingOrders.length > 0 ? pendingOrders.map(order => (
-              <div key={order.id} className="flex items-center justify-between p-3 bg-amber-50/50 rounded-xl border border-amber-100 hover:bg-amber-100/80 transition-colors cursor-pointer" onClick={() => router.visit(`/admin/orders/${order.id}`)}>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-12 bg-amber-400 rounded-full"></div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900">{order.order_number}</p>
-                    <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                      {formatDate(order.created_at)} • <Users size={10} /> {order.shipping_address.full_name}
-                    </p>
+            {pendingOrders.length > 0 ? pendingOrders.map(order => {
+              console.log('Pending Order:', order);
+              return (
+                <div key={order.id} className="flex items-center justify-between p-3 bg-amber-50/50 rounded-xl border border-amber-100 hover:bg-amber-100/80 transition-colors cursor-pointer" onClick={() => router.visit(`/admin/orders/${order.id}`)}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-12 bg-amber-400 rounded-full"></div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{order.order_number}</p>
+                      <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                        {formatDate(order.created_at)} • <Users size={10} /> {order.shipping_address?.full_name || 'N/A'}
+                      </p>
+                    </div>
                   </div>
+                  <span className="text-[10px] font-bold text-amber-700 bg-white px-2 py-1 rounded-lg border border-amber-200 shadow-sm uppercase tracking-wide">Pending</span>
                 </div>
-                <span className="text-[10px] font-bold text-amber-700 bg-white px-2 py-1 rounded-lg border border-amber-200 shadow-sm uppercase tracking-wide">Pending</span>
-              </div>
-            )) : (
+              );
+            }) : (
               <div className="text-center py-8 text-gray-400 text-sm bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
                 Không có đơn hàng chờ xử lý.
               </div>
@@ -442,32 +445,44 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100/50">
-              {recentOrders.map((order) => (
-                <tr
-                  key={order.id}
-                  className="hover:bg-white/60 transition-colors cursor-pointer"
-                  onClick={() => router.visit(`/admin/orders/${order.id}`)}
-                >
-                  <td className="px-6 py-4 font-bold text-gray-900">{order.order_number}</td>
-                  <td className="px-6 py-4 text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-500">
-                        {order.shipping_address.full_name.charAt(0)}
+              {recentOrders.map((order) => {
+                console.log('Dashboard Recent Order:', {
+                  id: order.id,
+                  order_number: order.order_number,
+                  shipping_address: order.shipping_address,
+                  full_name: order.shipping_address?.full_name
+                });
+
+                const fullName = order.shipping_address?.full_name || 'N/A';
+                const firstChar = fullName.charAt(0).toUpperCase();
+
+                return (
+                  <tr
+                    key={order.id}
+                    className="hover:bg-white/60 transition-colors cursor-pointer"
+                    onClick={() => router.visit(`/admin/orders/${order.id}`)}
+                  >
+                    <td className="px-6 py-4 font-bold text-gray-900">{order.order_number}</td>
+                    <td className="px-6 py-4 text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-500">
+                          {firstChar}
+                        </div>
+                        {fullName}
                       </div>
-                      {order.shipping_address.full_name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-500">
-                    {formatDate(order.created_at)}
-                  </td>
-                  <td className="px-6 py-4 font-bold text-primary">
-                    {formatCurrency(order.total_amount)}
-                  </td>
-                  <td className="px-6 py-4">
-                    {getStatusBadge(order.status)}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-6 py-4 text-gray-500">
+                      {formatDate(order.created_at)}
+                    </td>
+                    <td className="px-6 py-4 font-bold text-primary">
+                      {formatCurrency(order.total_amount)}
+                    </td>
+                    <td className="px-6 py-4">
+                      {getStatusBadge(order.status)}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

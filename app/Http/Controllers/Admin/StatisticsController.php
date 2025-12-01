@@ -200,6 +200,13 @@ class StatisticsController extends Controller
             ->limit(config('pagination.admin.recent_items'))
             ->get()
             ->map(function ($order) {
+                \Log::info('Recent Order Data', [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'shipping_full_name' => $order->shipping_full_name,
+                    'has_shipping_name' => !empty($order->shipping_full_name),
+                ]);
+
                 return [
                     'id' => $order->id,
                     'order_number' => $order->order_number,
@@ -207,7 +214,7 @@ class StatisticsController extends Controller
                     'status' => $order->status->value,
                     'created_at' => $order->placed_at->toISOString(),
                     'shipping_address' => [
-                        'full_name' => $order->shipping_full_name,
+                        'full_name' => $order->shipping_full_name ?? 'N/A',
                     ],
                 ];
             });
