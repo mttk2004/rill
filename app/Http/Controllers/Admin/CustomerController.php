@@ -78,7 +78,7 @@ class CustomerController extends Controller
             ', [now()->subMonth()])
             ->first();
 
-        return Inertia::render('admin/customers/index', [
+        return Inertia::render('admin/customers/CustomerList', [
             'users' => $users,
             'stats' => [
                 'total' => $stats->total,
@@ -111,18 +111,7 @@ class CustomerController extends Controller
         $totalSpent = $customer->orders()->sum('total_amount');
         $customer->total_spent = $totalSpent;
 
-        // If the request expects JSON (AJAX / fetch with Accept: application/json),
-        // return a JSON payload compatible with the Inertia response shape so the
-        // frontend can parse `data.props.customer` as before.
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json([
-                'props' => [
-                    'customer' => $customer,
-                ],
-            ]);
-        }
-
-        return Inertia::render('admin/customers/edit', [
+        return Inertia::render('admin/customers/CustomerForm', [
             'customer' => $customer,
         ]);
     }
