@@ -120,9 +120,12 @@ export interface Artist {
   image?: string;
   image_url?: string;
   country?: string;
+  description?: string;
+  is_active?: boolean;
   role?: string;
   sort_order?: number;
   products_count?: number;
+  deleted_at?: string | null;
 }
 
 export interface Collection {

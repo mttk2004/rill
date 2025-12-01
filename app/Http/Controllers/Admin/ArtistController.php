@@ -132,7 +132,7 @@ class ArtistController extends Controller
             ->values()
             ->toArray();
 
-        return Inertia::render('admin/artists/create', [
+        return Inertia::render('admin/artists/ArtistForm', [
             'countries' => $countries,
         ]);
     }
@@ -158,11 +158,7 @@ class ArtistController extends Controller
 
         $artist = Artist::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Nghệ sĩ đã được tạo thành công',
-            'artist' => $artist->fresh(),
-        ]);
+        return redirect()->route('admin.artists');
     }
 
     /**
@@ -206,7 +202,7 @@ class ArtistController extends Controller
             ->values()
             ->toArray();
 
-        return Inertia::render('admin/artists/edit', [
+        return Inertia::render('admin/artists/ArtistForm', [
             'artist' => $artist,
             'countries' => $countries,
         ]);
@@ -241,11 +237,7 @@ class ArtistController extends Controller
 
         $artist->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Cập nhật nghệ sĩ thành công',
-            'artist' => $artist->fresh(),
-        ]);
+        return redirect()->route('admin.artists');
     }
 
     /**
