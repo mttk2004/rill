@@ -1,9 +1,9 @@
 
-import React, { useState, useMemo } from 'react';
-import { Link, router } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { router } from '@inertiajs/react';
 import { Product, Artist } from '../../../types';
 import {
-  Plus, Search, Filter, ArrowUpDown,
+  Plus, Search, Filter,
   Eye, Edit2, Trash2, AlertCircle
 } from 'lucide-react';
 import { getImageUrl } from '../../../utils/image';
@@ -38,66 +38,41 @@ interface ProductListProps {
   };
 }
 
-const ProductList = ({ products: productsPagination, filters: _filters }: ProductListProps) => {
+const ProductList = ({ products: productsPagination, filters, stats, genres }: ProductListProps) => {
   const { showToast } = useToast();
 
-  // State
-  const [products, setProducts] = useState<Product[]>(productsPagination.data);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' } | null>(null);
+  // State for filters - initialize from backend
+  const [searchQuery, setSearchQuery] = useState(filters.search || '');
+  const [filterStatus, setFilterStatus] = useState(filters.status || 'all');
+  const [filterGenre, setFilterGenre] = useState(filters.genre || 'all');
+  const [sortBy, setSortBy] = useState(filters.sort || 'newest');
 
   // Modal State
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  // Derived Data
-  const filteredProducts = useMemo(() => {
-    let items = [...products];
+  // Debounced search
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
-    // Search
-    if (searchQuery) {
-      const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(p =>
-        p.name.toLowerCase().includes(lowerQuery) ||
-        p.sku.toLowerCase().includes(lowerQuery)
-      );
-    }
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
 
-    // Filter
-    if (filterStatus !== 'all') {
-      items = items.filter(p => (p.status || 'active') === filterStatus);
-    }
+    if (searchTimeout) clearTimeout(searchTimeout);
 
-    // Sort
-    if (sortConfig) {
-      items.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
+    const timeout = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (value) params.append('search', value);
+      if (filterStatus && filterStatus !== 'all') params.append('status', filterStatus);
+      if (filterGenre && filterGenre !== 'all') params.append('genre', filterGenre);
+      if (sortBy) params.append('sort', sortBy);
 
-        // Handle numeric strings like price
-        if (sortConfig.key === 'price' || sortConfig.key === 'stock_quantity') {
-          const numA = Number(aValue);
-          const numB = Number(bValue);
-          return sortConfig.direction === 'asc' ? numA - numB : numB - numA;
-        }
-
-        if ((aValue ?? '') < (bValue ?? '')) return sortConfig.direction === 'asc' ? -1 : 1;
-        if ((aValue ?? '') > (bValue ?? '')) return sortConfig.direction === 'asc' ? 1 : -1;
-        return 0;
+      router.get(`/admin/products?${params.toString()}`, {}, {
+        preserveState: true,
+        preserveScroll: true,
       });
-    }
+    }, 500);
 
-    return items;
-  }, [products, searchQuery, filterStatus, sortConfig]);
-
-  // Handlers
-  const handleSort = (key: keyof Product) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
+    setSearchTimeout(timeout);
   };
 
   const handleDeleteConfirm = () => {
@@ -173,7 +148,7 @@ const ProductList = ({ products: productsPagination, filters: _filters }: Produc
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm"
               placeholder="Tìm theo tên, SKU..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
           </div>
 
@@ -182,13 +157,67 @@ const ProductList = ({ products: productsPagination, filters: _filters }: Produc
               <Filter size={18} className="text-gray-500" />
               <select
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  const params = new URLSearchParams();
+                  if (searchQuery) params.append('search', searchQuery);
+                  if (e.target.value && e.target.value !== 'all') params.append('status', e.target.value);
+                  if (filterGenre && filterGenre !== 'all') params.append('genre', filterGenre);
+                  if (sortBy) params.append('sort', sortBy);
+                  router.get(`/admin/products?${params.toString()}`, {}, { preserveState: true, preserveScroll: true });
+                }}
                 className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
               >
                 <option value="all">Tất cả trạng thái</option>
                 <option value="active">Đang bán</option>
                 <option value="out_of_stock">Hết hàng</option>
                 <option value="inactive">Ngừng kinh doanh</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={filterGenre}
+                onChange={(e) => {
+                  setFilterGenre(e.target.value);
+                  const params = new URLSearchParams();
+                  if (searchQuery) params.append('search', searchQuery);
+                  if (filterStatus && filterStatus !== 'all') params.append('status', filterStatus);
+                  if (e.target.value && e.target.value !== 'all') params.append('genre', e.target.value);
+                  if (sortBy) params.append('sort', sortBy);
+                  router.get(`/admin/products?${params.toString()}`, {}, { preserveState: true, preserveScroll: true });
+                }}
+                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+              >
+                <option value="all">Tất cả thể loại</option>
+                {genres.map((genre) => (
+                  <option key={genre} value={genre}>{genre}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value);
+                  const params = new URLSearchParams();
+                  if (searchQuery) params.append('search', searchQuery);
+                  if (filterStatus && filterStatus !== 'all') params.append('status', filterStatus);
+                  if (filterGenre && filterGenre !== 'all') params.append('genre', filterGenre);
+                  params.append('sort', e.target.value);
+                  router.get(`/admin/products?${params.toString()}`, {}, { preserveState: true, preserveScroll: true });
+                }}
+                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+              >
+                <option value="newest">Mới nhất</option>
+                <option value="oldest">Cũ nhất</option>
+                <option value="name_asc">Tên A-Z</option>
+                <option value="name_desc">Tên Z-A</option>
+                <option value="price_asc">Giá thấp → cao</option>
+                <option value="price_desc">Giá cao → thấp</option>
+                <option value="stock_asc">Tồn kho ít nhất</option>
+                <option value="stock_desc">Tồn kho nhiều nhất</option>
               </select>
             </div>
           </div>
@@ -201,31 +230,16 @@ const ProductList = ({ products: productsPagination, filters: _filters }: Produc
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Hình ảnh</th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
-                    onClick={() => handleSort('name')}
-                  >
-                    <div className="flex items-center gap-1">Tên sản phẩm <ArrowUpDown size={14} /></div>
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản phẩm</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
-                    onClick={() => handleSort('stock_quantity')}
-                  >
-                    <div className="flex items-center gap-1">Tồn kho <ArrowUpDown size={14} /></div>
-                  </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
-                    onClick={() => handleSort('price')}
-                  >
-                    <div className="flex items-center gap-1">Giá bán <ArrowUpDown size={14} /></div>
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tồn kho</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá bán</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
                   <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredProducts.length > 0 ? filteredProducts.map((product) => (
+                {productsPagination.data.length > 0 ? productsPagination.data.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="h-12 w-12 rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
@@ -296,26 +310,85 @@ const ProductList = ({ products: productsPagination, filters: _filters }: Produc
         </div>
 
         {/* Pagination */}
-        <div className="mt-6 flex items-center justify-between">
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-gray-700">
-            Hiển thị {productsPagination.data.length} trong tổng số {productsPagination.total} sản phẩm
+            Hiển thị <span className="font-medium">{productsPagination.data.length}</span> trong tổng số{' '}
+            <span className="font-medium">{productsPagination.total}</span> sản phẩm
           </div>
-          <div className="flex gap-2">
+
+          <div className="flex items-center gap-2">
+            {/* Previous Button */}
             {productsPagination.current_page > 1 && (
               <button
-                onClick={() => router.get(`/admin/products?page=${productsPagination.current_page - 1}`)}
-                className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-50 text-sm font-medium"
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  if (searchQuery) params.append('search', searchQuery);
+                  if (filterStatus && filterStatus !== 'all') params.append('status', filterStatus);
+                  if (filterGenre && filterGenre !== 'all') params.append('genre', filterGenre);
+                  if (sortBy) params.append('sort', sortBy);
+                  params.append('page', String(productsPagination.current_page - 1));
+                  router.get(`/admin/products?${params.toString()}`, {}, { preserveState: true, preserveScroll: false });
+                }}
+                className="px-3 py-2 border rounded-lg bg-white hover:bg-gray-50 text-sm font-medium transition-colors"
               >
                 Trước
               </button>
             )}
-            <span className="px-4 py-2 border rounded-lg bg-primary text-white text-sm font-medium">
-              {productsPagination.current_page}
-            </span>
+
+            {/* Page Numbers */}
+            <div className="flex gap-1">
+              {Array.from({ length: productsPagination.last_page }, (_, i) => i + 1).map((page) => {
+                // Show first page, last page, current page, and pages around current
+                const showPage =
+                  page === 1 ||
+                  page === productsPagination.last_page ||
+                  (page >= productsPagination.current_page - 1 && page <= productsPagination.current_page + 1);
+
+                // Show ellipsis
+                if (!showPage) {
+                  if (page === productsPagination.current_page - 2 || page === productsPagination.current_page + 2) {
+                    return <span key={page} className="px-3 py-2 text-gray-400">...</span>;
+                  }
+                  return null;
+                }
+
+                return (
+                  <button
+                    key={page}
+                    onClick={() => {
+                      if (page === productsPagination.current_page) return;
+                      const params = new URLSearchParams();
+                      if (searchQuery) params.append('search', searchQuery);
+                      if (filterStatus && filterStatus !== 'all') params.append('status', filterStatus);
+                      if (filterGenre && filterGenre !== 'all') params.append('genre', filterGenre);
+                      if (sortBy) params.append('sort', sortBy);
+                      params.append('page', String(page));
+                      router.get(`/admin/products?${params.toString()}`, {}, { preserveState: true, preserveScroll: false });
+                    }}
+                    className={`px-3 py-2 border rounded-lg text-sm font-medium transition-colors ${page === productsPagination.current_page
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-white hover:bg-gray-50 text-gray-700'
+                      }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next Button */}
             {productsPagination.current_page < productsPagination.last_page && (
               <button
-                onClick={() => router.get(`/admin/products?page=${productsPagination.current_page + 1}`)}
-                className="px-4 py-2 border rounded-lg bg-white hover:bg-gray-50 text-sm font-medium"
+                onClick={() => {
+                  const params = new URLSearchParams();
+                  if (searchQuery) params.append('search', searchQuery);
+                  if (filterStatus && filterStatus !== 'all') params.append('status', filterStatus);
+                  if (filterGenre && filterGenre !== 'all') params.append('genre', filterGenre);
+                  if (sortBy) params.append('sort', sortBy);
+                  params.append('page', String(productsPagination.current_page + 1));
+                  router.get(`/admin/products?${params.toString()}`, {}, { preserveState: true, preserveScroll: false });
+                }}
+                className="px-3 py-2 border rounded-lg bg-white hover:bg-gray-50 text-sm font-medium transition-colors"
               >
                 Sau
               </button>
