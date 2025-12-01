@@ -1,5 +1,6 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import Button from '../components/Button';
 import { useShop } from '../context/ShopContext';
 import { usePlayer } from '../context/PlayerContext';
@@ -216,8 +217,8 @@ function ProductDetailContent({
 
               <p className="text-3xl font-bold text-primary mb-8">{formattedPrice}</p>
 
-              <div className="prose prose-sm text-gray-600 mb-8 leading-relaxed">
-                <p>{product.detailed_description || product.description}</p>
+              <div className="prose prose-sm text-gray-600 mb-8 leading-relaxed max-w-none">
+                <ReactMarkdown>{product.detailed_description || product.description}</ReactMarkdown>
               </div>
 
               <div className="border-t border-b border-gray-100 py-6 mb-8 space-y-4">

@@ -20,9 +20,11 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Diễm Xưa',
                 'description' => 'Album tuyển tập những ca khúc bất hủ của nhạc sĩ Trịnh Công Sơn do Khánh Ly thể hiện. Bao gồm các tác phẩm như "Diễm Xưa", "Biển Nhớ", "Nối Vòng Tay Lớn" - những sáng tác đi vào lòng người Việt.',
-                'detailed_description' => '`Diễm Xưa` là một trong những tuyển tập tiêu biểu nhất của dòng nhạc Trịnh Công Sơn qua giọng hát Khánh Ly. Album không chỉ là tập hợp các ca khúc mà còn là một cuốn nhật ký bằng âm nhạc, ghi lại những rung động tinh tế, nỗi buồn man mác và triết lý nhân sinh sâu sắc của người nhạc sĩ tài hoa. Sự kết hợp giữa ca từ đầy tính thơ của Trịnh và chất giọng "liêu trai", khàn đục đặc trưng của Khánh Ly đã tạo nên một tượng đài trong tân nhạc Việt Nam.
+                'detailed_description' => '**Diễm Xưa** là một trong những tuyển tập tiêu biểu nhất của dòng nhạc Trịnh Công Sơn qua giọng hát Khánh Ly. Album không chỉ là tập hợp các ca khúc mà còn là một cuốn nhật ký bằng âm nhạc, ghi lại những rung động tinh tế, nỗi buồn man mác và triết lý nhân sinh sâu sắc của người nhạc sĩ tài hoa.
 
-Trong album này, người nghe sẽ được đắm chìm trong không gian của những hoài niệm với bản thu âm kinh điển của ca khúc chủ đề "Diễm Xưa" - tác phẩm đã vượt ra khỏi biên giới Việt Nam để được yêu mến tại Nhật Bản. Bên cạnh đó, "Biển Nhớ" và "Hạ Trắng" mang đến những khắc khoải về tình yêu và sự chia ly, trong khi "Nối Vòng Tay Lớn" lại là tiếng gọi của sự đoàn kết và tình người.
+Sự kết hợp giữa ca từ đầy tính thơ của Trịnh và chất giọng *"liêu trai"*, khàn đục đặc trưng của Khánh Ly đã tạo nên một tượng đài trong tân nhạc Việt Nam.
+
+Trong album này, người nghe sẽ được đắm chìm trong không gian của những hoài niệm với bản thu âm kinh điển của ca khúc chủ đề **"Diễm Xưa"** - tác phẩm đã vượt ra khỏi biên giới Việt Nam để được yêu mến tại Nhật Bản. Bên cạnh đó, *"Biển Nhớ"* và *"Hạ Trắng"* mang đến những khắc khoải về tình yêu và sự chia ly, trong khi *"Nối Vòng Tay Lớn"* lại là tiếng gọi của sự đoàn kết và tình người.
 
 Bản thu âm trong tuyển tập này giữ được chất mộc mạc, chân thật của những phòng thu Sài Gòn xưa, nơi kỹ thuật không lấn át cảm xúc. Đây là đĩa nhạc không thể thiếu cho bất kỳ ai muốn tìm về cội nguồn của Nhạc Trịnh và văn hóa phòng trà Việt Nam thập niên cũ.',
                 'genre' => 'Nhạc Trịnh',
@@ -602,6 +604,10 @@ Bìa album với hình ảnh Stevie không đeo kính đen, nhìn xa xăm, thể
         ];
 
         foreach ($albums as $albumData) {
+            // Calculate cost_price: 50,000 to 300,000 VND lower than selling price
+            $priceReduction = rand(5, 30) * 10000;
+            $costPrice = max(50000, $albumData['price'] - $priceReduction); // Ensure cost price is at least 50,000 VND
+
             Product::create([
                 'name' => $albumData['name'],
                 'slug' => Str::slug($albumData['name']),
@@ -610,6 +616,7 @@ Bìa album với hình ảnh Stevie không đeo kính đen, nhìn xa xăm, thể
                 'genre' => $albumData['genre'],
                 'label' => $albumData['label'],
                 'price' => $albumData['price'],
+                'cost_price' => $costPrice,
                 'stock_quantity' => $albumData['stock_quantity'],
                 'status' => 'active',
             ]);
