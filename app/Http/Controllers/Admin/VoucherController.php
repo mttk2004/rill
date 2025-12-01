@@ -112,7 +112,7 @@ class VoucherController extends Controller
             ->first()
             ->toArray();
 
-        return Inertia::render('admin/vouchers/index', [
+        return Inertia::render('admin/vouchers/VoucherList', [
             'vouchers' => $vouchers,
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'sort']),
@@ -124,7 +124,7 @@ class VoucherController extends Controller
      */
     public function create()
     {
-        return Inertia::render('admin/vouchers/create');
+        return Inertia::render('admin/vouchers/VoucherForm');
     }
 
     /**
@@ -171,9 +171,9 @@ class VoucherController extends Controller
      */
     public function edit(string $id)
     {
-        $voucher = Voucher::findOrFail($id);
+        $voucher = Voucher::withCount('usages')->findOrFail($id);
 
-        return Inertia::render('admin/vouchers/edit', [
+        return Inertia::render('admin/vouchers/VoucherForm', [
             'voucher' => $voucher,
         ]);
     }
