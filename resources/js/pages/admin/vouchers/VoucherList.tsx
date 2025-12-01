@@ -24,7 +24,7 @@ interface Voucher {
   usage_limit_per_user: number | null;
   valid_from: string;
   valid_to: string;
-  is_active: number;
+  is_active: number | boolean;
   created_at: string;
   updated_at?: string;
 }
@@ -93,7 +93,8 @@ const VoucherList = ({ vouchers, filters, stats }: VoucherListProps) => {
     const now = new Date();
     const endDate = new Date(v.valid_to);
 
-    if (v.is_active === 0) return 'inactive';
+    // Check if inactive (handle both 0 and false)
+    if (!v.is_active || v.is_active === 0) return 'inactive';
     if (endDate < now) return 'expired';
     if (v.usage_limit && v.used_count >= v.usage_limit) return 'exhausted';
     return 'active';
