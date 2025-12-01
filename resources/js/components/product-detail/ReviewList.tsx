@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { User, Star, Edit2, Trash2 } from 'lucide-react';
 import { Review } from '../../types';
 import Button from '../Button';
 import { formatRelativeTime } from '../../utils/date';
+import ImageLightbox from '../ImageLightbox';
 
 interface ReviewListProps {
   reviews: Review[];
@@ -16,6 +17,15 @@ interface ReviewListProps {
 }
 
 const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCanReview, onEditReview, onDeleteReview, onWriteReview }) => {
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const handleImageClick = (images: string[], index: number) => {
+    setLightboxImages(images);
+    setLightboxIndex(index);
+    setIsLightboxOpen(true);
+  };
 
   return (
     <div className="border-t border-gray-100 pt-16 mb-20 animate-fade-in-up">
@@ -56,12 +66,17 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCan
               {review.images && review.images.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mt-3">
                   {review.images.map((img, idx) => (
-                    <img
+                    <button
                       key={idx}
-                      src={img}
-                      alt={`Review image ${idx + 1}`}
-                      className="w-full h-20 object-cover rounded-lg border border-gray-200"
-                    />
+                      onClick={() => handleImageClick(review.images!, idx)}
+                      className="w-full h-20 rounded-lg border border-gray-200 overflow-hidden hover:opacity-80 transition-opacity cursor-pointer"
+                    >
+                      <img
+                        src={img}
+                        alt={`Review image ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
                   ))}
                 </div>
               )}
@@ -96,6 +111,14 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCan
           )}
         </div>
       )}
+
+      {/* Image Lightbox */}
+      <ImageLightbox
+        images={lightboxImages}
+        initialIndex={lightboxIndex}
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+      />
     </div>
   );
 };

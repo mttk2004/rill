@@ -10,6 +10,7 @@ import type { Product, Artist } from '@/types';
 import type { Review } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import AlertDialog from '../components/AlertDialog';
+import ImageLightbox from '../components/ImageLightbox';
 
 // Imported Sub-components
 import QuantitySelector from '../components/product-detail/QuantitySelector';
@@ -41,6 +42,7 @@ function ProductDetailContent({
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [isProductImageLightboxOpen, setIsProductImageLightboxOpen] = useState(false);
 
   const reviewForm = useForm<{
     rating: number;
@@ -138,7 +140,10 @@ function ProductDetailContent({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-20">
             {/* Image Gallery */}
             <div className="space-y-4 animate-zoom-in">
-              <div className="aspect-square bg-gray-100 rounded-2xl overflow-hidden relative group shadow-sm">
+              <div
+                className="aspect-square bg-gray-100 rounded-2xl overflow-hidden relative group shadow-sm cursor-pointer"
+                onClick={() => setIsProductImageLightboxOpen(true)}
+              >
                 <img
                   src={product.image_url || ''}
                   alt={product.name}
@@ -545,6 +550,14 @@ function ProductDetailContent({
         type="danger"
         confirmText="Xóa"
         cancelText="Hủy"
+      />
+
+      {/* Product Image Lightbox */}
+      <ImageLightbox
+        images={[product.image_url || '']}
+        initialIndex={0}
+        isOpen={isProductImageLightboxOpen}
+        onClose={() => setIsProductImageLightboxOpen(false)}
       />
     </>
   );
