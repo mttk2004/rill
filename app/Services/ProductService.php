@@ -340,6 +340,9 @@ class ProductService
             }
         ]);
 
+        // Get shipping threshold from settings
+        $shippingThreshold = app(SettingService::class)->get('shipping_free_threshold', 3000000);
+
         // Get all reviews (auto-approved, no status filter needed)
         $reviews = $product->reviews()
             ->with('user:id,name,avatar')
@@ -431,6 +434,7 @@ class ProductService
             'reviews' => $reviews,
             'averageRating' => $averageRating,
             'relatedProducts' => $relatedProducts,
+            'shippingThreshold' => $shippingThreshold,
         ];
     }
 }

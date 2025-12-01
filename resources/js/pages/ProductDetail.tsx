@@ -22,6 +22,7 @@ interface ProductDetailProps {
   reviews: Review[];
   relatedProducts: Product[];
   averageRating: number;
+  shippingThreshold: number;
   auth?: { user?: { id: number; name: string; email: string; avatar_url?: string } };
 }
 
@@ -30,8 +31,19 @@ function ProductDetailContent({
   reviews = [],
   relatedProducts = [],
   averageRating = 5,
+  shippingThreshold = 3000000,
   auth
 }: ProductDetailProps) {
+  // Format shipping threshold for display (e.g., 3000000 -> "3tr")
+  const formatShippingThreshold = (amount: number): string => {
+    if (amount >= 1000000) {
+      return `${amount / 1000000}tr`;
+    }
+    if (amount >= 1000) {
+      return `${amount / 1000}k`;
+    }
+    return amount.toString();
+  };
   const { addToCart } = useShop();
   const { playTrack, currentTrack, isPlaying } = usePlayer();
   const { showToast } = useToast();
@@ -290,7 +302,7 @@ function ProductDetailContent({
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-2">
                   <Truck size={18} />
-                  <span>Miễn phí vận chuyển đơn từ 3tr</span>
+                  <span>Miễn phí vận chuyển đơn từ {formatShippingThreshold(shippingThreshold)}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={18} />
