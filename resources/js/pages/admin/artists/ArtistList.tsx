@@ -264,8 +264,8 @@ const ArtistList = ({ artists, countries, filters }: ArtistListProps) => {
           onClose={() => setDeleteId(null)}
           onConfirm={handleDeleteConfirm}
           title="Xóa nghệ sĩ?"
-          description="Bạn có chắc chắn muốn xóa nghệ sĩ này không? Lưu ý: Các sản phẩm liên kết với nghệ sĩ này có thể bị ảnh hưởng."
-          confirmText="Xóa vĩnh viễn"
+          description="Bạn có chắc chắn muốn xóa nghệ sĩ này không? Lưu ý: Các sản phẩm liên kết với nghệ sĩ này sẽ không bị ảnh hưởng."
+          confirmText="Xóa nghệ sĩ"
         />
       </div>
     </AdminLayout>

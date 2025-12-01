@@ -2,6 +2,7 @@
 import React from 'react';
 import { Edit2, Trash2, Globe, User, RotateCcw } from 'lucide-react';
 import { Artist } from '../../../types';
+import { getImageUrl } from '../../../utils/image';
 
 interface ArtistCardProps {
   artist: Artist;
@@ -17,7 +18,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete, onRes
       <div className="p-5 flex items-start gap-4">
         <div className="h-14 w-14 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
           {artist.image ? (
-            <img src={artist.image} alt={artist.name} className="h-full w-full object-cover" />
+            <img src={getImageUrl(artist.image) || artist.image} alt={artist.name} className="h-full w-full object-cover" />
           ) : (
             <div className="h-full w-full flex items-center justify-center text-gray-400">
               <User size={24} />

@@ -5,6 +5,7 @@ import { Artist } from '../../../types';
 import { useToast } from '../../../context/ToastContext';
 import Button from '../../../components/Button';
 import AdminLayout from '../../../components/admin/AdminLayout';
+import { getImageUrl } from '../../../utils/image';
 
 interface ArtistFormProps {
   artist?: Artist;
@@ -195,7 +196,7 @@ const ArtistForm = ({ artist, countries }: ArtistFormProps) => {
                 <div className="aspect-square rounded-full border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center text-gray-400 relative overflow-hidden group hover:border-primary hover:text-primary transition-colors cursor-pointer w-48 h-48 mx-auto">
                   {imagePreview || data.image ? (
                     <>
-                      <img src={imagePreview || (typeof data.image === 'string' ? data.image : '')} alt="Preview" className="w-full h-full object-cover" />
+                      <img src={imagePreview || (typeof data.image === 'string' ? (getImageUrl(data.image) || data.image) : '')} alt="Preview" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <span className="text-white text-sm font-medium">Thay đổi</span>
                       </div>
