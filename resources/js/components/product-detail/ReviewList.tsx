@@ -9,11 +9,13 @@ interface ReviewListProps {
   reviews: Review[];
   averageRating: number;
   currentUserId?: number;
+  userCanReview?: boolean;
   onEditReview?: (review: Review) => void;
   onDeleteReview?: (reviewId: number) => void;
+  onWriteReview?: () => void;
 }
 
-const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, onEditReview, onDeleteReview }) => {
+const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCanReview, onEditReview, onDeleteReview, onWriteReview }) => {
 
   return (
     <div className="border-t border-gray-100 pt-16 mb-20 animate-fade-in-up">
@@ -87,7 +89,11 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, onEditR
       ) : (
         <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-100 border-dashed">
           <p className="text-gray-500 mb-4">Chưa có đánh giá nào cho sản phẩm này.</p>
-          <Button variant="outline">Viết đánh giá đầu tiên</Button>
+          {userCanReview ? (
+            <Button variant="outline" onClick={onWriteReview}>Viết đánh giá đầu tiên</Button>
+          ) : (
+            <p className="text-sm text-gray-400">Mua sản phẩm để đánh giá</p>
+          )}
         </div>
       )}
     </div>

@@ -173,6 +173,13 @@ export interface Product {
     name: string;
     type: string;
   };
+  user_can_review?: boolean;
+  user_review?: {
+    id: number;
+    rating: number;
+    comment: string;
+    images?: string[];
+  };
   created_at: string;
   updated_at: string;
   deleted_at?: string;

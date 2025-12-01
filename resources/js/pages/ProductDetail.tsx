@@ -300,6 +300,7 @@ function ProductDetailContent({
             reviews={reviews}
             averageRating={averageRating}
             currentUserId={auth?.user?.id}
+            userCanReview={product.user_can_review}
             onEditReview={(review) => {
               setEditingReview(review);
               const existingImgs = review.images || [];
@@ -314,6 +315,13 @@ function ProductDetailContent({
               setImagePreviews([]);
             }}
             onDeleteReview={(reviewId) => setDeleteReviewId(reviewId)}
+            onWriteReview={() => {
+              setEditingReview({ id: 0, rating: 5, comment: '', user_id: 0, product_id: 0, created_at: '' } as Review);
+              reviewForm.reset();
+              setSelectedImages([]);
+              setImagePreviews([]);
+              setExistingImages([]);
+            }}
           />
 
           {/* Refactored Related Products */}
