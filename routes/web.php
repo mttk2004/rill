@@ -23,6 +23,7 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 // Product reviews (authenticated users only)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/products/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('products.reviews.store');
+    Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
 // Cart routes accessible to both guests and authenticated users

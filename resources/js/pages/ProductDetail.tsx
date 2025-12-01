@@ -19,13 +19,15 @@ interface ProductDetailProps {
   reviews: Review[];
   relatedProducts: Product[];
   averageRating: number;
+  auth?: { user?: { id: number; name: string; email: string; avatar_url?: string } };
 }
 
 function ProductDetailContent({
   product,
   reviews = [],
   relatedProducts = [],
-  averageRating = 5
+  averageRating = 5,
+  auth
 }: ProductDetailProps) {
   const { addToCart } = useShop();
   const { playTrack, currentTrack, isPlaying } = usePlayer();
@@ -274,7 +276,15 @@ function ProductDetailContent({
           </div>
 
           {/* Refactored Review List */}
-          <ReviewList reviews={reviews} averageRating={averageRating} />
+          <ReviewList
+            reviews={reviews}
+            averageRating={averageRating}
+            currentUserId={auth?.user?.id}
+            onEditReview={(review) => {
+              // TODO: Implement review editing modal
+              console.log('Edit review:', review);
+            }}
+          />
 
           {/* Refactored Related Products */}
           <RelatedProducts products={relatedProducts} artists={[]} />

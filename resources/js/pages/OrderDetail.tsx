@@ -343,7 +343,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                 <div className="divide-y divide-gray-100">
                   {order.items?.map((item: OrderItem, idx: number) => {
                     const hasReviewed = item.product?.reviews && item.product.reviews.length > 0;
-                    const canReview = isDelivered && !hasReviewed;
+                    const existingReview = hasReviewed && item.product?.reviews ? item.product.reviews[0] : null;
+                    const canReview = isDelivered;
 
                     return (
                       <div key={idx} className="p-6 flex gap-4 hover:bg-gray-50 transition-colors">
@@ -358,15 +359,26 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                                 {item.product_slug && <Link href={`/products/${item.product_slug}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>}
                                 {canReview && item.product && (
                                   <button
-                                    onClick={() => setReviewingProduct({ id: item.product!.id, name: item.product_name, slug: item.product!.slug })}
+                                    onClick={() => {
+                                      setReviewingProduct({ id: item.product!.id, name: item.product_name, slug: item.product!.slug });
+                                      if (existingReview) {
+                                        reviewForm.setData({
+                                          rating: existingReview.rating,
+                                          comment: existingReview.comment,
+                                          images: [],
+                                        });
+                                      } else {
+                                        reviewForm.setData({ rating: 5, comment: '', images: [] });
+                                      }
+                                    }}
                                     className="text-xs text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1"
                                   >
-                                    <Star size={12} /> Đánh giá
+                                    <Star size={12} /> {hasReviewed ? 'Chỉnh sửa đánh giá' : 'Đánh giá'}
                                   </button>
                                 )}
-                                {hasReviewed && (
+                                {hasReviewed && existingReview && (
                                   <span className="text-xs text-green-600 flex items-center gap-1">
-                                    <CheckCircle size={12} /> Đã đánh giá
+                                    <CheckCircle size={12} /> Đã đánh giá ({existingReview.rating}/5 ⭐)
                                   </span>
                                 )}
                               </div>

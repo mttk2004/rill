@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\User;
 use App\Services\Responses\ServiceResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewService
 {
@@ -131,7 +133,7 @@ class ReviewService
     }
 
     /**
-     * Get user's existing review for a product.
+     * Get a user's review for a product.
      *
      * @param User $user
      * @param Product $product
@@ -142,5 +144,32 @@ class ReviewService
         return ProductReview::where('user_id', $user->id)
             ->where('product_id', $product->id)
             ->first();
+    }
+
+    /**
+     * Delete a product review.
+     *
+     * @param ProductReview $review
+     * @return ServiceResponse
+     */
+    public function deleteReview(ProductReview $review): ServiceResponse
+    {
+        try {
+            // Delete associated images if any
+            if (!empty($review->images)) {
+                foreach ($review->images as $imagePath) {
+                    // Remove storage/app/public prefix to get the actual path
+                    $path = str_replace('storage/', 'public/', $imagePath);
+                    Storage::delete($path);
+                }
+            }
+
+            $review->delete();
+
+            return ServiceResponse::success('Đánh giá của bạn đã được xóa.');
+        } catch (\Exception $e) {
+            Log::error('Failed to delete review: ' . $e->getMessage());
+            return ServiceResponse::error('Có lỗi xảy ra khi xóa đánh giá. Vui lòng thử lại.');
+        }
     }
 }

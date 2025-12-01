@@ -49,4 +49,23 @@ class ReviewController extends Controller
 
         return back()->with('success', $result->message);
     }
+
+    /**
+     * Delete a product review.
+     */
+    public function destroy(\App\Models\ProductReview $review)
+    {
+        // Check if the authenticated user owns this review
+        if ($review->user_id !== Auth::id()) {
+            return back()->with('error', 'Bạn không có quyền xóa đánh giá này.');
+        }
+
+        $result = $this->reviewService->deleteReview($review);
+
+        if ($result->isError()) {
+            return back()->with('error', $result->message);
+        }
+
+        return back()->with('success', $result->message);
+    }
 }

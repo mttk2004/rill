@@ -369,6 +369,7 @@ class ProductService
                     'images' => $review->images, // Accessor will convert to full URLs
                     'created_at' => $review->created_at->toISOString(),
                     'user' => [
+                        'id' => $review->user->id,
                         'name' => $review->user->name,
                         'avatar_url' => $review->user->avatar_url,
                     ],

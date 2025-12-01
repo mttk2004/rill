@@ -243,9 +243,11 @@ export interface Review {
   product_id: number;
   rating: number;
   comment: string;
+  images?: string[];
   user_name?: string;
   created_at: string;
   user?: {
+    id?: number;
     name: string;
     avatar_url: string | null;
   };
