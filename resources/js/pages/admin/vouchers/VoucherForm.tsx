@@ -4,6 +4,7 @@ import { router } from '@inertiajs/react';
 import { ArrowLeft, Save, Tag, Calendar, AlertCircle, Lock } from 'lucide-react';
 import Button from '../../../components/Button';
 import AdminLayout from '../../../components/admin/AdminLayout';
+import { useToast } from '../../../context/ToastContext';
 
 interface Voucher {
   id: string;
@@ -30,6 +31,7 @@ interface VoucherFormProps {
 }
 
 const VoucherForm = ({ voucher }: VoucherFormProps) => {
+  const { showToast } = useToast();
   const isEditMode = Boolean(voucher);
 
   // Initialize with correct DB fields
@@ -65,10 +67,24 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
     if (isEditMode && voucher) {
       router.put(`/admin/vouchers/${voucher.id}`, formData, {
         preserveScroll: true,
+        onSuccess: () => {
+          showToast(`Đã cập nhật mã giảm giá "${formData.code}"`, 'success');
+        },
+        onError: (errors: Record<string, string>) => {
+          const firstError = Object.values(errors)[0];
+          showToast(firstError || 'Có lỗi xảy ra khi cập nhật mã giảm giá', 'error');
+        },
       });
     } else {
       router.post('/admin/vouchers', formData, {
         preserveScroll: true,
+        onSuccess: () => {
+          showToast(`Đã tạo mã giảm giá mới "${formData.code}"`, 'success');
+        },
+        onError: (errors: Record<string, string>) => {
+          const firstError = Object.values(errors)[0];
+          showToast(firstError || 'Có lỗi xảy ra khi tạo mã giảm giá', 'error');
+        },
       });
     }
   };
@@ -76,9 +92,16 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
   // Helpers to handle date-time-local input string format
   const toInputDate = (isoString?: string) => {
     if (!isoString) return '';
+    // Parse the datetime string and format for datetime-local input
+    // If it's already in ISO format with timezone, convert to local
     const date = new Date(isoString);
-    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-    return date.toISOString().slice(0, 16);
+    // Format as YYYY-MM-DDTHH:mm for datetime-local input
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
   // Check if voucher has been used
@@ -232,7 +255,11 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
                     type="datetime-local"
                     name="valid_from"
                     value={toInputDate(formData.valid_from)}
-                    onChange={(e) => setFormData(prev => ({ ...prev, valid_from: new Date(e.target.value).toISOString().replace('T', ' ').slice(0, 19) }))}
+                    onChange={(e) => {
+                      // Store the datetime-local value directly, browser handles timezone
+                      const value = e.target.value; // Format: YYYY-MM-DDTHH:mm
+                      setFormData(prev => ({ ...prev, valid_from: value.replace('T', ' ') + ':00' }));
+                    }}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                     required
                   />
@@ -243,7 +270,11 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
                     type="datetime-local"
                     name="valid_to"
                     value={toInputDate(formData.valid_to)}
-                    onChange={(e) => setFormData(prev => ({ ...prev, valid_to: new Date(e.target.value).toISOString().replace('T', ' ').slice(0, 19) }))}
+                    onChange={(e) => {
+                      // Store the datetime-local value directly, browser handles timezone
+                      const value = e.target.value; // Format: YYYY-MM-DDTHH:mm
+                      setFormData(prev => ({ ...prev, valid_to: value.replace('T', ' ') + ':00' }));
+                    }}
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                     required
                   />

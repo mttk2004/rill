@@ -8,6 +8,7 @@ import {
 import Button from '../../../components/Button';
 import AlertDialog from '../../../components/AlertDialog';
 import { useDebounce } from '../../../hooks/useDebounce';
+import { useToast } from '../../../context/ToastContext';
 
 interface Voucher {
   id: string;
@@ -52,6 +53,7 @@ interface VoucherListProps {
 }
 
 const VoucherList = ({ vouchers, filters, stats }: VoucherListProps) => {
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
   const [filterStatus, setFilterStatus] = useState(filters.status || 'all');
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -99,10 +101,16 @@ const VoucherList = ({ vouchers, filters, stats }: VoucherListProps) => {
 
   const handleDeleteConfirm = () => {
     if (deleteId) {
+      const voucherCode = vouchers.data.find(v => v.id === deleteId)?.code || 'mã giảm giá';
       router.delete(`/admin/vouchers/${deleteId}`, {
         preserveScroll: true,
         onSuccess: () => {
           setDeleteId(null);
+          showToast(`Đã xóa ${voucherCode}`, 'success');
+        },
+        onError: (errors: Record<string, string>) => {
+          const firstError = Object.values(errors)[0];
+          showToast(firstError || 'Có lỗi xảy ra khi xóa mã giảm giá', 'error');
         },
       });
     }
