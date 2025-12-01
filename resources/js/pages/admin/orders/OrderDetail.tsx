@@ -109,6 +109,17 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
   };
 
+  const handleExportInvoice = () => {
+    // Check if order is paid
+    if (!order.payment || order.payment.payment_status !== 'completed') {
+      showToast('Chỉ có thể xuất hóa đơn cho đơn hàng đã thanh toán', 'error');
+      return;
+    }
+
+    // Download PDF
+    window.location.href = `/admin/orders/${order.id}/export`;
+  };
+
   const handleStatusUpdate = (newStatus: OrderStatus, notes?: string) => {
     setIsUpdating(true);
 
@@ -187,8 +198,12 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
             </div>
           </div>
           <div className="flex gap-3">
-            {order.status === 'delivered' && (
-              <Button variant="secondary" className="h-10 px-4 py-2 flex items-center gap-2 text-sm">
+            {order.payment?.payment_status === 'completed' && (
+              <Button
+                variant="secondary"
+                onClick={handleExportInvoice}
+                className="h-10 px-4 py-2 flex items-center gap-2 text-sm"
+              >
                 <Printer size={16} /> In hóa đơn
               </Button>
             )}
