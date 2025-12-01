@@ -74,10 +74,15 @@ class CollectionController extends Controller
                 ->count(),
         ];
 
-        return Inertia::render('admin/collections/index', [
+        return Inertia::render('admin/collections/CollectionList', [
             'collections' => $collections,
             'stats' => $stats,
-            'filters' => $request->only(['search', 'type', 'status', 'sort']),
+            'filters' => [
+                'search' => $request->get('search', ''),
+                'type' => $request->get('type', 'all'),
+                'status' => $request->get('status', 'all'),
+                'sort' => $request->get('sort', 'display_order'),
+            ],
         ]);
     }
 
@@ -233,9 +238,7 @@ class CollectionController extends Controller
         $collection = Collection::findOrFail($id);
         $collection->delete();
 
-        return redirect()
-            ->route('admin.collections.index')
-            ->with('success', 'Collection đã được xóa thành công!');
+        return redirect()->back();
     }
 
     /**
