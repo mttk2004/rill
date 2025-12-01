@@ -130,8 +130,7 @@ class OrderController extends Controller
      */
     public function show(Request $request, string $id)
     {
-        $order = Order::withTrashed()
-        ->with([
+        $order = Order::with([
             'user',
             'payment',
             'items.product.artists',
@@ -213,7 +212,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        $order = Order::withTrashed()->findOrFail($id);
+        $order = Order::findOrFail($id);
         $oldStatus = $order->status;
         $newStatus = $request->status;
 
@@ -224,23 +223,11 @@ class OrderController extends Controller
             ]);
         }
 
-        if ($oldStatus === OrderStatus::CANCELLED && $newStatus !== OrderStatus::CANCELLED->value) {
-            // Restore cancelled order
-            if ($order->trashed()) {
-                $order->restore();
-            }
-        }
-
         // Update status (set notes as temporary attribute for history)
         if ($request->filled('notes')) {
             $order->status_change_notes = $request->notes;
         }
         $order->update(['status' => $newStatus]);
-
-        // If status is cancelled, soft delete the order
-        if ($newStatus === OrderStatus::CANCELLED->value && !$order->trashed()) {
-            $order->delete();
-        }
 
         return back();
     }
