@@ -161,6 +161,7 @@ export interface Product {
   status: 'active' | 'inactive' | 'out_of_stock';
   meta_title?: string;
   meta_description?: string;
+  deleted_at?: string | null;
   artists: Artist[];
   main_artists?: Artist[];
   in_stock?: boolean;

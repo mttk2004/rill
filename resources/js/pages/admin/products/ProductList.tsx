@@ -45,7 +45,7 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
   const [filterStatus, setFilterStatus] = useState(filters.status || 'all');
   const [filterGenre, setFilterGenre] = useState(filters.genre || 'all');
-  const [sortBy, setSortBy] = useState(filters.sort || 'newest');
+  const [sortBy, setSortBy] = useState(filters.sort || 'name_asc');
 
   // Modal State
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
@@ -210,8 +210,6 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
                 }}
                 className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
               >
-                <option value="newest">Mới nhất</option>
-                <option value="oldest">Cũ nhất</option>
                 <option value="name_asc">Tên A-Z</option>
                 <option value="name_desc">Tên Z-A</option>
                 <option value="price_asc">Giá thấp → cao</option>
@@ -233,6 +231,7 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản phẩm</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tồn kho</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá gốc</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá bán</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
                   <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
@@ -240,7 +239,7 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {productsPagination.data.length > 0 ? productsPagination.data.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50 transition-colors group">
+                  <tr key={product.id} className={`hover:bg-gray-50 transition-colors group ${product.deleted_at ? 'opacity-60 bg-gray-50' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="h-12 w-12 rounded-lg border border-gray-200 overflow-hidden bg-gray-100">
                         {product.image ? (
@@ -262,11 +261,21 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {product.stock_quantity}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.cost_price ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.cost_price)) : '---'}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(product.status)}
+                      <div className="flex flex-col gap-1">
+                        {getStatusBadge(product.status)}
+                        {product.deleted_at && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">
+                            Đã xóa
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -284,19 +293,44 @@ const ProductList = ({ products: productsPagination, filters, stats, genres }: P
                         >
                           <Edit2 size={18} />
                         </button>
-                        <button
-                          onClick={() => setDeleteId(product.id)}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded"
-                          title="Xóa"
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                        {product.deleted_at ? (
+                          <button
+                            onClick={() => {
+                              router.post(`/admin/products/${product.id}/restore`, {}, {
+                                preserveScroll: true,
+                                onSuccess: () => {
+                                  showToast('Đã khôi phục sản phẩm thành công', 'success');
+                                },
+                                onError: () => {
+                                  showToast('Có lỗi xảy ra khi khôi phục sản phẩm', 'error');
+                                },
+                              });
+                            }}
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+                            title="Khôi phục"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+                              <path d="M21 3v5h-5" />
+                              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+                              <path d="M3 21v-5h5" />
+                            </svg>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setDeleteId(product.id)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+                            title="Xóa"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center">
                         <AlertCircle size={48} className="text-gray-300 mb-3" />
                         <p>Không tìm thấy sản phẩm nào.</p>

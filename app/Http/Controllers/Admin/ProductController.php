@@ -37,8 +37,8 @@ class ProductController extends Controller
 
         $query = $this->productService->buildProductQuery($filters);
 
-        // Eager load relationships
-        $products = $query->with([
+        // Eager load relationships (include soft deleted products)
+        $products = $query->withTrashed()->with([
             'artists' => function ($q) {
                 $q->wherePivot('role', 'main')->orderByPivot('sort_order');
             },
