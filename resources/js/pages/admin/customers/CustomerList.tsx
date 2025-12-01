@@ -8,9 +8,13 @@ import {
 } from 'lucide-react';
 import { useDebounce } from '../../../hooks/useDebounce';
 
+interface CustomerWithOrders extends User {
+  orders_count?: number;
+}
+
 interface CustomerListProps {
   users: {
-    data: User[];
+    data: CustomerWithOrders[];
     current_page: number;
     last_page: number;
     per_page: number;
@@ -139,6 +143,7 @@ const CustomerList = ({ users, filters }: CustomerListProps) => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Khách hàng</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Liên hệ</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số đơn hàng</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tham gia</th>
                   <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
                 </tr>
@@ -149,8 +154,8 @@ const CustomerList = ({ users, filters }: CustomerListProps) => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          {user.avatar ? (
-                            <img className="h-10 w-10 rounded-full object-cover" src={user.avatar} alt="" />
+                          {user.avatar_url || user.avatar ? (
+                            <img className="h-10 w-10 rounded-full object-cover" src={user.avatar_url || user.avatar} alt="" />
                           ) : (
                             <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
                               <UserIcon size={20} />
@@ -189,6 +194,9 @@ const CustomerList = ({ users, filters }: CustomerListProps) => {
                         {user.is_active ? 'Active' : 'Inactive'}
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+                      {user.orders_count || 0}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(user.created_at).toLocaleDateString('vi-VN')}
                     </td>
@@ -206,7 +214,7 @@ const CustomerList = ({ users, filters }: CustomerListProps) => {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                       <p>Không tìm thấy khách hàng nào.</p>
                     </td>
                   </tr>
