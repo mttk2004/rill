@@ -130,7 +130,8 @@ class OrderController extends Controller
      */
     public function show(Request $request, string $id)
     {
-        $order = Order::with([
+        $order = Order::withTrashed()
+        ->with([
             'user',
             'payment',
             'items.product.artists',
