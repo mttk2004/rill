@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import AdminLayout from '../../../components/admin/AdminLayout';
 import {
-  Search, Filter, Eye, Package, Clock, CheckCircle, Truck, XCircle, CreditCard, RefreshCcw, Edit2
+  Search, Filter, Eye, Package, Clock, CheckCircle, Truck, XCircle, CreditCard
 } from 'lucide-react';
 
 type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
@@ -90,15 +90,6 @@ const OrderList = ({ orders: ordersPagination, filters }: OrderListProps) => {
     }, 500);
 
     setSearchTimeout(timeout);
-  };
-
-  const handleRestore = (id: string) => {
-    router.post(`/admin/orders/${id}/restore`, {}, {
-      preserveScroll: true,
-      onSuccess: () => {
-        // Toast notification handled by backend
-      },
-    });
   };
 
   const getStatusBadge = (status: OrderStatus) => {
@@ -293,32 +284,13 @@ const OrderList = ({ orders: ordersPagination, filters }: OrderListProps) => {
                       {getStatusBadge(order.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => router.visit(`/admin/orders/${order.id}`)}
-                          className="text-gray-400 hover:text-primary p-2 rounded-full hover:bg-gray-100"
-                          title="Xem chi tiết"
-                        >
-                          <Eye size={18} />
-                        </button>
-                        {order.deleted_at ? (
-                          <button
-                            onClick={() => handleRestore(order.id)}
-                            className="text-green-600 hover:text-green-700 p-2 rounded-full hover:bg-green-50"
-                            title="Khôi phục đơn hàng"
-                          >
-                            <RefreshCcw size={18} />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => router.visit(`/admin/orders/${order.id}`)}
-                            className="text-blue-600 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50"
-                            title="Chỉnh sửa đơn hàng"
-                          >
-                            <Edit2 size={18} />
-                          </button>
-                        )}
-                      </div>
+                      <button
+                        onClick={() => router.visit(`/admin/orders/${order.id}`)}
+                        className="text-gray-400 hover:text-primary p-2 rounded-full hover:bg-gray-100"
+                        title="Xem chi tiết"
+                      >
+                        <Eye size={18} />
+                      </button>
                     </td>
                   </tr>
                 )) : (
