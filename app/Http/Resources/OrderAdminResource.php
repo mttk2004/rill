@@ -39,19 +39,16 @@ class OrderAdminResource extends JsonResource
             }),
 
             // Shipping address (JSON column)
-            'shipping_address' => $this->when(!empty($this->shipping_address), function () {
-                $address = $this->shipping_address;
-                return [
-                    'id' => $address['id'] ?? 0,
-                    'full_name' => $address['full_name'] ?? '',
-                    'phone' => $address['phone'] ?? '',
-                    'address_line_1' => $address['address_line_1'] ?? '',
-                    'address_line_2' => $address['address_line_2'] ?? null,
-                    'ward' => $address['ward'] ?? '',
-                    'district' => $address['district'] ?? '',
-                    'province' => $address['province'] ?? '',
-                ];
-            }),
+            'shipping_address' => !empty($this->shipping_address) ? [
+                'id' => $this->shipping_address['id'] ?? 0,
+                'full_name' => $this->shipping_address['full_name'] ?? '',
+                'phone' => $this->shipping_address['phone'] ?? '',
+                'address_line_1' => $this->shipping_address['address_line_1'] ?? '',
+                'address_line_2' => $this->shipping_address['address_line_2'] ?? null,
+                'ward' => $this->shipping_address['ward'] ?? '',
+                'district' => $this->shipping_address['district'] ?? '',
+                'province' => $this->shipping_address['province'] ?? '',
+            ] : null,
 
             // Payment information
             'payment' => $this->when($this->relationLoaded('payment'), function () {

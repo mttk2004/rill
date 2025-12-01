@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import Button from '../../../components/Button';
 import { useToast } from '../../../context/ToastContext';
+import { formatDateTime } from '../../../utils/format';
 
 type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
 type PaymentMethod = 'cod' | 'vnpay';
@@ -28,7 +29,7 @@ interface Payment {
   id: string;
   payment_method: PaymentMethod;
   payment_status: PaymentStatus;
-  amount: number;
+  amount: string | number;
   transaction_id?: string | null;
   processed_at?: string | null;
 }
@@ -40,12 +41,19 @@ interface OrderItem {
   product_sku: string;
   product_image?: string | null;
   quantity: number;
-  unit_price: number;
-  total_price: number;
+  unit_price: string | number;
+  total_price: string | number;
   product?: {
     id: string;
     name: string;
+    slug?: string;
+    sku?: string;
     image_url?: string;
+    artists?: Array<{
+      id: string;
+      name: string;
+      slug: string;
+    }>;
   };
 }
 
@@ -65,18 +73,25 @@ interface Order {
   id: string;
   order_number: string;
   status: OrderStatus;
-  subtotal: number;
-  shipping_fee: number;
-  discount_amount: number;
-  total_amount: number;
-  shipping_address: UserAddress;
+  subtotal: string | number;
+  shipping_fee: string | number;
+  discount_amount: string | number;
+  total_amount: string | number;
+  shipping_address: UserAddress | null;
   notes: string | null;
   placed_at: string;
   created_at: string;
   deleted_at?: string | null;
-  items: OrderItem[];
-  statusHistories?: OrderStatusHistory[];
+  order_items?: OrderItem[];
+  items_count?: number;
+  status_histories?: OrderStatusHistory[];
   payment?: Payment;
+  customer?: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+  };
 }
 
 interface AdminOrderDetailProps {
@@ -86,6 +101,13 @@ interface AdminOrderDetailProps {
 const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
   const { showToast } = useToast();
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // Helper to format currency (handles both string and number from backend)
+  const formatPrice = (amount: string | number | undefined | null): string => {
+    if (amount === undefined || amount === null) return '0 ₫';
+    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
+  };
 
   const handleStatusUpdate = (newStatus: OrderStatus, notes?: string) => {
     setIsUpdating(true);
@@ -141,9 +163,6 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
     }
   };
 
-  const formatCurrency = (val: number) =>
-    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -163,7 +182,7 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
                 </span>
               </div>
               <p className="text-sm text-gray-500 mt-1">
-                Đặt ngày: {new Date(order.placed_at).toLocaleString('vi-VN')}
+                Đặt ngày: {formatDateTime(order.placed_at)}
               </p>
             </div>
           </div>
@@ -183,10 +202,10 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
             {/* Order Items */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 font-bold text-gray-900">
-                Danh sách sản phẩm ({order.items.length})
+                Danh sách sản phẩm ({order.order_items?.length || 0})
               </div>
               <div className="divide-y divide-gray-100">
-                {order.items.map((item) => (
+                {order.order_items?.map((item) => (
                   <div key={item.id} className="p-6 flex gap-4">
                     <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
                       {(item.product_image || item.product?.image_url) && (
@@ -196,10 +215,10 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-1">
                         <h4 className="font-medium text-gray-900">{item.product_name}</h4>
-                        <p className="font-medium text-gray-900">{formatCurrency(item.total_price)}</p>
+                        <p className="font-medium text-gray-900">{formatPrice(item.total_price)}</p>
                       </div>
                       <p className="text-sm text-gray-500 mb-1">SKU: {item.product_sku}</p>
-                      <p className="text-sm text-gray-600">{formatCurrency(item.unit_price)} x {item.quantity}</p>
+                      <p className="text-sm text-gray-600">{formatPrice(item.unit_price)} x {item.quantity}</p>
                     </div>
                   </div>
                 ))}
@@ -207,19 +226,19 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 space-y-2">
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Tạm tính</span>
-                  <span>{formatCurrency(order.subtotal)}</span>
+                  <span>{formatPrice(order.subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Phí vận chuyển</span>
-                  <span>{formatCurrency(order.shipping_fee)}</span>
+                  <span>{formatPrice(order.shipping_fee)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-600">
                   <span>Giảm giá</span>
-                  <span>-{formatCurrency(order.discount_amount)}</span>
+                  <span>-{formatPrice(order.discount_amount)}</span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-gray-900 pt-2 border-t border-gray-200 mt-2">
                   <span>Tổng cộng</span>
-                  <span className="text-primary">{formatCurrency(order.total_amount)}</span>
+                  <span className="text-primary">{formatPrice(order.total_amount)}</span>
                 </div>
               </div>
             </div>
@@ -253,7 +272,7 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
                   <div>
                     <label className="block text-xs font-medium text-gray-500 uppercase mb-1">Ngày xử lý</label>
                     <p className="text-sm text-gray-700">
-                      {order.payment.processed_at ? new Date(order.payment.processed_at).toLocaleString('vi-VN') : '---'}
+                      {order.payment.processed_at ? formatDateTime(order.payment.processed_at) : '---'}
                     </p>
                   </div>
                 </div>
@@ -268,13 +287,13 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
                 <Clock size={20} className="text-primary" /> Lịch sử đơn hàng
               </h3>
               <div className="relative border-l-2 border-gray-200 ml-3 space-y-8">
-                {order.statusHistories?.map((history) => (
+                {order.status_histories?.map((history) => (
                   <div key={history.id} className="relative pl-8">
                     <div className={`absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 ${getTimelineDotColor(history.status)}`}></div>
                     <div>
                       <p className="font-bold text-gray-900 text-sm uppercase tracking-wide">{getStatusLabel(history.status)}</p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {new Date(history.created_at).toLocaleString('vi-VN')}
+                        {formatDateTime(history.created_at)}
                         {history.createdBy && <span className="ml-2 text-gray-400">bởi {history.createdBy.name}</span>}
                       </p>
                       {history.notes && (
@@ -328,24 +347,26 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
             </div>
 
             {/* Customer Info */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <MapPin size={20} className="text-primary" /> Địa chỉ nhận hàng
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <p className="font-bold text-gray-900 text-base">{order.shipping_address.full_name}</p>
-                  <p className="text-gray-500">{order.shipping_address.phone}</p>
-                </div>
-                <hr className="border-gray-100" />
-                <div className="text-gray-600 space-y-1">
-                  <p>{order.shipping_address.address_line_1}</p>
-                  {order.shipping_address.address_line_2 && <p>{order.shipping_address.address_line_2}</p>}
-                  <p>{order.shipping_address.ward}, {order.shipping_address.district}</p>
-                  <p className="font-medium text-gray-800">{order.shipping_address.province}</p>
+            {order.shipping_address && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <MapPin size={20} className="text-primary" /> Địa chỉ nhận hàng
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="font-bold text-gray-900 text-base">{order.shipping_address.full_name}</p>
+                    <p className="text-gray-500">{order.shipping_address.phone}</p>
+                  </div>
+                  <hr className="border-gray-100" />
+                  <div className="text-gray-600 space-y-1">
+                    <p>{order.shipping_address.address_line_1}</p>
+                    {order.shipping_address.address_line_2 && <p>{order.shipping_address.address_line_2}</p>}
+                    <p>{order.shipping_address.ward}, {order.shipping_address.district}</p>
+                    <p className="font-medium text-gray-800">{order.shipping_address.province}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Note */}
             {order.notes && (
