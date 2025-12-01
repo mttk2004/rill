@@ -29,20 +29,20 @@ interface ArtistListProps {
     total_products: number;
   };
   countries: string[];
-  filters: {
-    search: string;
-    country: string;
-    status: string;
-    sort: string;
+  filters?: {
+    search?: string;
+    country?: string;
+    status?: string;
+    sort?: string;
   };
 }
 
 const ArtistList = ({ artists, stats, countries, filters }: ArtistListProps) => {
   const { showToast } = useToast();
-  const [searchQuery, setSearchQuery] = useState(filters.search || '');
-  const [filterCountry, setFilterCountry] = useState(filters.country || 'all');
-  const [filterStatus, setFilterStatus] = useState(filters.status || 'all');
-  const [sortBy, setSortBy] = useState(filters.sort || 'name_asc');
+  const [searchQuery, setSearchQuery] = useState(filters?.search || '');
+  const [filterCountry, setFilterCountry] = useState(filters?.country || 'all');
+  const [filterStatus, setFilterStatus] = useState(filters?.status || 'all');
+  const [sortBy, setSortBy] = useState(filters?.sort || 'name_asc');
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // Debounce search query
@@ -67,10 +67,10 @@ const ArtistList = ({ artists, stats, countries, filters }: ArtistListProps) => 
   const handlePageChange = (page: number) => {
     const params: Record<string, string> = { page: page.toString() };
 
-    if (filters.search) params.search = filters.search;
-    if (filters.country) params.country = filters.country;
-    if (filters.status) params.status = filters.status;
-    if (filters.sort) params.sort = filters.sort;
+    if (filters?.search) params.search = filters.search;
+    if (filters?.country) params.country = filters.country;
+    if (filters?.status) params.status = filters.status;
+    if (filters?.sort) params.sort = filters.sort;
 
     router.get('/admin/artists', params, {
       preserveState: true,
@@ -93,6 +93,20 @@ const ArtistList = ({ artists, stats, countries, filters }: ArtistListProps) => 
         },
       });
     }
+  };
+
+  const handleRestore = (id: string) => {
+    const artistName = artists.data.find(a => a.id === id)?.name || 'nghệ sĩ';
+    router.post(`/admin/artists/${id}/restore`, {}, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showToast(`Đã khôi phục ${artistName}`, 'success');
+      },
+      onError: (errors: Record<string, string>) => {
+        const firstError = Object.values(errors)[0];
+        showToast(firstError || 'Có lỗi xảy ra khi khôi phục nghệ sĩ', 'error');
+      },
+    });
   };
 
   return (
@@ -175,6 +189,7 @@ const ArtistList = ({ artists, stats, countries, filters }: ArtistListProps) => 
                 artist={artist}
                 onEdit={() => router.visit(`/admin/artists/${artist.id}/edit`)}
                 onDelete={setDeleteId}
+                onRestore={handleRestore}
               />
             ))
           ) : (
@@ -224,8 +239,8 @@ const ArtistList = ({ artists, stats, countries, filters }: ArtistListProps) => 
                       key={page}
                       onClick={() => handlePageChange(page)}
                       className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === artists.current_page
-                          ? 'z-10 bg-primary border-primary text-white'
-                          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                        ? 'z-10 bg-primary border-primary text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                         }`}
                     >
                       {page}

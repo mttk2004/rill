@@ -1,15 +1,17 @@
 
 import React from 'react';
-import { Edit2, Trash2, Globe, User } from 'lucide-react';
+import { Edit2, Trash2, Globe, User, RotateCcw } from 'lucide-react';
 import { Artist } from '../../../types';
 
 interface ArtistCardProps {
   artist: Artist;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onRestore: (id: string) => void;
 }
 
-const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete }) => {
+const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete, onRestore }) => {
+  const isDeleted = !!artist.deleted_at;
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col h-full group">
       <div className="p-5 flex items-start gap-4">
@@ -34,7 +36,12 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete }) => 
         </div>
         
         {/* Status Dot */}
-        <span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500 flex-shrink-0 mt-1.5" title="Đang hoạt động"></span>
+        <span 
+          className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${
+            isDeleted ? 'bg-red-500' : 'bg-green-500'
+          }`} 
+          title={isDeleted ? 'Đã xóa' : 'Đang hoạt động'}
+        ></span>
       </div>
       
       <div className="px-5 pb-4 flex-1">
@@ -44,22 +51,37 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete }) => 
       </div>
 
       <div className="mt-auto border-t border-gray-100 px-4 py-3 bg-gray-50 rounded-b-lg flex justify-between items-center opacity-80 group-hover:opacity-100 transition-opacity">
-        <span className="text-xs text-gray-400">ID: {artist.id.slice(-4)}</span>
+        <span className="text-xs text-gray-400">
+          {isDeleted && <span className="text-red-500 font-medium mr-2">Đã xóa</span>}
+          ID: {artist.id.slice(-4)}
+        </span>
         <div className="flex gap-2">
-            <button 
-                onClick={() => onEdit(artist.id)}
-                className="p-2 text-gray-500 hover:text-primary hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
-                title="Chỉnh sửa"
-            >
-                <Edit2 size={16} />
-            </button>
-            <button 
-                onClick={() => onDelete(artist.id)}
-                className="p-2 text-gray-500 hover:text-red-600 hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
-                title="Xóa"
-            >
-                <Trash2 size={16} />
-            </button>
+            {!isDeleted ? (
+              <>
+                <button 
+                    onClick={() => onEdit(artist.id)}
+                    className="p-2 text-gray-500 hover:text-primary hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+                    title="Chỉnh sửa"
+                >
+                    <Edit2 size={16} />
+                </button>
+                <button 
+                    onClick={() => onDelete(artist.id)}
+                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+                    title="Xóa"
+                >
+                    <Trash2 size={16} />
+                </button>
+              </>
+            ) : (
+              <button 
+                  onClick={() => onRestore(artist.id)}
+                  className="p-2 text-gray-500 hover:text-green-600 hover:bg-white rounded-md transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+                  title="Khôi phục"
+              >
+                  <RotateCcw size={16} />
+              </button>
+            )}
         </div>
       </div>
     </div>

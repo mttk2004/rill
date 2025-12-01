@@ -102,11 +102,19 @@ class ArtistController extends Controller
             'total_products' => DB::table('artist_product')->count(),
         ];
 
+        // Ensure filters is always an object, not an array
+        $filters = [
+            'search' => $request->get('search', ''),
+            'country' => $request->get('country', 'all'),
+            'status' => $request->get('status', 'all'),
+            'sort' => $request->get('sort', 'name_asc'),
+        ];
+
         return Inertia::render('admin/artists/ArtistList', [
             'artists' => $artists,
             'stats' => $stats,
             'countries' => $countries,
-            'filters' => $request->only(['search', 'country', 'status', 'sort']),
+            'filters' => $filters,
         ]);
     }
 
@@ -248,10 +256,7 @@ class ArtistController extends Controller
         $artist = Artist::findOrFail($id);
         $artist->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Nghệ sĩ đã được xóa thành công',
-        ]);
+        return redirect()->back();
     }
 
     /**
@@ -262,9 +267,6 @@ class ArtistController extends Controller
         $artist = Artist::withTrashed()->findOrFail($id);
         $artist->restore();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Nghệ sĩ đã được khôi phục thành công',
-        ]);
+        return redirect()->back();
     }
 }
