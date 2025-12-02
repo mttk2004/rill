@@ -190,7 +190,29 @@ class OrderController extends Controller
             return back()->with('error', 'Chỉ có thể hủy đơn hàng đang chờ xác nhận.');
         }
 
-        $order->update(['status' => OrderStatus::CANCELLED]);
+        // Load order items with products
+        $order->load('items.product');
+
+        // Use transaction to ensure atomicity
+        \DB::transaction(function () use ($order) {
+            // Restore stock for each item
+            foreach ($order->items as $item) {
+                if ($item->product) {
+                    $item->product->incrementStock($item->quantity);
+
+                    \Log::info('Stock restored after order cancellation', [
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product->name,
+                        'quantity_restored' => $item->quantity,
+                        'new_stock' => $item->product->fresh()->stock_quantity,
+                    ]);
+                }
+            }
+
+            // Update order status
+            $order->update(['status' => OrderStatus::CANCELLED]);
+        });
 
         return back()->with('success', 'Đơn hàng đã được hủy thành công.');
     }
