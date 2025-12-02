@@ -45,21 +45,23 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           Sản phẩm
         </Link>
 
-        <div className="px-3 py-2 text-gray-700 font-medium">
-          Bộ sưu tập
-          <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-100 pl-2">
-            {collections.map((col) => (
-              <Link
-                key={col.id}
-                href={`/products?collection=${col.slug}`}
-                className="block text-sm text-gray-600 hover:text-primary py-1"
-                onClick={onClose}
-              >
-                {col.name}
-              </Link>
-            ))}
+        {collections && collections.length > 0 && (
+          <div className="px-3 py-2 text-gray-700 font-medium">
+            Bộ sưu tập
+            <div className="ml-4 mt-2 space-y-2 border-l-2 border-gray-100 pl-2">
+              {collections.map((col) => (
+                <Link
+                  key={col.id}
+                  href={`/products?collection=${col.slug}`}
+                  className="block text-sm text-gray-600 hover:text-primary py-1"
+                  onClick={onClose}
+                >
+                  {col.name}
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <Link
           href="/about"

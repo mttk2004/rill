@@ -56,45 +56,47 @@ export default function Home({ featuredProducts = [], collections = [], artists 
         </section>
 
         {/* Featured Collections */}
-        <section className="py-24 bg-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <Reveal>
-              <div className="text-center mb-16">
-                <h2 className="text-4xl font-serif font-bold text-gray-900 mb-4">Bộ Sưu Tập</h2>
-                <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
-                <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
-                  Được tuyển chọn kỹ lưỡng bởi các chuyên gia âm thanh, mang đến trải nghiệm nghe nhạc tuyệt vời nhất cho không gian của bạn.
-                </p>
-              </div>
-            </Reveal>
+        {collections && collections.length > 0 && (
+          <section className="py-24 bg-white">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <Reveal>
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl font-serif font-bold text-gray-900 mb-4">Bộ Sưu Tập</h2>
+                  <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
+                  <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
+                    Được tuyển chọn kỹ lưỡng bởi các chuyên gia âm thanh, mang đến trải nghiệm nghe nhạc tuyệt vời nhất cho không gian của bạn.
+                  </p>
+                </div>
+              </Reveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {collections && collections.slice(0, 2).map((col, idx) => (
-                <Reveal key={col.id} delay={idx * 0.2} direction={idx % 2 === 0 ? 'left' : 'right'}>
-                  <Link href="/products" className="block h-full">
-                    <div className="relative group overflow-hidden rounded-2xl h-[400px] cursor-pointer">
-                      <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors z-10 duration-500"></div>
-                      <img
-                        src={`https://images.unsplash.com/photo-${idx === 0 ? '1489641493513-ba6daaa61833' : '1500462918059-b1a0cb512f1d'}?q=80&w=1000&auto=format&fit=crop`}
-                        alt={col.name}
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                      />
-                      <div className="absolute bottom-0 left-0 p-8 z-20 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                        <p className="text-accent text-sm font-bold tracking-widest mb-2 uppercase">{col.type === 'featured' ? 'Best Sellers' : 'Editors Choice'}</p>
-                        <div className="flex justify-between items-end">
-                          <h3 className="text-3xl font-serif font-bold text-white group-hover:text-accent transition-colors">{col.name}</h3>
-                          <span className="h-10 w-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white group-hover:bg-accent group-hover:text-white transition-all">
-                            <ArrowRight size={20} />
-                          </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {collections.slice(0, 2).map((col, idx) => (
+                  <Reveal key={col.id} delay={idx * 0.2} direction={idx % 2 === 0 ? 'left' : 'right'}>
+                    <Link href="/products" className="block h-full">
+                      <div className="relative group overflow-hidden rounded-2xl h-[400px] cursor-pointer">
+                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors z-10 duration-500"></div>
+                        <img
+                          src={`https://images.unsplash.com/photo-${idx === 0 ? '1489641493513-ba6daaa61833' : '1500462918059-b1a0cb512f1d'}?q=80&w=1000&auto=format&fit=crop`}
+                          alt={col.name}
+                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                        />
+                        <div className="absolute bottom-0 left-0 p-8 z-20 w-full transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                          <p className="text-accent text-sm font-bold tracking-widest mb-2 uppercase">{col.type === 'featured' ? 'Best Sellers' : 'Editors Choice'}</p>
+                          <div className="flex justify-between items-end">
+                            <h3 className="text-3xl font-serif font-bold text-white group-hover:text-accent transition-colors">{col.name}</h3>
+                            <span className="h-10 w-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white group-hover:bg-accent group-hover:text-white transition-all">
+                              <ArrowRight size={20} />
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                </Reveal>
-              ))}
+                    </Link>
+                  </Reveal>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Featured Products */}
         <section className="py-24 bg-gray-50 border-y border-gray-100">

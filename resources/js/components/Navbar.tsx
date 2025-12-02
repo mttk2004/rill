@@ -120,33 +120,35 @@ const Navbar = () => {
                   </div>
 
                   {/* Collection Dropdown */}
-                  <div
-                    className="relative group h-full flex items-center"
-                    onMouseEnter={() => setIsCollectionHovered(true)}
-                    onMouseLeave={() => setIsCollectionHovered(false)}
-                  >
-                    <button className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-accent ${isCollectionHovered ? 'text-primary' : 'text-gray-500'}`}>
-                      Bộ sưu tập <ChevronDown size={14} />
-                    </button>
+                  {collections && collections.length > 0 && (
+                    <div
+                      className="relative group h-full flex items-center"
+                      onMouseEnter={() => setIsCollectionHovered(true)}
+                      onMouseLeave={() => setIsCollectionHovered(false)}
+                    >
+                      <button className={`flex items-center gap-1 text-sm font-medium transition-colors hover:text-accent ${isCollectionHovered ? 'text-primary' : 'text-gray-500'}`}>
+                        Bộ sưu tập <ChevronDown size={14} />
+                      </button>
 
-                    {/* Dropdown Menu */}
-                    {isCollectionHovered && (
-                      <div className="absolute left-0 top-full w-56 rounded-xl border border-gray-100 bg-white shadow-xl animate-in fade-in slide-in-from-top-1 duration-200 pt-2 z-50">
-                        <div className="py-2">
-                          {collections.map((col) => (
-                            <Link
-                              key={col.id}
-                              href={`/products?collection=${col.slug}`}
-                              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
-                              onClick={closeAllMenus}
-                            >
-                              {col.name}
-                            </Link>
-                          ))}
+                      {/* Dropdown Menu */}
+                      {isCollectionHovered && (
+                        <div className="absolute left-0 top-full w-56 rounded-xl border border-gray-100 bg-white shadow-xl animate-in fade-in slide-in-from-top-1 duration-200 pt-2 z-50">
+                          <div className="py-2">
+                            {collections.map((col) => (
+                              <Link
+                                key={col.id}
+                                href={`/products?collection=${col.slug}`}
+                                className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                                onClick={closeAllMenus}
+                              >
+                                {col.name}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
 
                   <Link
                     href="/about"
