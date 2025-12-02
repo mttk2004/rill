@@ -26,6 +26,8 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const { cart, cartTotal } = useShop();
   const defaultAddress = addresses.find(a => a.is_default) || addresses[0];
   const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
+  const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const { data, setData, post, processing } = useForm<{
     shipping_address_id: string | null;
@@ -42,7 +44,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const [shippingCost, setShippingCost] = useState(0);
   const [loadingShipping, setLoadingShipping] = useState(false);
 
-  const finalTotal = cartTotal + shippingCost;
+  const finalTotal = cartTotal + shippingCost - discountAmount;
 
   // Fetch shipping cost when address changes
   useEffect(() => {
@@ -92,9 +94,28 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
     }
   }, [cartTotal]);
 
-  const handleApplyVoucher = (code: string) => {
-    setData('voucher_code', code);
+  const handleApplyVoucher = (voucher: Voucher) => {
+    setData('voucher_code', voucher.code);
+    setAppliedVoucher(voucher);
     setIsVoucherFocused(false);
+
+    // Calculate discount
+    let discount = 0;
+    if (voucher.discount_amount) {
+      discount = voucher.discount_amount;
+    } else {
+      discount = (cartTotal * voucher.value) / 100;
+      if (voucher.maximum_discount && discount > voucher.maximum_discount) {
+        discount = voucher.maximum_discount;
+      }
+    }
+    setDiscountAmount(discount);
+  };
+
+  const handleRemoveVoucher = () => {
+    setData('voucher_code', '');
+    setAppliedVoucher(null);
+    setDiscountAmount(0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -293,22 +314,29 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                 {/* Voucher Input */}
                 <div className="mb-6 relative">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Mã giảm giá</label>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Ticket size={16} className="text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        value={data.voucher_code}
-                        onChange={(e) => setData('voucher_code', e.target.value)}
-                        onFocus={() => setIsVoucherFocused(true)}
-                        onBlur={() => setTimeout(() => setIsVoucherFocused(false), 200)}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm"
-                        placeholder="Nhập mã voucher"
-                      />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Ticket size={16} className="text-gray-400" />
                     </div>
-                    <Button variant="secondary" className="px-4 py-2 h-auto text-sm">Áp dụng</Button>
+                    <input
+                      type="text"
+                      value={data.voucher_code}
+                      onChange={(e) => setData('voucher_code', e.target.value)}
+                      onFocus={() => setIsVoucherFocused(true)}
+                      onBlur={() => setTimeout(() => setIsVoucherFocused(false), 200)}
+                      className="block w-full pl-10 pr-20 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm"
+                      placeholder="Chọn hoặc nhập mã voucher"
+                      readOnly={!!appliedVoucher}
+                    />
+                    {appliedVoucher && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveVoucher}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-red-600 hover:text-red-700 font-medium"
+                      >
+                        Xóa
+                      </button>
+                    )}
                   </div>
 
                   {/* Dropdown Suggestions */}
@@ -322,7 +350,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                           <button
                             key={v.code}
                             className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group"
-                            onClick={() => handleApplyVoucher(v.code)}
+                            onClick={() => handleApplyVoucher(v)}
                             type="button"
                           >
                             <div className="flex justify-between items-center mb-1">
@@ -358,6 +386,12 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                       <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(shippingCost)}</span>
                     )}
                   </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Giảm giá {appliedVoucher && `(${appliedVoucher.code})`}</span>
+                      <span>-{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discountAmount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-t border-gray-200 pt-4 text-base font-bold text-gray-900">
                     <span>Tổng cộng</span>
                     <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(finalTotal)}</span>
