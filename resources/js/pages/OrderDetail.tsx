@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle, Star, Download, RefreshCw } from 'lucide-react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle, Star, Download, RefreshCw, XCircle } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { formatDate } from '../utils/date';
@@ -89,6 +89,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isRetryingPayment, setIsRetryingPayment] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const handleDownloadInvoice = () => {
     if (!canDownloadInvoice) {
@@ -125,6 +127,26 @@ export default function OrderDetail({ order }: OrderDetailProps) {
       }
       setIsRetryingPayment(false);
     }
+  };
+
+  const handleCancelOrder = () => {
+    if (isCancelling) return;
+
+    setIsCancelling(true);
+
+    router.post(`/orders/${order.id}/cancel`, {}, {
+      preserveScroll: true,
+      onSuccess: () => {
+        showToast('Đơn hàng đã được hủy thành công', 'success');
+        setShowCancelModal(false);
+        setIsCancelling(false);
+      },
+      onError: (errors) => {
+        const errorMessage = errors.error || Object.values(errors)[0] || 'Không thể hủy đơn hàng. Vui lòng thử lại!';
+        showToast(errorMessage as string, 'error');
+        setIsCancelling(false);
+      },
+    });
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,6 +233,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
       ? order.payment.payment_status === 'pending'
       : Object.values(order.payment.payment_status)[0] === 'pending') &&
     (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'pending';
+
+  const canCancelOrder = (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'pending';
 
   const isDelivered = (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'delivered';
 
@@ -522,12 +546,66 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   <Download size={18} />
                   {canDownloadInvoice ? 'Tải hóa đơn' : 'Chưa thể tải hóa đơn'}
                 </Button>
+                {canCancelOrder && (
+                  <Button
+                    fullWidth
+                    variant="outline"
+                    onClick={() => setShowCancelModal(true)}
+                    className="flex items-center justify-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                  >
+                    <XCircle size={18} />
+                    Hủy đơn hàng
+                  </Button>
+                )}
                 <Button fullWidth variant="outline">Yêu cầu hỗ trợ</Button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Cancel Order Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-gray-200">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <XCircle size={24} className="text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Xác nhận hủy đơn hàng</h3>
+                <p className="text-sm text-gray-600">
+                  Bạn có chắc chắn muốn hủy đơn hàng <span className="font-mono font-medium text-gray-900">#{order.order_number}</span> không?
+                </p>
+                <p className="text-sm text-red-600 mt-2">
+                  Hành động này không thể hoàn tác.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCancelModal(false)}
+                disabled={isCancelling}
+                fullWidth
+              >
+                Đóng
+              </Button>
+              <Button
+                type="button"
+                onClick={handleCancelOrder}
+                disabled={isCancelling}
+                fullWidth
+                className="bg-red-600 hover:bg-red-700 text-white border-transparent"
+              >
+                {isCancelling ? 'Đang hủy...' : 'Xác nhận hủy'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Review Modal */}
       {reviewingProduct && (
