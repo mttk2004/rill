@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { router, useForm } from '@inertiajs/react';
-import { ArrowLeft, Save, Layers, Plus, X, GripVertical, Search } from 'lucide-react';
+import { ArrowLeft, Save, Layers, Plus, X, GripVertical, Search, UploadCloud } from 'lucide-react';
 import { Collection, Product } from '../../../types';
 import { useToast } from '../../../context/ToastContext';
 import Button from '../../../components/Button';
@@ -191,6 +191,7 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
     slug: string;
     type: string;
     description: string;
+    image: string | File;
     is_active: boolean;
     products: Array<{ id: string; position: number }>;
   }>({
@@ -198,6 +199,7 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
     slug: collection?.slug || '',
     type: collection?.type || 'featured',
     description: collection?.description || '',
+    image: collection?.image || '',
     is_active: collection?.is_active ?? true,
     products: collection?.products?.map(p => ({
       id: p.id,
@@ -206,6 +208,7 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
   });
 
   const [items, setItems] = useState<Array<{ product_id: string; position: number }>>(data.products.map(p => ({ product_id: p.id, position: p.position })));
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // DnD Sensors
   const sensors = useSensors(
@@ -228,6 +231,16 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setData(name as keyof typeof data, value);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      // @ts-expect-error - Inertia handles File objects correctly
+      setData('image', file);
+    }
   };
 
   const handleSlugGen = () => {
@@ -282,11 +295,18 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
     e.preventDefault();
 
     if (isEditMode && collection) {
-      router.post(`/admin/collections/${collection.id}`, {
-        ...data,
-        _method: 'put',
-      }, {
+      // Prepare data for update
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updateData: Record<string, any> = { ...data, _method: 'put' };
+
+      // If image is a string (not a File), remove it from payload to avoid validation error
+      if (typeof data.image === 'string') {
+        delete updateData.image;
+      }
+
+      router.post(`/admin/collections/${collection.id}`, updateData, {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: () => {
           showToast(`Đã cập nhật bộ sưu tập "${data.name}"`, 'success');
         },
@@ -298,6 +318,7 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
     } else {
       post('/admin/collections', {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: () => {
           showToast(`Đã tạo bộ sưu tập mới "${data.name}"`, 'success');
         },
@@ -472,6 +493,52 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
                     <option value={0}>Ẩn (Inactive)</option>
                   </select>
                 </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Ảnh bộ sưu tập</h3>
+              <p className="text-xs text-gray-500 mb-3">Sử dụng cho hiển thị trên trang chủ (khuyến nghị 1200x800px)</p>
+
+              <div className="mb-3">
+                <div className="aspect-[3/2] rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center text-gray-400 relative overflow-hidden group hover:border-primary hover:text-primary transition-colors cursor-pointer">
+                  {imagePreview || (typeof data.image === 'string' && data.image) ? (
+                    <>
+                      <img
+                        src={imagePreview || (typeof data.image === 'string' ? data.image : '')}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="text-white text-sm font-medium">Thay đổi ảnh</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <UploadCloud size={32} className="mb-2" />
+                      <span className="text-sm font-medium">Tải ảnh lên</span>
+                      <span className="text-xs text-gray-400 mt-1">hoặc kéo thả vào đây</span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Hoặc nhập URL ảnh</label>
+                <input
+                  type="text"
+                  name="image"
+                  value={typeof data.image === 'string' ? data.image : ''}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                  placeholder="https://..."
+                />
               </div>
             </div>
           </div>

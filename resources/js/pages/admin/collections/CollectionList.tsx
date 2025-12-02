@@ -157,6 +157,7 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">#</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Ảnh</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên bộ sưu tập</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loại</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
@@ -169,6 +170,15 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
                   <tr key={collection.id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {collection.id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {collection.image_url ? (
+                        <img src={collection.image_url} alt={collection.name} className="h-10 w-10 rounded object-cover" />
+                      ) : (
+                        <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center text-gray-400">
+                          <Layers size={16} />
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{collection.name}</div>
@@ -212,7 +222,7 @@ const CollectionList = ({ collections, filters }: CollectionListProps) => {
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center justify-center">
                         <Layers size={48} className="text-gray-300 mb-3" />
                         <p>Không tìm thấy bộ sưu tập nào.</p>

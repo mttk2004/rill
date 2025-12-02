@@ -21,6 +21,7 @@ class CollectionSeeder extends Seeder
                 'name' => 'Sản phẩm nổi bật',
                 'type' => 'featured',
                 'description' => 'Các sản phẩm nổi bật được chọn lọc',
+                'image' => null, // Admin can upload later
                 'is_active' => true,
             ]
         );
@@ -45,15 +46,41 @@ class CollectionSeeder extends Seeder
             $this->command->info("Featured collection already has {$featuredCollection->products()->count()} products");
         }
 
-        // Create a promotional collection example
-        $promoCollection = Collection::create([
-            'name' => 'Giảm giá đặc biệt',
-            'slug' => 'giam-gia-dac-biet',
-            'type' => 'promotion',
-            'description' => 'Các sản phẩm đang được giảm giá',
-            'is_active' => false, // Inactive by default
-        ]);
+        // Create additional collections with sample data
+        $collections = [
+            [
+                'name' => 'Giảm giá đặc biệt',
+                'slug' => 'giam-gia-dac-biet',
+                'type' => 'promotion',
+                'description' => 'Các sản phẩm đang được giảm giá',
+                'image' => null,
+                'is_active' => false,
+            ],
+            [
+                'name' => 'Jazz Classics',
+                'slug' => 'jazz-classics',
+                'type' => 'curated',
+                'description' => 'Những album Jazz kinh điển không thể bỏ lỡ',
+                'image' => null,
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Rock Legends',
+                'slug' => 'rock-legends',
+                'type' => 'curated',
+                'description' => 'Huyền thoại nhạc Rock qua các thời kỳ',
+                'image' => null,
+                'is_active' => true,
+            ],
+        ];
 
-        $this->command->info('Created promotional collection (inactive)');
+        foreach ($collections as $collectionData) {
+            Collection::firstOrCreate(
+                ['slug' => $collectionData['slug']],
+                $collectionData
+            );
+        }
+
+        $this->command->info('Created sample collections');
     }
 }

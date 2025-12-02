@@ -134,6 +134,8 @@ export interface Collection {
   slug: string;
   type: 'featured' | 'banner' | 'promotion' | 'curated';
   description: string | null;
+  image?: string | null;
+  image_url?: string | null;
   is_active: boolean;
   products_count?: number;
   products?: Array<Product & { pivot: { position: number } }>;

@@ -117,6 +117,7 @@ class CollectionController extends Controller
             'slug' => 'nullable|string|max:255|unique:collections,slug',
             'type' => 'required|in:featured,banner,promotion,curated',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
             'products' => 'nullable|array',
             'products.*.id' => 'required_with:products|exists:products,id',
@@ -126,6 +127,11 @@ class CollectionController extends Controller
         // Generate slug if not provided
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $validated['image'] = $this->uploadImage($request->file('image'), 'collections');
         }
 
         $collection = Collection::create($validated);
@@ -197,11 +203,21 @@ class CollectionController extends Controller
             'slug' => 'nullable|string|max:255|unique:collections,slug,' . $collection->id,
             'type' => 'required|in:featured,banner,promotion,curated',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
             'products' => 'nullable|array',
             'products.*.id' => 'required_with:products|exists:products,id',
             'products.*.position' => 'required_with:products|integer|min:0',
         ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($collection->image) {
+                $this->deleteImage($collection->image);
+            }
+            $validated['image'] = $this->uploadImage($request->file('image'), 'collections');
+        }
 
         $collection->update($validated);
 
@@ -237,5 +253,61 @@ class CollectionController extends Controller
         $collection->update(['is_active' => !$collection->is_active]);
 
         return back()->with('success', 'Trạng thái collection đã được cập nhật!');
+    }
+
+    /**
+     * Upload image to Supabase storage
+     */
+    private function uploadImage($file, string $folder = 'collections'): string
+    {
+        $supabaseUrl = config('services.supabase.url');
+        $supabaseKey = config('services.supabase.anon_key');
+        $bucket = config('services.supabase.storage_bucket', 'images');
+
+        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $filePath = "{$folder}/{$fileName}";
+
+        $client = new \GuzzleHttp\Client();
+        $response = $client->post(
+            "{$supabaseUrl}/storage/v1/object/{$bucket}/{$filePath}",
+            [
+                'headers' => [
+                    'Authorization' => "Bearer {$supabaseKey}",
+                    'Content-Type' => $file->getMimeType(),
+                ],
+                'body' => file_get_contents($file->getRealPath()),
+            ]
+        );
+
+        if ($response->getStatusCode() !== 200) {
+            throw new \Exception('Failed to upload image to Supabase');
+        }
+
+        return $filePath;
+    }
+
+    /**
+     * Delete image from Supabase storage
+     */
+    private function deleteImage(string $path): void
+    {
+        try {
+            $supabaseUrl = config('services.supabase.url');
+            $supabaseKey = config('services.supabase.anon_key');
+            $bucket = config('services.supabase.storage_bucket', 'images');
+
+            $client = new \GuzzleHttp\Client();
+            $client->delete(
+                "{$supabaseUrl}/storage/v1/object/{$bucket}/{$path}",
+                [
+                    'headers' => [
+                        'Authorization' => "Bearer {$supabaseKey}",
+                    ],
+                ]
+            );
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            \Log::warning("Failed to delete image: {$path}", ['error' => $e->getMessage()]);
+        }
     }
 }

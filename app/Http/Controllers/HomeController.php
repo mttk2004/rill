@@ -26,7 +26,7 @@ class HomeController extends Controller
         $collections = Collection::active()
             ->orderBy('name')
             ->take(6)
-            ->get(['id', 'name', 'slug', 'type', 'description']);
+            ->get(['id', 'name', 'slug', 'type', 'description', 'image']);
 
         // Get featured artists
         $artists = \App\Models\Artist::active()

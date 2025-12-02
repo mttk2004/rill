@@ -20,6 +20,7 @@ class Collection extends Model
         'slug',
         'type',
         'description',
+        'image',
         'is_active',
     ];
 
@@ -29,6 +30,28 @@ class Collection extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    protected $appends = ['image_url'];
+
+    /**
+     * Get the full URL for the collection image
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image) {
+            return null;
+        }
+
+        // If it's already a full URL, return as-is
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+
+        // Otherwise, construct Supabase URL
+        $supabaseUrl = config('services.supabase.url');
+        $bucket = config('services.supabase.storage_bucket', 'images');
+        return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$this->image}";
+    }
 
     /**
      * Boot the model.

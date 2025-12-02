@@ -80,7 +80,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
                       <div className="relative group overflow-hidden rounded-2xl h-[400px] cursor-pointer">
                         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors z-10 duration-500"></div>
                         <img
-                          src={`https://images.unsplash.com/photo-${idx === 0 ? '1489641493513-ba6daaa61833' : '1500462918059-b1a0cb512f1d'}?q=80&w=1000&auto=format&fit=crop`}
+                          src={col.image_url || `https://images.unsplash.com/photo-${idx === 0 ? '1489641493513-ba6daaa61833' : '1500462918059-b1a0cb512f1d'}?q=80&w=1000&auto=format&fit=crop`}
                           alt={col.name}
                           className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                         />

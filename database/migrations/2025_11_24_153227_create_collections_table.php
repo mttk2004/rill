@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('slug')->unique()->comment('URL slug');
             $table->enum('type', ['featured', 'banner', 'promotion', 'curated'])->default('featured')->comment('Loại collection');
             $table->text('description')->nullable()->comment('Mô tả');
+            $table->string('image')->nullable()->comment('Ảnh collection (stored in Supabase)');
             $table->boolean('is_active')->default(true)->comment('Trạng thái hoạt động');
             $table->timestamps();
             $table->softDeletes();
