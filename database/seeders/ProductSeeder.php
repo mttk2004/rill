@@ -546,7 +546,11 @@ Bìa đĩa với hình ảnh đám đông giơ tay lên trời thể hiện chí
             // Marvin Gaye
             [
                 'name' => 'What\'s Going On',
-                'description' => 'Album phòng thu thứ mười một của Marvin Gaye phát hành năm 1971, một concept album về các vấn đề xã hội. Được coi là một trong những album vĩ đại nhất, với ca khúc chủ đề và "Mercy Mercy Me".',
+                'detailed_description' => '`What\'s Going On` (1971) thường xuyên đứng đầu các danh sách "Album hay nhất mọi thời đại" của các tạp chí uy tín. Đây là bước ngoặt khi Marvin Gaye thoát khỏi khuôn mẫu "hoàng tử tình ca" của Motown để trở thành một nghệ sĩ có lương tri xã hội. Album là một chuỗi ca khúc liền mạch (song cycle) phản ánh góc nhìn của một cựu chiến binh Việt Nam trở về Mỹ, chứng kiến sự bất công, nghèo đói, ma túy và ô nhiễm môi trường.
+
+Âm nhạc trong album là sự pha trộn mượt mà giữa Soul, Jazz và Gospel. Giọng hát của Marvin Gaye, lúc thì thì thầm, lúc thì vút cao đau đớn, trôi trên nền nhạc đệm đa lớp tinh tế. Ca khúc chủ đề và "Mercy Mercy Me (The Ecology)" mang thông điệp vượt thời gian.
+
+Nghe `What\'s Going On` trên đĩa than là một trải nghiệm tâm linh. Sự ấm áp của bản ghi Analog làm nổi bật không khí trò chuyện, tiếng ồn đường phố và sự kết nối giữa các bài hát, khiến người nghe cảm nhận sâu sắc nỗi đau và niềm hy vọng của tác giả.',
                 'genre' => 'Soul',
                 'label' => 'Tamla',
                 'price' => 820000,
@@ -555,6 +559,11 @@ Bìa đĩa với hình ảnh đám đông giơ tay lên trời thể hiện chí
             [
                 'name' => 'Let\'s Get It On',
                 'description' => 'Album phòng thu thứ mười ba của Marvin Gaye phát hành năm 1973, một album sensual về tình yêu và sexuality. Ca khúc chủ đề trở thành một trong những love song mang tính biểu tượng nhất.',
+                'detailed_description' => 'Nếu *What\'s Going On* là tiếng nói của tâm hồn và trí tuệ, thì `Let\'s Get It On` (1973) là tiếng nói của thể xác và dục vọng. Marvin Gaye đã biến tình dục thành một trải nghiệm tôn giáo thiêng liêng. Album này là chuẩn mực của dòng nhạc Soul/R&B lãng mạn, quyến rũ (Quiet Storm).
+
+Ca khúc chủ đề với tiếng guitar "wah-wah" mở đầu và giọng hát đầy khao khát của Marvin đã trở thành bản tình ca biểu tượng cho sự thân mật. Album không chỉ nói về tình dục, mà còn là sự chữa lành và giải phóng bản thân thông qua tình yêu.
+
+Chất âm của đĩa than cực kỳ phù hợp với không khí của album này: ấm, dày, mượt mà và gần gũi. Đây là chiếc đĩa than hoàn hảo cho những không gian riêng tư, lãng mạn.',
                 'genre' => 'Soul',
                 'label' => 'Tamla',
                 'price' => 780000,

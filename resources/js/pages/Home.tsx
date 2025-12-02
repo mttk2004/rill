@@ -76,7 +76,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {collections.slice(0, 2).map((col, idx) => (
                   <Reveal key={col.id} delay={idx * 0.2} direction={idx % 2 === 0 ? 'left' : 'right'}>
-                    <Link href="/products" className="block h-full">
+                    <Link href={`/products?collection=${col.slug}`} className="block h-full">
                       <div className="relative group overflow-hidden rounded-2xl h-[400px] cursor-pointer">
                         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors z-10 duration-500"></div>
                         <img
