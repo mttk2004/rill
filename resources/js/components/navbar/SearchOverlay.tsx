@@ -188,7 +188,7 @@ const SearchOverlay: React.FC<SearchOverlayProps> = ({
                   {suggestions.artists.map((artist) => (
                     <Link
                       key={artist.id}
-                      href={`/artists/${artist.slug}`}
+                      href={`/products?artist=${encodeURIComponent(artist.name)}`}
                       onClick={() => {
                         onClose();
                         setSearchQuery('');
