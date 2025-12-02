@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Collection;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Services\BestSellerService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,10 +35,18 @@ class HomeController extends Controller
             ->take(10)
             ->get(['id', 'name', 'slug', 'image', 'country']);
 
+        // Get policy settings for features section
+        $returnPolicyDays = Setting::where('key', 'return_policy_days')->value('value') ?? '7';
+        $returnPolicyCondition = Setting::where('key', 'return_policy_condition')->value('value') ?? 'lỗi nhà sản xuất';
+
         return Inertia::render('Home', [
             'featuredProducts' => $featuredProducts,
             'collections' => $collections,
             'artists' => $artists,
+            'settings' => [
+                'returnPolicyDays' => $returnPolicyDays,
+                'returnPolicyCondition' => $returnPolicyCondition,
+            ],
         ]);
     }
 }

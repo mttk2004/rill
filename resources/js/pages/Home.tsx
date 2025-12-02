@@ -11,9 +11,13 @@ interface HomeProps {
   featuredProducts: Product[];
   collections: Collection[];
   artists: Artist[];
+  settings: {
+    returnPolicyDays: string;
+    returnPolicyCondition: string;
+  };
 }
 
-export default function Home({ featuredProducts = [], collections = [], artists = [] }: HomeProps) {
+export default function Home({ featuredProducts = [], collections = [], artists = [], settings }: HomeProps) {
   // Fallback to empty arrays if data not provided
 
   return (
@@ -180,7 +184,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
                   </div>
                   <h3 className="text-xl font-bold mb-3">Bảo Hành 1 Đổi 1</h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    Chính sách đổi trả trong vòng 7 ngày nếu có lỗi từ nhà sản xuất (cong vênh, xước đĩa). Hỗ trợ kỹ thuật trọn đời.
+                    Chính sách đổi trả trong vòng {settings.returnPolicyDays} ngày nếu có {settings.returnPolicyCondition}. Hỗ trợ kỹ thuật trọn đời.
                   </p>
                 </div>
               </Reveal>

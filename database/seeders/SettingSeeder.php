@@ -69,7 +69,7 @@ class SettingSeeder extends Seeder
             ],
             [
                 'key' => 'return_policy_condition',
-                'value' => 'lỗi nhà sản xuất',
+                'value' => 'lỗi nhà sản xuất (cong vênh, xước đĩa)',
                 'type' => 'text',
                 'group' => 'policy',
                 'label' => 'Điều kiện đổi trả'
