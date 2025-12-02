@@ -48,8 +48,8 @@ class Collection extends Model
         }
 
         // Otherwise, construct Supabase URL
-        $supabaseUrl = config('services.supabase.url');
-        $bucket = config('services.supabase.storage_bucket', 'images');
+        $supabaseUrl = env('SUPABASE_URL');
+        $bucket = env('SUPABASE_BUCKET');
         return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$this->image}";
     }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 
@@ -185,8 +186,15 @@ class CollectionController extends Controller
                 'artists' => $product->artists->pluck('name')->join(', '),
             ]);
 
+        // Prepare collection data with image_url for preview
+        $collectionData = $collection->toArray();
+        // Ensure image_url is used for preview in form
+        if ($collection->image_url) {
+            $collectionData['image'] = $collection->image_url;
+        }
+
         return Inertia::render('admin/collections/CollectionForm', [
-            'collection' => $collection,
+            'collection' => $collectionData,
             'allProducts' => $allProducts,
         ]);
     }
@@ -260,30 +268,7 @@ class CollectionController extends Controller
      */
     private function uploadImage($file, string $folder = 'collections'): string
     {
-        $supabaseUrl = config('services.supabase.url');
-        $supabaseKey = config('services.supabase.anon_key');
-        $bucket = config('services.supabase.storage_bucket', 'images');
-
-        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-        $filePath = "{$folder}/{$fileName}";
-
-        $client = new \GuzzleHttp\Client();
-        $response = $client->post(
-            "{$supabaseUrl}/storage/v1/object/{$bucket}/{$filePath}",
-            [
-                'headers' => [
-                    'Authorization' => "Bearer {$supabaseKey}",
-                    'Content-Type' => $file->getMimeType(),
-                ],
-                'body' => file_get_contents($file->getRealPath()),
-            ]
-        );
-
-        if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Failed to upload image to Supabase');
-        }
-
-        return $filePath;
+        return $file->store($folder, 'supabase');
     }
 
     /**
@@ -291,23 +276,15 @@ class CollectionController extends Controller
      */
     private function deleteImage(string $path): void
     {
-        try {
-            $supabaseUrl = config('services.supabase.url');
-            $supabaseKey = config('services.supabase.anon_key');
-            $bucket = config('services.supabase.storage_bucket', 'images');
-
-            $client = new \GuzzleHttp\Client();
-            $client->delete(
-                "{$supabaseUrl}/storage/v1/object/{$bucket}/{$path}",
-                [
-                    'headers' => [
-                        'Authorization' => "Bearer {$supabaseKey}",
-                    ],
-                ]
-            );
-        } catch (\Exception $e) {
-            // Log error but don't fail the request
-            \Log::warning("Failed to delete image: {$path}", ['error' => $e->getMessage()]);
+        if ($path && !filter_var($path, FILTER_VALIDATE_URL)) {
+            try {
+                Storage::disk('supabase')->delete($path);
+            } catch (\Exception $e) {
+                \Log::warning('Failed to delete collection image', [
+                    'image_path' => $path,
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 }
