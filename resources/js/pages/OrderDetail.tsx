@@ -88,6 +88,17 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
+  const handleDownloadInvoice = () => {
+    if (!canDownloadInvoice) {
+      showToast('Chỉ có thể tải hóa đơn cho đơn hàng đã thanh toán', 'error');
+      return;
+    }
+
+    // Download invoice PDF
+    window.location.href = `/orders/${order.id}/invoice`;
+    showToast('Đang tải hóa đơn...', 'success');
+  };
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
 
@@ -456,6 +467,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   fullWidth
                   variant="primary"
                   disabled={!canDownloadInvoice}
+                  onClick={handleDownloadInvoice}
                   className="flex items-center justify-center gap-2"
                 >
                   <Download size={18} />
