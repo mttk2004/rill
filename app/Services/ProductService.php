@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\Artist;
 use App\Models\User;
+use App\Services\BestSellerService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -29,8 +30,8 @@ class ProductService
         // Apply filters
         $this->applyFilters($query, $filters);
 
-        // Apply sorting
-        $this->applySorting($query, $filters['sort'] ?? 'newest');
+        // Apply sorting (default to best seller)
+        $this->applySorting($query, $filters['sort'] ?? 'default');
 
         // Get paginated results
         $perPage = config('pagination.products');
@@ -106,6 +107,11 @@ class ProductService
     protected function applySorting(Builder $query, string $sort): void
     {
         switch ($sort) {
+            case 'best_seller':
+            case 'default':
+                // Use centralized best seller logic
+                BestSellerService::applyBestSellerScope($query);
+                break;
             case 'price_asc':
                 $query->orderBy('price', 'asc');
                 break;
@@ -119,7 +125,6 @@ class ProductService
                 $query->orderBy('name', 'desc');
                 break;
             case 'newest':
-            default:
                 $query->orderBy('created_at', 'desc');
                 break;
         }
@@ -233,6 +238,7 @@ class ProductService
             'low_stock' => $product->isLowStock(),
             'reviews_count' => $product->reviews()->count(),
             'average_rating' => round($product->reviews()->avg('rating') ?? 0, 1),
+            'total_sold' => $product->total_sold ?? 0,
         ];
     }
 

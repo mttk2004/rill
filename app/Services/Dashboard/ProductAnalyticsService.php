@@ -4,6 +4,7 @@ namespace App\Services\Dashboard;
 
 use App\Enums\OrderStatus;
 use App\Models\Product;
+use App\Services\BestSellerService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -11,6 +12,7 @@ class ProductAnalyticsService
 {
     /**
      * Get top selling products
+     * Note: Uses raw query for performance on dashboard, but logic matches BestSellerService
      */
     public function getTopProducts(int $limit = 5): Collection
     {

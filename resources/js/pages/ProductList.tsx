@@ -134,7 +134,15 @@ export default function ProductList({
                 ) : (
                   <h1 className="text-3xl font-serif font-bold text-gray-900">Sản phẩm</h1>
                 )}
-                <p className="text-gray-500 mt-2 text-sm">{products.length} sản phẩm được tìm thấy</p>
+                <p className="text-gray-500 mt-2 text-sm">
+                  {pagination.total > 0 ? (
+                    <>
+                      Hiển thị <span className="font-medium text-gray-700">{pagination.from}-{pagination.to}</span> trong <span className="font-medium text-gray-700">{pagination.total}</span> sản phẩm
+                    </>
+                  ) : (
+                    'Không có sản phẩm'
+                  )}
+                </p>
               </div>
 
               <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
@@ -155,7 +163,7 @@ export default function ProductList({
                       onChange={(e) => setSortOption(e.target.value)}
                       className="block w-full appearance-none bg-transparent text-sm focus:outline-none cursor-pointer"
                     >
-                      <option value="default">Đề xuất</option>
+                      <option value="default">Bán chạy nhất</option>
                       <option value="price_asc">Giá: Thấp đến Cao</option>
                       <option value="price_desc">Giá: Cao đến Thấp</option>
                       <option value="name_asc">Tên: A-Z</option>

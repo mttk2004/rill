@@ -102,7 +102,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
             {activeCategory === 'artist' && artists.map(artist => (
               <Link
                 key={artist.id}
-                href={`/products?artist=${artist.slug}`}
+                href={`/products?artist=${artist.name}`}
                 className="text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md px-3 py-2 transition-all duration-200 flex items-center gap-2.5 group hover:translate-x-1"
                 onClick={closeMenu}
               >
