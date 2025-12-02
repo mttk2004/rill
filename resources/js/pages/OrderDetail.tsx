@@ -108,7 +108,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
     try {
       const response = await axios.post(`/orders/${order.id}/retry-payment`);
-      
+
       if (response.data.payment_url) {
         showToast('Đang chuyển đến trang thanh toán...', 'success');
         // Redirect to VNPAY payment page
