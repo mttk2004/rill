@@ -110,6 +110,42 @@
   }
 }
 
+/* Global Cursor Styles - Force pointer cursor for interactive elements */
+button,
+[role="button"],
+[type="button"],
+[type="submit"],
+[type="reset"],
+a,
+label,
+select,
+.cursor-pointer,
+[onclick],
+[tabindex]:not([tabindex="-1"]) {
+  cursor: pointer !important;
+}
+
+button:disabled,
+[disabled] {
+  cursor: not-allowed !important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea {
+  cursor: text !important;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer !important;
+}
+
 /* React Toastify Custom Styles */
 .custom-toast-container {
   font-family: 'Outfit', system-ui, sans-serif;
