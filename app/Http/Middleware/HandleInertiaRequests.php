@@ -116,11 +116,10 @@ class HandleInertiaRequests extends Middleware
                     ->sort()
                     ->values();
 
-                // Get featured artists with product count
+                // Get all active artists sorted by product count
                 $artists = \App\Models\Artist::active()
                     ->withCount('products')
                     ->orderBy('products_count', 'desc')
-                    ->take(12)
                     ->get(['id', 'name', 'slug', 'image']);
 
                 return [

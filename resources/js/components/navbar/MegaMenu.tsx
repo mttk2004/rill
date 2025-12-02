@@ -65,16 +65,11 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
       {/* Right Content: Items */}
       <div className="col-span-9 bg-white">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-          <div className="flex justify-between items-end">
-            <h3 className="font-serif font-bold text-lg text-gray-900">
-              {activeCategory === 'genre' && 'Khám phá theo Thể loại'}
-              {activeCategory === 'label' && 'Hãng đĩa nổi bật'}
-              {activeCategory === 'artist' && 'Nghệ sĩ hàng đầu'}
-            </h3>
-            <Link href="/products" onClick={closeMenu} className="text-xs font-medium text-primary hover:underline flex items-center gap-1">
-              Xem tất cả <ChevronRight size={12} />
-            </Link>
-          </div>
+          <h3 className="font-serif font-bold text-lg text-gray-900">
+            {activeCategory === 'genre' && 'Khám phá theo Thể loại'}
+            {activeCategory === 'label' && 'Hãng đĩa nổi bật'}
+            {activeCategory === 'artist' && 'Nghệ sĩ hàng đầu'}
+          </h3>
         </div>
 
         {/* Scrollable Content Area */}
@@ -84,10 +79,10 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
               <Link
                 key={genre}
                 href={`/products?genre=${encodeURIComponent(genre)}`}
-                className="text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md px-3 py-2 transition-all flex items-center gap-2.5 group"
+                className="text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md px-3 py-2 transition-all duration-200 flex items-center gap-2.5 group hover:translate-x-1"
                 onClick={closeMenu}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-primary transition-colors"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-primary transition-colors duration-200"></span>
                 <span className="truncate">{genre}</span>
               </Link>
             ))}
@@ -96,10 +91,10 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
               <Link
                 key={label}
                 href={`/products?label=${encodeURIComponent(label)}`}
-                className="text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md px-3 py-2 transition-all flex items-center gap-2.5 group"
+                className="text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md px-3 py-2 transition-all duration-200 flex items-center gap-2.5 group hover:translate-x-1"
                 onClick={closeMenu}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-primary transition-colors"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-primary transition-colors duration-200"></span>
                 <span className="truncate">{label}</span>
               </Link>
             ))}
@@ -108,7 +103,7 @@ const MegaMenu: React.FC<MegaMenuProps> = ({ isOpen, closeMenu }) => {
               <Link
                 key={artist.id}
                 href={`/products?artist=${artist.slug}`}
-                className="text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md px-3 py-2 transition-all flex items-center gap-2.5 group"
+                className="text-sm text-gray-600 hover:text-primary hover:bg-gray-50 rounded-md px-3 py-2 transition-all duration-200 flex items-center gap-2.5 group hover:translate-x-1"
                 onClick={closeMenu}
               >
                 {artist.image_url ? (
