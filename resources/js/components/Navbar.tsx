@@ -50,6 +50,18 @@ const Navbar = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      // Save to search history
+      try {
+        const history = JSON.parse(localStorage.getItem('rill_search_history') || '[]');
+        const newHistory = [
+          searchQuery.trim(),
+          ...history.filter((item: string) => item !== searchQuery.trim())
+        ].slice(0, 5);
+        localStorage.setItem('rill_search_history', JSON.stringify(newHistory));
+      } catch (error) {
+        console.error('Failed to save search history:', error);
+      }
+
       router.visit(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
       setSearchQuery('');

@@ -66,6 +66,7 @@ class ProductService
             $searchTerm = $filters['search'];
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
                   ->orWhere('description', 'LIKE', "%{$searchTerm}%")
                   ->orWhere('genre', 'LIKE', "%{$searchTerm}%")
                   ->orWhere('label', 'LIKE', "%{$searchTerm}%")

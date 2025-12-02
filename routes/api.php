@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\AddressDataController;
+use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ShippingController;
 use App\Http\Controllers\Api\VoucherController;
 use Illuminate\Http\Request;
@@ -21,6 +22,9 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Search routes
+Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('api.search.suggestions');
 
 // Category routes for header menu
 Route::get('/categories/menu-data', [CategoryController::class, 'getMenuData'])->name('api.categories.menu');
