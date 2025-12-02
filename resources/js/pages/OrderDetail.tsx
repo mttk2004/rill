@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle, Star, Download } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Package, Truck, CheckCircle, Star, Download, RefreshCw } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { formatDate } from '../utils/date';
 import { useToast } from '../context/ToastContext';
+import axios from 'axios';
 
 interface OrderItem {
   id: string;
@@ -87,6 +88,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [isRetryingPayment, setIsRetryingPayment] = useState(false);
 
   const handleDownloadInvoice = () => {
     if (!canDownloadInvoice) {
@@ -97,6 +99,32 @@ export default function OrderDetail({ order }: OrderDetailProps) {
     // Download invoice PDF
     window.location.href = `/orders/${order.id}/invoice`;
     showToast('Đang tải hóa đơn...', 'success');
+  };
+
+  const handleRetryPayment = async () => {
+    if (isRetryingPayment) return;
+
+    setIsRetryingPayment(true);
+
+    try {
+      const response = await axios.post(`/orders/${order.id}/retry-payment`);
+      
+      if (response.data.payment_url) {
+        showToast('Đang chuyển đến trang thanh toán...', 'success');
+        // Redirect to VNPAY payment page
+        window.location.href = response.data.payment_url;
+      } else {
+        showToast('Không thể lấy link thanh toán. Vui lòng thử lại!', 'error');
+        setIsRetryingPayment(false);
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.data?.error) {
+        showToast(error.response.data.error, 'error');
+      } else {
+        showToast('Không thể thanh toán lại. Vui lòng thử lại!', 'error');
+      }
+      setIsRetryingPayment(false);
+    }
   };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,6 +202,15 @@ export default function OrderDetail({ order }: OrderDetailProps) {
     (typeof order.payment.payment_status === 'string'
       ? order.payment.payment_status === 'completed'
       : Object.values(order.payment.payment_status)[0] === 'completed');
+
+  const canRetryPayment = order.payment &&
+    (typeof order.payment.payment_method === 'string'
+      ? order.payment.payment_method === 'vnpay'
+      : Object.values(order.payment.payment_method)[0] === 'vnpay') &&
+    (typeof order.payment.payment_status === 'string'
+      ? order.payment.payment_status === 'pending'
+      : Object.values(order.payment.payment_status)[0] === 'pending') &&
+    (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'pending';
 
   const isDelivered = (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'delivered';
 
@@ -463,6 +500,18 @@ export default function OrderDetail({ order }: OrderDetailProps) {
               </div>
 
               <div className="space-y-3">
+                {canRetryPayment && (
+                  <Button
+                    fullWidth
+                    variant="primary"
+                    onClick={handleRetryPayment}
+                    disabled={isRetryingPayment}
+                    className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700"
+                  >
+                    <RefreshCw size={18} className={isRetryingPayment ? 'animate-spin' : ''} />
+                    {isRetryingPayment ? 'Đang xử lý...' : 'Thanh toán lại'}
+                  </Button>
+                )}
                 <Button
                   fullWidth
                   variant="primary"
