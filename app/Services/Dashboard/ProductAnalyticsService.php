@@ -13,6 +13,7 @@ class ProductAnalyticsService
     /**
      * Get top selling products
      * Note: Uses raw query for performance on dashboard, but logic matches BestSellerService
+     * IMPORTANT: Sorts by quantity (not revenue) to match Home and Products pages
      */
     public function getTopProducts(int $limit = 5): Collection
     {
@@ -29,7 +30,8 @@ class ProductAnalyticsService
                 DB::raw('SUM(order_items.total_price) as total_revenue')
             )
             ->groupBy('products.id', 'products.name', 'products.sku', 'products.image')
-            ->orderByDesc('total_revenue')
+            ->orderByDesc('total_quantity')  // Changed from total_revenue to match BestSellerService
+            ->orderBy('products.id')  // Secondary sort for consistency when quantities are equal
             ->limit($limit)
             ->get()
             ->map(function ($item) {

@@ -20,7 +20,7 @@ class BestSellerService
             $q->join('orders', 'order_items.order_id', '=', 'orders.id')
               ->where('orders.status', '!=', OrderStatus::CANCELLED->value)
               ->select(\DB::raw('COALESCE(SUM(order_items.quantity), 0)'));
-        }])->orderByDesc('total_sold');
+        }])->orderByDesc('total_sold')->orderBy('id');  // Added secondary sort by id for consistency
     }
 
     /**
