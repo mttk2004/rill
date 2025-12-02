@@ -173,9 +173,9 @@ export default function ThankYou({ order, vnpayResponse }: ThankYouProps) {
                 <ArrowRight size={18} />
               </Button>
             </Link>
-            <Link href="/" className="flex-1">
+            <Link href={`/orders/${order.id}`} className="flex-1">
               <Button fullWidth>
-                Về trang chủ
+                Xem chi tiết đơn hàng
               </Button>
             </Link>
           </div>
