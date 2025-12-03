@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\CalculateShippingRequest;
 use App\Models\ShippingAddress;
 use App\Services\CartService;
 use App\Services\SettingService;
@@ -14,24 +15,22 @@ class ShippingController extends Controller
     /**
      * Calculate shipping fee based on selected address
      *
-     * @param Request $request
-     * @param CartServiceRefactored $cartService
-     * @param ShippingServiceRefactored $shippingService
-     * @param SettingServiceRefactored $settingService
+     * @param CalculateShippingRequest $request
+     * @param CartService $cartService
+     * @param ShippingService $shippingService
+     * @param SettingService $settingService
      * @return \Illuminate\Http\JsonResponse
      */
     public function calculate(
-        Request $request,
-        CartServiceRefactored $cartService,
-        ShippingServiceRefactored $shippingService,
-        SettingServiceRefactored $settingService,
+        CalculateShippingRequest $request,
+        CartService $cartService,
+        ShippingService $shippingService,
+        SettingService $settingService,
     ) {
-        $request->validate([
-            'address_id' => 'required|exists:shipping_addresses,id'
-        ]);
+        $validated = $request->validated();
 
         // Get the selected address (no user verification since it's public API)
-        $address = ShippingAddress::findOrFail($request->address_id);
+        $address = ShippingAddress::findOrFail($validated['address_id']);
 
         // Get cart summary (CartService will use authenticated user if available)
         $cartSummary = $cartService->getCartSummary();
@@ -40,7 +39,7 @@ class ShippingController extends Controller
 
         // DEBUG: Log cart info
         \Log::info('Shipping calculation request', [
-            'address_id' => $request->address_id,
+            'address_id' => $validated['address_id'],
             'auth_user_id' => auth()->id(),
             'session_id' => session()->getId(),
             'cart_total' => $cartTotal,

@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\OrderStatus;
-use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Http\Requests\FilterOrdersRequest;
-use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Services\OrderLifecycleService;
 use App\Services\OrderPaymentService;

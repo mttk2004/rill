@@ -6,7 +6,6 @@ use App\Models\Collection;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Services\BestSellerService;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class HomeController extends Controller

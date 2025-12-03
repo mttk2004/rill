@@ -64,32 +64,6 @@ class VoucherController extends Controller
     }
 
     /**
-     * Display the specified voucher.
-     */
-    public function show(Request $request, string $id)
-    {
-        $voucher = Voucher::with(['usages.user', 'usages.order'])
-            ->withCount('usages')
-            ->findOrFail($id);
-
-        // Get statistics
-        $statistics = $this->voucherService->getVoucherStatistics((int) $id);
-
-        // Return JSON for AJAX requests
-        if ($request->expectsJson() || $request->ajax()) {
-            return response()->json([
-                'voucher' => $voucher,
-                'statistics' => $statistics,
-            ]);
-        }
-
-        return Inertia::render('admin/vouchers/show', [
-            'voucher' => $voucher,
-            'statistics' => $statistics,
-        ]);
-    }
-
-    /**
      * Show the form for editing the specified voucher.
      */
     public function edit(string $id)

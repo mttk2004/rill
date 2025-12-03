@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Services\SettingService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -38,27 +39,9 @@ class SettingController extends Controller
     /**
      * Update settings
      */
-    public function update(Request $request)
+    public function update(UpdateSettingsRequest $request)
     {
-        $validated = $request->validate([
-            'settings' => 'required|array',
-            'settings.banner_enabled' => 'required|in:0,1',
-            'settings.banner_content' => 'required|string|max:500',
-            'settings.banner_type' => 'required|in:info,success,warning',
-            'settings.shipping_free_threshold' => 'required|numeric|min:0',
-            'settings.shipping_estimate_min_days' => 'required|integer|min:1',
-            'settings.shipping_estimate_max_days' => 'required|integer|min:1|gte:settings.shipping_estimate_min_days',
-            'settings.return_policy_days' => 'required|integer|min:1',
-            'settings.return_policy_condition' => 'required|string|max:200',
-        ], [
-            'settings.banner_enabled.in' => 'Giá trị bật/tắt banner không hợp lệ.',
-            'settings.banner_content.required' => 'Nội dung banner không được để trống.',
-            'settings.banner_content.max' => 'Nội dung banner không được vượt quá 500 ký tự.',
-            'settings.banner_type.in' => 'Kiểu banner phải là info, success hoặc warning.',
-            'settings.shipping_free_threshold.required' => 'Giá trị miễn phí vận chuyển không được để trống.',
-            'settings.shipping_free_threshold.numeric' => 'Giá trị miễn phí vận chuyển phải là số.',
-            'settings.shipping_estimate_max_days.gte' => 'Thời gian giao hàng tối đa phải lớn hơn hoặc bằng thời gian tối thiểu.',
-        ]);
+        $validated = $request->validated();
 
         // Update settings - this automatically clears cache via Observer
         $this->settingService->updateMany($validated['settings']);

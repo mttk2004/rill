@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreShippingAddressRequest;
 use App\Http\Requests\UpdateShippingAddressRequest;
-use App\Http\Resources\ShippingAddressResource;
 use App\Models\ShippingAddress;
 use App\Services\AddressService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -19,7 +18,7 @@ class AddressController extends Controller
 
     protected AddressService $addressService;
 
-    public function __construct(AddressServiceRefactored $addressService)
+    public function __construct(AddressService $addressService)
     {
         $this->addressService = $addressService;
     }
@@ -51,7 +50,9 @@ class AddressController extends Controller
         }
 
         return back()->with('success', $result->message);
-    }    /**
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateShippingAddressRequest $request, ShippingAddress $address): RedirectResponse

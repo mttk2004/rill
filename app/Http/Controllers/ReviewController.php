@@ -13,7 +13,7 @@ class ReviewController extends Controller
     /**
      * Constructor with dependency injection.
      *
-     * @param ReviewServiceRefactored $reviewService
+     * @param ReviewService $reviewService
      * @param ContentValidationService $contentValidator
      */
     public function __construct(
