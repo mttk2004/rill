@@ -3,112 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreArtistRequest;
+use App\Http\Requests\Admin\UpdateArtistRequest;
 use App\Models\Artist;
+use App\Services\ArtistService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ArtistController extends Controller
 {
+    public function __construct(
+        private ArtistService $artistService
+    ) {}
     /**
      * Display a listing of artists for admin.
      */
     public function index(Request $request)
     {
-        $perPage = (int) $request->get('per_page', 20);
-        $search = trim((string) $request->get('search', ''));
-        $country = $request->get('country', 'all');
-        $status = $request->get('status', 'all');
-        $sort = $request->get('sort', 'name_asc');
-
-        $query = Artist::query()->withTrashed();
-
-        // Search
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('country', 'like', "%{$search}%");
-            });
-        }
-
-        // Country filter
-        if ($country && $country !== 'all') {
-            $query->where('country', $country);
-        }
-
-        // Status filter
-        if ($status && $status !== 'all') {
-            if ($status === 'active') {
-                $query->whereNull('deleted_at')->where('is_active', true);
-            } elseif ($status === 'inactive') {
-                $query->whereNull('deleted_at')->where('is_active', false);
-            } elseif ($status === 'deleted') {
-                $query->whereNotNull('deleted_at');
-            }
-        }
-
-        // Sorting
-        switch ($sort) {
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'products_desc':
-                $query->withCount('products')
-                      ->orderBy('products_count', 'desc');
-                break;
-            case 'created_desc':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'created_asc':
-                $query->orderBy('created_at', 'asc');
-                break;
-            default:
-                $query->orderBy('name', 'asc');
-                break;
-        }
-
-        // Get unique countries for filters
-        $countries = Artist::whereNotNull('country')
-            ->distinct()
-            ->pluck('country')
-            ->filter()
-            ->sort()
-            ->values()
-            ->toArray();
-
-        // Eager load relationships and counts
-        $artists = $query->withCount('products')
-            ->paginate($perPage)
-            ->withQueryString();
-
-        // Calculate stats with optimized queries
-        $artistStats = Artist::selectRaw('
-                COUNT(*) as total,
-                SUM(CASE WHEN EXISTS (
-                    SELECT 1 FROM artist_product WHERE artist_product.artist_id = artists.id
-                ) THEN 1 ELSE 0 END) as with_products
-            ')
-            ->first();
-
-        $stats = [
-            'total' => $artistStats->total,
-            'with_products' => $artistStats->with_products,
-            'without_products' => $artistStats->total - $artistStats->with_products,
-            'total_products' => DB::table('artist_product')->count(),
-        ];
-
-        // Ensure filters is always an object, not an array
         $filters = [
+            'per_page' => (int) $request->get('per_page', 20),
             'search' => $request->get('search', ''),
             'country' => $request->get('country', 'all'),
             'status' => $request->get('status', 'all'),
             'sort' => $request->get('sort', 'name_asc'),
         ];
+
+        $artists = $this->artistService->getFilteredArtists($filters);
+        $stats = $this->artistService->getStats();
+        $countries = $this->artistService->getCountries();
 
         return Inertia::render('admin/artists/ArtistList', [
             'artists' => $artists,
@@ -123,40 +45,24 @@ class ArtistController extends Controller
      */
     public function create()
     {
-        // Get unique countries for dropdown
-        $countries = Artist::whereNotNull('country')
-            ->distinct()
-            ->pluck('country')
-            ->filter()
-            ->sort()
-            ->values()
-            ->toArray();
-
         return Inertia::render('admin/artists/ArtistForm', [
-            'countries' => $countries,
+            'countries' => $this->artistService->getCountries(),
         ]);
     }
 
     /**
      * Store a newly created artist in storage.
      */
-    public function store(Request $request)
+    public function store(StoreArtistRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'country' => 'nullable|string|max:100',
-            'is_active' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:500',
-        ]);
+        $validated = $request->validated();
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('artists', 'supabase');
-            $validated['image'] = $path;
+            $validated['image'] = $this->artistService->uploadImage($request->file('image'));
         }
 
-        $artist = Artist::create($validated);
+        Artist::create($validated);
 
         return redirect()->route('admin.artists');
     }
@@ -193,46 +99,26 @@ class ArtistController extends Controller
     {
         $artist = Artist::withTrashed()->findOrFail($id);
 
-        // Get unique countries for dropdown
-        $countries = Artist::whereNotNull('country')
-            ->distinct()
-            ->pluck('country')
-            ->filter()
-            ->sort()
-            ->values()
-            ->toArray();
-
         return Inertia::render('admin/artists/ArtistForm', [
             'artist' => $artist,
-            'countries' => $countries,
+            'countries' => $this->artistService->getCountries(),
         ]);
     }
 
     /**
      * Update the specified artist in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateArtistRequest $request, string $id)
     {
         $artist = Artist::withTrashed()->findOrFail($id);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'country' => 'nullable|string|max:100',
-            'is_active' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:500',
-        ]);
+        $validated = $request->validated();
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($artist->image && !filter_var($artist->image, FILTER_VALIDATE_URL)) {
-                Storage::disk('supabase')->delete($artist->image);
-            }
-
-            // Store new image
-            $path = $request->file('image')->store('artists', 'supabase');
-            $validated['image'] = $path;
+            $validated['image'] = $this->artistService->handleImageUpdate(
+                $artist,
+                $request->file('image')
+            );
         }
 
         $artist->update($validated);
