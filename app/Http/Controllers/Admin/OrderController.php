@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Http\Resources\OrderAdminResource;
 use App\Models\Order;
 use App\Services\OrderServiceRefactored;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -22,94 +22,16 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = (int) $request->get('per_page', 20);
-        $search = trim((string) $request->get('search', ''));
-        $status = $request->get('status');
-        $payment_status = $request->get('payment_status');
-        $sort = $request->get('sort', 'newest');
+        $filters = [
+            'per_page' => (int) $request->get('per_page', 20),
+            'search' => $request->get('search', ''),
+            'status' => $request->get('status'),
+            'payment_status' => $request->get('payment_status'),
+            'sort' => $request->get('sort', 'newest'),
+        ];
 
-        $query = Order::query()->withTrashed();
-
-        // Search (order number, customer name, email, phone)
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%")
-                                ->orWhere('phone', 'like', "%{$search}%");
-                  });
-            });
-        }
-
-        // Order status filter
-        if ($status && $status !== 'all') {
-            $query->where('status', $status);
-        }
-
-        // Payment status filter
-        if ($payment_status && $payment_status !== 'all') {
-            if ($payment_status === PaymentStatus::PENDING->value) {
-                // For pending: include orders with pending payment OR without payment record
-                $query->where(function ($q) use ($payment_status) {
-                    $q->whereHas('payment', function ($subQ) use ($payment_status) {
-                        $subQ->where('payment_status', $payment_status);
-                    })->orWhereDoesntHave('payment');
-                });
-            } else {
-                // For other statuses: only include orders with that specific payment status
-                $query->whereHas('payment', function ($q) use ($payment_status) {
-                    $q->where('payment_status', $payment_status);
-                });
-            }
-        }
-
-        // Sorting
-        switch ($sort) {
-            case 'order_number_asc':
-                $query->orderBy('order_number', 'asc');
-                break;
-            case 'order_number_desc':
-                $query->orderBy('order_number', 'desc');
-                break;
-            case 'total_asc':
-                $query->orderBy('total_amount', 'asc');
-                break;
-            case 'total_desc':
-                $query->orderBy('total_amount', 'desc');
-                break;
-            case 'oldest':
-                $query->orderBy('placed_at', 'asc');
-                break;
-            case 'newest':
-            default:
-                $query->orderBy('placed_at', 'desc');
-                break;
-        }
-
-        // Eager load relationships
-        $orders = $query->with(['user', 'payment'])
-            ->withCount('items')
-            ->paginate($perPage)
-            ->withQueryString();
-
-        // Calculate stats with single query
-        $stats = Order::selectRaw('
-                COUNT(*) as total,
-                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending,
-                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as confirmed,
-                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as shipped,
-                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as delivered,
-                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as cancelled
-            ', [
-                OrderStatus::PENDING->value,
-                OrderStatus::CONFIRMED->value,
-                OrderStatus::SHIPPED->value,
-                OrderStatus::DELIVERED->value,
-                OrderStatus::CANCELLED->value,
-            ])
-            ->first()
-            ->toArray();
+        $orders = $this->orderService->getAdminOrders($filters);
+        $stats = $this->orderService->getOrderStats();
 
         return Inertia::render('admin/orders/OrderList', [
             'orders' => [
@@ -209,29 +131,22 @@ class OrderController extends Controller
     /**
      * Update order status.
      */
-    public function updateStatus(Request $request, string $id)
+    public function updateStatus(UpdateOrderStatusRequest $request, string $id)
     {
-        $request->validate([
-            'status' => 'required|in:' . implode(',', array_map(fn($case) => $case->value, OrderStatus::cases())),
-            'notes' => 'nullable|string|max:1000',
-        ]);
-
         $order = Order::findOrFail($id);
-        $oldStatus = $order->status;
-        $newStatus = OrderStatus::from($request->status);
+        $newStatus = OrderStatus::from($request->validated()['status']);
 
         // Business rules validation
-        if ($oldStatus === OrderStatus::DELIVERED && $newStatus !== OrderStatus::CANCELLED) {
-            return back()->withErrors([
-                'status' => 'Không thể thay đổi trạng thái của đơn hàng đã giao',
-            ]);
+        $validationError = $this->orderService->validateStatusUpdate($order->status, $newStatus);
+        if ($validationError) {
+            return back()->withErrors(['status' => $validationError]);
         }
 
         // Use service to update status
         $result = $this->orderService->updateOrderStatus(
             (int) $id,
             $newStatus,
-            $request->notes
+            $request->validated()['notes'] ?? null
         );
 
         if ($result->isSuccess()) {

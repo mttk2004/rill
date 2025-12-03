@@ -378,4 +378,125 @@ class OrderServiceRefactored
             return ServiceResult::error('Không thể tạo link thanh toán. Vui lòng thử lại!');
         }
     }
+
+    /**
+     * Get filtered orders for admin with pagination.
+     *
+     * @param array $filters
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getAdminOrders(array $filters)
+    {
+        $perPage = $filters['per_page'] ?? 20;
+        $search = trim($filters['search'] ?? '');
+        $status = $filters['status'] ?? null;
+        $paymentStatus = $filters['payment_status'] ?? null;
+        $sort = $filters['sort'] ?? 'newest';
+
+        $query = \App\Models\Order::query()->withTrashed();
+
+        // Search (order number, customer name, email, phone)
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Order status filter
+        if ($status && $status !== 'all') {
+            $query->where('status', $status);
+        }
+
+        // Payment status filter
+        if ($paymentStatus && $paymentStatus !== 'all') {
+            if ($paymentStatus === \App\Enums\PaymentStatus::PENDING->value) {
+                // For pending: include orders with pending payment OR without payment record
+                $query->where(function ($q) use ($paymentStatus) {
+                    $q->whereHas('payment', function ($subQ) use ($paymentStatus) {
+                        $subQ->where('payment_status', $paymentStatus);
+                    })->orWhereDoesntHave('payment');
+                });
+            } else {
+                // For other statuses: only include orders with that specific payment status
+                $query->whereHas('payment', function ($q) use ($paymentStatus) {
+                    $q->where('payment_status', $paymentStatus);
+                });
+            }
+        }
+
+        // Sorting
+        switch ($sort) {
+            case 'order_number_asc':
+                $query->orderBy('order_number', 'asc');
+                break;
+            case 'order_number_desc':
+                $query->orderBy('order_number', 'desc');
+                break;
+            case 'total_asc':
+                $query->orderBy('total_amount', 'asc');
+                break;
+            case 'total_desc':
+                $query->orderBy('total_amount', 'desc');
+                break;
+            case 'oldest':
+                $query->orderBy('placed_at', 'asc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('placed_at', 'desc');
+                break;
+        }
+
+        // Eager load relationships
+        return $query->with(['user', 'payment'])
+            ->withCount('items')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    /**
+     * Get order statistics for admin dashboard.
+     *
+     * @return array
+     */
+    public function getOrderStats(): array
+    {
+        return \App\Models\Order::selectRaw('
+                COUNT(*) as total,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as confirmed,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as shipped,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as delivered,
+                SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as cancelled
+            ', [
+                \App\Enums\OrderStatus::PENDING->value,
+                \App\Enums\OrderStatus::CONFIRMED->value,
+                \App\Enums\OrderStatus::SHIPPED->value,
+                \App\Enums\OrderStatus::DELIVERED->value,
+                \App\Enums\OrderStatus::CANCELLED->value,
+            ])
+            ->first()
+            ->toArray();
+    }
+
+    /**
+     * Validate status update business rules.
+     *
+     * @param \App\Enums\OrderStatus $oldStatus
+     * @param \App\Enums\OrderStatus $newStatus
+     * @return string|null Error message if validation fails
+     */
+    public function validateStatusUpdate(\App\Enums\OrderStatus $oldStatus, \App\Enums\OrderStatus $newStatus): ?string
+    {
+        if ($oldStatus === \App\Enums\OrderStatus::DELIVERED && $newStatus !== \App\Enums\OrderStatus::CANCELLED) {
+            return 'Không thể thay đổi trạng thái của đơn hàng đã giao';
+        }
+
+        return null;
+    }
 }
