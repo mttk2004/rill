@@ -7,7 +7,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Services\ThankYouPageService;
+use App\Services\ThankYouPageServiceRefactored;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -16,7 +16,7 @@ use Inertia\Inertia;
 class OrderController extends Controller
 {
     public function __construct(
-        private ThankYouPageService $thankYouPageService
+        private ThankYouPageServiceRefactored $thankYouPageService
     ) {}
     /**
      * Display a listing of the resource.
@@ -120,25 +120,35 @@ class OrderController extends Controller
     public function thankYou(Request $request, ?Order $order = null)
     {
         // Resolve order from route parameter or VNPAY return URL
-        $order = $this->thankYouPageService->resolveOrder($request, $order);
+        $orderResult = $this->thankYouPageService->resolveOrder($request, $order, Auth::id());
+
+        if (!$orderResult->success) {
+            abort(404, $orderResult->message);
+        }
+
+        $order = $orderResult->data;
 
         // Check authorization for authenticated users
         if (Auth::check()) {
             Gate::authorize('view', $order);
         } else {
             // Log unauthenticated access (from VNPAY redirect with lost session)
-            $this->thankYouPageService->logUnauthenticatedAccess($order, $request);
+            $this->thankYouPageService->logUnauthenticatedAccess($order, $request, false);
         }
 
         // Load payment information
         $order->load('payment');
 
         // Get VNPAY response data if available
-        $vnpayResponse = $this->thankYouPageService->getVnpayResponse($request);
+        $vnpayResponseResult = $this->thankYouPageService->getVnpayResponse($request);
+        $vnpayResponse = $vnpayResponseResult->success ? $vnpayResponseResult->data : null;
 
         // Auto-trigger IPN in local environment if payment is pending
-        if ($vnpayResponse) {
+        if ($vnpayResponse && $vnpayResponse['has_vnpay_response']) {
             $this->thankYouPageService->autoTriggerLocalIpn($request, $order);
+
+            // Reload payment after IPN trigger
+            $order->load('payment');
         }
 
         return Inertia::render('orders/thank-you', [
