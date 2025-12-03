@@ -3,15 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCollectionRequest;
+use App\Http\Requests\Admin\UpdateCollectionRequest;
 use App\Models\Collection;
-use App\Models\Product;
+use App\Services\CollectionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class CollectionController extends Controller
 {
+    public function __construct(
+        protected CollectionService $collectionService
+    ) {}
     /**
      * Display a listing of collections.
      */
@@ -65,16 +69,9 @@ class CollectionController extends Controller
 
         $collections = $query->paginate(20);
 
-        // Stats
-        $stats = [
-            'total' => Collection::count(),
-            'active' => Collection::where('is_active', true)->count(),
-            'featured' => Collection::where('type', 'featured')->count(),
-        ];
-
         return Inertia::render('admin/collections/CollectionList', [
             'collections' => $collections,
-            'stats' => $stats,
+            'stats' => $this->collectionService->getStats(),
             'filters' => [
                 'search' => $request->get('search', ''),
                 'type' => $request->get('type', 'all'),
@@ -89,41 +86,17 @@ class CollectionController extends Controller
      */
     public function create()
     {
-        // Get products for selection
-        $products = Product::with('artists')
-            ->active()
-            ->orderBy('name')
-            ->get()
-            ->map(fn($product) => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'price' => $product->price,
-                'image_url' => $product->image_url,
-                'artists' => $product->artists->pluck('name')->join(', '),
-            ]);
-
         return Inertia::render('admin/collections/CollectionForm', [
-            'products' => $products,
+            'products' => $this->collectionService->getProductsForForm(),
         ]);
     }
 
     /**
      * Store a newly created collection.
      */
-    public function store(Request $request)
+    public function store(StoreCollectionRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:collections,slug',
-            'type' => 'required|in:featured,banner,promotion,curated',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_active' => 'boolean',
-            'products' => 'nullable|array',
-            'products.*.id' => 'required_with:products|exists:products,id',
-            'products.*.position' => 'required_with:products|integer|min:0',
-        ]);
+        $validated = $request->validated();
 
         // Generate slug if not provided
         if (empty($validated['slug'])) {
@@ -132,21 +105,18 @@ class CollectionController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $validated['image'] = $this->uploadImage($request->file('image'), 'collections');
+            $validated['image'] = $this->collectionService->uploadImage($request->file('image'));
         }
 
         $collection = Collection::create($validated);
 
-        // Attach products with positions
-        if (!empty($validated['products'])) {
-            $syncData = [];
-            foreach ($validated['products'] as $product) {
-                $syncData[$product['id']] = ['position' => $product['position']];
-            }
-            $collection->products()->sync($syncData);
+        // Sync products
+        if (isset($validated['products'])) {
+            $this->collectionService->syncProducts($collection, $validated['products']);
         }
 
-        return redirect()->route('admin.collections.index');
+        return redirect()->route('admin.collections.index')
+            ->with('success', 'Collection đã được tạo thành công');
     }
 
     /**
@@ -158,9 +128,7 @@ class CollectionController extends Controller
             $query->with('artists')->orderBy('collection_product.position');
         }])->withCount('products')->findOrFail($id);
 
-        return Inertia::render('admin/collections/show', [
-            'collection' => $collection,
-        ]);
+        return response()->json(['collection' => $collection]);
     }
 
     /**
@@ -172,73 +140,43 @@ class CollectionController extends Controller
             $query->with('artists')->orderBy('collection_product.position');
         }])->findOrFail($id);
 
-        // Get all products for selection
-        $allProducts = Product::with('artists')
-            ->active()
-            ->orderBy('name')
-            ->get()
-            ->map(fn($product) => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'price' => $product->price,
-                'image_url' => $product->image_url,
-                'artists' => $product->artists->pluck('name')->join(', '),
-            ]);
-
-        // Prepare collection data with image_url for preview
+        // Prepare collection data
         $collectionData = $collection->toArray();
-        // Ensure image_url is used for preview in form
         if ($collection->image_url) {
             $collectionData['image'] = $collection->image_url;
         }
 
         return Inertia::render('admin/collections/CollectionForm', [
             'collection' => $collectionData,
-            'allProducts' => $allProducts,
+            'allProducts' => $this->collectionService->getProductsForForm(),
         ]);
     }
 
     /**
      * Update the specified collection.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCollectionRequest $request, string $id)
     {
         $collection = Collection::findOrFail($id);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:collections,slug,' . $collection->id,
-            'type' => 'required|in:featured,banner,promotion,curated',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_active' => 'boolean',
-            'products' => 'nullable|array',
-            'products.*.id' => 'required_with:products|exists:products,id',
-            'products.*.position' => 'required_with:products|integer|min:0',
-        ]);
+        $validated = $request->validated();
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($collection->image) {
-                $this->deleteImage($collection->image);
-            }
-            $validated['image'] = $this->uploadImage($request->file('image'), 'collections');
+            $validated['image'] = $this->collectionService->handleImageUpdate(
+                $collection,
+                $request->file('image')
+            );
         }
 
         $collection->update($validated);
 
-        // Update products with positions
+        // Sync products
         if (isset($validated['products'])) {
-            $syncData = [];
-            foreach ($validated['products'] as $product) {
-                $syncData[$product['id']] = ['position' => $product['position']];
-            }
-            $collection->products()->sync($syncData);
+            $this->collectionService->syncProducts($collection, $validated['products']);
         }
 
-        return redirect()->route('admin.collections.index');
+        return redirect()->route('admin.collections.index')
+            ->with('success', 'Collection đã được cập nhật thành công');
     }
 
     /**
@@ -249,7 +187,8 @@ class CollectionController extends Controller
         $collection = Collection::findOrFail($id);
         $collection->delete();
 
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success', 'Collection đã được xóa thành công');
     }
 
     /**
@@ -263,28 +202,4 @@ class CollectionController extends Controller
         return back()->with('success', 'Trạng thái collection đã được cập nhật!');
     }
 
-    /**
-     * Upload image to Supabase storage
-     */
-    private function uploadImage($file, string $folder = 'collections'): string
-    {
-        return $file->store($folder, 'supabase');
-    }
-
-    /**
-     * Delete image from Supabase storage
-     */
-    private function deleteImage(string $path): void
-    {
-        if ($path && !filter_var($path, FILTER_VALIDATE_URL)) {
-            try {
-                Storage::disk('supabase')->delete($path);
-            } catch (\Exception $e) {
-                \Log::warning('Failed to delete collection image', [
-                    'image_path' => $path,
-                    'error' => $e->getMessage()
-                ]);
-            }
-        }
-    }
 }
