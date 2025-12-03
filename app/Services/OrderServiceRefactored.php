@@ -259,4 +259,123 @@ class OrderServiceRefactored
     {
         return $this->generateStatusChangeNotesAction->execute($oldStatus, $newStatus);
     }
+
+    /**
+     * Check if order can be cancelled.
+     *
+     * @param Order $order
+     * @return bool
+     */
+    public function canCancelOrder(Order $order): bool
+    {
+        return $order->status === OrderStatus::PENDING;
+    }
+
+    /**
+     * Cancel order and restore stock.
+     *
+     * @param Order $order
+     * @return ServiceResult
+     */
+    public function cancelOrderWithStockRestore(Order $order): ServiceResult
+    {
+        if (!$this->canCancelOrder($order)) {
+            return ServiceResult::error('Chỉ có thể hủy đơn hàng đang chờ xác nhận.');
+        }
+
+        // Load order items with products
+        $order->load('items.product');
+
+        try {
+            // Use transaction to ensure atomicity
+            \DB::transaction(function () use ($order) {
+                // Restore stock for each item
+                foreach ($order->items as $item) {
+                    if ($item->product) {
+                        $item->product->incrementStock($item->quantity);
+                    }
+                }
+
+                // Update order status
+                $order->update(['status' => OrderStatus::CANCELLED]);
+            });
+
+            return ServiceResult::success('Đơn hàng đã được hủy thành công.');
+        } catch (\Exception $e) {
+            return ServiceResult::error('Không thể hủy đơn hàng: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Check if order payment can be retried.
+     *
+     * @param Order $order
+     * @return bool
+     */
+    public function canRetryPayment(Order $order): bool
+    {
+        $order->load('payment');
+
+        return $order->payment
+            && $order->payment->payment_method === PaymentMethod::VNPAY
+            && $order->payment->payment_status === PaymentStatus::PENDING
+            && $order->status === OrderStatus::PENDING;
+    }
+
+    /**
+     * Get retry payment validation error message.
+     *
+     * @param Order $order
+     * @return string|null
+     */
+    public function getRetryPaymentError(Order $order): ?string
+    {
+        $order->load('payment');
+
+        if (!$order->payment) {
+            return 'Không tìm thấy thông tin thanh toán.';
+        }
+
+        if ($order->payment->payment_method !== PaymentMethod::VNPAY) {
+            return 'Chỉ có thể thanh toán lại cho đơn hàng VNPAY.';
+        }
+
+        if ($order->payment->payment_status !== PaymentStatus::PENDING) {
+            return 'Đơn hàng này đã được thanh toán hoặc đã bị hủy.';
+        }
+
+        if ($order->status !== OrderStatus::PENDING) {
+            return 'Chỉ có thể thanh toán lại cho đơn hàng đang chờ xử lý.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Retry payment for VNPAY order.
+     *
+     * @param Order $order
+     * @param \Illuminate\Http\Request $request
+     * @return ServiceResult
+     */
+    public function retryVnpayPayment(Order $order, $request): ServiceResult
+    {
+        $error = $this->getRetryPaymentError($order);
+        if ($error) {
+            return ServiceResult::error($error);
+        }
+
+        try {
+            // Generate new VNPAY payment URL (reuse existing payment record)
+            $vnpayService = app(\App\Services\VnpayServiceRefactored::class);
+            $paymentUrl = $vnpayService->createPaymentUrl($order, $request);
+
+            return ServiceResult::success([
+                'payment_url' => $paymentUrl,
+                'order_id' => $order->id,
+            ], 'Payment URL created');
+        } catch (\Exception $e) {
+            return ServiceResult::error('Không thể tạo link thanh toán. Vui lòng thử lại!');
+        }
+    }
 }
