@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class CustomerController extends Controller
+{
+    /**
+     * Display a listing of customers for admin.
+     */
+    public function index(Request $request)
+    {
+        $perPage = (int) $request->get('per_page', 20);
+        $search = trim((string) $request->get('search', ''));
+        $status = $request->get('status'); // active/inactive
+        $verified = $request->get('verified'); // verified/unverified
+        $sort = $request->get('sort', 'newest');
+
+        $query = User::query()->where('role', 'customer');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status === 'active') {
+            $query->where('is_active', true);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', false);
+        }
+
+        if ($verified === 'verified') {
+            $query->whereNotNull('email_verified_at');
+        } elseif ($verified === 'unverified') {
+            $query->whereNull('email_verified_at');
+        }
+
+        // Sorting
+        switch ($sort) {
+            case 'name-asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name-desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'orders-desc':
+                $query->withCount('orders')->orderBy('orders_count', 'desc');
+                break;
+            case 'spent-desc':
+                // If there's a cached spent column or relation, use it. Fallback to newest.
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'recent-order':
+                // Not implemented: fallback
+            case 'newest':
+            default:
+                $query->orderBy('created_at', 'desc');
+                break;
+        }
+
+        // Eager load order count for display
+        $users = $query->withCount('orders')->paginate($perPage)->withQueryString();
+
+        // Calculate stats with single query
+        $stats = User::where('role', 'customer')
+            ->selectRaw('
+                COUNT(*) as total,
+                SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active,
+                SUM(CASE WHEN email_verified_at IS NOT NULL THEN 1 ELSE 0 END) as verified,
+                SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as new_this_month
+            ', [now()->subMonth()])
+            ->first();
+
+        return Inertia::render('admin/customers/CustomerList', [
+            'users' => $users,
+            'stats' => [
+                'total' => $stats->total,
+                'active' => $stats->active,
+                'verified' => $stats->verified,
+                'new_this_month' => $stats->new_this_month,
+            ],
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+                'verified' => $verified,
+                'sort' => $sort,
+            ],
+        ]);
+    }
+
+    /**
+     * Display the specified customer.
+     */
+    public function show(Request $request, string $id)
+    {
+        $customer = User::where('role', 'customer')
+            ->with(['orders' => function ($query) {
+                $query->latest()->limit(config('pagination.admin.recent_items'));
+            }])
+            ->withCount('orders')
+            ->findOrFail($id);
+
+        // Calculate total spent
+        $totalSpent = $customer->orders()->sum('total_amount');
+        $customer->total_spent = $totalSpent;
+
+        return Inertia::render('admin/customers/CustomerForm', [
+            'customer' => $customer,
+        ]);
+    }
+}
