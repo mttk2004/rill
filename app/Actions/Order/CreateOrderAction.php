@@ -10,7 +10,7 @@ use App\Models\Payment;
 use App\Models\Product;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
-use App\Services\ShippingService;
+use App\Services\ShippingServiceRefactored;
 use App\Services\VoucherServiceRefactored;
 use App\Support\ServiceResult;
 use App\Enums\OrderStatus;
@@ -27,7 +27,7 @@ class CreateOrderAction extends BaseAction
     public function __construct(
         protected OrderRepositoryInterface $orderRepository,
         protected ProductRepositoryInterface $productRepository,
-        protected ShippingService $shippingService,
+        protected ShippingServiceRefactored $shippingService,
         protected VoucherServiceRefactored $voucherService,
     ) {}
 
