@@ -58,7 +58,15 @@ class AddressServiceRefactored
     public function createAddress(int $userId, array $data): ServiceResult
     {
         try {
-            $addressData = AddressData::fromRequest($data);
+            $addressData = new AddressData(
+                recipientName: trim($data['recipient_name'] ?? ''),
+                phoneNumber: trim($data['phone_number'] ?? ''),
+                address: trim($data['address'] ?? ''),
+                ward: trim($data['ward'] ?? ''),
+                district: trim($data['district'] ?? ''),
+                province: trim($data['province'] ?? ''),
+                isDefault: $data['is_default'] ?? false
+            );
             return $this->createAddressAction->execute($userId, $addressData);
         } catch (\InvalidArgumentException $e) {
             return ServiceResult::error($e->getMessage());
@@ -76,7 +84,15 @@ class AddressServiceRefactored
     public function updateAddress(int $addressId, int $userId, array $data): ServiceResult
     {
         try {
-            $addressData = AddressData::fromRequest($data);
+            $addressData = new AddressData(
+                recipientName: trim($data['recipient_name'] ?? ''),
+                phoneNumber: trim($data['phone_number'] ?? ''),
+                address: trim($data['address'] ?? ''),
+                ward: trim($data['ward'] ?? ''),
+                district: trim($data['district'] ?? ''),
+                province: trim($data['province'] ?? ''),
+                isDefault: $data['is_default'] ?? false
+            );
             return $this->updateAddressAction->execute($addressId, $userId, $addressData);
         } catch (\InvalidArgumentException $e) {
             return ServiceResult::error($e->getMessage());

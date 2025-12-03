@@ -34,7 +34,7 @@ class OrderServiceRefactored
         protected CancelOrderAction $cancelOrderAction,
         protected ProcessPaymentAction $processPaymentAction,
         protected GenerateStatusChangeNotesAction $generateStatusChangeNotesAction,
-        protected ShippingService $shippingService,
+        protected ShippingServiceRefactored $shippingService,
         protected VoucherServiceRefactored $voucherService,
     ) {}
 
@@ -70,11 +70,17 @@ class OrderServiceRefactored
 
         $itemsCount = $cartItems->sum('quantity');
         $estimatedWeight = $this->shippingService->estimateWeight($itemsCount);
-        $shippingFee = $this->shippingService->calculateFee(
+        $shippingFeeResult = $this->shippingService->calculateFee(
             $shippingAddress,
             (int) $subtotal,
             $estimatedWeight
         );
+
+        if (!$shippingFeeResult->isSuccess()) {
+            return ServiceResult::error($shippingFeeResult->message);
+        }
+
+        $shippingFee = $shippingFeeResult->data['fee'];
 
         // Process voucher if provided
         $discountAmount = 0;

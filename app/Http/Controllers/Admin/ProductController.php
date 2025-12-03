@@ -3,23 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreProductRequest;
+use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Product;
 use App\QueryBuilders\ProductQueryBuilder;
 use App\Services\ProductServiceRefactored;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    protected ProductServiceRefactored $productService;
-
-    public function __construct(ProductServiceRefactored $productService)
-    {
-        $this->productService = $productService;
-    }
+    public function __construct(
+        protected ProductServiceRefactored $productService
+    ) {}
     /**
      * Display a listing of products for admin.
      */
@@ -84,35 +82,16 @@ class ProductController extends Controller
         // Add sales data efficiently (no N+1 queries)
         $this->productService->enrichProductsWithSalesData($products->getCollection());
 
-        // Get stats
+        // Get stats and form options
         $stats = $this->productService->getProductStats();
-
-        // Get unique genres for filter dropdown
-        $genres = Product::select('genre')
-            ->distinct()
-            ->whereNotNull('genre')
-            ->orderBy('genre')
-            ->pluck('genre');
-
-        // Get unique labels for form dropdown
-        $labels = Product::select('label')
-            ->distinct()
-            ->whereNotNull('label')
-            ->orderBy('label')
-            ->pluck('label');
-
-        // Get all artists for form dropdown
-        $artists = \App\Models\Artist::select('id', 'name')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        $formOptions = $this->productService->getFormOptions();
 
         return Inertia::render('admin/products/ProductList', [
             'products' => $products,
             'stats' => $stats,
-            'genres' => $genres,
-            'labels' => $labels,
-            'artists' => $artists,
+            'genres' => $formOptions['genres'],
+            'labels' => $formOptions['labels'],
+            'artists' => $formOptions['artists'],
             'filters' => $filters,
         ]);
     }
@@ -122,51 +101,15 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $genres = Product::select('genre')
-            ->distinct()
-            ->whereNotNull('genre')
-            ->orderBy('genre')
-            ->pluck('genre');
-
-        $labels = Product::select('label')
-            ->distinct()
-            ->whereNotNull('label')
-            ->orderBy('label')
-            ->pluck('label');
-
-        $artists = \App\Models\Artist::select('id', 'name')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        return Inertia::render('admin/products/ProductForm', [
-            'genres' => $genres,
-            'labels' => $labels,
-            'artists' => $artists,
-        ]);
+        return Inertia::render('admin/products/ProductForm', $this->productService->getFormOptions());
     }
 
     /**
      * Store a newly created product.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:100|unique:products,sku',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'cost_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'min_stock_level' => 'required|integer|min:0',
-            'genre' => 'nullable|string|max:100',
-            'label' => 'required|string|max:100',
-            'status' => 'required|in:active,inactive,out_of_stock',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:500',
-            'artists' => 'nullable|array',
-            'artists.*.artist_id' => 'required_with:artists|exists:artists,id',
-            'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
-        ]);
+        $validated = $request->validated();
 
         // Generate slug
         $validated['slug'] = Str::slug($validated['name']);
@@ -179,10 +122,9 @@ class ProductController extends Controller
         $product = Product::create($validated);
 
         // Sync artists
-        $this->productService->syncArtists(
-            $product,
-            $validated['artists'] ?? null
-        );
+        if (isset($validated['artists'])) {
+            $this->productService->syncArtists($product, $validated['artists']);
+        }
 
         return redirect()->route('admin.products')
             ->with('success', 'Tạo sản phẩm mới thành công');
@@ -248,85 +190,34 @@ class ProductController extends Controller
             },
         ])->findOrFail($id);
 
-        $genres = Product::select('genre')
-            ->distinct()
-            ->whereNotNull('genre')
-            ->orderBy('genre')
-            ->pluck('genre');
-
-        $labels = Product::select('label')
-            ->distinct()
-            ->whereNotNull('label')
-            ->orderBy('label')
-            ->pluck('label');
-
-        $artists = \App\Models\Artist::select('id', 'name')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        return Inertia::render('admin/products/ProductForm', [
-            'product' => $product,
-            'genres' => $genres,
-            'labels' => $labels,
-            'artists' => $artists,
-        ]);
+        return Inertia::render('admin/products/ProductForm', array_merge(
+            ['product' => $product],
+            $this->productService->getFormOptions()
+        ));
     }
 
     /**
      * Update the specified product.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProductRequest $request, string $id)
     {
         $product = Product::withTrashed()->findOrFail($id);
-
-        // Debug: Log incoming request data
-        \Log::info('Product update request', [
-            'id' => $id,
-            'all_data' => $request->all(),
-            'has_file' => $request->hasFile('image'),
-        ]);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'cost_price' => 'nullable|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'min_stock_level' => 'nullable|integer|min:0',
-            'genre' => 'nullable|string|max:100',
-            'label' => 'required|string|max:100',
-            'status' => 'required|in:active,inactive,out_of_stock',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:500',
-            'artists' => 'nullable|array',
-            'artists.*.artist_id' => 'required_with:artists|exists:artists,id',
-            'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
-        ]);
+        $validated = $request->validated();
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            try {
-                $validated['image'] = $this->productService->handleImageUpload(
-                    $product,
-                    $request->file('image')
-                );
-            } catch (\Exception $e) {
-                \Log::error('Failed to upload product image', [
-                    'product_id' => $product->id,
-                    'error' => $e->getMessage()
-                ]);
-                throw $e;
-            }
+            $validated['image'] = $this->productService->handleImageUpload(
+                $product,
+                $request->file('image')
+            );
         }
 
         $product->update($validated);
 
         // Sync artists
-        $this->productService->syncArtists(
-            $product,
-            $validated['artists'] ?? null
-        );
+        if (isset($validated['artists'])) {
+            $this->productService->syncArtists($product, $validated['artists']);
+        }
 
         return redirect()->route('admin.products')
             ->with('success', 'Cập nhật sản phẩm thành công');
@@ -337,10 +228,13 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $product = Product::findOrFail($id);
-        $product->delete();
+        $result = $this->productService->deleteProduct($id);
 
-        return redirect()->back()->with('success', 'Sản phẩm đã được xóa thành công');
+        if (!$result->success) {
+            return redirect()->back()->with('error', $result->message);
+        }
+
+        return redirect()->back()->with('success', $result->message);
     }
 
     /**
@@ -348,9 +242,12 @@ class ProductController extends Controller
      */
     public function restore(string $id)
     {
-        $product = Product::withTrashed()->findOrFail($id);
-        $product->restore();
+        $result = $this->productService->restoreProduct($id);
 
-        return redirect()->back()->with('success', 'Sản phẩm đã được khôi phục thành công');
+        if (!$result->success) {
+            return redirect()->back()->with('error', $result->message);
+        }
+
+        return redirect()->back()->with('success', $result->message);
     }
 }

@@ -18,7 +18,7 @@ class ShippingServiceRefactored
     private int $freeShippingThreshold;
 
     public function __construct(
-        private SettingService $settingService,
+        private SettingServiceRefactored $settingService,
     ) {
         // Initialize GHN configuration
         $token = config('ghn.api_token');

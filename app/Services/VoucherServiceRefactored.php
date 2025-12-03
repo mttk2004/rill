@@ -104,7 +104,18 @@ class VoucherServiceRefactored
     public function createVoucher(array $data): ServiceResult
     {
         try {
-            $voucherData = VoucherData::fromRequest($data);
+            $voucherData = new VoucherData(
+                code: strtoupper(trim($data['code'])),
+                type: $data['type'],
+                value: (float) $data['value'],
+                validFrom: new \DateTime($data['valid_from']),
+                validTo: new \DateTime($data['valid_to']),
+                minimumAmount: isset($data['minimum_amount']) ? (float) $data['minimum_amount'] : null,
+                usageLimit: isset($data['usage_limit']) ? (int) $data['usage_limit'] : null,
+                usageLimitPerUser: isset($data['usage_limit_per_user']) ? (int) $data['usage_limit_per_user'] : null,
+                description: $data['description'] ?? null,
+                isActive: $data['is_active'] ?? true
+            );
             return $this->createVoucherAction->execute($voucherData);
         } catch (\InvalidArgumentException $e) {
             return ServiceResult::error($e->getMessage());
@@ -121,7 +132,18 @@ class VoucherServiceRefactored
     public function updateVoucher(int $voucherId, array $data): ServiceResult
     {
         try {
-            $voucherData = VoucherData::fromRequest($data);
+            $voucherData = new VoucherData(
+                code: strtoupper(trim($data['code'])),
+                type: $data['type'],
+                value: (float) $data['value'],
+                validFrom: new \DateTime($data['valid_from']),
+                validTo: new \DateTime($data['valid_to']),
+                minimumAmount: isset($data['minimum_amount']) ? (float) $data['minimum_amount'] : null,
+                usageLimit: isset($data['usage_limit']) ? (int) $data['usage_limit'] : null,
+                usageLimitPerUser: isset($data['usage_limit_per_user']) ? (int) $data['usage_limit_per_user'] : null,
+                description: $data['description'] ?? null,
+                isActive: $data['is_active'] ?? true
+            );
             return $this->updateVoucherAction->execute($voucherId, $voucherData);
         } catch (\InvalidArgumentException $e) {
             return ServiceResult::error($e->getMessage());

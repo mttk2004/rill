@@ -3,6 +3,7 @@
 namespace App\DataObjects\Address;
 
 use App\DataObjects\BaseData;
+use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 /**
@@ -77,19 +78,19 @@ class AddressData extends BaseData
     /**
      * Create AddressData from request data.
      *
-     * @param array $data
-     * @return self
+     * @param Request $request
+     * @return static
      */
-    public static function fromRequest(array $data): self
+    public static function fromRequest(Request $request): static
     {
-        return new self(
-            recipientName: trim($data['recipient_name']),
-            phoneNumber: trim($data['phone_number']),
-            address: trim($data['address']),
-            ward: trim($data['ward']),
-            district: trim($data['district']),
-            province: trim($data['province']),
-            isDefault: $data['is_default'] ?? false
+        return new static(
+            recipientName: trim($request->input('recipient_name', '')),
+            phoneNumber: trim($request->input('phone_number', '')),
+            address: trim($request->input('address', '')),
+            ward: trim($request->input('ward', '')),
+            district: trim($request->input('district', '')),
+            province: trim($request->input('province', '')),
+            isDefault: $request->boolean('is_default', false)
         );
     }
 }

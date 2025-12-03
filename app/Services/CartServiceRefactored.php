@@ -134,4 +134,38 @@ class CartServiceRefactored
     {
         return $this->mergeGuestCartAction->execute($userId, $sessionId);
     }
+
+    /**
+     * Format cart items for view presentation.
+     *
+     * @param Collection $cartItems
+     * @return Collection
+     */
+    public function formatCartItemsForView(Collection $cartItems): Collection
+    {
+        return $cartItems->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'unit_price' => $item->unit_price,
+                'total_price' => $item->quantity * $item->unit_price,
+                'product' => [
+                    'id' => $item->product->id,
+                    'name' => $item->product->name,
+                    'slug' => $item->product->slug,
+                    'description' => $item->product->description,
+                    'price' => $item->product->price,
+                    'image_url' => $item->product->image_url,
+                    'stock_quantity' => $item->product->stock_quantity,
+                    'status' => $item->product->status,
+                    'artists' => $item->product->artists->map(fn($artist) => [
+                        'id' => $artist->id,
+                        'name' => $artist->name,
+                        'slug' => $artist->slug,
+                    ]),
+                ],
+            ];
+        });
+    }
 }

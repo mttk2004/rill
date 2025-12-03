@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Actions\Product\CreateProductAction;
+use App\Actions\Product\DeleteProductAction;
 use App\Actions\Product\GetProductDetailDataAction;
 use App\Actions\Product\GetProductsWithFiltersAction;
+use App\Actions\Product\RestoreProductAction;
 use App\Actions\Product\UpdateProductAction;
 use App\Actions\Product\UpdateProductStockAction;
 use App\DataObjects\Product\CreateProductData;
@@ -30,6 +32,8 @@ class ProductServiceRefactored
         protected CreateProductAction $createProductAction,
         protected UpdateProductAction $updateProductAction,
         protected UpdateProductStockAction $updateProductStockAction,
+        protected DeleteProductAction $deleteProductAction,
+        protected RestoreProductAction $restoreProductAction,
         protected GetProductsWithFiltersAction $getProductsWithFiltersAction,
         protected GetProductDetailDataAction $getProductDetailDataAction,
     ) {}
@@ -408,5 +412,82 @@ class ProductServiceRefactored
     public function getDataForShowPage(Product $product, ?User $user): ServiceResult
     {
         return $this->getProductDetailDataAction->execute($product, $user);
+    }
+
+    /**
+     * Get unique genres from products.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getGenres()
+    {
+        return Product::select('genre')
+            ->distinct()
+            ->whereNotNull('genre')
+            ->orderBy('genre')
+            ->pluck('genre');
+    }
+
+    /**
+     * Get unique labels from products.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getLabels()
+    {
+        return Product::select('label')
+            ->distinct()
+            ->whereNotNull('label')
+            ->orderBy('label')
+            ->pluck('label');
+    }
+
+    /**
+     * Get active artists for product form.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getActiveArtists()
+    {
+        return \App\Models\Artist::select('id', 'name')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+    }
+
+    /**
+     * Get form options (genres, labels, artists) for product create/edit forms.
+     *
+     * @return array
+     */
+    public function getFormOptions(): array
+    {
+        return [
+            'genres' => $this->getGenres(),
+            'labels' => $this->getLabels(),
+            'artists' => $this->getActiveArtists(),
+        ];
+    }
+
+    /**
+     * Delete (soft delete) a product.
+     *
+     * @param string $productId
+     * @return ServiceResult
+     */
+    public function deleteProduct(string $productId): ServiceResult
+    {
+        return $this->deleteProductAction->execute($productId);
+    }
+
+    /**
+     * Restore a soft-deleted product.
+     *
+     * @param string $productId
+     * @return ServiceResult
+     */
+    public function restoreProduct(string $productId): ServiceResult
+    {
+        return $this->restoreProductAction->execute($productId);
     }
 }

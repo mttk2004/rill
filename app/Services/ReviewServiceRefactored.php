@@ -70,7 +70,7 @@ class ReviewServiceRefactored
             }
 
             // Create ReviewData DTO
-            $reviewData = ReviewData::fromRequest($userId, $productId, $orderItem->id, $data);
+            $reviewData = ReviewData::forUpdate($userId, $productId, $orderItem->id, $data);
 
             // Extract uploaded images if any
             $uploadedImages = $data['images'] ?? null;

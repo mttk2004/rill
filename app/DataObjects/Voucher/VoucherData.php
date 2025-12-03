@@ -91,11 +91,12 @@ class VoucherData extends BaseData
     /**
      * Create VoucherData from request data.
      *
-     * @param array $data
-     * @return self
+     * @param \Illuminate\Http\Request $request
+     * @return static
      */
-    public static function fromRequest(array $data): self
+    public static function fromRequest(\Illuminate\Http\Request $request): static
     {
+        $data = $request->all();
         return new self(
             code: strtoupper(trim($data['code'])),
             type: $data['type'],

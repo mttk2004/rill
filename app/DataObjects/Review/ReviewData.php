@@ -63,21 +63,18 @@ class ReviewData extends BaseData
     /**
      * Create ReviewData from request data for new review.
      *
-     * @param int $userId
-     * @param string $productId
-     * @param int $orderItemId
-     * @param array $data
-     * @return self
+     * @param \Illuminate\Http\Request $request
+     * @return static
      */
-    public static function fromRequest(int $userId, string $productId, int $orderItemId, array $data): self
+    public static function fromRequest(\Illuminate\Http\Request $request): static
     {
         return new self(
-            userId: $userId,
-            productId: $productId,
-            orderItemId: $orderItemId,
-            rating: (int) $data['rating'],
-            comment: (string) $data['comment'],
-            images: $data['images'] ?? null
+            userId: (int) $request->input('user_id'),
+            productId: (string) $request->input('product_id'),
+            orderItemId: (int) $request->input('order_item_id'),
+            rating: (int) $request->input('rating'),
+            comment: (string) $request->input('comment'),
+            images: $request->input('images')
         );
     }
 
