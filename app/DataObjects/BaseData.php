@@ -8,35 +8,10 @@ use Illuminate\Http\Request;
  * Base Data Transfer Object
  *
  * Abstract class for all DTOs in the application.
- * Provides common methods for creating DTOs from various sources.
+ * Child classes should implement their own static factory methods as needed.
  */
 abstract class BaseData
 {
-    /**
-     * Create DTO from validated request data.
-     *
-     * @param Request $request
-     * @return static
-     */
-    public static function fromRequest(Request $request): static
-    {
-        return static::from($request->validated());
-    }
-
-    /**
-     * Create DTO from array.
-     *
-     * Child classes must implement a constructor that accepts named parameters.
-     *
-     * @param array $data
-     * @return static
-     */
-    public static function from(array $data): static
-    {
-        // This uses named parameters from the child class constructor
-        return new static(...$data);
-    }
-
     /**
      * Convert DTO to array.
      *

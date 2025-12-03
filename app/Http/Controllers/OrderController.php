@@ -256,7 +256,7 @@ class OrderController extends Controller
 
         try {
             // Generate new VNPAY payment URL (reuse existing payment record)
-            $vnpayService = app(\App\Services\VnpayService::class);
+            $vnpayService = app(\App\Services\VnpayServiceRefactored::class);
             $paymentUrl = $vnpayService->createPaymentUrl($order, $request);
 
             \Log::info('Retry payment initiated', [
