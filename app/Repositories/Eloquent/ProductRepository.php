@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Product;
+use App\QueryBuilders\ProductQueryBuilder;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -23,6 +24,16 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function __construct(Product $model)
     {
         parent::__construct($model);
+    }
+
+    /**
+     * Get new query builder instance.
+     *
+     * @return ProductQueryBuilder
+     */
+    public function newQuery(): ProductQueryBuilder
+    {
+        return new ProductQueryBuilder($this->model->query());
     }
 
     /**

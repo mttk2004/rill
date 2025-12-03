@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Order;
+use App\QueryBuilders\OrderQueryBuilder;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -24,6 +25,16 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
     public function __construct(Order $model)
     {
         parent::__construct($model);
+    }
+
+    /**
+     * Get new query builder instance.
+     *
+     * @return OrderQueryBuilder
+     */
+    public function newQuery(): OrderQueryBuilder
+    {
+        return new OrderQueryBuilder($this->model->query());
     }
 
     /**
