@@ -8,14 +8,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Http\Resources\OrderAdminResource;
 use App\Models\Order;
-use App\Services\OrderService;
+use App\Services\OrderLifecycleService;
+use App\Services\OrderQueryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class OrderController extends Controller
 {
     public function __construct(
-        protected OrderService $orderService
+        protected OrderQueryService $orderQueryService,
+        protected OrderLifecycleService $orderLifecycleService
     ) {}
     /**
      * Display a listing of orders for admin.
@@ -30,8 +32,8 @@ class OrderController extends Controller
             'sort' => $request->get('sort', 'newest'),
         ];
 
-        $orders = $this->orderService->getAdminOrders($filters);
-        $stats = $this->orderService->getOrderStats();
+        $orders = $this->orderQueryService->getAdminOrders($filters);
+        $stats = $this->orderQueryService->getOrderStats();
 
         return Inertia::render('admin/orders/OrderList', [
             'orders' => [
@@ -105,7 +107,7 @@ class OrderController extends Controller
      */
     public function destroy(string $id)
     {
-        $result = $this->orderService->cancelOrder((int) $id, 'Cancelled by admin');
+        $result = $this->orderLifecycleService->cancelOrder((int) $id, 'Cancelled by admin');
 
         if ($result->isSuccess()) {
             return redirect()->back()->with('success', 'Đơn hàng đã được hủy');
@@ -137,13 +139,13 @@ class OrderController extends Controller
         $newStatus = OrderStatus::from($request->validated()['status']);
 
         // Business rules validation
-        $validationError = $this->orderService->validateStatusUpdate($order->status, $newStatus);
+        $validationError = $this->orderLifecycleService->validateStatusUpdate($order->status, $newStatus);
         if ($validationError) {
             return back()->withErrors(['status' => $validationError]);
         }
 
         // Use service to update status
-        $result = $this->orderService->updateOrderStatus(
+        $result = $this->orderLifecycleService->updateOrderStatus(
             (int) $id,
             $newStatus,
             $request->validated()['notes'] ?? null
@@ -156,3 +158,5 @@ class OrderController extends Controller
         return back()->withErrors(['status' => $result->message]);
     }
 }
+
+

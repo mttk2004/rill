@@ -8,7 +8,9 @@ use App\Enums\PaymentStatus;
 use App\Http\Requests\FilterOrdersRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Services\OrderService;
+use App\Services\OrderLifecycleService;
+use App\Services\OrderPaymentService;
+use App\Services\OrderQueryService;
 use App\Services\ThankYouPageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +21,9 @@ class OrderController extends Controller
 {
     public function __construct(
         private ThankYouPageService $thankYouPageService,
-        private OrderService $orderService
+        private OrderQueryService $orderQueryService,
+        private OrderLifecycleService $orderLifecycleService,
+        private OrderPaymentService $orderPaymentService
     ) {}
     /**
      * Display a listing of the resource.
@@ -28,7 +32,7 @@ class OrderController extends Controller
     {
         $filters = $request->validated();
 
-        $orders = $this->orderService->getUserOrders(
+        $orders = $this->orderQueryService->getUserOrders(
             Auth::id(),
             array_merge($filters, ['per_page' => config('pagination.orders', 15)])
         )->withQueryString();
@@ -136,7 +140,7 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
-        $result = $this->orderService->cancelOrderWithStockRestore($order);
+        $result = $this->orderLifecycleService->cancelOrderWithStockRestore($order);
 
         return back()->with(
             $result->success ? 'success' : 'error',
@@ -151,7 +155,7 @@ class OrderController extends Controller
     {
         Gate::authorize('view', $order);
 
-        $result = $this->orderService->retryVnpayPayment($order, $request);
+        $result = $this->orderPaymentService->retryVnpayPayment($order, $request);
 
         if (!$result->success) {
             return response()->json(['error' => $result->message], 400);

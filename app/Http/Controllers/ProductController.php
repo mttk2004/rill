@@ -4,19 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Services\CartService;
-use App\Services\ProductService;
+use App\Services\ProductQueryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProductController extends Controller
 {
-    protected ProductService $productService;
+    protected ProductQueryService $productQueryService;
     protected CartService $cartService;
 
-    public function __construct(ProductService $productService, CartService $cartService)
+    public function __construct(ProductQueryService $productQueryService, CartService $cartService)
     {
-        $this->productService = $productService;
+        $this->productQueryService = $productQueryService;
         $this->cartService = $cartService;
     }
 
@@ -27,7 +27,7 @@ class ProductController extends Controller
     {
         $filters = $request->only(['search', 'genre', 'label', 'artist', 'collection', 'sort', 'page']);
 
-        $serviceResult = $this->productService->getProducts($filters);
+        $serviceResult = $this->productQueryService->getProducts($filters);
 
         if (!$serviceResult->success) {
             abort(500, $serviceResult->message);
@@ -73,7 +73,7 @@ class ProductController extends Controller
      */
     public function show(Product $product): Response
     {
-        $serviceResult = $this->productService->getDataForShowPage($product, auth()->user());
+        $serviceResult = $this->productQueryService->getDataForShowPage($product, auth()->user());
 
         if (!$serviceResult->success) {
             abort(500, $serviceResult->message);

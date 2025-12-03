@@ -7,7 +7,9 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Product;
 use App\QueryBuilders\ProductQueryBuilder;
-use App\Services\ProductService;
+use App\Services\ProductCrudService;
+use App\Services\ProductMediaService;
+use App\Services\ProductQueryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,7 +18,9 @@ use Inertia\Inertia;
 class ProductController extends Controller
 {
     public function __construct(
-        protected ProductService $productService
+        protected ProductCrudService $productCrudService,
+        protected ProductQueryService $productQueryService,
+        protected ProductMediaService $productMediaService
     ) {}
     /**
      * Display a listing of products for admin.
@@ -80,11 +84,11 @@ class ProductController extends Controller
         ->withQueryString();
 
         // Add sales data efficiently (no N+1 queries)
-        $this->productService->enrichProductsWithSalesData($products->getCollection());
+        $this->productQueryService->enrichProductsWithSalesData($products->getCollection());
 
         // Get stats and form options
-        $stats = $this->productService->getProductStats();
-        $formOptions = $this->productService->getFormOptions();
+        $stats = $this->productQueryService->getProductStats();
+        $formOptions = $this->productQueryService->getFormOptions();
 
         return Inertia::render('admin/products/ProductList', [
             'products' => $products,
@@ -101,7 +105,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return Inertia::render('admin/products/ProductForm', $this->productService->getFormOptions());
+        return Inertia::render('admin/products/ProductForm', $this->productQueryService->getFormOptions());
     }
 
     /**
@@ -123,7 +127,7 @@ class ProductController extends Controller
 
         // Sync artists
         if (isset($validated['artists'])) {
-            $this->productService->syncArtists($product, $validated['artists']);
+            $this->productMediaService->syncArtists($product, $validated['artists']);
         }
 
         return redirect()->route('admin.products')
@@ -192,7 +196,7 @@ class ProductController extends Controller
 
         return Inertia::render('admin/products/ProductForm', array_merge(
             ['product' => $product],
-            $this->productService->getFormOptions()
+            $this->productQueryService->getFormOptions()
         ));
     }
 
@@ -206,7 +210,7 @@ class ProductController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $validated['image'] = $this->productService->handleImageUpload(
+            $validated['image'] = $this->productMediaService->handleImageUpload(
                 $product,
                 $request->file('image')
             );
@@ -216,7 +220,7 @@ class ProductController extends Controller
 
         // Sync artists
         if (isset($validated['artists'])) {
-            $this->productService->syncArtists($product, $validated['artists']);
+            $this->productMediaService->syncArtists($product, $validated['artists']);
         }
 
         return redirect()->route('admin.products')
@@ -228,7 +232,7 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $result = $this->productService->deleteProduct($id);
+        $result = $this->productCrudService->deleteProduct($id);
 
         if (!$result->success) {
             return redirect()->back()->with('error', $result->message);
@@ -242,7 +246,7 @@ class ProductController extends Controller
      */
     public function restore(string $id)
     {
-        $result = $this->productService->restoreProduct($id);
+        $result = $this->productCrudService->restoreProduct($id);
 
         if (!$result->success) {
             return redirect()->back()->with('error', $result->message);
@@ -251,3 +255,5 @@ class ProductController extends Controller
         return redirect()->back()->with('success', $result->message);
     }
 }
+
+

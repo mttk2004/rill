@@ -68,31 +68,6 @@ class ArtistController extends Controller
     }
 
     /**
-     * Display the specified artist (for AJAX requests).
-     */
-    public function show(Request $request, string $id)
-    {
-        $artist = Artist::with([
-            'products' => function ($query) {
-                $query->withCount('orderItems')
-                      ->orderBy('created_at', 'desc');
-            },
-        ])->withCount('products')
-          ->withTrashed()
-          ->findOrFail($id);
-
-        // Return JSON for AJAX requests
-        if ($request->expectsJson() || $request->ajax()) {
-            return response()->json($artist);
-        }
-
-        // Fallback to Inertia render (though this shouldn't be used anymore)
-        return Inertia::render('admin/artists/show', [
-            'artist' => $artist,
-        ]);
-    }
-
-    /**
      * Show the form for editing the specified artist.
      */
     public function edit(string $id)
