@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidateVoucherRequest;
 use App\Http\Resources\ApiResource;
-use App\Services\VoucherService;
+use App\Services\VoucherServiceRefactored;
 use Illuminate\Http\Request;
 
 class VoucherController extends Controller
 {
     public function __construct(
-        protected VoucherService $voucherService
+        protected VoucherServiceRefactored $voucherService
     ) {}
 
     /**
@@ -29,10 +29,10 @@ class VoucherController extends Controller
             $userId
         );
 
-        if ($result->isError()) {
+        if (!$result->isSuccess()) {
             return ApiResource::error(
                 $result->message,
-                $result->errorCode,
+                $result->errors['error_code'] ?? 'VALIDATION_ERROR',
                 null,
                 422
             );

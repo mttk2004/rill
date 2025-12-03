@@ -12,6 +12,10 @@ use App\Services\Responses\ServiceResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * @deprecated Use ReviewServiceRefactored instead
+ * This service will be removed in a future version
+ */
 class ReviewService
 {
     /**

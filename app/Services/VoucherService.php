@@ -9,6 +9,10 @@ use App\Models\VoucherUsage;
 use App\Services\Responses\ServiceResponse;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @deprecated Use VoucherServiceRefactored instead
+ * This service will be removed in a future version
+ */
 class VoucherService
 {
     /**

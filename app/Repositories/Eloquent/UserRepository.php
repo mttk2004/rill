@@ -208,4 +208,14 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
             'new_this_month' => $stats->new_this_month,
         ];
     }
+
+    /**
+     * Get query builder for complex queries.
+     *
+     * @return \App\QueryBuilders\UserQueryBuilder
+     */
+    public function newQuery(): \App\QueryBuilders\UserQueryBuilder
+    {
+        return new \App\QueryBuilders\UserQueryBuilder();
+    }
 }

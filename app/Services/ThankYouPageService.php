@@ -12,7 +12,7 @@ class ThankYouPageService
 {
     public function __construct(
         private VnpayService $vnpayService,
-        private OrderService $orderService
+        private OrderServiceRefactored $orderService
     ) {}
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Product;
+use App\QueryBuilders\ProductQueryBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -141,4 +142,11 @@ interface ProductRepositoryInterface extends BaseRepositoryInterface
      * @return array
      */
     public function getStats(): array;
+
+    /**
+     * Get query builder for complex queries.
+     *
+     * @return ProductQueryBuilder
+     */
+    public function newQuery(): ProductQueryBuilder;
 }

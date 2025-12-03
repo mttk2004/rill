@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
+/**
+ * @deprecated Use OrderServiceRefactored instead
+ * This service will be removed in a future version
+ */
 class OrderService
 {
     protected $shippingService;

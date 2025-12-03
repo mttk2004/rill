@@ -6,7 +6,7 @@ use App\Http\Requests\StoreShippingAddressRequest;
 use App\Http\Requests\UpdateShippingAddressRequest;
 use App\Http\Resources\ShippingAddressResource;
 use App\Models\ShippingAddress;
-use App\Services\AddressService;
+use App\Services\AddressServiceRefactored;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -17,9 +17,9 @@ class AddressController extends Controller
 {
     use AuthorizesRequests;
 
-    protected AddressService $addressService;
+    protected AddressServiceRefactored $addressService;
 
-    public function __construct(AddressService $addressService)
+    public function __construct(AddressServiceRefactored $addressService)
     {
         $this->addressService = $addressService;
     }
@@ -29,8 +29,8 @@ class AddressController extends Controller
      */
     public function index(): Response
     {
-        $user = Auth::user();
-        $addresses = $this->addressService->getUserAddresses($user);
+        $userId = Auth::id();
+        $addresses = $this->addressService->getUserAddresses($userId);
 
         return Inertia::render('Addresses', [
             'addresses' => $addresses,
@@ -44,10 +44,13 @@ class AddressController extends Controller
     {
         $this->authorize('create', ShippingAddress::class);
 
-        $user = Auth::user();
-        $this->addressService->createAddress($user, $request->validated());
+        $result = $this->addressService->createAddress(Auth::id(), $request->validated());
 
-        return back();
+        if (!$result->isSuccess()) {
+            return back()->with('error', $result->message);
+        }
+
+        return back()->with('success', $result->message);
     }    /**
      * Update the specified resource in storage.
      */
@@ -55,9 +58,13 @@ class AddressController extends Controller
     {
         $this->authorize('update', $address);
 
-        $this->addressService->updateAddress($address, $request->validated());
+        $result = $this->addressService->updateAddress($address->id, Auth::id(), $request->validated());
 
-        return back();
+        if (!$result->isSuccess()) {
+            return back()->with('error', $result->message);
+        }
+
+        return back()->with('success', $result->message);
     }
 
     /**
@@ -67,12 +74,13 @@ class AddressController extends Controller
     {
         $this->authorize('delete', $address);
 
-        try {
-            $this->addressService->deleteAddress($address);
-            return back()->with('success', 'Địa chỉ đã được xóa thành công.');
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+        $result = $this->addressService->deleteAddress($address->id, Auth::id());
+
+        if (!$result->isSuccess()) {
+            return back()->with('error', $result->message);
         }
+
+        return back()->with('success', $result->message);
     }
 
     /**
@@ -82,11 +90,12 @@ class AddressController extends Controller
     {
         $this->authorize('setDefault', $address);
 
-        try {
-            $this->addressService->setDefaultAddress(Auth::user(), $address);
-            return back()->with('success', 'Địa chỉ mặc định đã được cập nhật.');
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+        $result = $this->addressService->setDefaultAddress($address->id, Auth::id());
+
+        if (!$result->isSuccess()) {
+            return back()->with('error', $result->message);
         }
+
+        return back()->with('success', $result->message);
     }
 }

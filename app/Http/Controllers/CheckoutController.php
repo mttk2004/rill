@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\PaymentMethod;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\ShoppingCartItem;
-use App\Services\OrderService;
+use App\Services\OrderServiceRefactored;
 use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +47,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(StoreOrderRequest $request, OrderService $orderService, VnpayService $vnpayService)
+    public function store(StoreOrderRequest $request, OrderServiceRefactored $orderService, VnpayService $vnpayService)
     {
         $user = Auth::user();
 
@@ -56,7 +56,13 @@ class CheckoutController extends Controller
             // This prevents race conditions between cart view and checkout
             $this->validateCartStockBeforeCheckout($user);
 
-            $order = $orderService->createOrderFromCart($user, $request->validated());
+            $result = $orderService->createOrderFromCart($user, $request->validated());
+
+            if (!$result->isSuccess()) {
+                return back()->withErrors(['order' => $result->message])->with('error', $result->message);
+            }
+
+            $order = $result->data['order'];
 
             // Kiểm tra payment method
             $paymentMethod = $request->input('payment_method', PaymentMethod::COD->value);

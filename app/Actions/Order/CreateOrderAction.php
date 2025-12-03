@@ -11,7 +11,7 @@ use App\Models\Product;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\ShippingService;
-use App\Services\VoucherService;
+use App\Services\VoucherServiceRefactored;
 use App\Support\ServiceResult;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
@@ -28,7 +28,7 @@ class CreateOrderAction extends BaseAction
         protected OrderRepositoryInterface $orderRepository,
         protected ProductRepositoryInterface $productRepository,
         protected ShippingService $shippingService,
-        protected VoucherService $voucherService,
+        protected VoucherServiceRefactored $voucherService,
     ) {}
 
     /**
@@ -116,9 +116,12 @@ class CreateOrderAction extends BaseAction
             // Apply voucher if provided
             if ($data->voucherId) {
                 try {
-                    $voucher = \App\Models\Voucher::findOrFail($data->voucherId);
-                    $user = \App\Models\User::findOrFail($data->userId);
-                    $this->voucherService->applyVoucher($voucher, $order, $user);
+                    $this->voucherService->applyVoucher(
+                        $data->voucherId,
+                        $order->id,
+                        $data->userId,
+                        (float) $data->discountAmount
+                    );
                 } catch (\Exception $e) {
                     return $this->error('Failed to apply voucher: ' . $e->getMessage());
                 }

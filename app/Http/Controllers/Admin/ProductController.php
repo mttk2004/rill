@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Services\ProductAdminService;
+use App\QueryBuilders\ProductQueryBuilder;
+use App\Services\ProductServiceRefactored;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -13,9 +14,9 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    protected ProductAdminService $productService;
+    protected ProductServiceRefactored $productService;
 
-    public function __construct(ProductAdminService $productService)
+    public function __construct(ProductServiceRefactored $productService)
     {
         $this->productService = $productService;
     }
@@ -35,10 +36,38 @@ class ProductController extends Controller
             'sort' => $request->get('sort', 'newest'),
         ];
 
-        $query = $this->productService->buildProductQuery($filters);
+        // Build query using ProductQueryBuilder
+        $queryBuilder = new ProductQueryBuilder(Product::query()->withTrashed());
+
+        // Apply filters
+        $queryBuilder->search($filters['search'] ?? null)
+                    ->status($filters['status'] ?? null)
+                    ->genre($filters['genre'] ?? null);
+
+        // Stock filter
+        if (($filters['stock'] ?? null) === 'low_stock') {
+            $queryBuilder->lowStock();
+        } elseif (($filters['stock'] ?? null) === 'out_of_stock') {
+            $queryBuilder->outOfStock();
+        }
+
+        // Sorting
+        $sort = $filters['sort'] ?? 'newest';
+        match ($sort) {
+            'name_asc' => $queryBuilder->sortByName('asc'),
+            'name_desc' => $queryBuilder->sortByName('desc'),
+            'price_asc' => $queryBuilder->sortByPrice('asc'),
+            'price_desc' => $queryBuilder->sortByPrice('desc'),
+            'stock_asc' => $queryBuilder->orderBy('stock_quantity', 'asc'),
+            'stock_desc' => $queryBuilder->orderBy('stock_quantity', 'desc'),
+            'sold_desc' => $queryBuilder->bestSellers(),
+            'oldest' => $queryBuilder->oldest(),
+            default => $queryBuilder->newest(),
+        };
 
         // Eager load relationships (include soft deleted products)
-        $products = $query->withTrashed()->with([
+        $query = $queryBuilder->getQuery();
+        $products = $query->with([
             'artists' => function ($q) {
                 $q->wherePivot('role', 'main')->orderByPivot('sort_order');
             },

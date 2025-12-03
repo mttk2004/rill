@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Order;
+use App\QueryBuilders\OrderQueryBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -111,4 +112,11 @@ interface OrderRepositoryInterface extends BaseRepositoryInterface
      * @return float
      */
     public function getTotalRevenue(?\Carbon\Carbon $startDate = null, ?\Carbon\Carbon $endDate = null): float;
+
+    /**
+     * Get query builder for complex queries.
+     *
+     * @return OrderQueryBuilder
+     */
+    public function newQuery(): OrderQueryBuilder;
 }

@@ -9,6 +9,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
+/**
+ * @deprecated Use CartServiceRefactored instead
+ * This service will be removed in a future version
+ */
 class CartService
 {
     /**

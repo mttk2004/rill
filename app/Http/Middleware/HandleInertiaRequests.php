@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\CartService;
+use App\Services\CartServiceRefactored;
 use App\Services\SettingService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -54,11 +54,14 @@ class HandleInertiaRequests extends Middleware
                 'info' => $request->session()->get('info'),
                 'warning' => $request->session()->get('warning'),
             ],
-            'cart' => function () {
-                $cartService = app(CartService::class);
+            'cart' => function () use ($request) {
+                $cartService = app(CartServiceRefactored::class);
+                $userId = $request->user()?->id;
+                $sessionId = $request->session()->getId();
+
                 return [
-                    'summary' => $cartService->getCartSummary(),
-                    'items' => $cartService->getCartItems()->map(function ($item) {
+                    'summary' => $cartService->getCartSummary($userId, $sessionId),
+                    'items' => $cartService->getCartItems($userId, $sessionId)->map(function ($item) {
                         return [
                             'id' => $item->id,
                             'quantity' => $item->quantity,
@@ -67,7 +70,7 @@ class HandleInertiaRequests extends Middleware
                                 'id' => $item->product->id,
                                 'name' => $item->product->name,
                                 'slug' => $item->product->slug,
-                                'image_url' => $item->product->image_url,
+                                'image_urlc' => $item->product->image_url,
                             ],
                         ];
                     }),

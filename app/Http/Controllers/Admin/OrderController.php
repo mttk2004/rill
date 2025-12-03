@@ -7,12 +7,16 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderAdminResource;
 use App\Models\Order;
+use App\Services\OrderServiceRefactored;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        protected OrderServiceRefactored $orderService
+    ) {}
     /**
      * Display a listing of orders for admin.
      */
@@ -179,13 +183,13 @@ class OrderController extends Controller
      */
     public function destroy(string $id)
     {
-        $order = Order::findOrFail($id);
+        $result = $this->orderService->cancelOrder((int) $id, 'Cancelled by admin');
 
-        // Update status to cancelled
-        $order->update(['status' => OrderStatus::CANCELLED]);
-        $order->delete();
+        if ($result->isSuccess()) {
+            return redirect()->back()->with('success', 'Đơn hàng đã được hủy');
+        }
 
-        return redirect()->back()->with('success', 'Đơn hàng đã được hủy');
+        return redirect()->back()->withErrors(['error' => $result->message]);
     }
 
     /**
@@ -214,21 +218,26 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         $oldStatus = $order->status;
-        $newStatus = $request->status;
+        $newStatus = OrderStatus::from($request->status);
 
         // Business rules validation
-        if ($oldStatus === OrderStatus::DELIVERED && $newStatus !== OrderStatus::CANCELLED->value) {
+        if ($oldStatus === OrderStatus::DELIVERED && $newStatus !== OrderStatus::CANCELLED) {
             return back()->withErrors([
                 'status' => 'Không thể thay đổi trạng thái của đơn hàng đã giao',
             ]);
         }
 
-        // Update status (set notes as temporary attribute for history)
-        if ($request->filled('notes')) {
-            $order->status_change_notes = $request->notes;
-        }
-        $order->update(['status' => $newStatus]);
+        // Use service to update status
+        $result = $this->orderService->updateOrderStatus(
+            (int) $id,
+            $newStatus,
+            $request->notes
+        );
 
-        return back();
+        if ($result->isSuccess()) {
+            return back()->with('success', 'Cập nhật trạng thái thành công');
+        }
+
+        return back()->withErrors(['status' => $result->message]);
     }
 }

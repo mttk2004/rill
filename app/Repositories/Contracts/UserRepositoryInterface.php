@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\User;
+use App\QueryBuilders\UserQueryBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -86,4 +87,11 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
      * @return array
      */
     public function getStats(): array;
+
+    /**
+     * Get query builder for complex queries.
+     *
+     * @return UserQueryBuilder
+     */
+    public function newQuery(): UserQueryBuilder;
 }

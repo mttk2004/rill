@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVoucherRequest;
 use App\Http\Requests\UpdateVoucherRequest;
 use App\Models\Voucher;
-use App\Services\VoucherService;
+use App\Services\VoucherServiceRefactored;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class VoucherController extends Controller
 {
     public function __construct(
-        protected VoucherService $voucherService
+        protected VoucherServiceRefactored $voucherService
     ) {
         //
     }
@@ -132,12 +132,14 @@ class VoucherController extends Controller
      */
     public function store(StoreVoucherRequest $request)
     {
-        $validated = $request->validated();
+        $result = $this->voucherService->createVoucher($request->validated());
 
-        $voucher = Voucher::create($validated);
+        if (!$result->isSuccess()) {
+            return redirect()->back()->with('error', $result->message);
+        }
 
         return redirect()->route('admin.vouchers')
-            ->with('success', 'Voucher đã được tạo thành công');
+            ->with('success', $result->message);
     }
 
     /**
@@ -183,14 +185,14 @@ class VoucherController extends Controller
      */
     public function update(UpdateVoucherRequest $request, string $id)
     {
-        $voucher = Voucher::findOrFail($id);
+        $result = $this->voucherService->updateVoucher((int) $id, $request->validated());
 
-        $validated = $request->validated();
-
-        $voucher->update($validated);
+        if (!$result->isSuccess()) {
+            return redirect()->back()->with('error', $result->message);
+        }
 
         return redirect()->route('admin.vouchers')
-            ->with('success', 'Voucher đã được cập nhật thành công');
+            ->with('success', $result->message);
     }
 
     /**
@@ -198,7 +200,11 @@ class VoucherController extends Controller
      */
     public function destroy(string $id)
     {
-        $voucher = Voucher::findOrFail($id);
+        $voucher = $this->voucherService->getVoucher((int) $id);
+
+        if (!$voucher) {
+            return redirect()->back()->with('error', 'Voucher không tồn tại');
+        }
 
         // Check if voucher has been used
         if ($voucher->used_count > 0) {
@@ -206,7 +212,7 @@ class VoucherController extends Controller
                 ->with('error', 'Không thể xóa voucher đã được sử dụng');
         }
 
-        $voucher->delete();
+        $this->voucherService->deleteVoucher((int) $id);
 
         return redirect()->route('admin.vouchers')
             ->with('success', 'Voucher đã được xóa thành công');

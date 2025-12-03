@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\CartService;
+use App\Services\CartServiceRefactored;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -11,9 +11,9 @@ use Illuminate\Http\RedirectResponse;
 
 class CartController extends Controller
 {
-    protected CartService $cartService;
+    protected CartServiceRefactored $cartService;
 
-    public function __construct(CartService $cartService)
+    public function __construct(CartServiceRefactored $cartService)
     {
         $this->cartService = $cartService;
     }
@@ -23,8 +23,12 @@ class CartController extends Controller
      */
     public function index(): Response
     {
-        $cartItems = $this->cartService->getCartItems();
-        $cartSummary = $this->cartService->getCartSummary();
+        // Get context (user_id or session_id)
+        $userId = auth()->check() ? auth()->id() : null;
+        $sessionId = $userId ? null : session()->getId();
+
+        $cartItems = $this->cartService->getCartItems($userId, $sessionId);
+        $cartSummary = $this->cartService->getCartSummary($userId, $sessionId);
 
         return Inertia::render('Cart', [
             'cartItems' => $cartItems->map(function ($item) {
@@ -65,12 +69,25 @@ class CartController extends Controller
             'quantity' => 'sometimes|integer|min:1',
         ]);
 
+        // Get product to retrieve unit price
+        $product = \App\Models\Product::find($request->input('product_id'));
+        if (!$product) {
+            return back()->with('error', 'Sản phẩm không tồn tại');
+        }
+
+        // Get context (user_id or session_id)
+        $userId = auth()->check() ? auth()->id() : null;
+        $sessionId = $userId ? null : session()->getId();
+
         $result = $this->cartService->addToCart(
             $request->input('product_id'),
-            $request->input('quantity', 1)
+            $request->input('quantity', 1),
+            (float) $product->price,
+            $userId,
+            $sessionId
         );
 
-        if ($result->isError()) {
+        if (!$result->isSuccess()) {
             return back()->with('error', $result->message);
         }
 
@@ -86,12 +103,18 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:0',
         ]);
 
+        // Get context
+        $userId = auth()->check() ? auth()->id() : null;
+        $sessionId = $userId ? null : session()->getId();
+
         $result = $this->cartService->updateQuantity(
             $cartItemId,
-            $request->input('quantity')
+            $request->input('quantity'),
+            $userId,
+            $sessionId
         );
 
-        if ($result->isError()) {
+        if (!$result->isSuccess()) {
             return back()->withErrors(['message' => $result->message]);
         }
 
@@ -103,9 +126,13 @@ class CartController extends Controller
      */
     public function remove(int $cartItemId)
     {
-        $result = $this->cartService->removeFromCart($cartItemId);
+        // Get context
+        $userId = auth()->check() ? auth()->id() : null;
+        $sessionId = $userId ? null : session()->getId();
 
-        if ($result->isError()) {
+        $result = $this->cartService->removeFromCart($cartItemId, $userId, $sessionId);
+
+        if (!$result->isSuccess()) {
             return back()->withErrors(['message' => $result->message]);
         }
 
@@ -117,9 +144,17 @@ class CartController extends Controller
      */
     public function clear(): JsonResponse
     {
-        $result = $this->cartService->clearCart();
+        // Get context
+        $userId = auth()->check() ? auth()->id() : null;
+        $sessionId = $userId ? null : session()->getId();
 
-        return response()->json($result->toArray());
+        $result = $this->cartService->clearCart($userId, $sessionId);
+
+        return response()->json([
+            'success' => $result->isSuccess(),
+            'message' => $result->message,
+            'data' => $result->data,
+        ]);
     }
 
     /**
@@ -127,7 +162,11 @@ class CartController extends Controller
      */
     public function summary(): JsonResponse
     {
-        $summary = $this->cartService->getCartSummary();
+        // Get context
+        $userId = auth()->check() ? auth()->id() : null;
+        $sessionId = $userId ? null : session()->getId();
+
+        $summary = $this->cartService->getCartSummary($userId, $sessionId);
 
         return response()->json($summary);
     }

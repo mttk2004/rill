@@ -9,6 +9,10 @@ use App\Services\BestSellerService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * @deprecated Use ProductServiceRefactored instead
+ * This service will be removed in a future version
+ */
 class ProductService
 {
     /**

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\PaymentStatus;
 use App\Models\Order;
-use App\Services\OrderService;
+use App\Services\OrderServiceRefactored;
 use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ class VnpayController extends Controller
      * Xử lý IPN (Instant Payment Notification) từ VNPAY.
      * Đây là endpoint mà VNPAY gọi để thông báo kết quả thanh toán.
      */
-    public function handleIpn(Request $request, VnpayService $vnpayService, OrderService $orderService)
+    public function handleIpn(Request $request, VnpayService $vnpayService, OrderServiceRefactored $orderService)
     {
         $data = $request->all();
         Log::info('VNPAY IPN Received:', $data);

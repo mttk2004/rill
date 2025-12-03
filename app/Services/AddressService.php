@@ -7,6 +7,10 @@ use App\Models\ShippingAddress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * @deprecated Use AddressServiceRefactored instead
+ * This service will be removed in a future version
+ */
 class AddressService
 {
     /**

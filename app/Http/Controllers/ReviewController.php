@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductReviewRequest;
 use App\Models\Product;
 use App\Services\ContentValidationService;
-use App\Services\ReviewService;
+use App\Services\ReviewServiceRefactored;
 use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
@@ -13,11 +13,11 @@ class ReviewController extends Controller
     /**
      * Constructor with dependency injection.
      *
-     * @param ReviewService $reviewService
+     * @param ReviewServiceRefactored $reviewService
      * @param ContentValidationService $contentValidator
      */
     public function __construct(
-        protected ReviewService $reviewService,
+        protected ReviewServiceRefactored $reviewService,
         protected ContentValidationService $contentValidator
     ) {}
 
@@ -37,13 +37,25 @@ class ReviewController extends Controller
         }
 
         // Delegate to service
-        $result = $this->reviewService->createOrUpdateReview(
-            Auth::user(),
-            $product,
-            $validated
-        );
+        // Check if it's an update (user already has a review)
+        $existingReview = $this->reviewService->getUserReview(Auth::id(), $product->id);
 
-        if ($result->isError()) {
+        if ($existingReview) {
+            $result = $this->reviewService->updateReview(
+                $existingReview->id,
+                Auth::id(),
+                $product->id,
+                $validated
+            );
+        } else {
+            $result = $this->reviewService->createReview(
+                Auth::id(),
+                $product->id,
+                $validated
+            );
+        }
+
+        if (!$result->isSuccess()) {
             return back()->with('error', $result->message);
         }
 
@@ -60,9 +72,9 @@ class ReviewController extends Controller
             return back()->with('error', 'Bạn không có quyền xóa đánh giá này.');
         }
 
-        $result = $this->reviewService->deleteReview($review);
+        $result = $this->reviewService->deleteReview($review->id, Auth::id());
 
-        if ($result->isError()) {
+        if (!$result->isSuccess()) {
             return back()->with('error', $result->message);
         }
 
