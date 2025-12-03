@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Actions\Product\CreateProductAction;
+use App\Actions\Product\GetProductDetailDataAction;
+use App\Actions\Product\GetProductsWithFiltersAction;
 use App\Actions\Product\UpdateProductAction;
 use App\Actions\Product\UpdateProductStockAction;
 use App\DataObjects\Product\CreateProductData;
 use App\DataObjects\Product\ProductFilterData;
 use App\DataObjects\Product\UpdateProductData;
 use App\Models\Product;
+use App\Models\User;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Support\ServiceResult;
 use Illuminate\Http\UploadedFile;
@@ -27,6 +30,8 @@ class ProductServiceRefactored
         protected CreateProductAction $createProductAction,
         protected UpdateProductAction $updateProductAction,
         protected UpdateProductStockAction $updateProductStockAction,
+        protected GetProductsWithFiltersAction $getProductsWithFiltersAction,
+        protected GetProductDetailDataAction $getProductDetailDataAction,
     ) {}
 
     /**
@@ -378,5 +383,30 @@ class ProductServiceRefactored
         }
 
         $product->artists()->sync($artistsData);
+    }
+
+    /**
+     * Get products with filters, sorting and pagination.
+     * Used by frontend product listing page.
+     *
+     * @param array $filters
+     * @return ServiceResult
+     */
+    public function getProducts(array $filters = []): ServiceResult
+    {
+        return $this->getProductsWithFiltersAction->execute($filters);
+    }
+
+    /**
+     * Get all data needed for product detail page.
+     * Includes product info, reviews, related products, shipping threshold.
+     *
+     * @param Product $product
+     * @param User|null $user
+     * @return ServiceResult
+     */
+    public function getDataForShowPage(Product $product, ?User $user): ServiceResult
+    {
+        return $this->getProductDetailDataAction->execute($product, $user);
     }
 }

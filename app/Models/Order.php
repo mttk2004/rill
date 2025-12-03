@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\HasSnowflakeId;
-use App\Services\OrderStatusService;
+use App\Services\OrderServiceRefactored;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -70,7 +70,7 @@ class Order extends Model
         // Auto-create status history when status changes
         static::updated(function ($order) {
             if ($order->isDirty('status')) {
-                $statusService = app(OrderStatusService::class);
+                $statusService = app(OrderServiceRefactored::class);
                 $oldStatusEnum = $order->getOriginal('status');
                 $oldStatus = $oldStatusEnum instanceof OrderStatus ? $oldStatusEnum->value : $oldStatusEnum;
                 $newStatus = $order->status->value;
@@ -89,7 +89,7 @@ class Order extends Model
 
         // Create initial status history when order is created
         static::created(function ($order) {
-            $statusService = app(OrderStatusService::class);
+            $statusService = app(OrderServiceRefactored::class);
             $notes = $order->status_change_notes ?? 'Đơn hàng mới được tạo, chờ xác nhận';
 
             OrderStatusHistory::create([

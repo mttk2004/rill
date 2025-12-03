@@ -14,7 +14,7 @@ $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Services\AnalyticsServiceRefactored;
 use App\Services\BestSellerService;
-use App\Services\ProductService;
+use App\Services\ProductServiceRefactored;
 use App\Models\Product;
 
 echo "=== CHECKING BEST SELLER DATA CONSISTENCY ===\n\n";
@@ -59,14 +59,15 @@ foreach ($homeProducts as $index => $product) {
 }
 echo "\n";
 
-// 3. Product List - ProductService with default sort
+// 3. Product List - ProductServiceRefactored with default sort
 echo "3️⃣  PRODUCT LIST (/products?sort=default)\n";
-echo "   Using: ProductService with sort='default'\n";
+echo "   Using: ProductServiceRefactored with sort='default'\n";
 echo "   " . str_repeat("-", 70) . "\n";
 
-$productService = new ProductService();
+$productService = app(ProductServiceRefactored::class);
 $filters = ['sort' => 'default', 'per_page' => 5];
-$productListResult = $productService->getProducts($filters);
+$productListServiceResult = $productService->getProducts($filters);
+$productListResult = $productListServiceResult->success ? $productListServiceResult->data : ['products' => []];
 $productListProducts = collect($productListResult['products']);
 
 foreach ($productListProducts as $index => $product) {

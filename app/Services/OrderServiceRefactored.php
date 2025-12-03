@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Actions\Order\CancelOrderAction;
 use App\Actions\Order\CreateOrderAction;
+use App\Actions\Order\GenerateStatusChangeNotesAction;
 use App\Actions\Order\UpdateOrderStatusAction;
 use App\Actions\Payment\ProcessPaymentAction;
 use App\DataObjects\Order\CreateOrderData;
@@ -32,6 +33,7 @@ class OrderServiceRefactored
         protected UpdateOrderStatusAction $updateOrderStatusAction,
         protected CancelOrderAction $cancelOrderAction,
         protected ProcessPaymentAction $processPaymentAction,
+        protected GenerateStatusChangeNotesAction $generateStatusChangeNotesAction,
         protected ShippingService $shippingService,
         protected VoucherServiceRefactored $voucherService,
     ) {}
@@ -237,5 +239,18 @@ class OrderServiceRefactored
             ->withRelations(['items.product', 'payment', 'user', 'statusHistories'])
             ->getQuery()
             ->find($orderId);
+    }
+
+    /**
+     * Generate automatic notes for order status changes.
+     * Helper method from OrderStatusService integration.
+     *
+     * @param string|null $oldStatus
+     * @param string $newStatus
+     * @return string
+     */
+    public function generateStatusChangeNotes(?string $oldStatus, string $newStatus): string
+    {
+        return $this->generateStatusChangeNotesAction->execute($oldStatus, $newStatus);
     }
 }

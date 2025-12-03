@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Services\CartServiceRefactored;
-use App\Services\ProductService;
+use App\Services\ProductServiceRefactored;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProductController extends Controller
 {
-    protected ProductService $productService;
+    protected ProductServiceRefactored $productService;
     protected CartServiceRefactored $cartService;
 
-    public function __construct(ProductService $productService, CartServiceRefactored $cartService)
+    public function __construct(ProductServiceRefactored $productService, CartServiceRefactored $cartService)
     {
         $this->productService = $productService;
         $this->cartService = $cartService;
@@ -27,7 +27,13 @@ class ProductController extends Controller
     {
         $filters = $request->only(['search', 'genre', 'label', 'artist', 'collection', 'sort', 'page']);
 
-        $result = $this->productService->getProducts($filters);
+        $serviceResult = $this->productService->getProducts($filters);
+
+        if (!$serviceResult->success) {
+            abort(500, $serviceResult->message);
+        }
+
+        $result = $serviceResult->data;
 
         // Get active collection if filter is set
         $activeCollection = null;
@@ -67,8 +73,12 @@ class ProductController extends Controller
      */
     public function show(Product $product): Response
     {
-        $data = $this->productService->getDataForShowPage($product, auth()->user());
+        $serviceResult = $this->productService->getDataForShowPage($product, auth()->user());
 
-        return Inertia::render('ProductDetail', $data);
+        if (!$serviceResult->success) {
+            abort(500, $serviceResult->message);
+        }
+
+        return Inertia::render('ProductDetail', $serviceResult->data);
     }
 }
