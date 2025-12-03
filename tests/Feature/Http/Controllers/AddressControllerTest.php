@@ -24,7 +24,7 @@ test('user can create new address with valid data', function () {
 
     $addressData = [
         'full_name' => 'John Doe',
-        'phone' => '0123456789',
+        'phone' => '0912345678',
         'province_id' => 1,
         'province' => 'Hà Nội',
         'district_id' => 1,
@@ -53,7 +53,7 @@ test('first address is automatically set as default', function () {
 
     $addressData = [
         'full_name' => 'John Doe',
-        'phone' => '0123456789',
+        'phone' => '0912345678',
         'province_id' => 1,
         'province' => 'Hà Nội',
         'district_id' => 1,

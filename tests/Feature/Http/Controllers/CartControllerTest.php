@@ -68,7 +68,7 @@ test('guest can add product to cart with session', function () {
         'stock_quantity' => 10,
     ]);
 
-    $response = $this->post(route('cart.add'), [
+    $response = $this->post(route('cart.add.public'), [
         'product_id' => $product->id,
         'quantity' => 1,
     ]);
