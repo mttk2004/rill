@@ -168,4 +168,44 @@ class CartServiceRefactored
             ];
         });
     }
+
+    /**
+     * Validate stock availability for all cart items before checkout.
+     *
+     * @param int $userId
+     * @throws \Exception if any product is out of stock
+     * @return void
+     */
+    public function validateCartStockBeforeCheckout(int $userId): void
+    {
+        $cartItems = \App\Models\ShoppingCartItem::with('product')
+            ->where('user_id', $userId)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            throw new \Exception('Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi thanh toán.');
+        }
+
+        foreach ($cartItems as $item) {
+            // Check if product still exists
+            if (!$item->product) {
+                throw new \Exception('Một số sản phẩm trong giỏ hàng không còn tồn tại.');
+            }
+
+            // Check stock availability
+            if ($item->quantity > $item->product->stock_quantity) {
+                throw new \Exception(
+                    "Sản phẩm '{$item->product->name}' chỉ còn {$item->product->stock_quantity} " .
+                    "sản phẩm trong kho. Vui lòng cập nhật số lượng trong giỏ hàng."
+                );
+            }
+
+            // Check if product is still active
+            if ($item->product->status === 'out_of_stock' || !$item->product->isInStock()) {
+                throw new \Exception(
+                    "Sản phẩm '{$item->product->name}' hiện không còn hàng."
+                );
+            }
+        }
+    }
 }
