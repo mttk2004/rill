@@ -4,11 +4,10 @@ namespace App\Actions\Order;
 
 use App\Actions\BaseAction;
 use App\Enums\OrderStatus;
-use App\Mail\OrderStatusUpdated;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Services\NotificationServiceRefactored;
 use App\Support\ServiceResult;
-use Illuminate\Support\Facades\Mail;
 
 /**
  * Update Order Status Action
@@ -19,6 +18,7 @@ class UpdateOrderStatusAction extends BaseAction
 {
     public function __construct(
         protected OrderRepositoryInterface $orderRepository,
+        protected NotificationServiceRefactored $notificationService,
     ) {}
 
     /**
@@ -63,13 +63,12 @@ class UpdateOrderStatusAction extends BaseAction
 
             // Send notification email
             if ($order->user && $order->user->email) {
-                try {
-                    Mail::to($order->user->email)
-                        ->queue(new OrderStatusUpdated($order->fresh()));
-                } catch (\Exception $e) {
+                $emailResult = $this->notificationService->sendOrderStatusEmail($order->fresh());
+
+                if (!$emailResult->success) {
                     \Log::warning('Failed to send order status email', [
                         'order_id' => $order->id,
-                        'error' => $e->getMessage()
+                        'error' => $emailResult->message,
                     ]);
                 }
             }
