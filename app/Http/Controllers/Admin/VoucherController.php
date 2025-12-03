@@ -23,94 +23,15 @@ class VoucherController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = (int) $request->get('per_page', 10);
-        $search = trim((string) $request->get('search', ''));
-        $status = $request->get('status', 'all');
-        $sort = $request->get('sort', 'created_desc');
+        $filters = [
+            'per_page' => (int) $request->get('per_page', 10),
+            'search' => $request->get('search', ''),
+            'status' => $request->get('status', 'all'),
+            'sort' => $request->get('sort', 'created_desc'),
+        ];
 
-        $query = Voucher::query();
-
-        // Search
-        if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        // Status filter
-        $now = now();
-        if ($status && $status !== 'all') {
-            switch ($status) {
-                case 'active':
-                    $query->where('is_active', true)
-                        ->where('valid_from', '<=', $now)
-                        ->where('valid_to', '>=', $now);
-                    break;
-                case 'inactive':
-                    $query->where('is_active', false);
-                    break;
-                case 'expired':
-                    $query->where('valid_to', '<', $now);
-                    break;
-                case 'upcoming':
-                    $query->where('valid_from', '>', $now);
-                    break;
-                case 'exhausted':
-                    $query->whereNotNull('usage_limit')
-                        ->whereColumn('used_count', '>=', 'usage_limit');
-                    break;
-            }
-        }
-
-        // Sorting
-        switch ($sort) {
-            case 'code_asc':
-                $query->orderBy('code', 'asc');
-                break;
-            case 'code_desc':
-                $query->orderBy('code', 'desc');
-                break;
-            case 'value_asc':
-                $query->orderBy('value', 'asc');
-                break;
-            case 'value_desc':
-                $query->orderBy('value', 'desc');
-                break;
-            case 'usage_desc':
-                $query->orderBy('used_count', 'desc');
-                break;
-            case 'valid_from_desc':
-                $query->orderBy('valid_from', 'desc');
-                break;
-            case 'valid_to_asc':
-                $query->orderBy('valid_to', 'asc');
-                break;
-            case 'created_desc':
-                $query->orderBy('created_at', 'desc');
-                break;
-            case 'created_asc':
-                $query->orderBy('created_at', 'asc');
-                break;
-            default:
-                $query->orderBy('created_at', 'desc');
-                break;
-        }
-
-        $vouchers = $query->withCount('usages')
-            ->paginate($perPage)
-            ->withQueryString();
-
-        // Calculate stats with single query
-        $stats = Voucher::selectRaw('
-                COUNT(*) as total,
-                SUM(CASE WHEN is_active = 1 AND valid_from <= ? AND valid_to >= ? THEN 1 ELSE 0 END) as active,
-                SUM(CASE WHEN valid_to < ? THEN 1 ELSE 0 END) as expired,
-                SUM(used_count) as total_used
-            ', [$now, $now, $now])
-            ->first()
-            ->toArray();
+        $vouchers = $this->voucherService->getFilteredVouchers($filters);
+        $stats = $this->voucherService->getVoucherStats();
 
         return Inertia::render('admin/vouchers/VoucherList', [
             'vouchers' => $vouchers,
@@ -206,10 +127,10 @@ class VoucherController extends Controller
             return redirect()->back()->with('error', 'Voucher không tồn tại');
         }
 
-        // Check if voucher has been used
-        if ($voucher->used_count > 0) {
-            return redirect()->back()
-                ->with('error', 'Không thể xóa voucher đã được sử dụng');
+        // Check if voucher can be deleted
+        $error = $this->voucherService->canDeleteVoucher($voucher);
+        if ($error) {
+            return redirect()->back()->with('error', $error);
         }
 
         $this->voucherService->deleteVoucher((int) $id);
@@ -224,10 +145,10 @@ class VoucherController extends Controller
     public function toggleStatus(string $id)
     {
         $voucher = Voucher::findOrFail($id);
+        $this->voucherService->toggleVoucherStatus((int) $id);
 
-        $voucher->update([
-            'is_active' => !$voucher->is_active,
-        ]);
+        // Refresh to get updated status
+        $voucher->refresh();
 
         return redirect()->back()
             ->with('success', $voucher->is_active
