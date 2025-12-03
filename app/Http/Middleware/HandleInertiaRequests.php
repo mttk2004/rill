@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\CartServiceRefactored;
-use App\Services\SettingService;
+use App\Services\SettingServiceRefactored;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -77,7 +77,7 @@ class HandleInertiaRequests extends Middleware
                 ];
             },
             'settings' => function () {
-                $settingService = app(SettingService::class);
+                $settingService = app(SettingServiceRefactored::class);
                 return [
                     'banner' => [
                         'enabled' => $settingService->get('banner_enabled', false),

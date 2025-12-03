@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShippingAddress;
-use App\Services\CartService;
-use App\Services\SettingService;
+use App\Services\CartServiceRefactored;
+use App\Services\SettingServiceRefactored;
 use App\Services\ShippingServiceRefactored;
 use Illuminate\Http\Request;
 
@@ -15,16 +15,16 @@ class ShippingController extends Controller
      * Calculate shipping fee based on selected address
      *
      * @param Request $request
-     * @param CartService $cartService
+     * @param CartServiceRefactored $cartService
      * @param ShippingServiceRefactored $shippingService
-     * @param SettingService $settingService
+     * @param SettingServiceRefactored $settingService
      * @return \Illuminate\Http\JsonResponse
      */
     public function calculate(
         Request $request,
-        CartService $cartService,
+        CartServiceRefactored $cartService,
         ShippingServiceRefactored $shippingService,
-        SettingService $settingService,
+        SettingServiceRefactored $settingService,
     ) {
         $request->validate([
             'address_id' => 'required|exists:shipping_addresses,id'

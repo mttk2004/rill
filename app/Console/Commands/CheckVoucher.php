@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Voucher;
-use App\Services\VoucherService;
+use App\Services\VoucherServiceRefactored;
 use Illuminate\Console\Command;
 
 class CheckVoucher extends Command
@@ -11,7 +11,7 @@ class CheckVoucher extends Command
     protected $signature = 'voucher:check {code}';
     protected $description = 'Check voucher details and availability';
 
-    public function handle(VoucherService $voucherService)
+    public function handle(VoucherServiceRefactored $voucherService)
     {
         $code = $this->argument('code');
 

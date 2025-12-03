@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\SettingService;
+use App\Services\SettingServiceRefactored;
 use Illuminate\Console\Command;
 
 class ClearSettingsCache extends Command
@@ -24,7 +24,7 @@ class ClearSettingsCache extends Command
     /**
      * Execute the console command.
      */
-    public function handle(SettingService $settingService): int
+    public function handle(SettingServiceRefactored $settingService): int
     {
         $settingService->clearCache();
 

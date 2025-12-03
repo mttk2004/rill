@@ -12,20 +12,21 @@ require __DIR__.'/vendor/autoload.php';
 $app = require_once __DIR__.'/bootstrap/app.php';
 $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-use App\Services\Dashboard\ProductAnalyticsService;
+use App\Services\AnalyticsServiceRefactored;
 use App\Services\BestSellerService;
 use App\Services\ProductService;
 use App\Models\Product;
 
 echo "=== CHECKING BEST SELLER DATA CONSISTENCY ===\n\n";
 
-// 1. Admin Dashboard - ProductAnalyticsService::getTopProducts()
+// 1. Admin Dashboard - AnalyticsServiceRefactored::getTopProducts()
 echo "1️⃣  ADMIN DASHBOARD (/admin/dashboard)\n";
-echo "   Using: ProductAnalyticsService::getTopProducts()\n";
+echo "   Using: AnalyticsServiceRefactored::getTopProducts()\n";
 echo "   " . str_repeat("-", 70) . "\n";
 
-$analyticsService = new ProductAnalyticsService();
-$dashboardProducts = $analyticsService->getTopProducts(5);
+$analyticsService = app(AnalyticsServiceRefactored::class);
+$dashboardResult = $analyticsService->getTopProducts(5);
+$dashboardProducts = $dashboardResult->success ? $dashboardResult->data : [];
 
 foreach ($dashboardProducts as $index => $product) {
     $productData = is_array($product) ? (object)$product : $product;

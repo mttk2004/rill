@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Services\CartService;
+use App\Services\CartServiceRefactored;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,9 +12,9 @@ use Inertia\Response;
 class ProductController extends Controller
 {
     protected ProductService $productService;
-    protected CartService $cartService;
+    protected CartServiceRefactored $cartService;
 
-    public function __construct(ProductService $productService, CartService $cartService)
+    public function __construct(ProductService $productService, CartServiceRefactored $cartService)
     {
         $this->productService = $productService;
         $this->cartService = $cartService;

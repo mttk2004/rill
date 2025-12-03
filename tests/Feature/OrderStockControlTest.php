@@ -5,7 +5,7 @@ use App\Models\Product;
 use App\Models\ShippingAddress;
 use App\Models\ShoppingCartItem;
 use App\Models\User;
-use App\Services\OrderService;
+use App\Services\OrderServiceRefactored;
 use Illuminate\Support\Facades\DB;
 
 uses()->group('stock-control');
@@ -29,7 +29,7 @@ test('stock is decremented when order is created', function () {
     ]);
 
     // Act
-    $orderService = app(OrderService::class);
+    $orderService = app(OrderServiceRefactored::class);
     $order = $orderService->createOrderFromCart($user, [
         'shipping_address_id' => $shippingAddress->id,
         'payment_method' => 'cod',
@@ -60,7 +60,7 @@ test('order creation fails when insufficient stock', function () {
     ]);
 
     // Act & Assert
-    $orderService = app(OrderService::class);
+    $orderService = app(OrderServiceRefactored::class);
 
     expect(fn() => $orderService->createOrderFromCart($user, [
         'shipping_address_id' => $shippingAddress->id,
@@ -90,7 +90,7 @@ test('product status changes to out_of_stock when stock reaches zero', function 
     ]);
 
     // Act
-    $orderService = app(OrderService::class);
+    $orderService = app(OrderServiceRefactored::class);
     $orderService->createOrderFromCart($user, [
         'shipping_address_id' => $shippingAddress->id,
         'payment_method' => 'cod',
@@ -120,7 +120,7 @@ test('stock is restored when order is cancelled', function () {
         'unit_price' => $product->price,
     ]);
 
-    $orderService = app(OrderService::class);
+    $orderService = app(OrderServiceRefactored::class);
     $order = $orderService->createOrderFromCart($user, [
         'shipping_address_id' => $shippingAddress->id,
         'payment_method' => 'cod',
@@ -154,7 +154,7 @@ test('cancelled order cannot be cancelled again', function () {
         'unit_price' => $product->price,
     ]);
 
-    $orderService = app(OrderService::class);
+    $orderService = app(OrderServiceRefactored::class);
     $order = $orderService->createOrderFromCart($user, [
         'shipping_address_id' => $shippingAddress->id,
         'payment_method' => 'cod',
@@ -196,7 +196,7 @@ test('concurrent orders cannot oversell', function () {
     ]);
 
     // Act - Simulate concurrent requests
-    $orderService = app(OrderService::class);
+    $orderService = app(OrderServiceRefactored::class);
     $success1 = false;
     $success2 = false;
 
