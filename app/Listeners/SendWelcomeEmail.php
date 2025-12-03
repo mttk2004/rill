@@ -16,7 +16,7 @@ class SendWelcomeEmail implements ShouldQueue
      * Create the event listener.
      */
     public function __construct(
-        private \App\Services\NotificationServiceRefactored $notificationService,
+        private \App\Services\NotificationService $notificationService,
     ) {}
 
     /**

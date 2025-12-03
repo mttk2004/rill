@@ -11,7 +11,7 @@ use App\Models\Order;
 use App\Support\ServiceResult;
 
 /**
- * Vnpay Service Refactored
+ * Vnpay Service
  *
  * Clean Architecture implementation for VNPAY payment gateway integration.
  * Uses Actions for business logic, DTOs for data transfer.

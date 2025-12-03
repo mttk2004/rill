@@ -11,7 +11,7 @@ class CheckVoucher extends Command
     protected $signature = 'voucher:check {code}';
     protected $description = 'Check voucher details and availability';
 
-    public function handle(VoucherServiceRefactored $voucherService)
+    public function handle(VoucherService $voucherService)
     {
         $code = $this->argument('code');
 

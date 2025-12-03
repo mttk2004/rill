@@ -24,7 +24,7 @@ class ClearSettingsCache extends Command
     /**
      * Execute the console command.
      */
-    public function handle(SettingServiceRefactored $settingService): int
+    public function handle(SettingService $settingService): int
     {
         $settingService->clearCache();
 

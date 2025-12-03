@@ -33,3 +33,6 @@ Route::get('/categories/menu-data', [CategoryController::class, 'getMenuData'])-
 Route::get('/provinces', [AddressDataController::class, 'getProvinces'])->name('api.provinces');
 Route::get('/districts', [AddressDataController::class, 'getDistricts'])->name('api.districts');
 Route::get('/wards', [AddressDataController::class, 'getWards'])->name('api.wards');
+
+// Shipping calculation route
+Route::post('/shipping/calculate', [ShippingController::class, 'calculate'])->name('api.shipping.calculate');
