@@ -44,7 +44,7 @@ test('user can create new address with valid data', function () {
     $this->assertDatabaseHas('shipping_addresses', [
         'user_id' => $user->id,
         'full_name' => 'John Doe',
-        'phone' => '0123456789',
+        'phone' => '0912345678',
     ]);
 });
 
@@ -126,7 +126,7 @@ test('user cannot update another users address', function () {
     $response = $this->actingAs($user)
         ->put(route('addresses.update', $address), [
             'full_name' => 'Hacked',
-            'phone' => '0123456789',
+            'phone' => '0912345678',
             'province_id' => 1,
             'province' => 'Hà Nội',
             'district_id' => 1,

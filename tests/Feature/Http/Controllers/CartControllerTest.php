@@ -144,7 +144,7 @@ test('user can update cart item quantity', function () {
         ]);
 
     $response->assertRedirect()
-        ->assertSessionHas('success');
+        ->assertSessionHas('message');
 
     $this->assertDatabaseHas('shopping_cart_items', [
         'id' => $cartItem->id,
@@ -181,7 +181,7 @@ test('user can remove item from cart', function () {
         ->delete(route('cart.remove', $cartItem->id));
 
     $response->assertRedirect()
-        ->assertSessionHas('success');
+        ->assertSessionHas('message');
 
     $this->assertDatabaseMissing('shopping_cart_items', [
         'id' => $cartItem->id,
@@ -201,7 +201,7 @@ test('user cannot remove another users cart item', function () {
         ->delete(route('cart.remove', $cartItem->id));
 
     $response->assertRedirect()
-        ->assertSessionHas('error');
+        ->assertSessionHasErrors();
 
     $this->assertDatabaseHas('shopping_cart_items', [
         'id' => $cartItem->id,
@@ -217,8 +217,10 @@ test('user can clear entire cart', function () {
     $response = $this->actingAs($user)
         ->delete(route('cart.clear'));
 
-    $response->assertRedirect()
-        ->assertSessionHas('success');
+    $response->assertOk()
+        ->assertJson([
+            'success' => true,
+        ]);
 
     $this->assertDatabaseCount('shopping_cart_items', 0);
 });
