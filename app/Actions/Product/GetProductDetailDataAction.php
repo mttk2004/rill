@@ -4,7 +4,7 @@ namespace App\Actions\Product;
 
 use App\Models\Product;
 use App\Models\User;
-use App\Services\SettingServiceRefactored;
+use App\Services\SettingService;
 use App\Support\ServiceResult;
 
 /**
@@ -13,7 +13,7 @@ use App\Support\ServiceResult;
 class GetProductDetailDataAction
 {
     public function __construct(
-        protected SettingServiceRefactored $settingService,
+        protected SettingService $settingService,
         protected GetRelatedProductsAction $getRelatedProductsAction,
     ) {}
 

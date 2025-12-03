@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\VnpayServiceRefactored;
+use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class VnpayController extends Controller
 {
     public function __construct(
-        protected VnpayServiceRefactored $vnpayService
+        protected VnpayService $vnpayService
     ) {}
 
     /**

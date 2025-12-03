@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 /**
  * Refactored notification service with Clean Architecture
  */
-class NotificationServiceRefactored
+class NotificationService
 {
     private SendEmailAction $sendEmailAction;
 

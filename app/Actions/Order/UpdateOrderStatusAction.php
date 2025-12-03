@@ -6,7 +6,7 @@ use App\Actions\BaseAction;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
-use App\Services\NotificationServiceRefactored;
+use App\Services\NotificationService;
 use App\Support\ServiceResult;
 
 /**
@@ -18,7 +18,7 @@ class UpdateOrderStatusAction extends BaseAction
 {
     public function __construct(
         protected OrderRepositoryInterface $orderRepository,
-        protected NotificationServiceRefactored $notificationService,
+        protected NotificationService $notificationService,
     ) {}
 
     /**

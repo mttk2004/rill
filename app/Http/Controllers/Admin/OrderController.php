@@ -8,14 +8,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Http\Resources\OrderAdminResource;
 use App\Models\Order;
-use App\Services\OrderServiceRefactored;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class OrderController extends Controller
 {
     public function __construct(
-        protected OrderServiceRefactored $orderService
+        protected OrderService $orderService
     ) {}
     /**
      * Display a listing of orders for admin.

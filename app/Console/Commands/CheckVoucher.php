@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Voucher;
-use App\Services\VoucherServiceRefactored;
+use App\Services\VoucherService;
 use Illuminate\Console\Command;
 
 class CheckVoucher extends Command

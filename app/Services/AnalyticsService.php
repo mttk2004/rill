@@ -16,7 +16,7 @@ use App\Support\ServiceResult;
  * Refactored analytics service with Clean Architecture
  * Combines revenue, product, and order analytics
  */
-class AnalyticsServiceRefactored
+class AnalyticsService
 {
     private GetDailyRevenueAction $dailyRevenueAction;
     private GetRevenueByGenreAction $revenueByGenreAction;

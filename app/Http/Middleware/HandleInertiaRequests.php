@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\CartServiceRefactored;
-use App\Services\SettingServiceRefactored;
+use App\Services\CartService;
+use App\Services\SettingService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -55,7 +55,7 @@ class HandleInertiaRequests extends Middleware
                 'warning' => $request->session()->get('warning'),
             ],
             'cart' => function () use ($request) {
-                $cartService = app(CartServiceRefactored::class);
+                $cartService = app(CartService::class);
                 $userId = $request->user()?->id;
                 $sessionId = $request->session()->getId();
 
@@ -77,7 +77,7 @@ class HandleInertiaRequests extends Middleware
                 ];
             },
             'settings' => function () {
-                $settingService = app(SettingServiceRefactored::class);
+                $settingService = app(SettingService::class);
                 return [
                     'banner' => [
                         'enabled' => $settingService->get('banner_enabled', false),

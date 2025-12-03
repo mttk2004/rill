@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreVoucherRequest;
 use App\Http\Requests\UpdateVoucherRequest;
 use App\Models\Voucher;
-use App\Services\VoucherServiceRefactored;
+use App\Services\VoucherService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class VoucherController extends Controller
 {
     public function __construct(
-        protected VoucherServiceRefactored $voucherService
+        protected VoucherService $voucherService
     ) {
         //
     }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\SettingServiceRefactored;
+use App\Services\SettingService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -11,7 +11,7 @@ use Inertia\Response;
 class SettingController extends Controller
 {
     public function __construct(
-        private SettingServiceRefactored $settingService
+        private SettingService $settingService
     ) {}
 
     /**

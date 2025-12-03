@@ -16,7 +16,7 @@ use App\Support\ServiceResult;
  * Clean Architecture implementation for VNPAY payment gateway integration.
  * Uses Actions for business logic, DTOs for data transfer.
  */
-class VnpayServiceRefactored
+class VnpayService
 {
     public function __construct(
         protected CreateVnpayPaymentAction $createPaymentAction,

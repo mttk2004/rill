@@ -7,7 +7,7 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Models\Product;
 use App\QueryBuilders\ProductQueryBuilder;
-use App\Services\ProductServiceRefactored;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -16,7 +16,7 @@ use Inertia\Inertia;
 class ProductController extends Controller
 {
     public function __construct(
-        protected ProductServiceRefactored $productService
+        protected ProductService $productService
     ) {}
     /**
      * Display a listing of products for admin.

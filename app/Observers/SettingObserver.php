@@ -3,12 +3,12 @@
 namespace App\Observers;
 
 use App\Models\Setting;
-use App\Services\SettingServiceRefactored;
+use App\Services\SettingService;
 
 class SettingObserver
 {
     public function __construct(
-        private SettingServiceRefactored $settingService
+        private SettingService $settingService
     ) {}
 
     /**

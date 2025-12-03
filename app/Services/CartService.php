@@ -17,7 +17,7 @@ use Illuminate\Support\Collection;
  *
  * Orchestrates cart operations using Clean Architecture patterns.
  */
-class CartServiceRefactored
+class CartService
 {
     public function __construct(
         protected CartRepositoryInterface $cartRepository,

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Services\SettingServiceRefactored;
+use App\Services\SettingService;
 use Illuminate\Console\Command;
 
 class ClearSettingsCache extends Command

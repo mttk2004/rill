@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductReviewRequest;
 use App\Models\Product;
 use App\Services\ContentValidationService;
-use App\Services\ReviewServiceRefactored;
+use App\Services\ReviewService;
 use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
@@ -17,7 +17,7 @@ class ReviewController extends Controller
      * @param ContentValidationService $contentValidator
      */
     public function __construct(
-        protected ReviewServiceRefactored $reviewService,
+        protected ReviewService $reviewService,
         protected ContentValidationService $contentValidator
     ) {}
 

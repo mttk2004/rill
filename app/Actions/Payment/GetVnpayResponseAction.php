@@ -2,7 +2,7 @@
 
 namespace App\Actions\Payment;
 
-use App\Services\VnpayServiceRefactored;
+use App\Services\VnpayService;
 use App\Support\ServiceResult;
 use Illuminate\Http\Request;
 
@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class GetVnpayResponseAction
 {
     public function __construct(
-        private VnpayServiceRefactored $vnpayService,
+        private VnpayService $vnpayService,
     ) {}
 
     /**

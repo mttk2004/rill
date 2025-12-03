@@ -6,7 +6,7 @@ use App\Http\Requests\StoreShippingAddressRequest;
 use App\Http\Requests\UpdateShippingAddressRequest;
 use App\Http\Resources\ShippingAddressResource;
 use App\Models\ShippingAddress;
-use App\Services\AddressServiceRefactored;
+use App\Services\AddressService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +17,7 @@ class AddressController extends Controller
 {
     use AuthorizesRequests;
 
-    protected AddressServiceRefactored $addressService;
+    protected AddressService $addressService;
 
     public function __construct(AddressServiceRefactored $addressService)
     {

@@ -8,8 +8,8 @@ use App\Enums\PaymentStatus;
 use App\Http\Requests\FilterOrdersRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Services\OrderServiceRefactored;
-use App\Services\ThankYouPageServiceRefactored;
+use App\Services\OrderService;
+use App\Services\ThankYouPageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -18,8 +18,8 @@ use Inertia\Inertia;
 class OrderController extends Controller
 {
     public function __construct(
-        private ThankYouPageServiceRefactored $thankYouPageService,
-        private OrderServiceRefactored $orderService
+        private ThankYouPageService $thankYouPageService,
+        private OrderService $orderService
     ) {}
     /**
      * Display a listing of the resource.

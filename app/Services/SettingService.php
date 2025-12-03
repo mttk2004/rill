@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 /**
  * Refactored settings service with Clean Architecture
  */
-class SettingServiceRefactored
+class SettingService
 {
     private GetSettingAction $getAction;
     private UpdateSettingAction $updateAction;

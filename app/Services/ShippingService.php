@@ -11,14 +11,14 @@ use App\Support\ServiceResult;
 /**
  * Refactored shipping service with Clean Architecture
  */
-class ShippingServiceRefactored
+class ShippingService
 {
     private GetAvailableServiceAction $getServiceAction;
     private CalculateShippingFeeAction $calculateFeeAction;
     private int $freeShippingThreshold;
 
     public function __construct(
-        private SettingServiceRefactored $settingService,
+        private SettingService $settingService,
     ) {
         // Initialize GHN configuration
         $token = config('ghn.api_token');

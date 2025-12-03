@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Storage;
  *
  * Uses Clean Architecture: Actions, Repositories, Query Builders, DTOs
  */
-class ProductServiceRefactored
+class ProductService
 {
     public function __construct(
         protected ProductRepositoryInterface $productRepository,

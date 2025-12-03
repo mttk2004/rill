@@ -15,7 +15,7 @@ use App\Support\ServiceResult;
  *
  * Orchestrates review operations using Clean Architecture patterns.
  */
-class ReviewServiceRefactored
+class ReviewService
 {
     public function __construct(
         protected ReviewRepositoryInterface $reviewRepository,

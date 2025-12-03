@@ -13,13 +13,13 @@ use Illuminate\Support\Facades\Log;
 /**
  * Refactored Thank You Page service with Clean Architecture
  */
-class ThankYouPageServiceRefactored
+class ThankYouPageService
 {
     private ResolveOrderFromRequestAction $resolveOrderAction;
     private GetVnpayResponseAction $getVnpayResponseAction;
 
     public function __construct(
-        private VnpayServiceRefactored $vnpayService,
+        private VnpayService $vnpayService,
     ) {
         $this->resolveOrderAction = new ResolveOrderFromRequestAction();
         $this->getVnpayResponseAction = new GetVnpayResponseAction($this->vnpayService);

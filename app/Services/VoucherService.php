@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Collection;
  *
  * Orchestrates voucher operations using Clean Architecture patterns.
  */
-class VoucherServiceRefactored
+class VoucherService
 {
     public function __construct(
         protected VoucherRepositoryInterface $voucherRepository,

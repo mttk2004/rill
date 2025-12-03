@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\PaymentMethod;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\ShoppingCartItem;
-use App\Services\OrderServiceRefactored;
-use App\Services\VnpayServiceRefactored;
+use App\Services\OrderService;
+use App\Services\VnpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -49,9 +49,9 @@ class CheckoutController extends Controller
 
     public function store(
         StoreOrderRequest $request,
-        OrderServiceRefactored $orderService,
-        VnpayServiceRefactored $vnpayService,
-        \App\Services\CartServiceRefactored $cartService
+        OrderService $orderService,
+        VnpayService $vnpayService,
+        \App\Services\CartService $cartService
     ) {
         $user = Auth::user();
 

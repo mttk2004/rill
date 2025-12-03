@@ -25,7 +25,7 @@ use App\Support\ServiceResult;
  * Uses Clean Architecture: Actions, Repositories, DTOs
  * Orchestrates business workflows without containing business logic
  */
-class OrderServiceRefactored
+class OrderService
 {
     public function __construct(
         protected OrderRepositoryInterface $orderRepository,
@@ -34,8 +34,8 @@ class OrderServiceRefactored
         protected CancelOrderAction $cancelOrderAction,
         protected ProcessPaymentAction $processPaymentAction,
         protected GenerateStatusChangeNotesAction $generateStatusChangeNotesAction,
-        protected ShippingServiceRefactored $shippingService,
-        protected VoucherServiceRefactored $voucherService,
+        protected ShippingService $shippingService,
+        protected VoucherService $voucherService,
     ) {}
 
     /**
@@ -367,7 +367,7 @@ class OrderServiceRefactored
 
         try {
             // Generate new VNPAY payment URL (reuse existing payment record)
-            $vnpayService = app(\App\Services\VnpayServiceRefactored::class);
+            $vnpayService = app(\App\Services\VnpayService::class);
             $paymentUrl = $vnpayService->createPaymentUrl($order, $request);
 
             return ServiceResult::success([

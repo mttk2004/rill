@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidateVoucherRequest;
 use App\Http\Resources\ApiResource;
-use App\Services\VoucherServiceRefactored;
+use App\Services\VoucherService;
 use Illuminate\Http\Request;
 
 class VoucherController extends Controller
 {
     public function __construct(
-        protected VoucherServiceRefactored $voucherService
+        protected VoucherService $voucherService
     ) {}
 
     /**

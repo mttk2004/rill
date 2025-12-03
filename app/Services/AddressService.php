@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Collection;
  *
  * Orchestrates shipping address operations using Clean Architecture patterns.
  */
-class AddressServiceRefactored
+class AddressService
 {
     public function __construct(
         protected AddressRepositoryInterface $addressRepository,
