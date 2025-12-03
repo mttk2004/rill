@@ -27,6 +27,7 @@ class RepositoryServiceProvider extends ServiceProvider
         \App\Repositories\Contracts\ReviewRepositoryInterface::class => \App\Repositories\Eloquent\ReviewRepository::class,
         \App\Repositories\Contracts\VoucherRepositoryInterface::class => \App\Repositories\Eloquent\VoucherRepository::class,
         \App\Repositories\Contracts\AddressRepositoryInterface::class => \App\Repositories\Eloquent\AddressRepository::class,
+        \App\Repositories\Contracts\PaymentRepositoryInterface::class => \App\Repositories\Eloquent\PaymentRepository::class,
     ];    /**
      * Register repository bindings.
      */

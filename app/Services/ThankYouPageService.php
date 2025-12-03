@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class ThankYouPageService
 {
     public function __construct(
-        private VnpayService $vnpayService,
+        private VnpayServiceRefactored $vnpayService,
         private OrderServiceRefactored $orderService
     ) {}
 
@@ -111,7 +111,7 @@ class ThankYouPageService
 
         try {
             $vnpayController = app(VnpayController::class);
-            $vnpayController->handleIpn($request, $this->vnpayService, $this->orderService);
+            $vnpayController->handleIpn($request);
 
             // Reload payment to get updated status
             $order->load('payment');

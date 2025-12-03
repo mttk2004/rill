@@ -6,7 +6,7 @@ use App\Enums\PaymentMethod;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\ShoppingCartItem;
 use App\Services\OrderServiceRefactored;
-use App\Services\VnpayService;
+use App\Services\VnpayServiceRefactored;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -47,7 +47,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function store(StoreOrderRequest $request, OrderServiceRefactored $orderService, VnpayService $vnpayService)
+    public function store(StoreOrderRequest $request, OrderServiceRefactored $orderService, VnpayServiceRefactored $vnpayService)
     {
         $user = Auth::user();
 
@@ -69,7 +69,15 @@ class CheckoutController extends Controller
 
             if ($paymentMethod === PaymentMethod::VNPAY->value) {
                 // Tạo URL thanh toán VNPAY
-                $paymentUrl = $vnpayService->createPaymentUrl($order, $request);
+                $paymentResult = $vnpayService->createPaymentUrl($order, $request->ip());
+
+                if (!$paymentResult->success) {
+                    return response()->json([
+                        'error' => 'Không thể tạo link thanh toán: ' . $paymentResult->message,
+                    ], 500);
+                }
+
+                $paymentUrl = $paymentResult->data['payment_url'];
 
                 // Trả về JSON chứa payment URL cho frontend
                 return response()->json([
