@@ -47,8 +47,10 @@
     window.supabaseBucket = "{{ config('filesystems.disks.supabase.bucket') }}";
   </script>
 
-  @viteReactRefresh
-  @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+  @if (!app()->environment('testing'))
+    @viteReactRefresh
+    @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+  @endif
   @inertiaHead
 </head>
 

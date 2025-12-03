@@ -59,12 +59,16 @@ class AddressService
     {
         try {
             $addressData = new AddressData(
-                recipientName: trim($data['recipient_name'] ?? ''),
-                phoneNumber: trim($data['phone_number'] ?? ''),
-                address: trim($data['address'] ?? ''),
-                ward: trim($data['ward'] ?? ''),
-                district: trim($data['district'] ?? ''),
+                fullName: trim($data['full_name'] ?? ''),
+                phone: trim($data['phone'] ?? ''),
+                addressLine1: trim($data['address_line_1'] ?? ''),
+                addressLine2: $data['address_line_2'] ?? null,
                 province: trim($data['province'] ?? ''),
+                provinceId: (int) ($data['province_id'] ?? 0),
+                district: trim($data['district'] ?? ''),
+                districtId: (int) ($data['district_id'] ?? 0),
+                ward: trim($data['ward'] ?? ''),
+                wardId: trim($data['ward_id'] ?? ''),
                 isDefault: $data['is_default'] ?? false
             );
             return $this->createAddressAction->execute($userId, $addressData);
@@ -85,12 +89,16 @@ class AddressService
     {
         try {
             $addressData = new AddressData(
-                recipientName: trim($data['recipient_name'] ?? ''),
-                phoneNumber: trim($data['phone_number'] ?? ''),
-                address: trim($data['address'] ?? ''),
-                ward: trim($data['ward'] ?? ''),
-                district: trim($data['district'] ?? ''),
+                fullName: trim($data['full_name'] ?? ''),
+                phone: trim($data['phone'] ?? ''),
+                addressLine1: trim($data['address_line_1'] ?? ''),
+                addressLine2: $data['address_line_2'] ?? null,
                 province: trim($data['province'] ?? ''),
+                provinceId: (int) ($data['province_id'] ?? 0),
+                district: trim($data['district'] ?? ''),
+                districtId: (int) ($data['district_id'] ?? 0),
+                ward: trim($data['ward'] ?? ''),
+                wardId: trim($data['ward_id'] ?? ''),
                 isDefault: $data['is_default'] ?? false
             );
             return $this->updateAddressAction->execute($addressId, $userId, $addressData);

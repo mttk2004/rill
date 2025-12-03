@@ -14,12 +14,16 @@ use InvalidArgumentException;
 class AddressData extends BaseData
 {
     public function __construct(
-        public readonly string $recipientName,
-        public readonly string $phoneNumber,
-        public readonly string $address,
-        public readonly string $ward,
-        public readonly string $district,
+        public readonly string $fullName,
+        public readonly string $phone,
+        public readonly string $addressLine1,
+        public readonly ?string $addressLine2,
         public readonly string $province,
+        public readonly int $provinceId,
+        public readonly string $district,
+        public readonly int $districtId,
+        public readonly string $ward,
+        public readonly string $wardId,
         public readonly bool $isDefault = false
     ) {
         $this->validate();
@@ -32,16 +36,16 @@ class AddressData extends BaseData
      */
     protected function validate(): void
     {
-        if (empty(trim($this->recipientName))) {
-            throw new InvalidArgumentException('Recipient name cannot be empty');
+        if (empty(trim($this->fullName))) {
+            throw new InvalidArgumentException('Full name cannot be empty');
         }
 
-        if (empty(trim($this->phoneNumber))) {
+        if (empty(trim($this->phone))) {
             throw new InvalidArgumentException('Phone number cannot be empty');
         }
 
-        if (empty(trim($this->address))) {
-            throw new InvalidArgumentException('Address cannot be empty');
+        if (empty(trim($this->addressLine1))) {
+            throw new InvalidArgumentException('Address line 1 cannot be empty');
         }
 
         if (empty(trim($this->ward))) {
@@ -65,12 +69,16 @@ class AddressData extends BaseData
     public function toArray(): array
     {
         return [
-            'recipient_name' => $this->recipientName,
-            'phone_number' => $this->phoneNumber,
-            'address' => $this->address,
-            'ward' => $this->ward,
-            'district' => $this->district,
+            'full_name' => $this->fullName,
+            'phone' => $this->phone,
+            'address_line_1' => $this->addressLine1,
+            'address_line_2' => $this->addressLine2,
             'province' => $this->province,
+            'province_id' => $this->provinceId,
+            'district' => $this->district,
+            'district_id' => $this->districtId,
+            'ward' => $this->ward,
+            'ward_id' => $this->wardId,
             'is_default' => $this->isDefault,
         ];
     }
@@ -84,12 +92,16 @@ class AddressData extends BaseData
     public static function fromRequest(Request $request): static
     {
         return new static(
-            recipientName: trim($request->input('recipient_name', '')),
-            phoneNumber: trim($request->input('phone_number', '')),
-            address: trim($request->input('address', '')),
-            ward: trim($request->input('ward', '')),
-            district: trim($request->input('district', '')),
+            fullName: trim($request->input('full_name', '')),
+            phone: trim($request->input('phone', '')),
+            addressLine1: trim($request->input('address_line_1', '')),
+            addressLine2: $request->input('address_line_2'),
             province: trim($request->input('province', '')),
+            provinceId: (int) $request->input('province_id', 0),
+            district: trim($request->input('district', '')),
+            districtId: (int) $request->input('district_id', 0),
+            ward: trim($request->input('ward', '')),
+            wardId: trim($request->input('ward_id', '')),
             isDefault: $request->boolean('is_default', false)
         );
     }

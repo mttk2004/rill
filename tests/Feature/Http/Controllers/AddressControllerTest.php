@@ -23,15 +23,15 @@ test('user can create new address with valid data', function () {
     $user = User::factory()->create();
 
     $addressData = [
-        'recipient_name' => 'John Doe',
+        'full_name' => 'John Doe',
         'phone' => '0123456789',
         'province_id' => 1,
-        'province_name' => 'Hà Nội',
+        'province' => 'Hà Nội',
         'district_id' => 1,
-        'district_name' => 'Ba Đình',
-        'ward_code' => '00001',
-        'ward_name' => 'Phường Phúc Xá',
-        'address_detail' => '123 Đường ABC',
+        'district' => 'Ba Đình',
+        'ward_id' => '00001',
+        'ward' => 'Phường Phúc Xá',
+        'address_line_1' => '123 Đường ABC',
         'is_default' => false,
     ];
 
@@ -43,7 +43,7 @@ test('user can create new address with valid data', function () {
 
     $this->assertDatabaseHas('shipping_addresses', [
         'user_id' => $user->id,
-        'recipient_name' => 'John Doe',
+        'full_name' => 'John Doe',
         'phone' => '0123456789',
     ]);
 });
@@ -52,15 +52,15 @@ test('first address is automatically set as default', function () {
     $user = User::factory()->create();
 
     $addressData = [
-        'recipient_name' => 'John Doe',
+        'full_name' => 'John Doe',
         'phone' => '0123456789',
         'province_id' => 1,
-        'province_name' => 'Hà Nội',
+        'province' => 'Hà Nội',
         'district_id' => 1,
-        'district_name' => 'Ba Đình',
-        'ward_code' => '00001',
-        'ward_name' => 'Phường Phúc Xá',
-        'address_detail' => '123 Đường ABC',
+        'district' => 'Ba Đình',
+        'ward_id' => '00001',
+        'ward' => 'Phường Phúc Xá',
+        'address_line_1' => '123 Đường ABC',
         'is_default' => false,
     ];
 
@@ -80,12 +80,12 @@ test('address creation fails without required fields', function () {
         ->post(route('addresses.store'), []);
 
     $response->assertSessionHasErrors([
-        'recipient_name',
+        'full_name',
         'phone',
         'province_id',
         'district_id',
-        'ward_code',
-        'address_detail',
+        'ward_id',
+        'address_line_1',
     ]);
 });
 
@@ -94,15 +94,15 @@ test('user can update their address', function () {
     $address = ShippingAddress::factory()->create(['user_id' => $user->id]);
 
     $updatedData = [
-        'recipient_name' => 'Jane Doe Updated',
+        'full_name' => 'Jane Doe Updated',
         'phone' => '0987654321',
         'province_id' => $address->province_id,
-        'province_name' => $address->province_name,
+        'province' => $address->province,
         'district_id' => $address->district_id,
-        'district_name' => $address->district_name,
-        'ward_code' => $address->ward_code,
-        'ward_name' => $address->ward_name,
-        'address_detail' => 'Updated Address',
+        'district' => $address->district,
+        'ward_id' => $address->ward_id,
+        'ward' => $address->ward,
+        'address_line_1' => 'Updated Address',
         'is_default' => $address->is_default,
     ];
 
@@ -114,7 +114,7 @@ test('user can update their address', function () {
 
     $this->assertDatabaseHas('shipping_addresses', [
         'id' => $address->id,
-        'recipient_name' => 'Jane Doe Updated',
+        'full_name' => 'Jane Doe Updated',
     ]);
 });
 
@@ -125,15 +125,15 @@ test('user cannot update another users address', function () {
 
     $response = $this->actingAs($user)
         ->put(route('addresses.update', $address), [
-            'recipient_name' => 'Hacked',
+            'full_name' => 'Hacked',
             'phone' => '0123456789',
             'province_id' => 1,
-            'province_name' => 'Hà Nội',
+            'province' => 'Hà Nội',
             'district_id' => 1,
-            'district_name' => 'Ba Đình',
-            'ward_code' => '00001',
-            'ward_name' => 'Phường Phúc Xá',
-            'address_detail' => '123 Đường ABC',
+            'district' => 'Ba Đình',
+            'ward_id' => '00001',
+            'ward' => 'Phường Phúc Xá',
+            'address_line_1' => '123 Đường ABC',
             'is_default' => false,
         ]);
 
@@ -206,15 +206,15 @@ test('phone number must be 10 digits', function () {
 
     $response = $this->actingAs($user)
         ->post(route('addresses.store'), [
-            'recipient_name' => 'John Doe',
+            'full_name' => 'John Doe',
             'phone' => '123', // Invalid: too short
             'province_id' => 1,
-            'province_name' => 'Hà Nội',
+            'province' => 'Hà Nội',
             'district_id' => 1,
-            'district_name' => 'Ba Đình',
-            'ward_code' => '00001',
-            'ward_name' => 'Phường Phúc Xá',
-            'address_detail' => '123 Đường ABC',
+            'district' => 'Ba Đình',
+            'ward_id' => '00001',
+            'ward' => 'Phường Phúc Xá',
+            'address_line_1' => '123 Đường ABC',
             'is_default' => false,
         ]);
 
