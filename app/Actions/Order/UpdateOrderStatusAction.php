@@ -107,14 +107,10 @@ class UpdateOrderStatusAction extends BaseAction
                 OrderStatus::CANCELLED->value,
             ],
             OrderStatus::CONFIRMED->value => [
-                OrderStatus::PROCESSING->value,
+                OrderStatus::SHIPPED->value,
                 OrderStatus::CANCELLED->value,
             ],
-            OrderStatus::PROCESSING->value => [
-                OrderStatus::SHIPPING->value,
-                OrderStatus::CANCELLED->value,
-            ],
-            OrderStatus::SHIPPING->value => [
+            OrderStatus::SHIPPED->value => [
                 OrderStatus::DELIVERED->value,
             ],
         ];

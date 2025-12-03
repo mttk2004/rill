@@ -55,7 +55,7 @@ class CancelOrderAction extends BaseAction
             // Update payment status if pending
             if ($order->payment && $order->payment->payment_status === PaymentStatus::PENDING) {
                 $order->payment->update([
-                    'payment_status' => PaymentStatus::CANCELLED,
+                    'payment_status' => PaymentStatus::FAILED,
                 ]);
             }
 
@@ -98,7 +98,7 @@ class CancelOrderAction extends BaseAction
         }
 
         // Cannot cancel if already shipping (require admin approval)
-        if ($order->status === OrderStatus::SHIPPING && !auth()->user()?->isAdmin()) {
+        if ($order->status === OrderStatus::SHIPPED && !auth()->user()?->isAdmin()) {
             return false;
         }
 

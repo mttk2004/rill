@@ -115,14 +115,12 @@ class CreateOrderAction extends BaseAction
 
             // Apply voucher if provided
             if ($data->voucherId) {
-                $voucherResult = $this->voucherService->applyVoucherToOrder(
-                    $data->voucherId,
-                    $order->id,
-                    $data->userId
-                );
-
-                if (!$voucherResult->success) {
-                    return $this->error($voucherResult->message);
+                try {
+                    $voucher = \App\Models\Voucher::findOrFail($data->voucherId);
+                    $user = \App\Models\User::findOrFail($data->userId);
+                    $this->voucherService->applyVoucher($voucher, $order, $user);
+                } catch (\Exception $e) {
+                    return $this->error('Failed to apply voucher: ' . $e->getMessage());
                 }
             }
 

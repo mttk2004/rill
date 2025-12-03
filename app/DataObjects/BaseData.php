@@ -26,11 +26,14 @@ abstract class BaseData
     /**
      * Create DTO from array.
      *
+     * Child classes must implement a constructor that accepts named parameters.
+     *
      * @param array $data
      * @return static
      */
     public static function from(array $data): static
     {
+        // This uses named parameters from the child class constructor
         return new static(...$data);
     }
 

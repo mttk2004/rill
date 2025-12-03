@@ -9,17 +9,11 @@ use App\Support\ServiceResult;
  *
  * Abstract class for all action classes in the application.
  * Actions encapsulate single-purpose business operations.
+ *
+ * Each action should implement its own execute() method with appropriate parameters.
  */
 abstract class BaseAction
 {
-    /**
-     * Execute the action.
-     *
-     * @param mixed ...$params
-     * @return ServiceResult
-     */
-    abstract public function execute(...$params): ServiceResult;
-
     /**
      * Create a success result.
      *
