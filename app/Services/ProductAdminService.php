@@ -3,12 +3,17 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductAdminService
 {
+    public function __construct(
+        protected ProductRepositoryInterface $productRepository
+    ) {}
+
     /**
      * Build query with filters for product listing.
      *
@@ -127,16 +132,7 @@ class ProductAdminService
      */
     public function getProductStats(): array
     {
-        return [
-            'total' => Product::count(),
-            'active' => Product::where('status', 'active')->count(),
-            'out_of_stock' => Product::where('status', 'out_of_stock')
-                ->orWhere('stock_quantity', 0)
-                ->count(),
-            'low_stock' => Product::whereColumn('stock_quantity', '<=', 'min_stock_level')
-                ->where('stock_quantity', '>', 0)
-                ->count(),
-        ];
+        return $this->productRepository->getStats();
     }
 
     /**

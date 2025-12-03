@@ -20,13 +20,10 @@ class RepositoryServiceProvider extends ServiceProvider
      * @var array
      */
     protected array $repositories = [
-        // Register repository bindings here
-        // Example:
-        // \App\Repositories\Contracts\OrderRepositoryInterface::class => \App\Repositories\Eloquent\OrderRepository::class,
-        // \App\Repositories\Contracts\ProductRepositoryInterface::class => \App\Repositories\Eloquent\ProductRepository::class,
-    ];
-
-    /**
+        \App\Repositories\Contracts\ProductRepositoryInterface::class => \App\Repositories\Eloquent\ProductRepository::class,
+        \App\Repositories\Contracts\OrderRepositoryInterface::class => \App\Repositories\Eloquent\OrderRepository::class,
+        \App\Repositories\Contracts\UserRepositoryInterface::class => \App\Repositories\Eloquent\UserRepository::class,
+    ];    /**
      * Register repository bindings.
      */
     public function register(): void
