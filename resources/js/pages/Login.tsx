@@ -13,6 +13,10 @@ interface LoginProps {
 export default function Login({ canResetPassword, status }: LoginProps) {
   const { showToast } = useToast();
 
+  // Debug logging
+  console.log('Login props:', { canResetPassword, status, statusType: typeof status });
+  console.log('Status value:', JSON.stringify(status, null, 2));
+
   // Convert status to string if it's an object
   const statusMessage = typeof status === 'string' ? status : null;
 
