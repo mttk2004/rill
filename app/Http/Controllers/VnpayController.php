@@ -46,8 +46,8 @@ class VnpayController extends Controller
         }
 
         Log::info('VNPAY IPN: Processing successful', [
-            'order_id' => $result->data['order_id'],
-            'status' => $result->data['status'],
+            'order_id' => $result->data['order_id'] ?? 'unknown',
+            'status' => $result->data['status'] ?? 'unknown',
         ]);
 
         // Return success response to VNPAY

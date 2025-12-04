@@ -44,12 +44,23 @@ class ProcessVnpayIPNAction extends BaseAction
             }
 
             // Find payment by transaction reference
+            \Log::info('Looking for payment with txnRef', [
+                'txn_ref' => $data->txnRef,
+                'is_string' => is_string($data->txnRef),
+            ]);
+
             $payment = $this->paymentRepository->findByTxnRef($data->txnRef);
 
             if (!$payment) {
+                \Log::error('Payment not found', [
+                    'txn_ref' => $data->txnRef,
+                    'all_payments' => \App\Models\Payment::count(),
+                ]);
+
                 return $this->error('Payment not found', [
                     'code' => 'PAYMENT_NOT_FOUND',
                     'txn_ref' => $data->txnRef,
+                    'order_id' => 'unknown',
                 ]);
             }
 
@@ -66,18 +77,22 @@ class ProcessVnpayIPNAction extends BaseAction
                 ? PaymentStatus::COMPLETED->value
                 : PaymentStatus::FAILED->value;
 
-            $this->paymentRepository->update($payment->id, [
+            $updateData = [
                 'payment_status' => $newStatus,
                 'transaction_id' => $data->transactionNo,
-                'paid_at' => $data->isSuccessful() ? now() : null,
-                'metadata' => array_merge($payment->metadata ?? [], [
-                    'vnpay_response_code' => $data->responseCode,
-                    'vnpay_transaction_no' => $data->transactionNo,
-                    'vnpay_bank_code' => $data->bankCode,
-                    'vnpay_pay_date' => $data->payDate,
-                    'processed_at' => now()->toDateTimeString(),
-                ]),
+                'processed_at' => now(),
+            ];
+
+            // Add gateway_response with VNPAY details
+            $updateData['gateway_response'] = array_merge($payment->gateway_response ?? [], [
+                'vnpay_response_code' => $data->responseCode,
+                'vnpay_transaction_no' => $data->transactionNo,
+                'vnpay_bank_code' => $data->bankCode,
+                'vnpay_pay_date' => $data->payDate,
+                'processed_at' => now()->toDateTimeString(),
             ]);
+
+            $this->paymentRepository->update($payment->id, $updateData);
 
             // Store callback data
             $this->paymentRepository->storeCallbackData($payment->id, $data->rawData);

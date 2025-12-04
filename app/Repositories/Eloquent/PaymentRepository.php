@@ -39,7 +39,9 @@ class PaymentRepository extends BaseRepository implements PaymentRepositoryInter
      */
     public function findByTxnRef(string $txnRef): ?Payment
     {
-        return $this->model->where('transaction_id', $txnRef)->first();
+        // vnp_TxnRef is the order_id in VNPAY integration
+        // Query by order_id instead of transaction_id (which is set after payment success)
+        return $this->model->where('order_id', $txnRef)->first();
     }
 
     /**
