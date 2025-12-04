@@ -30,6 +30,22 @@ class GetProductDetailDataAction
             }
         ]);
 
+        // Load total sold quantity
+        $product->loadSum([
+            'orderItems as order_items_sum_quantity' => function ($query) {
+                $query->whereHas('order', function ($q) {
+                    $q->whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered']);
+                });
+            }
+        ], 'quantity');
+
+        \Log::info('Product total_sold calculation', [
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'order_items_sum' => $product->order_items_sum_quantity,
+            'total_sold_accessor' => $product->total_sold,
+        ]);
+
         // Get shipping threshold from settings
         $shippingThreshold = $this->settingService->get('shipping_free_threshold', 3000000);
 
@@ -112,6 +128,7 @@ class GetProductDetailDataAction
                 'featured_artists' => $product->artists->where('pivot.role', 'featured')->values(),
                 'in_stock' => $product->isInStock(),
                 'low_stock' => $product->isLowStock(),
+                'total_sold' => $product->total_sold,
                 'collection' => $product->collections->first() ? [
                     'id' => $product->collections->first()->id,
                     'name' => $product->collections->first()->name,

@@ -50,6 +50,7 @@ class Product extends Model
      */
     protected $appends = [
         'image_url',
+        'total_sold',
     ];
 
     /**
@@ -264,6 +265,25 @@ class Product extends Model
         $supabaseUrl = env('SUPABASE_URL');
         $bucket = env('SUPABASE_BUCKET');
         return "{$supabaseUrl}/storage/v1/object/public/{$bucket}/{$this->image}";
+    }
+
+    /**
+     * Get total quantity sold (only from confirmed orders).
+     * Uses relationship aggregate if loaded, otherwise runs query.
+     */
+    public function getTotalSoldAttribute(): int
+    {
+        // Check if already loaded via withSum
+        if ($this->relationLoaded('orderItems') && isset($this->attributes['order_items_sum_quantity'])) {
+            return (int) $this->attributes['order_items_sum_quantity'];
+        }
+
+        // Fallback to query
+        return (int) $this->orderItems()
+            ->whereHas('order', function ($query) {
+                $query->whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered']);
+            })
+            ->sum('quantity');
     }
 
     /**

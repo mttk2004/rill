@@ -4,10 +4,8 @@ namespace App\Actions\Order;
 
 use App\Actions\BaseAction;
 use App\DataObjects\Order\CreateOrderData;
-use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
-use App\Models\Product;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\ShippingService;

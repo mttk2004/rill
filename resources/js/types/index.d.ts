@@ -171,6 +171,7 @@ export interface Product {
   discount_percentage?: number;
   reviews_count?: number;
   average_rating?: number;
+  total_sold?: number;
   collection?: {
     id: number;
     name: string;

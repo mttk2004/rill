@@ -35,6 +35,14 @@ function ProductDetailContent({
   shippingThreshold = 3000000,
   auth
 }: ProductDetailProps) {
+  // Debug log
+  console.log('ProductDetail - product data:', {
+    id: product.id,
+    name: product.name,
+    total_sold: product.total_sold,
+    product_keys: Object.keys(product)
+  });
+
   // Format shipping threshold for display (e.g., 3000000 -> "3tr")
   const formatShippingThreshold = (amount: number): string => {
     if (amount >= 1000000) {
@@ -235,6 +243,12 @@ function ProductDetailContent({
                   <Link href={`/products?label=${encodeURIComponent(product.label)}`} className="font-medium text-gray-900 hover:text-primary transition-colors">
                     {product.label}
                   </Link>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Đã bán</span>
+                  <span className="font-medium text-gray-900">
+                    {product.total_sold ? product.total_sold.toLocaleString('vi-VN') : 0}
+                  </span>
                 </div>
               </div>
 

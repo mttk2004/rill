@@ -43,6 +43,30 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
   const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState<number | null>(null);
 
+  // Reset state when dialog opens/closes or when formData changes
+  useEffect(() => {
+    if (isOpen) {
+      // Initialize with formData values if editing
+      if (formData.province_id) {
+        setSelectedProvinceId(formData.province_id);
+      } else {
+        setSelectedProvinceId(null);
+      }
+
+      if (formData.district_id) {
+        setSelectedDistrictId(formData.district_id);
+      } else {
+        setSelectedDistrictId(null);
+      }
+    } else {
+      // Reset state when dialog closes
+      setSelectedProvinceId(null);
+      setSelectedDistrictId(null);
+      setDistricts([]);
+      setWards([]);
+    }
+  }, [isOpen, formData.province_id, formData.district_id]);
+
   // Fetch provinces on mount
   useEffect(() => {
     if (isOpen) {
@@ -298,7 +322,7 @@ const AddressFormDialog: React.FC<AddressFormDialogProps> = ({
               type="checkbox"
               id="is_default"
               name="is_default"
-              checked={formData.is_default === 1}
+              checked={formData.is_default === true}
               onChange={onChange}
               className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
