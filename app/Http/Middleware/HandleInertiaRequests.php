@@ -40,8 +40,13 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        return [
-            ...parent::share($request),
+        $parentShared = parent::share($request);
+
+        // Remove errors from parent share to prevent ViewErrorBag serialization issue
+        unset($parentShared['errors']);
+
+        return array_merge($parentShared, [
+            'errors' => (object) [], // Always provide empty object, form errors handled by Inertia separately
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
@@ -49,10 +54,10 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
-                'success' => $request->session()->get('success'),
-                'error' => $request->session()->get('error'),
-                'info' => $request->session()->get('info'),
-                'warning' => $request->session()->get('warning'),
+                'success' => $request->session()->get('success') ?: null,
+                'error' => $request->session()->get('error') ?: null,
+                'info' => $request->session()->get('info') ?: null,
+                'warning' => $request->session()->get('warning') ?: null,
             ],
             'cart' => function () use ($request) {
                 $cartService = app(CartService::class);
@@ -70,7 +75,7 @@ class HandleInertiaRequests extends Middleware
                                 'id' => $item->product->id,
                                 'name' => $item->product->name,
                                 'slug' => $item->product->slug,
-                                'image_urlc' => $item->product->image_url,
+                                'image_url' => $item->product->image_url,
                             ],
                         ];
                     }),
@@ -131,6 +136,6 @@ class HandleInertiaRequests extends Middleware
                     'artists' => $artists,
                 ];
             },
-        ];
+        ]);
     }
 }

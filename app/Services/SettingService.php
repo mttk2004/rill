@@ -31,7 +31,12 @@ class SettingService
     public function get(string $key, mixed $default = null): mixed
     {
         $result = $this->getAction->execute($key, $default);
-        return $result->isSuccess() ? $result->data : $default;
+
+        if ($result->isSuccess() && is_array($result->data) && array_key_exists('value', $result->data)) {
+            return $result->data['value'];
+        }
+
+        return $default;
     }
 
     /**

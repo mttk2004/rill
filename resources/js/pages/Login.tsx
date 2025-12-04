@@ -16,27 +16,6 @@ export default function Login(allProps: Record<string, unknown>) {
   // Extract only the props we need, ignore all Inertia shared data
   const { canResetPassword, status } = allProps as LoginProps;
 
-  // Comprehensive debug logging
-  console.group('🔍 Login Component Props Debug');
-  console.log('All props keys:', Object.keys(allProps));
-  console.log('canResetPassword:', canResetPassword, typeof canResetPassword);
-  console.log('status:', status, typeof status);
-
-  // Check each prop type
-  Object.keys(allProps).forEach(key => {
-    const value = allProps[key];
-    const type = typeof value;
-    if (type === 'object' && value !== null) {
-      console.warn(`⚠️ Object prop detected: ${key}`, value);
-      try {
-        console.log(`   Keys in ${key}:`, Object.keys(value as object));
-      } catch {
-        console.error(`   Cannot read keys from ${key}`);
-      }
-    }
-  });
-  console.groupEnd();
-
   // Safely extract props
   const canReset = canResetPassword === true;
   const statusMessage = (status && typeof status === 'string') ? status : null; const { data, setData, post, processing } = useForm<{
