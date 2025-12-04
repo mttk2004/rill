@@ -67,7 +67,7 @@ class PaymentRepository extends BaseRepository implements PaymentRepositoryInter
     {
         return $this->model->where('id', $id)->update([
             'payment_status' => $status,
-            'paid_at' => $status === 'completed' ? now() : null,
+            'processed_at' => $status === 'completed' ? now() : null,
         ]);
     }
 
@@ -82,13 +82,13 @@ class PaymentRepository extends BaseRepository implements PaymentRepositoryInter
             return false;
         }
 
-        $existingMetadata = $payment->metadata ?? [];
-        $updatedMetadata = array_merge($existingMetadata, [
+        $existingGatewayResponse = $payment->gateway_response ?? [];
+        $updatedGatewayResponse = array_merge($existingGatewayResponse, [
             'callback_data' => $callbackData,
             'callback_received_at' => now()->toDateTimeString(),
         ]);
 
-        return $this->update($paymentId, ['metadata' => $updatedMetadata]);
+        return $this->update($paymentId, ['gateway_response' => $updatedGatewayResponse]);
     }
 
     /**
