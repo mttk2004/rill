@@ -74,14 +74,21 @@ interface DashboardProps {
 
 const Dashboard = () => {
   const { props } = usePage<DashboardProps>();
+
+  console.log('Dashboard props:', {
+    keys: Object.keys(props),
+    has_trendingArtists: 'trendingArtists' in props,
+    trendingArtists_value: props.trendingArtists
+  });
+
   const {
     dashboardStats,
     topProducts,
     genreData,
-    trendingArtists,
+    trendingArtists = [],
     lowStockProducts,
     pendingOrders,
-    recentOrders,
+    recentOrders = [],
     revenueData
   } = props;
 

@@ -37,6 +37,13 @@ class DashboardController extends Controller
         // Get recent activities
         $recentActivities = $this->dashboardService->getRecentActivities(24);
 
+        \Log::info('Admin Dashboard Data', [
+            'has_topProducts' => !empty($topProducts),
+            'has_topCustomers' => !empty($topCustomers),
+            'has_dailyRevenue' => !empty($dailyRevenue),
+            'overview_keys' => array_keys($overview),
+        ]);
+
         return Inertia::render('admin/Dashboard', [
             'dashboardStats' => [
                 'revenue' => $overview['revenue']['total_revenue'] ?? 0,

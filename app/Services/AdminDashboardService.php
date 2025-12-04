@@ -77,7 +77,6 @@ class AdminDashboardService
             'active' => $this->productRepository->newQuery()->active()->count(),
             'low_stock' => $this->productRepository->newQuery()->lowStock()->count(),
             'out_of_stock' => $this->productRepository->newQuery()->outOfStock()->count(),
-            'featured' => $this->productRepository->newQuery()->featured()->count(),
         ];
     }
 
