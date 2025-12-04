@@ -37,8 +37,8 @@ class AuthenticatedSessionController extends Controller
         $user = $request->user();
         $intendedRoute = match($user->role) {
             'admin' => route('admin.dashboard', absolute: false),
-            'customer' => route('products', absolute: false),
-            default => route('products', absolute: false),
+            'customer' => route('products.index', absolute: false),
+            default => route('products.index', absolute: false),
         };
 
         return redirect()->intended($intendedRoute);
