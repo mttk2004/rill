@@ -126,6 +126,45 @@ class SalesReportQueryBuilder
     }
 
     /**
+     * Get trending artists by sales.
+     *
+     * @param int $limit
+     * @param Carbon|null $from
+     * @param Carbon|null $to
+     * @return \Illuminate\Support\Collection
+     */
+    public function getTrendingArtists(int $limit = 10, ?Carbon $from = null, ?Carbon $to = null)
+    {
+        $query = DB::table('order_items')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('artist_product', 'products.id', '=', 'artist_product.product_id')
+            ->join('artists', 'artist_product.artist_id', '=', 'artists.id')
+            ->select([
+                'artists.id',
+                'artists.name',
+                'artists.country',
+                'artists.image',
+                DB::raw('SUM(order_items.quantity) as total_sold'),
+            ])
+            ->where('orders.status', '!=', 'cancelled')
+            ->where('artist_product.role', '=', 'main');
+
+        if ($from) {
+            $query->where('orders.created_at', '>=', $from);
+        }
+
+        if ($to) {
+            $query->where('orders.created_at', '<=', $to);
+        }
+
+        return $query->groupBy('artists.id', 'artists.name', 'artists.country', 'artists.image')
+            ->orderByDesc('total_sold')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
      * Get revenue by payment method.
      *
      * @param Carbon|null $from

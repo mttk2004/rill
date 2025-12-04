@@ -25,6 +25,7 @@ class DashboardController extends Controller
         // Get analytics data
         $topProducts = $this->dashboardService->getTopProducts(5);
         $topCustomers = $this->dashboardService->getTopCustomers(5);
+        $trendingArtists = $this->dashboardService->getTrendingArtists(5);
         $dailyRevenue = $this->dashboardService->getDailyRevenue(30);
         $revenueByPaymentMethod = $this->dashboardService->getRevenueByPaymentMethod();
         $revenueByGenre = $this->dashboardService->getRevenueByGenre();
@@ -49,6 +50,7 @@ class DashboardController extends Controller
             ],
             'topProducts' => $topProducts,
             'topCustomers' => $topCustomers,
+            'trendingArtists' => $trendingArtists,
             'genreData' => $revenueByGenre,
             'lowStockProducts' => $productsNeedingAttention['low_stock'] ?? [],
             'pendingOrders' => $ordersNeedingAttention['pending'] ?? [],

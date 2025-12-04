@@ -168,7 +168,34 @@ class AdminDashboardService
             })
             ->values()
             ->toArray();
-    }    /**
+    }
+
+    /**
+     * Get trending artists by sales.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getTrendingArtists(int $limit = 5): array
+    {
+        $salesBuilder = new SalesReportQueryBuilder();
+
+        return $salesBuilder->getTrendingArtists($limit)
+            ->map(function ($item) {
+                $item = (array) $item;
+                return [
+                    'id' => $item['id'],
+                    'name' => $item['name'],
+                    'country' => $item['country'] ?? 'N/A',
+                    'sales' => (int) $item['total_sold'],
+                    'image' => $item['image'] ?? null,
+                ];
+            })
+            ->values()
+            ->toArray();
+    }
+
+    /**
      * Get top customers by total spend.
      *
      * @param int $limit

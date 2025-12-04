@@ -272,7 +272,11 @@ const Dashboard = () => {
                 <div key={artist.id || idx} className="flex items-center gap-3">
                   <div className="relative">
                     <div className="h-12 w-12 rounded-full bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
-                      {artist.image ? <img src={artist.image} alt="" className="h-full w-full object-cover" /> : <Users size={20} className="m-auto mt-3 text-gray-400" />}
+                      {artist.image ? (
+                        <img src={getImageUrl(artist.image) || ''} alt={artist.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <Users size={20} className="m-auto mt-3 text-gray-400" />
+                      )}
                     </div>
                     <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-gray-100 text-[10px] font-bold w-5 h-5 flex items-center justify-center text-primary">
                       #{idx + 1}
