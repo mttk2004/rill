@@ -64,24 +64,38 @@ class ProcessVnpayIPNAction extends BaseAction
                 ]);
             }
 
-            // Check if payment already processed
-            if ($payment->payment_status !== PaymentStatus::PENDING) {
+            // Check if payment already processed (allow retry for failed payments)
+            if ($payment->payment_status === PaymentStatus::COMPLETED) {
+                \Log::info('Payment already completed, skipping IPN', [
+                    'payment_id' => $payment->id,
+                    'order_id' => $payment->order_id,
+                    'current_status' => $payment->payment_status->value,
+                ]);
                 return $this->success([
                     'payment_id' => $payment->id,
                     'order_id' => $payment->order_id,
                     'status' => $payment->payment_status->value,
-                ], 'Payment already processed');
+                ], 'Payment already completed');
             }
 
-            \Log::info('Payment found and is pending, processing update', [
+            \Log::info('Processing IPN for payment', [
                 'payment_id' => $payment->id,
                 'order_id' => $payment->order_id,
+                'current_status' => $payment->payment_status->value,
+                'vnp_response_code' => $data->responseCode,
+                'is_successful' => $data->isSuccessful(),
             ]);
 
             // Update payment status
             $newStatus = $data->isSuccessful()
                 ? PaymentStatus::COMPLETED->value
                 : PaymentStatus::FAILED->value;
+
+            \Log::info('Updating payment status', [
+                'payment_id' => $payment->id,
+                'old_status' => $payment->payment_status->value,
+                'new_status' => $newStatus,
+            ]);
 
             $updateData = [
                 'payment_status' => $newStatus,
@@ -100,15 +114,29 @@ class ProcessVnpayIPNAction extends BaseAction
 
             $this->paymentRepository->update($payment->id, $updateData);
 
+            \Log::info('Payment updated successfully', [
+                'payment_id' => $payment->id,
+                'new_status' => $newStatus,
+            ]);
+
             // Store callback data
             $this->paymentRepository->storeCallbackData($payment->id, $data->rawData);
 
             // Update order status if payment successful
             if ($data->isSuccessful()) {
+                \Log::info('Updating order status to confirmed', [
+                    'order_id' => $payment->order_id,
+                ]);
                 $this->orderRepository->update($payment->order_id, [
                     'status' => 'confirmed',
                 ]);
             }
+
+            \Log::info('IPN processing completed', [
+                'payment_id' => $payment->id,
+                'order_id' => $payment->order_id,
+                'final_status' => $newStatus,
+            ]);
 
             return $this->success([
                 'payment_id' => $payment->id,

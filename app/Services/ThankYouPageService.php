@@ -54,10 +54,10 @@ class ThankYouPageService
             ]);
         }
 
-        if ($order->payment->payment_status !== \App\Enums\PaymentStatus::PENDING) {
+        if ($order->payment->payment_status === \App\Enums\PaymentStatus::COMPLETED) {
             return ServiceResult::success([
                 'triggered' => false,
-                'reason' => 'Payment not pending',
+                'reason' => 'Payment already completed',
             ]);
         }
 

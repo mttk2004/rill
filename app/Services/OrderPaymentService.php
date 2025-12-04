@@ -123,7 +123,7 @@ class OrderPaymentService
         }
 
         return null;
-    }
+      }
 
     /**
      * Retry VNPay payment for an order.
@@ -141,8 +141,12 @@ class OrderPaymentService
         }
 
         // Generate new payment URL
-        $paymentUrl = $this->vnpayService->createPaymentUrl($order, $request);
+        $result = $this->vnpayService->createPaymentUrl($order, $request->ip());
 
-        return ServiceResult::success('Đã tạo link thanh toán mới.');
+        if (!$result->success) {
+            return $result; // Return the error from VnpayService
+        }
+
+        return $result; // Return success with payment URL in data
     }
 }
