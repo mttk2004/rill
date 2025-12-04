@@ -209,12 +209,16 @@ class AdminDashboardService
         $salesBuilder = new SalesReportQueryBuilder();
 
         return $salesBuilder->getRevenueByGenre()
-            ->map(fn($item) => (array) $item)
+            ->map(function ($item) {
+                $item = (array) $item;
+                return [
+                    'name' => $item['genre'],
+                    'value' => (float) $item['total_revenue'],
+                ];
+            })
             ->values()
             ->toArray();
-    }
-
-    /**
+    }    /**
      * Get order status distribution.
      *
      * @return array
