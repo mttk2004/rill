@@ -9,7 +9,7 @@ use App\DataObjects\BaseData;
  *
  * Represents data for recording voucher usage.
  */
-class VoucherUsageData extends BaseData
+readonly class VoucherUsageData extends BaseData
 {
     public function __construct(
         public readonly int $voucherId,

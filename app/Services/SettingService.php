@@ -28,7 +28,16 @@ class SettingService
     /**
      * Get a single setting value
      */
-    public function get(string $key, mixed $default = null): ServiceResult
+    public function get(string $key, mixed $default = null): mixed
+    {
+        $result = $this->getAction->execute($key, $default);
+        return $result->isSuccess() ? $result->data : $default;
+    }
+
+    /**
+     * Get a single setting value as ServiceResult
+     */
+    public function getSetting(string $key, mixed $default = null): ServiceResult
     {
         return $this->getAction->execute($key, $default);
     }

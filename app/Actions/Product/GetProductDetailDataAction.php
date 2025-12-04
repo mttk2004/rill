@@ -31,10 +31,7 @@ class GetProductDetailDataAction
         ]);
 
         // Get shipping threshold from settings
-        $shippingThresholdResult = $this->settingService->get('shipping_free_threshold');
-        $shippingThreshold = $shippingThresholdResult->success
-            ? ($shippingThresholdResult->data['value'] ?? 3000000)
-            : 3000000;
+        $shippingThreshold = $this->settingService->get('shipping_free_threshold', 3000000);
 
         // Get all reviews
         $reviews = $product->reviews()

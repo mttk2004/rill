@@ -11,7 +11,7 @@ use InvalidArgumentException;
  *
  * Represents shipping address data for create/update operations.
  */
-class AddressData extends BaseData
+readonly class AddressData extends BaseData
 {
     public function __construct(
         public readonly string $fullName,

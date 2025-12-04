@@ -32,7 +32,7 @@ test('product index displays active products', function () {
     $response->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('ProductList')
-            ->where('products.data', fn ($products) => count($products) === 3)
+            ->where('products', fn ($products) => count($products) === 3)
         );
 });
 
@@ -158,7 +158,7 @@ test('product show page displays product details', function () {
         ->assertInertia(fn ($page) => $page
             ->component('ProductDetail')
             ->where('product.name', 'Test Album')
-            ->where('product.price', 250000)
+            ->where('product.price', fn ($price) => (float)$price == 250000)
         );
 });
 

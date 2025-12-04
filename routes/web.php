@@ -12,17 +12,17 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // VNPAY IPN Handler (phải đặt ngoài middleware auth vì VNPAY server gọi)
-Route::get('/vnpay/ipn', [VnpayController::class, 'handleIpn'])->name('vnpay.ipn');
+Route::post('/vnpay/ipn', [VnpayController::class, 'handleIpn'])->name('vnpay.ipn');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Public routes (accessible to guests and authenticated users)
-Route::get('/products', [ProductController::class, 'index'])->name('products');
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 // Product reviews (authenticated users only)
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/products/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('products.reviews.store');
+    Route::post('/products/{product}/reviews', [App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
     Route::delete('/reviews/{review}', [App\Http\Controllers\ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
     // Checkout and Order Placement
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::post('/checkout/shipping-fee', [ShippingController::class, 'calculate'])->name('checkout.shipping-fee');
 
     // Voucher API endpoints (using web middleware for session auth)
@@ -59,7 +60,7 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
     Route::post('/orders', [CheckoutController::class, 'store'])->name('orders.store');
 
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'downloadInvoice'])->name('orders.invoice');
 
@@ -68,10 +69,6 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
 
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');
-
-    Route::get('/wishlist', function () {
-        return Inertia::render('wishlist');
-    })->name('wishlist');
 
     // Address management
     Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');

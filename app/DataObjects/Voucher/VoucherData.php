@@ -10,7 +10,7 @@ use InvalidArgumentException;
  *
  * Represents voucher data for create/update operations.
  */
-class VoucherData extends BaseData
+readonly class VoucherData extends BaseData
 {
     public function __construct(
         public readonly string $code,

@@ -10,7 +10,7 @@ use InvalidArgumentException;
  *
  * Represents review data for create/update operations.
  */
-class ReviewData extends BaseData
+readonly class ReviewData extends BaseData
 {
     public function __construct(
         public readonly int $userId,

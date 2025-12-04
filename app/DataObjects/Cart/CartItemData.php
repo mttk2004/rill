@@ -9,7 +9,7 @@ use App\DataObjects\BaseData;
  *
  * Represents data for adding or updating a cart item.
  */
-class CartItemData extends BaseData
+readonly class CartItemData extends BaseData
 {
     public function __construct(
         public readonly string $productId,

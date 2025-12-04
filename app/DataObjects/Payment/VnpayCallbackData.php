@@ -9,7 +9,7 @@ use App\DataObjects\BaseData;
  *
  * Data transfer object for VNPAY callback/return data.
  */
-class VnpayCallbackData extends BaseData
+readonly class VnpayCallbackData extends BaseData
 {
     public function __construct(
         public readonly string $txnRef,

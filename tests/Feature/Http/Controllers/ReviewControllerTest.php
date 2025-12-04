@@ -15,10 +15,10 @@ test('authenticated user can create review for purchased product', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create(['status' => 'active']);
 
-    // Create completed order with the product
+    // Create delivered order with the product
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -70,7 +70,7 @@ test('review requires rating', function () {
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -90,7 +90,7 @@ test('review requires comment', function () {
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -110,7 +110,7 @@ test('rating must be between 1 and 5', function () {
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -131,7 +131,7 @@ test('user can update their existing review', function () {
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -174,7 +174,7 @@ test('review rejects inappropriate content', function () {
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -254,7 +254,7 @@ test('comment must have minimum length', function () {
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -269,17 +269,13 @@ test('comment must have minimum length', function () {
     $response->assertSessionHasErrors('comment');
 });
 
-test('review updates product rating statistics', function () {
+test('review creates record in product_reviews table', function () {
     $user = User::factory()->create();
-    $product = Product::factory()->create([
-        'status' => 'active',
-        'rating_avg' => 0,
-        'rating_count' => 0,
-    ]);
+    $product = Product::factory()->create(['status' => 'active']);
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status' => 'delivered',
     ]);
     OrderItem::factory()->create([
         'order_id' => $order->id,
@@ -291,6 +287,6 @@ test('review updates product rating statistics', function () {
         'comment' => 'Excellent product!',
     ]);
 
-    $product->refresh();
-    expect($product->rating_count)->toBeGreaterThan(0);
+    expect($product->reviews()->count())->toBe(1);
+    expect($product->reviews()->first()->rating)->toBe(5);
 });

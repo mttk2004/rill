@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
  * Abstract class for all DTOs in the application.
  * Child classes should implement their own static factory methods as needed.
  */
-abstract class BaseData
+abstract readonly class BaseData
 {
     /**
      * Convert DTO to array.

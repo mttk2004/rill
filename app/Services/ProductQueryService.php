@@ -212,8 +212,7 @@ class ProductQueryService
     public function getProducts(array $filters = []): ServiceResult
     {
         try {
-            $products = $this->getProductsWithFiltersAction->execute($filters);
-            return ServiceResult::success(data: $products);
+            return $this->getProductsWithFiltersAction->execute($filters);
         } catch (\Exception $e) {
             return ServiceResult::error('Không thể lấy danh sách sản phẩm: ' . $e->getMessage());
         }

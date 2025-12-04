@@ -3,6 +3,7 @@
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\VnpayService;
+use App\Support\ServiceResult;
 
 use function Pest\Laravel\post;
 
@@ -16,13 +17,10 @@ test('vnpay IPN validates signature', function () {
     // Mock valid VNPAY IPN request
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => true,
-            'data' => [
-                'order_id' => $order->id,
-                'status' => 'success',
-            ],
-        ]);
+        ->andReturn(ServiceResult::success([
+            'order_id' => $order->id,
+            'status' => 'success',
+        ]));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',
@@ -46,11 +44,7 @@ test('vnpay IPN rejects invalid signature', function () {
 
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => false,
-            'message' => 'Invalid signature',
-            'errors' => ['code' => 'INVALID_SIGNATURE'],
-        ]);
+        ->andReturn(ServiceResult::error('Invalid signature', ['code' => 'INVALID_SIGNATURE']));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',
@@ -68,11 +62,7 @@ test('vnpay IPN rejects invalid signature', function () {
 test('vnpay IPN handles payment not found', function () {
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => false,
-            'message' => 'Payment not found',
-            'errors' => ['code' => 'PAYMENT_NOT_FOUND'],
-        ]);
+        ->andReturn(ServiceResult::error('Payment not found', ['code' => 'PAYMENT_NOT_FOUND']));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',
@@ -92,11 +82,7 @@ test('vnpay IPN handles invalid amount', function () {
 
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => false,
-            'message' => 'Invalid amount',
-            'errors' => ['code' => 'INVALID_AMOUNT'],
-        ]);
+        ->andReturn(ServiceResult::error('Invalid amount', ['code' => 'INVALID_AMOUNT']));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',
@@ -114,11 +100,7 @@ test('vnpay IPN handles invalid amount', function () {
 test('vnpay IPN handles unknown error', function () {
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => false,
-            'message' => 'Unknown error',
-            'errors' => ['code' => 'UNKNOWN'],
-        ]);
+        ->andReturn(ServiceResult::error('Unknown error', ['code' => 'UNKNOWN']));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',
@@ -137,18 +119,15 @@ test('vnpay IPN updates payment status on success', function () {
     $payment = Payment::factory()->create([
         'order_id' => $order->id,
         'transaction_id' => 'VNP123456789',
-        'status' => 'pending',
+        'payment_status' => 'pending',
     ]);
 
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => true,
-            'data' => [
-                'order_id' => $order->id,
-                'status' => 'completed',
-            ],
-        ]);
+        ->andReturn(ServiceResult::success([
+            'order_id' => $order->id,
+            'status' => 'completed',
+        ]));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',
@@ -170,13 +149,10 @@ test('vnpay IPN logs successful processing', function () {
 
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => true,
-            'data' => [
-                'order_id' => $order->id,
-                'status' => 'success',
-            ],
-        ]);
+        ->andReturn(ServiceResult::success([
+            'order_id' => $order->id,
+            'status' => 'success',
+        ]));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',
@@ -192,11 +168,7 @@ test('vnpay IPN logs successful processing', function () {
 test('vnpay IPN logs failed processing', function () {
     $this->mock(VnpayService::class)
         ->shouldReceive('processIPN')
-        ->andReturn((object)[
-            'success' => false,
-            'message' => 'Test error',
-            'errors' => ['code' => 'TEST_ERROR'],
-        ]);
+        ->andReturn(ServiceResult::error('Test error', ['code' => 'TEST_ERROR']));
 
     $response = post(route('vnpay.ipn'), [
         'vnp_TmnCode' => 'TEST123',

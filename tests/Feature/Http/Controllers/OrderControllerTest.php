@@ -59,7 +59,7 @@ test('user can filter orders by status', function () {
     ]);
     Order::factory()->create([
         'user_id' => $user->id,
-        'status' => OrderStatus::COMPLETED->value,
+        'status' => OrderStatus::DELIVERED->value,
     ]);
 
     $response = actingAs($user)->get(route('orders.index', ['status' => OrderStatus::PENDING->value]));
@@ -159,14 +159,14 @@ test('user can cancel pending order', function () {
 
     $response->assertRedirect();
     $order->refresh();
-    expect($order->status)->toBe(OrderStatus::CANCELLED->value);
+    expect($order->status)->toBe(OrderStatus::CANCELLED);
 });
 
-test('user cannot cancel completed order', function () {
+test('user cannot cancel delivered order', function () {
     $user = User::factory()->create();
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => OrderStatus::COMPLETED->value,
+        'status' => OrderStatus::DELIVERED->value,
     ]);
 
     $response = actingAs($user)->post(route('orders.cancel', $order));
@@ -175,7 +175,7 @@ test('user cannot cancel completed order', function () {
         ->assertSessionHas('error');
 
     $order->refresh();
-    expect($order->status)->toBe(OrderStatus::COMPLETED->value);
+    expect($order->status)->toBe(OrderStatus::DELIVERED);
 });
 
 test('user cannot cancel another users order', function () {

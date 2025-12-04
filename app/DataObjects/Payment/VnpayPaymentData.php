@@ -9,7 +9,7 @@ use App\DataObjects\BaseData;
  *
  * Data transfer object for creating VNPAY payment.
  */
-class VnpayPaymentData extends BaseData
+readonly class VnpayPaymentData extends BaseData
 {
     public function __construct(
         public readonly int $orderId,

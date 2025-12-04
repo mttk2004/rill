@@ -66,10 +66,10 @@ class OrderController extends Controller
     /**
      * Display the thank you page for a specific order.
      */
-    public function thankYou(Request $request, ?Order $order = null)
+    public function thankYou(Request $request, ?Order $routeOrder = null)
     {
         // Resolve order from route parameter or VNPAY return URL
-        $orderResult = $this->thankYouPageService->resolveOrder($request, $order, Auth::id());
+        $orderResult = $this->thankYouPageService->resolveOrder($request, $routeOrder, Auth::id());
 
         if (!$orderResult->success) {
             abort(404, $orderResult->message);
