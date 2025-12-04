@@ -94,7 +94,16 @@ class OrderService
 
             if ($voucherResult->success) {
                 $discountAmount = $voucherResult->data['discount_amount'];
-                $voucherId = $voucherResult->data['voucher']->id;
+                // Check if voucher object exists in data, if not try to find it by code
+                if (isset($voucherResult->data['voucher']) && is_object($voucherResult->data['voucher'])) {
+                    $voucherId = $voucherResult->data['voucher']->id;
+                } else {
+                    // Fallback: try to find voucher by code
+                    $voucher = \App\Models\Voucher::where('code', $data['voucher_code'])->first();
+                    if ($voucher) {
+                        $voucherId = $voucher->id;
+                    }
+                }
             }
         }
 
@@ -125,10 +134,8 @@ class OrderService
 
         $result = $this->createOrderAction->execute($orderData);
 
-        if ($result->isSuccess()) {
-            // Clear cart on success
-            ShoppingCartItem::where('user_id', $user->id)->delete();
-        }
+        // NOTE: Cart is NOT cleared here to prevent redirect issues
+        // Cart will be cleared by the controller after successful redirect
 
         return $result;
     }
