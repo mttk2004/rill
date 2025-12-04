@@ -123,7 +123,10 @@ class AdminDashboardService
         $salesBuilder = new SalesReportQueryBuilder();
         $startDate = Carbon::now()->subDays($days);
 
-        return $salesBuilder->getDailyRevenue($startDate, now())->toArray();
+        return $salesBuilder->getDailyRevenue($startDate, now())
+            ->map(fn($item) => (array) $item)
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -137,7 +140,7 @@ class AdminDashboardService
         $salesBuilder = new SalesReportQueryBuilder();
         $year = Carbon::now()->year;
 
-        return $salesBuilder->getMonthlyRevenue($year)->toArray();
+        return $salesBuilder->getMonthlyRevenue($year)->values()->toArray();
     }
 
     /**
@@ -146,11 +149,14 @@ class AdminDashboardService
      * @param int $limit
      * @return array
      */
-    public function getTopProducts(int $limit = 10): array
+    public function getTopProducts(int $limit = 5): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getTopProducts($limit)->toArray();
+        return $salesBuilder->getTopProducts($limit)
+            ->map(fn($item) => (array) $item)
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -159,11 +165,14 @@ class AdminDashboardService
      * @param int $limit
      * @return array
      */
-    public function getTopCustomers(int $limit = 10): array
+    public function getTopCustomers(int $limit = 5): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getTopCustomers($limit)->toArray();
+        return $salesBuilder->getTopCustomers($limit)
+            ->map(fn($item) => (array) $item)
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -175,7 +184,10 @@ class AdminDashboardService
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getRevenueByPaymentMethod()->toArray();
+        return $salesBuilder->getRevenueByPaymentMethod()
+            ->map(fn($item) => (array) $item)
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -187,7 +199,10 @@ class AdminDashboardService
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getRevenueByGenre()->toArray();
+        return $salesBuilder->getRevenueByGenre()
+            ->map(fn($item) => (array) $item)
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -199,7 +214,10 @@ class AdminDashboardService
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getOrderStatusDistribution()->toArray();
+        return $salesBuilder->getOrderStatusDistribution()
+            ->map(fn($item) => (array) $item)
+            ->values()
+            ->toArray();
     }
 
     /**
@@ -294,5 +312,38 @@ class AdminDashboardService
                 ->dateRange($since, now())
                 ->count(),
         ];
+    }
+
+    /**
+     * Get recent orders with customer information.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function getRecentOrders(int $limit = 10): array
+    {
+        return $this->orderRepository->newQuery()
+            ->withRelations(['user'])
+            ->newest()
+            ->getQuery()
+            ->take($limit)
+            ->get()
+            ->map(function ($order) {
+                  // Parse shipping_address JSON
+                $shippingAddress = is_string($order->shipping_address)
+                    ? json_decode($order->shipping_address, true)
+                    : $order->shipping_address;
+
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'shipping_address' => $shippingAddress,
+                    'total_amount' => $order->total_amount,
+                    'status' => $order->status,
+                    'created_at' => $order->created_at,
+                ];
+            })
+            ->values()
+            ->toArray();
     }
 }

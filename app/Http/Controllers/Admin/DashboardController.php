@@ -37,12 +37,8 @@ class DashboardController extends Controller
         // Get recent activities
         $recentActivities = $this->dashboardService->getRecentActivities(24);
 
-        \Log::info('Admin Dashboard Data', [
-            'has_topProducts' => !empty($topProducts),
-            'has_topCustomers' => !empty($topCustomers),
-            'has_dailyRevenue' => !empty($dailyRevenue),
-            'overview_keys' => array_keys($overview),
-        ]);
+        // Get recent orders
+        $recentOrders = $this->dashboardService->getRecentOrders(10);
 
         return Inertia::render('admin/Dashboard', [
             'dashboardStats' => [
@@ -61,6 +57,7 @@ class DashboardController extends Controller
             'revenueByPaymentMethod' => $revenueByPaymentMethod,
             'orderStatusDistribution' => $orderStatusDistribution,
             'recentActivities' => $recentActivities,
+            'recentOrders' => $recentOrders,
             'dateRange' => [
                 'start' => $startDate->format('Y-m-d'),
                 'end' => $endDate->format('Y-m-d'),

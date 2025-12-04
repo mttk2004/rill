@@ -9,12 +9,13 @@ import {
 import { Link, router, usePage } from '@inertiajs/react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import StatCard from '../../components/admin/StatCard';
-import { formatCurrency, formatDate } from '../../utils/format';
+import { formatCurrency } from '../../utils/format';
+import { formatDate } from '../../utils/date';
 import { getImageUrl } from '../../utils/image';
 
 const CHART_COLORS = ['#1B4D3E', '#d4af37', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
-interface DashboardProps {
+interface DashboardProps extends Record<string, unknown> {
   dashboardStats: {
     revenue: number;
     newOrders: number;
@@ -74,12 +75,6 @@ interface DashboardProps {
 
 const Dashboard = () => {
   const { props } = usePage<DashboardProps>();
-
-  console.log('Dashboard props:', {
-    keys: Object.keys(props),
-    has_trendingArtists: 'trendingArtists' in props,
-    trendingArtists_value: props.trendingArtists
-  });
 
   const {
     dashboardStats,
@@ -493,10 +488,10 @@ const Dashboard = () => {
                   return (
                     <tr
                       key={order.id}
-                      className="hover:bg-white/60 transition-colors cursor-pointer"
+                      className="hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent transition-all duration-200 cursor-pointer group hover:shadow-sm"
                       onClick={() => router.visit(`/admin/orders/${order.id}`)}
                     >
-                      <td className="px-6 py-4 font-bold text-gray-900">{order.order_number}</td>
+                      <td className="px-6 py-4 font-bold text-gray-900 group-hover:text-primary transition-colors">{order.order_number}</td>
                       <td className="px-6 py-4 text-gray-600">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-500">
