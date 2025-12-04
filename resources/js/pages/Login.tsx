@@ -7,20 +7,22 @@ import { ShieldCheck, User } from 'lucide-react';
 
 interface LoginProps {
   canResetPassword?: boolean;
-  status?: string | null;
+  status?: unknown; // Allow any type to prevent type errors
 }
 
-export default function Login({ canResetPassword, status }: LoginProps) {
+export default function Login(allProps: Record<string, unknown>) {
   const { showToast } = useToast();
 
-  // Debug logging
-  console.log('Login props:', { canResetPassword, status, statusType: typeof status });
-  console.log('Status value:', JSON.stringify(status, null, 2));
+  // Extract only the props we need, ignore all Inertia shared data
+  const { canResetPassword, status } = allProps as LoginProps;
 
-  // Convert status to string if it's an object
-  const statusMessage = typeof status === 'string' ? status : null;
+  // Debug
+  console.log('Login - canResetPassword:', canResetPassword);
+  console.log('Login - status:', status);
 
-  const { data, setData, post, processing } = useForm<{
+  // Safely extract props
+  const canReset = canResetPassword === true;
+  const statusMessage = (status && typeof status === 'string') ? status : null; const { data, setData, post, processing } = useForm<{
     email: string;
     password: string;
     remember: boolean;
@@ -153,7 +155,7 @@ export default function Login({ canResetPassword, status }: LoginProps) {
                 </label>
               </div>
 
-              {canResetPassword && (
+              {canReset && (
                 <div className="text-sm">
                   <Link href="/password/reset" className="font-medium text-gray-600 hover:text-primary">
                     Quên mật khẩu?
