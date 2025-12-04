@@ -18,9 +18,19 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): Response
     {
+        $status = $request->session()->get('status');
+
+        // Debug logging
+        \Log::info('Login page props:', [
+            'canResetPassword' => Route::has('password.request'),
+            'status' => $status,
+            'status_type' => gettype($status),
+            'status_dump' => print_r($status, true),
+        ]);
+
         return Inertia::render('Login', [
             'canResetPassword' => Route::has('password.request'),
-            'status' => $request->session()->get('status'),
+            'status' => $status,
         ]);
     }
 
