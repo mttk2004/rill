@@ -40,13 +40,7 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        $parentShared = parent::share($request);
-
-        // Remove errors from parent share to prevent ViewErrorBag serialization issue
-        unset($parentShared['errors']);
-
-        return array_merge($parentShared, [
-            'errors' => (object) [], // Always provide empty object, form errors handled by Inertia separately
+        return array_merge(parent::share($request), [
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
