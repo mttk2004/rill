@@ -65,7 +65,8 @@ Route::middleware(['auth', 'verified', 'customer'])->group(function () {
     Route::get('/orders/{order}/invoice', [OrderController::class, 'downloadInvoice'])->name('orders.invoice');
 
     // Thank you page cho COD (có {order})
-    Route::get('/orders/{order}/thank-you', [OrderController::class, 'thankYou'])->name('orders.thank-you');
+    // Use orderId string parameter instead of model binding to avoid soft delete scope issues
+    Route::get('/orders/{orderId}/thank-you', [OrderController::class, 'thankYou'])->name('orders.thank-you');
 
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/retry-payment', [OrderController::class, 'retryPayment'])->name('orders.retry-payment');

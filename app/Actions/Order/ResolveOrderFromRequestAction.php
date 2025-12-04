@@ -51,6 +51,7 @@ class ResolveOrderFromRequestAction
             return ServiceResult::error('Không tìm thấy đơn hàng');
         }
 
-        return ServiceResult::success(['order' => $order]);
+        // Return order directly, not wrapped in array
+        return ServiceResult::success($order);
     }
 }

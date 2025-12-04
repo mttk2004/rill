@@ -4,12 +4,19 @@ import AppLayout from '@/layouts/app-layout';
 import Button from '../../components/Button';
 import { CheckCircle, Package, ArrowRight } from 'lucide-react';
 
+interface Payment {
+  id: number;
+  payment_method: 'cod' | 'vnpay';
+  payment_status: string;
+  amount: number;
+}
+
 interface Order {
   id: number;
   order_number: string;
   total_amount: number;
-  payment_method: string;
   created_at: string;
+  payment: Payment;
 }
 
 interface VnpayResponse {
@@ -92,7 +99,7 @@ export default function ThankYou({ order, vnpayResponse }: ThankYouProps) {
               <div className="flex justify-between">
                 <span className="text-gray-600">Phương thức thanh toán</span>
                 <span className="font-medium text-gray-900">
-                  {order.payment_method === 'cod' ? 'Thanh toán khi nhận hàng' : 'VNPAY'}
+                  {order.payment.payment_method === 'cod' ? 'Thanh toán khi nhận hàng' : 'VNPAY'}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -103,7 +110,7 @@ export default function ThankYou({ order, vnpayResponse }: ThankYouProps) {
               </div>
             </div>
 
-            {order.payment_method === 'cod' && !isVnpayFailed && (
+            {order.payment.payment_method === 'cod' && !isVnpayFailed && (
               <div className="mt-6 rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
                 <p className="font-medium">💳 Thanh toán khi nhận hàng</p>
                 <p className="mt-1 text-blue-700">

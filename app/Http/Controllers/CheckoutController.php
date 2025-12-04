@@ -65,7 +65,20 @@ class CheckoutController extends Controller
                 return back()->withErrors(['order' => $result->message])->with('error', $result->message);
             }
 
-            $order = $result->data['order'];
+            // Get order from result data (CreateOrderAction returns order directly)
+            $order = $result->data;
+
+            if (!$order) {
+                \Log::error('Checkout: Order is null after creation', ['result' => $result->toArray()]);
+                return back()->withErrors(['order' => 'Failed to create order'])->with('error', 'Không thể tạo đơn hàng. Vui lòng thử lại.');
+            }
+
+            \Log::info('Checkout: Order object details', [
+                'order_id' => $order->id,
+                'order_class' => get_class($order),
+                'order_exists' => \App\Models\Order::find($order->id) !== null,
+                'order_number' => $order->order_number,
+            ]);
 
             // Clear cart after successful order creation
             ShoppingCartItem::where('user_id', $user->id)->delete();
@@ -96,9 +109,9 @@ class CheckoutController extends Controller
             \Log::info('Checkout: Order created successfully. Redirecting to thank-you.', [
                 'order_id' => $order->id,
                 'user_id' => $user->id,
-                'url' => route('orders.thank-you', $order)
+                'url' => route('orders.thank-you', ['orderId' => $order->id])
             ]);
-            return redirect()->route('orders.thank-you', $order)->with('success', 'Order placed successfully!');
+            return redirect()->route('orders.thank-you', ['orderId' => $order->id])->with('success', 'Order placed successfully!');
         } catch (\Exception $e) {
             \Log::error('Checkout: Failed to create order.', ['error' => $e->getMessage()]);
             // Handle stock errors specifically

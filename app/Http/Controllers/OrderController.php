@@ -66,13 +66,16 @@ class OrderController extends Controller
     /**
      * Display the thank you page for a specific order.
      */
-    public function thankYou(Request $request, ?Order $routeOrder = null)
+    public function thankYou(Request $request, ?string $orderId = null)
     {
         \Log::info('OrderController: thankYou method hit.', [
             'url' => $request->fullUrl(),
-            'route_order_id' => $routeOrder?->id,
+            'order_id_param' => $orderId,
             'user_id' => Auth::id()
         ]);
+
+        // Manually load order from ID parameter (avoid route model binding issues with soft deletes)
+        $routeOrder = $orderId ? Order::find($orderId) : null;
 
         // Resolve order from route parameter or VNPAY return URL
         $orderResult = $this->thankYouPageService->resolveOrder($request, $routeOrder, Auth::id());
@@ -96,10 +99,14 @@ class OrderController extends Controller
 
         // Get VNPAY response data if available
         $vnpayResponseResult = $this->thankYouPageService->getVnpayResponse($request);
-        $vnpayResponse = $vnpayResponseResult->success ? $vnpayResponseResult->data : null;
+        $vnpayData = $vnpayResponseResult->success ? $vnpayResponseResult->data : null;
 
-        // Auto-trigger IPN in local environment if payment is pending
-        if ($vnpayResponse && $vnpayResponse['has_vnpay_response']) {
+        // Extract only the response part (null if no VNPAY params)
+        $vnpayResponse = null;
+        if ($vnpayData && $vnpayData['has_vnpay_response']) {
+            $vnpayResponse = $vnpayData['response'];
+
+            // Auto-trigger IPN in local environment if payment is pending
             $this->thankYouPageService->autoTriggerLocalIpn($request, $order);
 
             // Reload payment after IPN trigger
@@ -108,7 +115,7 @@ class OrderController extends Controller
 
         return Inertia::render('orders/thank-you', [
             'order' => $order,
-            'vnpayResponse' => $vnpayResponse,
+            'vnpayResponse' => $vnpayResponse, // null for COD, response object for VNPAY
         ]);
     }
 

@@ -35,6 +35,32 @@ class ShippingAddress extends Model
         'district_id' => 'integer',
     ];
 
+    protected $appends = ['name', 'address', 'city'];
+
+    /**
+     * Get name attribute (alias for full_name).
+     */
+    public function getNameAttribute(): ?string
+    {
+        return $this->full_name;
+    }
+
+    /**
+     * Get address attribute (alias for address_line_1).
+     */
+    public function getAddressAttribute(): ?string
+    {
+        return $this->address_line_1;
+    }
+
+    /**
+     * Get city attribute (alias for province).
+     */
+    public function getCityAttribute(): ?string
+    {
+        return $this->province;
+    }
+
     /**
      * Get the user that owns the shipping address.
      */
