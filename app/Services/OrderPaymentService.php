@@ -90,7 +90,8 @@ class OrderPaymentService
 
         return $order->payment
             && $order->payment->payment_method === PaymentMethod::VNPAY
-            && $order->payment->payment_status === PaymentStatus::PENDING
+            && ($order->payment->payment_status === PaymentStatus::PENDING
+                || $order->payment->payment_status === PaymentStatus::FAILED)
             && $order->status === OrderStatus::PENDING;
     }
 
@@ -112,8 +113,9 @@ class OrderPaymentService
             return 'Chỉ có thể thanh toán lại cho đơn hàng VNPAY.';
         }
 
-        if ($order->payment->payment_status !== PaymentStatus::PENDING) {
-            return 'Đơn hàng này đã được thanh toán hoặc đã bị hủy.';
+        if ($order->payment->payment_status !== PaymentStatus::PENDING
+            && $order->payment->payment_status !== PaymentStatus::FAILED) {
+            return 'Đơn hàng này đã được thanh toán.';
         }
 
         if ($order->status !== OrderStatus::PENDING) {
