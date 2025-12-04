@@ -98,16 +98,15 @@ class OrderService
 
             if ($voucherResult->success) {
                 $discountAmount = $voucherResult->data['discount_amount'];
-                // Check if voucher object exists in data, if not try to find it by code
-                if (isset($voucherResult->data['voucher']) && is_object($voucherResult->data['voucher'])) {
-                    $voucherId = $voucherResult->data['voucher']->id;
+                
+                // Simplified voucher lookup to avoid property access errors
+                $voucher = \App\Models\Voucher::where('code', $data['voucher_code'])->first();
+                if ($voucher) {
+                    $voucherId = $voucher->id;
                 } else {
-                    // Fallback: try to find voucher by code
-                    $voucher = \App\Models\Voucher::where('code', $data['voucher_code'])->first();
-                    if ($voucher) {
-                        $voucherId = $voucher->id;
-                    }
+                    \Log::warning('OrderService: Voucher validated but not found in DB', ['code' => $data['voucher_code']]);
                 }
+                
                 \Log::info('OrderService: Voucher processed', ['id' => $voucherId, 'discount' => $discountAmount]);
             }
         }
