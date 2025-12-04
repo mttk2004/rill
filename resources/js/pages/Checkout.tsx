@@ -6,6 +6,7 @@ import Button from '../components/Button';
 import { CheckCircle, CreditCard, MapPin, Ticket } from 'lucide-react';
 import type { UserAddress } from '@/types';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 interface Voucher {
   id: number;
@@ -123,7 +124,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
 
     // Validate address selected
     if (!data.shipping_address_id) {
-      alert('Vui lòng chọn địa chỉ giao hàng');
+      toast.error('Vui lòng chọn địa chỉ giao hàng');
       return;
     }
 
@@ -146,32 +147,45 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
         if (axios.isAxiosError(error) && error.response?.data) {
           const errorData = error.response.data;
           if (errorData.message) {
-            alert(errorData.message);
+            toast.error(errorData.message);
+          } else if (errorData.errors) {
+            // Handle validation errors
+            const firstError = Object.values(errorData.errors)[0];
+            toast.error(Array.isArray(firstError) ? firstError[0] : firstError);
           } else {
-            alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
           }
         } else {
-          alert('Có lỗi xảy ra. Vui lòng thử lại.');
+          toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
         }
       }
       return;
     }
 
     // For COD: Use Inertia post (backend does redirect)
+    // useForm's post() automatically sends data from form state
     post('/orders', {
-      onError: (errors) => {
+      preserveScroll: true,
+      onSuccess: () => {
+        // Backend will redirect to thank-you page
+        toast.success('Đặt hàng thành công!');
+      },
+      onError: (errors: Record<string, string>) => {
         console.error('Checkout error:', errors);
-        const errorObj = errors as Record<string, string>;
-        if (errorObj.stock) {
-          alert(errorObj.stock);
+        if (errors.stock) {
+          toast.error(errors.stock);
+        } else if (errors.order) {
+          toast.error(errors.order);
         } else {
-          alert('Có lỗi xảy ra. Vui lòng thử lại.');
+          const firstError = Object.values(errors)[0];
+          toast.error(Array.isArray(firstError) ? firstError : String(firstError));
         }
       }
     });
   };
 
-  if (cart.length === 0) {
+  // Only show empty cart message if we are NOT processing a checkout
+  if (cart.length === 0 && !processing) {
     return (
       <>
         <Head title="Thanh toán - Rill" />
