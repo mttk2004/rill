@@ -201,7 +201,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   }
 
   // Only show empty cart message if we are NOT processing a checkout and NOT successful
-  if (cart.length === 0 && !processing) {
+  if (cart.length === 0 && !processing && !isSuccess) {
     return (
       <>
         <Head title="Thanh toán - Rill" />
