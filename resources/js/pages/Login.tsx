@@ -5,7 +5,12 @@ import AppLayout from '@/layouts/app-layout';
 import { useToast } from '../context/ToastContext';
 import { ShieldCheck, User } from 'lucide-react';
 
-export default function Login() {
+interface LoginProps {
+  canResetPassword?: boolean;
+  status?: string;
+}
+
+export default function Login({ canResetPassword, status }: LoginProps) {
   const { showToast } = useToast();
 
   const { data, setData, post, processing } = useForm<{
@@ -63,6 +68,13 @@ export default function Login() {
               Đăng nhập vào tài khoản của bạn để tiếp tục
             </p>
           </div>
+
+          {/* Status Message */}
+          {status && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+              {status}
+            </div>
+          )}
 
           {/* Quick Login Buttons (Dev Only) */}
           <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-6">
@@ -134,11 +146,13 @@ export default function Login() {
                 </label>
               </div>
 
-              <div className="text-sm">
-                <a href="#" className="font-medium text-gray-600 hover:text-primary">
-                  Quên mật khẩu?
-                </a>
-              </div>
+              {canResetPassword && (
+                <div className="text-sm">
+                  <Link href="/password/reset" className="font-medium text-gray-600 hover:text-primary">
+                    Quên mật khẩu?
+                  </Link>
+                </div>
+              )}
             </div>
 
             <div>
