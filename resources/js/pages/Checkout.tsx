@@ -44,6 +44,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const [isVoucherFocused, setIsVoucherFocused] = useState(false);
   const [shippingCost, setShippingCost] = useState(0);
   const [loadingShipping, setLoadingShipping] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const finalTotal = cartTotal + shippingCost - discountAmount;
 
@@ -168,6 +169,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
       preserveScroll: true,
       onSuccess: () => {
         // Backend will redirect to thank-you page
+        setIsSuccess(true);
         toast.success('Đặt hàng thành công!');
       },
       onError: (errors: Record<string, string>) => {
@@ -184,7 +186,21 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
     });
   };
 
-  // Only show empty cart message if we are NOT processing a checkout
+  // Show loading state if order is successful (redirecting)
+  if (isSuccess) {
+    return (
+      <>
+        <Head title="Đang xử lý - Rill" />
+        <div className="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent mb-4"></div>
+          <h2 className="text-xl font-bold text-gray-900">Đang chuyển hướng...</h2>
+          <p className="text-gray-600">Vui lòng chờ trong giây lát.</p>
+        </div>
+      </>
+    );
+  }
+
+  // Only show empty cart message if we are NOT processing a checkout and NOT successful
   if (cart.length === 0 && !processing) {
     return (
       <>
