@@ -82,10 +82,14 @@ class OrderService
 
         $shippingFee = $shippingFeeResult->data['fee'];
 
+        \Log::info('OrderService: Shipping fee calculated', ['fee' => $shippingFee]);
+
         // Process voucher if provided
         $discountAmount = 0;
         $voucherId = null;
         if (!empty($data['voucher_code'])) {
+            \Log::info('OrderService: Processing voucher', ['code' => $data['voucher_code']]);
+            
             $voucherResult = $this->voucherService->validateVoucher(
                 $data['voucher_code'],
                 (float) $subtotal,
@@ -104,6 +108,7 @@ class OrderService
                         $voucherId = $voucher->id;
                     }
                 }
+                \Log::info('OrderService: Voucher processed', ['id' => $voucherId, 'discount' => $discountAmount]);
             }
         }
 
