@@ -7,11 +7,14 @@ import { ShieldCheck, User } from 'lucide-react';
 
 interface LoginProps {
   canResetPassword?: boolean;
-  status?: string;
+  status?: string | null;
 }
 
 export default function Login({ canResetPassword, status }: LoginProps) {
   const { showToast } = useToast();
+
+  // Convert status to string if it's an object
+  const statusMessage = typeof status === 'string' ? status : null;
 
   const { data, setData, post, processing } = useForm<{
     email: string;
@@ -70,9 +73,9 @@ export default function Login({ canResetPassword, status }: LoginProps) {
           </div>
 
           {/* Status Message */}
-          {status && (
+          {statusMessage && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
-              {status}
+              {statusMessage}
             </div>
           )}
 
