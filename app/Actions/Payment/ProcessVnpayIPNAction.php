@@ -65,12 +65,18 @@ class ProcessVnpayIPNAction extends BaseAction
             }
 
             // Check if payment already processed
-            if ($payment->payment_status !== PaymentStatus::PENDING->value) {
+            if ($payment->payment_status !== PaymentStatus::PENDING) {
                 return $this->success([
                     'payment_id' => $payment->id,
-                    'status' => $payment->payment_status,
+                    'order_id' => $payment->order_id,
+                    'status' => $payment->payment_status->value,
                 ], 'Payment already processed');
             }
+
+            \Log::info('Payment found and is pending, processing update', [
+                'payment_id' => $payment->id,
+                'order_id' => $payment->order_id,
+            ]);
 
             // Update payment status
             $newStatus = $data->isSuccessful()
