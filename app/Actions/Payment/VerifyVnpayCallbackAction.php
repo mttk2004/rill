@@ -36,16 +36,9 @@ class VerifyVnpayCallbackAction extends BaseAction
                 ]);
             }
 
-            // Verify response code
-            if (!$data->isSuccessful()) {
-                return $this->error(
-                    $this->getResponseMessage($data->responseCode),
-                    [
-                        'code' => 'PAYMENT_FAILED',
-                        'response_code' => $data->responseCode,
-                    ]
-                );
-            }
+            // Note: We don't reject failed payments here
+            // ProcessVnpayIPNAction will handle both success and failed cases
+            // This allows us to update payment status to 'failed' when needed
 
             return $this->success([
                 'order_id' => $data->getOrderId(),
@@ -53,7 +46,10 @@ class VerifyVnpayCallbackAction extends BaseAction
                 'transaction_no' => $data->transactionNo,
                 'bank_code' => $data->bankCode,
                 'pay_date' => $data->payDate,
-            ], 'Payment verified successfully');
+                'is_successful' => $data->isSuccessful(),
+                'response_code' => $data->responseCode,
+                'response_message' => $this->getResponseMessage($data->responseCode),
+            ], 'Callback verified successfully');
 
         } catch (\Exception $e) {
             return $this->error('Failed to verify payment: ' . $e->getMessage());
