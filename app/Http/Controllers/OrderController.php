@@ -68,6 +68,12 @@ class OrderController extends Controller
      */
     public function thankYou(Request $request, ?Order $routeOrder = null)
     {
+        \Log::info('OrderController: thankYou method hit.', [
+            'url' => $request->fullUrl(),
+            'route_order_id' => $routeOrder?->id,
+            'user_id' => Auth::id()
+        ]);
+
         // Resolve order from route parameter or VNPAY return URL
         $orderResult = $this->thankYouPageService->resolveOrder($request, $routeOrder, Auth::id());
 

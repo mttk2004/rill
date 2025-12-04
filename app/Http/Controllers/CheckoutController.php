@@ -67,6 +67,9 @@ class CheckoutController extends Controller
 
             $order = $result->data['order'];
 
+            // Clear cart after successful order creation
+            ShoppingCartItem::where('user_id', $user->id)->delete();
+
             // Kiểm tra payment method
             $paymentMethod = $request->input('payment_method', PaymentMethod::COD->value);
 
@@ -90,8 +93,14 @@ class CheckoutController extends Controller
             }
 
             // COD: Redirect đến trang thank you như cũ
+            \Log::info('Checkout: Order created successfully. Redirecting to thank-you.', [
+                'order_id' => $order->id,
+                'user_id' => $user->id,
+                'url' => route('orders.thank-you', $order)
+            ]);
             return redirect()->route('orders.thank-you', $order)->with('success', 'Order placed successfully!');
         } catch (\Exception $e) {
+            \Log::error('Checkout: Failed to create order.', ['error' => $e->getMessage()]);
             // Handle stock errors specifically
             if (str_contains($e->getMessage(), 'không đủ số lượng') ||
                 str_contains($e->getMessage(), 'Không thể tạo đơn hàng')) {
