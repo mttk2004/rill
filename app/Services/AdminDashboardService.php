@@ -154,12 +154,21 @@ class AdminDashboardService
         $salesBuilder = new SalesReportQueryBuilder();
 
         return $salesBuilder->getTopProducts($limit)
-            ->map(fn($item) => (array) $item)
+            ->map(function ($item) {
+                $item = (array) $item;
+                return [
+                    'id' => $item['id'],
+                    'name' => $item['name'],
+                    'sku' => $item['sku'],
+                    'image' => $item['image'] ?? null,
+                    'sales' => (int) $item['total_sold'],
+                    'revenue' => (float) $item['total_revenue'],
+                    'avg_price' => (float) $item['avg_price'],
+                ];
+            })
             ->values()
             ->toArray();
-    }
-
-    /**
+    }    /**
      * Get top customers by total spend.
      *
      * @param int $limit

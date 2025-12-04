@@ -104,6 +104,7 @@ class SalesReportQueryBuilder
                 'products.id',
                 'products.name',
                 'products.sku',
+                'products.image',
                 DB::raw('SUM(order_items.quantity) as total_sold'),
                 DB::raw('SUM(order_items.total_price) as total_revenue'),
                 DB::raw('AVG(order_items.unit_price) as avg_price'),
@@ -118,7 +119,7 @@ class SalesReportQueryBuilder
             $query->where('orders.created_at', '<=', $to);
         }
 
-        return $query->groupBy('products.id', 'products.name', 'products.sku')
+        return $query->groupBy('products.id', 'products.name', 'products.sku', 'products.image')
             ->orderByDesc('total_sold')
             ->limit($limit)
             ->get();
