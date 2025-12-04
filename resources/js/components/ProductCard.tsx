@@ -21,12 +21,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
   const isCurrentTrack = currentTrack?.id === product.id;
   const isThisPlaying = isCurrentTrack && isPlaying;
 
+  const isOutOfStock = product.stock_quantity <= 0 || product.in_stock === false;
+
   const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation(); // Prevent navigating to product detail
 
-    // Prevent double clicks
-    if (btnState !== 'idle') return;
+    // Prevent if out of stock or not idle
+    if (btnState !== 'idle' || isOutOfStock) return;
 
     // 1. Capture Rect IMMEDIATELY (before async/await)
     const btnRect = e.currentTarget.getBoundingClientRect();
@@ -78,12 +80,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
           <img
             src={product.image_url || product.image}
             alt={product.name}
-            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            className={`h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105 ${isOutOfStock ? 'opacity-60' : ''}`}
             loading="lazy"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
             <span className="text-sm">Chưa có ảnh</span>
+          </div>
+        )}
+
+        {/* Out of Stock Badge */}
+        {isOutOfStock && (
+          <div className="absolute top-3 left-3 lg:top-4 lg:left-4 z-10 bg-gray-900/80 text-white px-3 py-1 rounded-full text-xs font-medium">
+            Hết hàng
           </div>
         )}
 
@@ -110,12 +119,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, artist }) => {
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          disabled={btnState !== 'idle'}
+          disabled={btnState !== 'idle' || isOutOfStock}
           className={`absolute bottom-3 right-3 lg:bottom-4 lg:right-4 z-20 rounded-full p-2.5 lg:p-3 shadow-lg transition-all duration-300 flex items-center justify-center
-            ${btnState === 'success' ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-white text-gray-900 hover:bg-primary hover:text-white'}
-            ${btnState !== 'idle' ? 'translate-y-0 opacity-100' : 'translate-y-0 lg:translate-y-full group-hover:translate-y-0'}
+            ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
+              btnState === 'success' ? 'bg-green-500 text-white hover:bg-green-600' :
+                'bg-white text-gray-900 hover:bg-primary hover:text-white'}
+            ${btnState !== 'idle' || isOutOfStock ? 'translate-y-0 opacity-100' : 'translate-y-0 lg:translate-y-full group-hover:translate-y-0'}
           `}
-          aria-label="Thêm vào giỏ"
+          aria-label={isOutOfStock ? "Hết hàng" : "Thêm vào giỏ"}
+          title={isOutOfStock ? "Sản phẩm hiện đang hết hàng" : "Thêm vào giỏ hàng"}
         >
           {btnState === 'loading' ? (
             <Loader2 size={20} className="animate-spin" />
