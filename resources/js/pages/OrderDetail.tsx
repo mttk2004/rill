@@ -230,8 +230,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
       ? order.payment.payment_method === 'vnpay'
       : Object.values(order.payment.payment_method)[0] === 'vnpay') &&
     (typeof order.payment.payment_status === 'string'
-      ? order.payment.payment_status === 'pending'
-      : Object.values(order.payment.payment_status)[0] === 'pending') &&
+      ? (order.payment.payment_status === 'pending' || order.payment.payment_status === 'failed')
+      : (Object.values(order.payment.payment_status)[0] === 'pending' || Object.values(order.payment.payment_status)[0] === 'failed')) &&
     (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'pending';
 
   const canCancelOrder = (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'pending';
@@ -513,8 +513,17 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   {order.payment ? (
                     <>
                       <p className="mb-2">Phương thức: <span className="font-medium text-gray-900">{typeof order.payment.payment_method === 'string' ? order.payment.payment_method : Object.values(order.payment.payment_method)[0].toUpperCase()}</span></p>
-                      <p className={`text-xs font-bold inline-block px-2.5 py-1 rounded border ${(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
-                        {(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'pending' ? 'CHƯA THANH TOÁN' : 'ĐÃ THANH TOÁN'}
+                      <p className={`text-xs font-bold inline-block px-2.5 py-1 rounded border ${(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'completed'
+                          ? 'bg-green-50 text-green-700 border-green-100'
+                          : (typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'failed'
+                            ? 'bg-red-50 text-red-700 border-red-100'
+                            : 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                        }`}>
+                        {(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'completed'
+                          ? 'ĐÃ THANH TOÁN'
+                          : (typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'failed'
+                            ? 'THANH TOÁN THẤT BẠI'
+                            : 'CHƯA THANH TOÁN'}
                       </p>
                     </>
                   ) : (

@@ -5,7 +5,7 @@ require __DIR__ . '/vendor/autoload.php';
 $app = require_once __DIR__ . '/bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
-$orderId = '814335568196599808';
+$orderId = '814340351128719360'; // Failed payment test
 
 echo "Checking Order ID: $orderId\n\n";
 
