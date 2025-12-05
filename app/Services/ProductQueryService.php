@@ -163,7 +163,7 @@ class ProductQueryService
     {
         return [
             'total' => Product::count(),
-            'active' => Product::where('is_active', true)->count(),
+            'active' => Product::where('status', 'active')->count(),
             'out_of_stock' => Product::where('stock_quantity', 0)->count(),
             'low_stock' => Product::where('stock_quantity', '>', 0)->where('stock_quantity', '<', 10)->count(),
         ];
