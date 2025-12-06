@@ -217,7 +217,7 @@ class OrderSeeder extends Seeder
         OrderStatusHistory::create([
             'order_id' => $order->id,
             'status' => 'pending',
-            'notes' => 'Đơn hàng mới được tạo, chờ xác nhận',
+            'notes' => 'Đơn hàng đã được tạo, chờ xác nhận',
             'created_by' => null, // Khách hàng tạo
             'created_at' => $currentTime,
         ]);

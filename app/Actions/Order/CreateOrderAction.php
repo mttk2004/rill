@@ -112,12 +112,7 @@ class CreateOrderAction extends BaseAction
                 'amount' => $data->totalAmount,
             ]);
 
-            // Create initial status history
-            $order->statusHistories()->create([
-                'status' => OrderStatus::PENDING->value,
-                'notes' => OrderStatusNote::PENDING->value,
-                'created_by' => $data->userId,
-            ]);
+            // Note: Initial status history is automatically created by Order model's boot() method
 
             // Apply voucher if provided
             if ($data->voucherId) {

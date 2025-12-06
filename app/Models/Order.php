@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\OrderStatusNote;
 use App\Enums\PaymentStatus;
 use App\Models\Concerns\HasSnowflakeId;
 use App\Services\OrderService;
@@ -89,8 +90,7 @@ class Order extends Model
 
         // Create initial status history when order is created
         static::created(function ($order) {
-            $statusService = app(OrderService::class);
-            $notes = $order->status_change_notes ?? 'Đơn hàng mới được tạo, chờ xác nhận';
+            $notes = $order->status_change_notes ?? OrderStatusNote::forStatus($order->status);
 
             OrderStatusHistory::create([
                 'order_id' => $order->id,
