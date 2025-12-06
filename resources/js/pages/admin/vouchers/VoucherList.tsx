@@ -261,9 +261,13 @@ const VoucherList = ({ vouchers, filters }: VoucherListProps) => {
                     <Edit2 size={18} />
                   </button>
                   <button
-                    onClick={() => setDeleteId(voucher.id)}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-gray-200"
-                    title="Xóa"
+                    onClick={() => voucher.used_count === 0 && setDeleteId(voucher.id)}
+                    disabled={voucher.used_count > 0}
+                    className={`p-2 rounded-lg transition-colors border border-transparent ${voucher.used_count > 0
+                        ? 'text-gray-300 cursor-not-allowed bg-gray-100'
+                        : 'text-gray-600 hover:text-red-600 hover:bg-white hover:border-gray-200'
+                      }`}
+                    title={voucher.used_count > 0 ? 'Không thể xóa voucher đã được sử dụng' : 'Xóa'}
                   >
                     <Trash2 size={18} />
                   </button>
