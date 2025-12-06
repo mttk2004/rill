@@ -114,6 +114,7 @@ class GetProductDetailDataAction
                 'image' => $product->image,
                 'image_url' => $product->image_url,
                 'status' => $product->status,
+                'deleted_at' => $product->deleted_at?->toISOString(),
                 'artists' => $product->artists->map(function ($artist) {
                     return [
                         'id' => $artist->id,

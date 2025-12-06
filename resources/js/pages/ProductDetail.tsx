@@ -40,6 +40,7 @@ function ProductDetailContent({
     id: product.id,
     name: product.name,
     total_sold: product.total_sold,
+    deleted_at: product.deleted_at,
     product_keys: Object.keys(product)
   });
 
@@ -79,6 +80,13 @@ function ProductDetailContent({
 
   const isCurrentTrack = currentTrack?.id === product.id;
   const isThisPlaying = isCurrentTrack && isPlaying;
+  const isDeleted = !!product.deleted_at;
+
+  console.log('ProductDetail - isDeleted check:', {
+    deleted_at: product.deleted_at,
+    isDeleted: isDeleted,
+    type_of_deleted_at: typeof product.deleted_at
+  });
 
   const handlePlayClick = () => {
     if (isDeleted) {
@@ -146,8 +154,6 @@ function ProductDetailContent({
   };
 
   const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price));
-
-  const isDeleted = !!product.deleted_at;
 
   return (
     <>
@@ -369,7 +375,7 @@ function ProductDetailContent({
             reviews={reviews}
             averageRating={averageRating}
             currentUserId={auth?.user?.id}
-            userCanReview={product.user_can_review}
+            userCanReview={product.user_can_review && !isDeleted}
             onEditReview={(review) => {
               setEditingReview(review);
               const existingImgs = review.images || [];
