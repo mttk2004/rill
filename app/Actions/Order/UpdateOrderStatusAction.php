@@ -51,15 +51,12 @@ class UpdateOrderStatusAction extends BaseAction
             // Update order status
             $this->orderRepository->updateStatus($order->id, $newStatus->value);
 
-            // Create status history if notes provided
-            if ($notes) {
-                $order->statusHistories()->create([
-                    'old_status' => $oldStatus->value,
-                    'new_status' => $newStatus->value,
-                    'notes' => $notes,
-                    'changed_by' => auth()->id(),
-                ]);
-            }
+            // Always create status history record
+            $order->statusHistories()->create([
+                'status' => $newStatus->value,
+                'notes' => $notes,
+                'created_by' => auth()->id(),
+            ]);
 
             // Send notification email
             if ($order->user && $order->user->email) {
