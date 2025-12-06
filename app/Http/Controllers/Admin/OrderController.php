@@ -138,13 +138,21 @@ class OrderController extends Controller
      */
     public function updateStatus(UpdateOrderStatusRequest $request, string $id)
     {
-        $order = Order::findOrFail($id);
+        $order = Order::with('payment')->findOrFail($id);
         $newStatus = OrderStatus::from($request->validated()['status']);
 
         // Business rules validation
         $validationError = $this->orderLifecycleService->validateStatusUpdate($order->status, $newStatus);
         if ($validationError) {
             return back()->withErrors(['status' => $validationError]);
+        }
+
+        // Additional validation: VNPAY orders must be paid before confirmation
+        if ($newStatus === OrderStatus::CONFIRMED &&
+            $order->payment &&
+            $order->payment->payment_method->value === 'vnpay' &&
+            $order->payment->payment_status !== PaymentStatus::COMPLETED) {
+            return back()->withErrors(['status' => 'Đơn hàng VNPAY chỉ có thể xác nhận sau khi thanh toán thành công']);
         }
 
         // Use service to update status

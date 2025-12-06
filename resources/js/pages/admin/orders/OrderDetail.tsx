@@ -142,6 +142,19 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
     );
   };
 
+  // Check if order can be confirmed
+  const canConfirmOrder = () => {
+    if (order.status !== 'pending') return false;
+
+    // For VNPAY orders, payment must be completed
+    if (order.payment?.payment_method === 'vnpay') {
+      return order.payment.payment_status === 'completed';
+    }
+
+    // For COD orders, can confirm anytime
+    return true;
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
@@ -342,9 +355,19 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
               <div className="space-y-3">
                 {order.status === 'pending' && (
                   <>
-                    <Button fullWidth onClick={() => handleStatusUpdate('confirmed')} disabled={isUpdating} className="bg-blue-600 hover:bg-blue-700 border-transparent">
+                    <Button
+                      fullWidth
+                      onClick={() => handleStatusUpdate('confirmed')}
+                      disabled={isUpdating || !canConfirmOrder()}
+                      className="bg-blue-600 hover:bg-blue-700 border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       <CheckCircle size={16} className="mr-2" /> {isUpdating ? 'Đang xử lý...' : 'Xác nhận đơn hàng'}
                     </Button>
+                    {order.payment?.payment_method === 'vnpay' && order.payment.payment_status !== 'completed' && (
+                      <p className="text-xs text-red-600 text-center">
+                        Đơn hàng VNPAY chỉ có thể xác nhận sau khi thanh toán thành công
+                      </p>
+                    )}
                     <Button fullWidth variant="outline" onClick={() => handleStatusUpdate('cancelled')} disabled={isUpdating} className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700">
                       <XCircle size={16} className="mr-2" /> Hủy đơn hàng
                     </Button>

@@ -109,7 +109,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
               <div className="flex flex-col md:flex-row justify-between items-end mb-12">
                 <div>
                   <span className="text-accent font-bold tracking-wider text-xs uppercase mb-2 block">Trending Now</span>
-                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900">Đĩa Than Nổi Bật</h2>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900">Đĩa Than Bán Chạy Nhất</h2>
                 </div>
                 <Link href="/products" className="hidden md:flex items-center text-sm font-bold text-primary hover:text-accent transition-colors border-b border-primary hover:border-accent pb-0.5">
                   Xem tất cả <ArrowRight size={16} className="ml-1" />
