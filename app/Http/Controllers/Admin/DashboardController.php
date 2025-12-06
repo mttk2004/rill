@@ -38,7 +38,7 @@ class DashboardController extends Controller
 
         // Get all-time overview for stat cards (not filtered by time range)
         $allTimeOverview = $this->dashboardService->getDashboardOverview();
-        
+
         // Calculate all-time total profit
         $allTimeDailyRevenue = $this->dashboardService->getDailyRevenue();
         $allTimeTotalProfit = collect($allTimeDailyRevenue)->sum('profit');
