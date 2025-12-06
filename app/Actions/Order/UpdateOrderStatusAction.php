@@ -49,18 +49,14 @@ class UpdateOrderStatusAction extends BaseAction
         return $this->transaction(function () use ($order, $newStatus, $notes) {
             $oldStatus = $order->status;
 
-            // Update order status
+            // Set custom notes for the Order model event to use
+            // If no notes provided, the model event will generate automatic notes
+            if ($notes) {
+                $order->status_change_notes = $notes;
+            }
+
+            // Update order status (this will trigger Order model event which creates status history)
             $this->orderRepository->updateStatus($order->id, $newStatus->value);
-
-            // Use automatic note if none provided
-            $finalNotes = $notes ?? OrderStatusNote::forStatus($newStatus);
-
-            // Always create status history record
-            $order->statusHistories()->create([
-                'status' => $newStatus->value,
-                'notes' => $finalNotes,
-                'created_by' => auth()->id(),
-            ]);
 
             // Send notification email
             if ($order->user && $order->user->email) {
