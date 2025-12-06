@@ -78,22 +78,39 @@ class ProductMediaService
      */
     public function syncArtists(Product $product, ?array $artists): void
     {
-        if ($artists === null) {
+        if ($artists === null || empty($artists)) {
             $product->artists()->detach();
             return;
         }
 
-        // Filter out invalid values and sync
-        $validArtistIds = [];
-        foreach ($artists as $artistId) {
-            if (is_numeric($artistId) && $artistId > 0) {
-                $validArtistIds[] = $artistId;
+        // Prepare sync data with pivot fields
+        $syncData = [];
+        foreach ($artists as $artistData) {
+            // Handle both array and object format
+            if (is_array($artistData)) {
+                $artistId = $artistData['artist_id'] ?? null;
+                $role = $artistData['role'] ?? 'main';
+                $sortOrder = $artistData['sort_order'] ?? 0;
+            } else if (is_object($artistData)) {
+                $artistId = $artistData->artist_id ?? null;
+                $role = $artistData->role ?? 'main';
+                $sortOrder = $artistData->sort_order ?? 0;
+            } else {
+                // Simple artist ID format (backward compatibility)
+                $artistId = $artistData;
+                $role = 'main';
+                $sortOrder = 0;
+            }
+
+            if ($artistId) {
+                $syncData[$artistId] = [
+                    'role' => $role,
+                    'sort_order' => $sortOrder,
+                ];
             }
         }
 
-        $validArtistIds = array_unique($validArtistIds);
-
-        $product->artists()->sync($validArtistIds);
+        $product->artists()->sync($syncData);
     }
 
     /**

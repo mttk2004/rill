@@ -11,7 +11,14 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $product = $this->route('product');
+        // Route parameter is 'id', not 'product'
+        $productId = $this->route('id');
+        $product = \App\Models\Product::withTrashed()->find($productId);
+
+        if (!$product) {
+            return false;
+        }
+
         return $this->user()->can('update', $product);
     }
 
@@ -20,7 +27,7 @@ class UpdateProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $productId = $this->route('product');
+        $productId = $this->route('id');
 
         return [
             'name' => 'required|string|max:255',
@@ -37,6 +44,7 @@ class UpdateProductRequest extends FormRequest
             'artists' => 'nullable|array',
             'artists.*.artist_id' => 'required_with:artists|exists:artists,id',
             'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
+            'artists.*.sort_order' => 'nullable|integer|min:0',
         ];
     }
 

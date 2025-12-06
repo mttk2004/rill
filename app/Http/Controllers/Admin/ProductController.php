@@ -71,7 +71,7 @@ class ProductController extends Controller
         $query = $queryBuilder->getQuery();
         $products = $query->with([
             'artists' => function ($q) {
-                $q->wherePivot('role', 'main')->orderByPivot('sort_order');
+                $q->orderByPivot('sort_order');
             },
             'collections' => function ($query) {
                 $query->where('is_active', true)
@@ -188,11 +188,14 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        $product = Product::with([
+        $product = Product::findOrFail($id);
+
+        // Explicitly load artists relationship
+        $product->load([
             'artists' => function ($query) {
                 $query->orderByPivot('sort_order');
             },
-        ])->findOrFail($id);
+        ]);
 
         return Inertia::render('admin/products/ProductForm', array_merge(
             ['product' => $product],
@@ -216,11 +219,17 @@ class ProductController extends Controller
             );
         }
 
+        // Remove artists from update data to handle separately
+        $artistsData = $validated['artists'] ?? null;
+        unset($validated['artists']);
+
         $product->update($validated);
 
-        // Sync artists
-        if (isset($validated['artists'])) {
-            $this->productMediaService->syncArtists($product, $validated['artists']);
+        // Sync artists only if explicitly provided in request
+        // If artists key exists in request (even if empty), sync it
+        // If artists key doesn't exist, keep current relationships
+        if ($request->has('artists')) {
+            $this->productMediaService->syncArtists($product, $artistsData);
         }
 
         return redirect()->route('admin.products')

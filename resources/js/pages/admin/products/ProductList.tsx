@@ -90,19 +90,30 @@ const ProductList = ({ products: productsPagination, filters, genres }: ProductL
     }
   };
 
-  // Updated to handle multiple artists
-  const getMainArtistsName = (product: Product) => {
-    if (product.artists && product.artists.length > 0) {
-      const mainArtists = product.artists
-        .filter((a: Artist & { pivot?: { role?: string } }) => a.pivot?.role === 'main')
-        .map((a: Artist) => a.name);
-
-      if (mainArtists.length > 0) return mainArtists.join(', ');
-      // Fallback to first artist if no main role
-      return (product.artists[0] as Artist).name || '---';
+  // Show all artists with truncation and tooltip
+  const getArtistsDisplay = (product: Product) => {
+    if (!product.artists || product.artists.length === 0) {
+      return { display: '---', tooltip: '' };
     }
 
-    return '---';
+    // Sort by role: main first, then by sort_order
+    const sortedArtists = [...product.artists].sort((a, b) => {
+      const aPivot = (a as Artist & { pivot?: { role?: string; sort_order?: number } }).pivot;
+      const bPivot = (b as Artist & { pivot?: { role?: string; sort_order?: number } }).pivot;
+      const aRole = aPivot?.role || 'featured';
+      const bRole = bPivot?.role || 'featured';
+
+      if (aRole === 'main' && bRole !== 'main') return -1;
+      if (bRole === 'main' && aRole !== 'main') return 1;
+
+      // If same role, sort by sort_order
+      const aOrder = aPivot?.sort_order ?? 999;
+      const bOrder = bPivot?.sort_order ?? 999;
+      return aOrder - bOrder;
+    });
+
+    const fullText = sortedArtists.map((a: Artist) => a.name).join(', ');
+    return { display: fullText, tooltip: fullText };
   };
 
   const getStatusBadge = (status: string = 'active') => {
@@ -253,7 +264,12 @@ const ProductList = ({ products: productsPagination, filters, genres }: ProductL
                       <div className="text-sm font-medium text-gray-900 max-w-[200px] truncate" title={product.name}>
                         {product.name}
                       </div>
-                      <div className="text-xs text-gray-500">{getMainArtistsName(product)}</div>
+                      <div
+                        className="text-xs text-gray-500 max-w-[200px] truncate"
+                        title={getArtistsDisplay(product).tooltip}
+                      >
+                        {getArtistsDisplay(product).display}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
                       {product.sku}

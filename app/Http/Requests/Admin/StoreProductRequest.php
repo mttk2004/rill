@@ -34,6 +34,7 @@ class StoreProductRequest extends FormRequest
             'artists' => 'nullable|array',
             'artists.*.artist_id' => 'required_with:artists|exists:artists,id',
             'artists.*.role' => 'required_with:artists|in:main,featured,composer,producer',
+            'artists.*.sort_order' => 'nullable|integer|min:0',
         ];
     }
 
