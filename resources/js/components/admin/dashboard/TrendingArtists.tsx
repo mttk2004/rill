@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { TrendingUp, Users } from 'lucide-react';
 import { getImageUrl } from '../../../utils/image';
 
@@ -26,25 +26,29 @@ const TrendingArtists: React.FC<TrendingArtistsProps> = ({ artists }) => {
       </div>
       <div className="space-y-5">
         {artists.length > 0 ? artists.map((artist, idx) => (
-          <div key={artist.id || idx} className="flex items-center gap-3">
+          <div
+            key={artist.id || idx}
+            className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50/80 transition-colors cursor-pointer group"
+            onClick={() => router.visit(`/admin/artists/${artist.id}/edit`)}
+          >
             <div className="relative">
-              <div className="h-12 w-12 rounded-full bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200">
+              <div className="h-12 w-12 rounded-full bg-gray-100 flex-shrink-0 overflow-hidden border border-gray-200 group-hover:border-primary/30 transition-colors">
                 {artist.image ? (
                   <img src={getImageUrl(artist.image) || ''} alt={artist.name} className="h-full w-full object-cover" />
                 ) : (
                   <Users size={20} className="m-auto mt-3 text-gray-400" />
                 )}
               </div>
-              <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-gray-100 text-[10px] font-bold w-5 h-5 flex items-center justify-center text-primary">
+              <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm border border-gray-100 text-[10px] font-bold w-5 h-5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                 #{idx + 1}
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-gray-900 truncate">{artist.name}</p>
+              <p className="text-sm font-bold text-gray-900 truncate group-hover:text-primary transition-colors">{artist.name}</p>
               <p className="text-xs text-gray-500 truncate">{artist.country}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-bold text-gray-900">{artist.sales}</p>
+              <p className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors">{artist.sales}</p>
               <span className="text-[10px] font-medium text-gray-400 uppercase">bản</span>
             </div>
           </div>
