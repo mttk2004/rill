@@ -51,6 +51,7 @@ class Product extends Model
     protected $appends = [
         'image_url',
         'total_sold',
+        'profit',
     ];
 
     /**
@@ -271,6 +272,20 @@ class Product extends Model
      * Get total quantity sold (only from confirmed orders).
      * Uses relationship aggregate if loaded, otherwise runs query.
      */
+    /**
+     * Get the profit for the product.
+     * Profit = (selling_price - cost_price) * total_sold
+     */
+    public function getProfitAttribute(): float
+    {
+        if (!$this->cost_price) {
+            return 0;
+        }
+
+        $margin = $this->price - $this->cost_price;
+        return $margin * $this->total_sold;
+    }
+
     public function getTotalSoldAttribute(): int
     {
         // Check if already loaded via withSum

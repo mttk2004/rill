@@ -172,6 +172,7 @@ export interface Product {
   reviews_count?: number;
   average_rating?: number;
   total_sold?: number;
+  profit?: number;
   collection?: {
     id: number;
     name: string;
