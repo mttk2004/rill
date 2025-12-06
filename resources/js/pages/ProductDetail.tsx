@@ -81,11 +81,15 @@ function ProductDetailContent({
   const isThisPlaying = isCurrentTrack && isPlaying;
 
   const handlePlayClick = () => {
+    if (isDeleted) {
+      showToast('Sản phẩm này đã ngừng kinh doanh', 'error');
+      return;
+    }
     playTrack(product);
   };
 
   const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (btnState !== 'idle') return;
+    if (btnState !== 'idle' || isDeleted) return;
 
     // 1. Capture Rect IMMEDIATELY before state change
     const btnRect = e.currentTarget.getBoundingClientRect();
@@ -226,7 +230,14 @@ function ProductDetailContent({
                   </div>
                 )}
               </div>
-              <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">{product.name}</h1>
+              <div className="flex items-center gap-3 mb-4">
+                <h1 className="text-4xl font-serif font-bold text-gray-900">{product.name}</h1>
+                {isDeleted && (
+                  <span className="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full border border-red-300 flex-shrink-0">
+                    Ngừng kinh doanh
+                  </span>
+                )}
+              </div>
 
               {/* Rating Summary */}
               <div className="flex items-center gap-2 mb-6">
@@ -319,7 +330,8 @@ function ProductDetailContent({
                   <Button
                     variant="outline"
                     onClick={handlePlayClick}
-                    className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 h-[48px] ${isThisPlaying ? 'border-accent text-accent bg-accent/5' : ''}`}
+                    disabled={isDeleted}
+                    className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 h-[48px] ${isThisPlaying ? 'border-accent text-accent bg-accent/5' : ''} ${isDeleted ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {isThisPlaying ? (
                       <>
