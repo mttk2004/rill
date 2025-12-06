@@ -57,17 +57,9 @@ class OrderController extends Controller
             },
             'payment',
             'statusHistories' => function($query) {
-                $query->with('createdBy:id,name')->orderBy('created_at', 'asc');
+                $query->with('createdBy')->orderBy('created_at', 'asc');
             }
         ]);
-
-        // Debug log
-        \Log::info('OrderDetail - items data:', $order->items->map(fn($item) => [
-            'product_name' => $item->product_name,
-            'product_deleted' => $item->product_deleted,
-            'product_exists' => $item->product ? true : false,
-            'product_trashed' => $item->product?->trashed(),
-        ])->toArray());
 
         return Inertia::render('OrderDetail', [
             'order' => $order,

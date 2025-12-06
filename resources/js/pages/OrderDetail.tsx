@@ -47,7 +47,7 @@ interface StatusHistory {
   status: string;
   created_at: string;
   notes: string | null;
-  createdBy?: {
+  created_by?: {
     id: string;
     name: string;
     is_admin: boolean;
@@ -306,7 +306,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
     return null;
   };
 
-  const isCancelled = order.status === 'cancelled';
+  const isCancelled = (typeof order.status === 'string' ? order.status : Object.values(order.status)[0]) === 'cancelled';
 
   return (
     <AppLayout>
@@ -335,8 +335,33 @@ export default function OrderDetail({ order }: OrderDetailProps) {
           </div>
 
           {/* Progress Stepper */}
-          {!isCancelled && (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 mb-8 overflow-x-auto shadow-sm">
+          <div className="bg-white rounded-xl border border-gray-200 p-8 mb-8 overflow-x-auto shadow-sm">
+            {isCancelled ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                  <XCircle size={32} className="text-red-600" />
+                </div>
+                <h3 className="text-xl font-bold text-red-700 mb-2">Đơn hàng đã bị hủy</h3>
+                {order.status_histories && (() => {
+                  const cancelHistory = order.status_histories.find(h => h.status === 'cancelled');
+                  if (!cancelHistory) return null;
+
+                  const creatorLabel = cancelHistory.created_by
+                    ? (cancelHistory.created_by.is_admin ? 'Admin' : cancelHistory.created_by.name)
+                    : 'Hệ thống';
+
+                  return (
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600 mb-1">{formatDate(cancelHistory.created_at)}</p>
+                      {cancelHistory.notes && (
+                        <p className="text-sm text-gray-700 mb-1">{cancelHistory.notes}</p>
+                      )}
+                      <p className="text-xs text-gray-500">bởi {creatorLabel}</p>
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : (
               <div className="flex items-start justify-between min-w-[600px]">
                 {steps.map((step, idx) => {
                   const isCompleted = idx <= currentStepIndex;
@@ -381,8 +406,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
                         if (!history) return null;
 
-                        const creatorLabel = history.createdBy
-                          ? (history.createdBy.is_admin ? 'Admin' : history.createdBy.name)
+                        const creatorLabel = history.created_by
+                          ? (history.created_by.is_admin ? 'Admin' : history.created_by.name)
                           : 'Hệ thống';
 
                         return (
@@ -408,8 +433,8 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                   )
                 })}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Order Items */}
