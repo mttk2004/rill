@@ -58,12 +58,17 @@ class Order extends Model
             }
         });
 
-        // Auto-complete payment when order is delivered
+        // Auto-complete payment when COD order is delivered
         static::updated(function ($order) {
             if ($order->isDirty('status') && $order->status === OrderStatus::DELIVERED) {
                 $payment = $order->payment;
-                if ($payment && $payment->payment_status === PaymentStatus::PENDING) {
-                    $payment->update(['payment_status' => PaymentStatus::COMPLETED]);
+                if ($payment
+                    && $payment->payment_method === \App\Enums\PaymentMethod::COD
+                    && $payment->payment_status === PaymentStatus::PENDING) {
+                    $payment->update([
+                        'payment_status' => PaymentStatus::COMPLETED,
+                        'processed_at' => now(),
+                    ]);
                 }
             }
         });
