@@ -238,9 +238,15 @@ class AdminDashboardService
         return $salesBuilder->getRevenueByGenre()
             ->map(function ($item) {
                 $item = (array) $item;
+                $revenue = (float) $item['total_revenue'];
+                $profit = (float) $item['total_profit'];
+                $profitMargin = $revenue > 0 ? ($profit / $revenue) * 100 : 0;
+
                 return [
                     'name' => $item['genre'],
-                    'value' => (float) $item['total_revenue'],
+                    'value' => $revenue,
+                    'profit' => $profit,
+                    'profit_margin' => round($profitMargin, 2),
                 ];
             })
             ->values()

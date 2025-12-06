@@ -51,14 +51,17 @@ class SalesReportQueryBuilder
     public function getDailyRevenue(Carbon $from, Carbon $to)
     {
         return DB::table('orders')
+            ->leftJoin('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
             ->select([
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as order_count'),
-                DB::raw('SUM(total_amount) as revenue'),
-                DB::raw('AVG(total_amount) as avg_order_value'),
+                DB::raw('DATE(orders.created_at) as date'),
+                DB::raw('COUNT(DISTINCT orders.id) as order_count'),
+                DB::raw('SUM(orders.total_amount) as revenue'),
+                DB::raw('AVG(orders.total_amount) as avg_order_value'),
+                DB::raw('SUM((order_items.price - COALESCE(products.cost_price, 0)) * order_items.quantity) as profit'),
             ])
-            ->where('status', '!=', 'cancelled')
-            ->whereBetween('created_at', [$from, $to])
+            ->where('orders.status', '!=', 'cancelled')
+            ->whereBetween('orders.created_at', [$from, $to])
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
@@ -211,6 +214,7 @@ class SalesReportQueryBuilder
                 'products.genre',
                 DB::raw('SUM(order_items.quantity) as total_sold'),
                 DB::raw('SUM(order_items.total_price) as total_revenue'),
+                DB::raw('SUM((order_items.price - COALESCE(products.cost_price, 0)) * order_items.quantity) as total_profit'),
                 DB::raw('COUNT(DISTINCT order_items.order_id) as order_count'),
             ])
             ->where('orders.status', '!=', 'cancelled')

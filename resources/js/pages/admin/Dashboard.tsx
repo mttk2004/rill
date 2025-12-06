@@ -33,6 +33,8 @@ interface DashboardProps extends Record<string, unknown> {
   genreData: Array<{
     name: string;
     value: number;
+    profit: number;
+    profit_margin: number;
   }>;
   trendingArtists: Array<{
     id: string;
@@ -70,6 +72,7 @@ interface DashboardProps extends Record<string, unknown> {
     date: string;
     revenue: number;
     orders: number;
+    profit?: number;
   }>;
 }
 
@@ -88,13 +91,19 @@ const Dashboard = () => {
   } = props;
 
   const [timeRange, setTimeRange] = useState('week');
+  const [genreMetric, setGenreMetric] = useState<'revenue' | 'profit'>('revenue');
 
   // Transform revenue data for chart
   const chartData = revenueData.map(item => {
     const date = new Date(item.date);
+    const profit = item.profit || 0;
+    const revenue = item.revenue || 0;
+    const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
     return {
       name: date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' }),
-      value: item.revenue,
+      value: revenue,
+      profit: profit,
+      profitMargin: profitMargin.toFixed(2),
       fullDate: date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })
     };
   });
@@ -249,8 +258,20 @@ const Dashboard = () => {
                   />
                   <Tooltip
                     contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                    formatter={(value: number) => [formatCurrency(value), 'Doanh thu']}
-                    labelFormatter={(label, payload) => payload?.[0]?.payload?.fullDate || label}
+                    content={({ active, payload }) => {
+                      if (!active || !payload || payload.length === 0) return null;
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white/90 backdrop-blur-xl rounded-xl border border-white/50 shadow-lg p-3">
+                          <div className="font-semibold mb-2">{data.fullDate}</div>
+                          <div className="space-y-1">
+                            <div className="font-semibold text-gray-900">Doanh thu: {formatCurrency(data.value)}</div>
+                            <div className="text-green-600 font-medium">Lợi nhuận: {formatCurrency(data.profit || 0)}</div>
+                            <div className="text-sm text-gray-500">Tỷ suất: {data.profitMargin}%</div>
+                          </div>
+                        </div>
+                      );
+                    }}
                   />
                   <CartesianGrid vertical={false} stroke="#f3f4f6" />
                   <Area type="monotone" dataKey="value" stroke="#1B4D3E" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
@@ -356,10 +377,30 @@ const Dashboard = () => {
 
           {/* Revenue by Genre */}
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-white/50 shadow-sm p-6 flex flex-col">
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                <Music size={20} className="text-blue-500" /> Doanh thu theo thể loại
+                <Music size={20} className="text-blue-500" /> {genreMetric === 'revenue' ? 'Doanh thu' : 'Lợi nhuận'} theo thể loại
               </h3>
+              <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setGenreMetric('revenue')}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${genreMetric === 'revenue'
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                >
+                  Doanh thu
+                </button>
+                <button
+                  onClick={() => setGenreMetric('profit')}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${genreMetric === 'profit'
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                >
+                  Lợi nhuận
+                </button>
+              </div>
             </div>
             <div className="flex-1 min-h-[250px] relative">
               <ResponsiveContainer width="100%" height="100%">
@@ -371,7 +412,7 @@ const Dashboard = () => {
                     innerRadius={50}
                     outerRadius={70}
                     paddingAngle={5}
-                    dataKey="value"
+                    dataKey={genreMetric === 'revenue' ? 'value' : 'profit'}
                   >
                     {genreData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="rgba(255,255,255,0.8)" strokeWidth={2} />
@@ -379,6 +420,10 @@ const Dashboard = () => {
                   </Pie>
                   <Tooltip
                     formatter={(value: number) => formatCurrency(value)}
+                    labelFormatter={(label: string) => {
+                      const entry = genreData.find(g => g.name === label);
+                      return entry ? `${label} (${entry.profit_margin}% lợi nhuận)` : label;
+                    }}
                     contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                   />
                   <Legend
