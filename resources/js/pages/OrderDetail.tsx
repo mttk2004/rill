@@ -47,9 +47,10 @@ interface StatusHistory {
   status: string;
   created_at: string;
   notes: string | null;
-  created_by: {
+  createdBy?: {
     id: string;
     name: string;
+    is_admin: boolean;
   } | null;
 }
 
@@ -92,14 +93,6 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   const [isRetryingPayment, setIsRetryingPayment] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
-
-  // Debug log for order items
-  console.log('OrderDetail - order items:', order.items.map(item => ({
-    name: item.product_name,
-    product_deleted: item.product_deleted,
-    has_product: !!item.product,
-    product_keys: item.product ? Object.keys(item.product) : []
-  })));
 
   const handleDownloadInvoice = () => {
     if (!canDownloadInvoice) {
@@ -313,23 +306,6 @@ export default function OrderDetail({ order }: OrderDetailProps) {
     return null;
   };
 
-  // Helper to get notes from status_histories
-  const getStepNotes = (stepId: string) => {
-    if (!order.status_histories) return null;
-
-    const reverseMap: { [key: string]: string } = {
-      pending: 'pending',
-      processing: 'confirmed',
-      shipping: 'shipped',
-      delivered: 'delivered',
-    };
-
-    const statusToFind = reverseMap[stepId];
-    const history = order.status_histories.find(h => h.status === statusToFind);
-
-    return history?.notes || null;
-  };
-
   const isCancelled = order.status === 'cancelled';
 
   return (
@@ -392,10 +368,32 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                         <span className="mt-1 text-xs font-medium text-gray-500 bg-gray-50 px-2 py-0.5 rounded">{time}</span>
                       )}
 
-                      {/* Notes */}
-                      {isCompleted && getStepNotes(step.id) && (
-                        <p className="mt-2 text-xs text-gray-600 text-center max-w-[120px] line-clamp-2">{getStepNotes(step.id)}</p>
-                      )}
+                      {/* Notes & Creator */}
+                      {isCompleted && (() => {
+                        const reverseMap: { [key: string]: string } = {
+                          pending: 'pending',
+                          processing: 'confirmed',
+                          shipping: 'shipped',
+                          delivered: 'delivered',
+                        };
+                        const statusToFind = reverseMap[step.id];
+                        const history = order.status_histories?.find(h => h.status === statusToFind);
+
+                        if (!history) return null;
+
+                        const creatorLabel = history.createdBy
+                          ? (history.createdBy.is_admin ? 'Admin' : history.createdBy.name)
+                          : 'Hệ thống';
+
+                        return (
+                          <>
+                            {history.notes && (
+                              <p className="mt-2 text-xs text-gray-600 text-center max-w-[120px] line-clamp-2">{history.notes}</p>
+                            )}
+                            <p className="mt-1 text-[10px] text-gray-400 text-center">bởi {creatorLabel}</p>
+                          </>
+                        );
+                      })()}
 
                       {/* Connector Line */}
                       {idx !== steps.length - 1 && (

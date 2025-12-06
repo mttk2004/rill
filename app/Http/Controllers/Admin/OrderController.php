@@ -66,7 +66,7 @@ class OrderController extends Controller
             },
             'items.product.artists',
             'statusHistories' => function($query) {
-                $query->with('createdBy:id,name')->orderBy('created_at', 'asc');
+                $query->with('createdBy:id,name,is_admin')->orderBy('created_at', 'asc');
             }
         ])
         ->withCount('items')

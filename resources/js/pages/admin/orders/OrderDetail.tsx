@@ -326,23 +326,29 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
                 <Clock size={20} className="text-primary" /> Lịch sử đơn hàng
               </h3>
               <div className="relative border-l-2 border-gray-200 ml-3 space-y-8">
-                {order.status_histories?.map((history) => (
-                  <div key={history.id} className="relative pl-8">
-                    <div className={`absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 ${getTimelineDotColor(history.status)}`}></div>
-                    <div>
-                      <p className="font-bold text-gray-900 text-sm uppercase tracking-wide">{getStatusLabel(history.status)}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {formatDateTime(history.created_at)}
-                        {history.createdBy && <span className="ml-2 text-gray-400">bởi {history.createdBy.name}</span>}
-                      </p>
-                      {history.notes && (
-                        <p className="text-sm text-gray-600 mt-2 bg-gray-50 p-2 rounded border border-gray-100">
-                          {history.notes}
+                {order.status_histories?.map((history) => {
+                  const creatorLabel = history.createdBy
+                    ? (history.createdBy.is_admin ? 'Admin' : history.createdBy.name)
+                    : 'Hệ thống';
+
+                  return (
+                    <div key={history.id} className="relative pl-8">
+                      <div className={`absolute -left-[9px] top-0 h-4 w-4 rounded-full border-2 ${getTimelineDotColor(history.status)}`}></div>
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm uppercase tracking-wide">{getStatusLabel(history.status)}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {formatDateTime(history.created_at)}
+                          <span className="ml-2 text-gray-400">bởi {creatorLabel}</span>
                         </p>
-                      )}
+                        {history.notes && (
+                          <p className="text-sm text-gray-600 mt-2 bg-gray-50 p-2 rounded border border-gray-100">
+                            {history.notes}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
