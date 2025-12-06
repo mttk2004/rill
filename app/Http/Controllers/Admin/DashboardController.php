@@ -36,8 +36,12 @@ class DashboardController extends Controller
         $timeRange = $request->get('time_range', 'month');
         [$startDate, $endDate] = $this->getDateRangeFromTimeRange($timeRange);
 
-        // Get comprehensive dashboard overview (filtered by date range)
-        $overview = $this->dashboardService->getDashboardOverview($startDate, $endDate);
+        // Get all-time overview for stat cards (not filtered by time range)
+        $allTimeOverview = $this->dashboardService->getDashboardOverview();
+        
+        // Calculate all-time total profit
+        $allTimeDailyRevenue = $this->dashboardService->getDailyRevenue();
+        $allTimeTotalProfit = collect($allTimeDailyRevenue)->sum('profit');
 
         // Get analytics data (filtered by date range)
         $topProducts = $this->dashboardService->getTopProducts(5, $startDate, $endDate);
@@ -58,15 +62,12 @@ class DashboardController extends Controller
         // Get recent orders
         $recentOrders = $this->dashboardService->getRecentOrders(10);
 
-        // Calculate total profit from daily revenue data
-        $totalProfit = collect($dailyRevenue)->sum('profit');
-
         return Inertia::render('admin/Dashboard', [
             'dashboardStats' => [
-                'revenue' => $overview['revenue']['total_revenue'] ?? 0,
-                'newOrders' => $overview['orders']['pending'] ?? 0,
-                'customers' => $overview['users']['total'] ?? 0,
-                'totalProfit' => $totalProfit,
+                'revenue' => $allTimeOverview['revenue']['total_revenue'] ?? 0,
+                'newOrders' => $allTimeOverview['orders']['pending'] ?? 0,
+                'customers' => $allTimeOverview['users']['total'] ?? 0,
+                'totalProfit' => $allTimeTotalProfit,
             ],
             'topProducts' => $topProducts,
             'topCustomers' => $topCustomers,

@@ -30,7 +30,7 @@ const StatCard = ({ title, value, trend, trendUp, icon: Icon, color }: StatCardP
     <div className={`relative overflow-hidden rounded-2xl p-6 border bg-gradient-to-br ${gradientClass} shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group`}>
       {/* Decorative Blur Blob */}
       <div className={`absolute -right-6 -top-6 h-32 w-32 rounded-full opacity-10 blur-3xl ${color} group-hover:opacity-20 transition-opacity duration-500`}></div>
-      
+
       <div className="relative z-10 flex items-center justify-between mb-4">
         <div className={`p-3.5 rounded-xl ${color} text-white shadow-lg shadow-${colorName}-500/20 ring-4 ring-white/50`}>
           <Icon size={22} />
