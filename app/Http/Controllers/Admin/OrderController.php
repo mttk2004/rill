@@ -61,6 +61,9 @@ class OrderController extends Controller
         $order = Order::with([
             'user',
             'payment',
+            'items.product' => function($query) {
+                $query->withTrashed();
+            },
             'items.product.artists',
             'statusHistories' => function($query) {
                 $query->with('createdBy:id,name')->orderBy('created_at', 'asc');

@@ -40,6 +40,7 @@ interface OrderItem {
   product_name: string;
   product_sku: string;
   product_image?: string | null;
+  product_deleted?: boolean;
   quantity: number;
   unit_price: string | number;
   total_price: string | number;
@@ -222,14 +223,24 @@ const AdminOrderDetail = ({ order }: AdminOrderDetailProps) => {
               <div className="divide-y divide-gray-100">
                 {order.order_items?.map((item) => (
                   <div key={item.id} className="p-6 flex gap-4">
-                    <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                    <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 relative">
                       {(item.product_image || item.product?.image_url) && (
                         <img src={item.product_image || item.product?.image_url} alt="" className="h-full w-full object-cover" />
+                      )}
+                      {item.product_deleted && (
+                        <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center">
+                          <span className="text-[10px] font-bold text-white bg-red-500 px-2 py-0.5 rounded">Ngừng KD</span>
+                        </div>
                       )}
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-medium text-gray-900">{item.product_name}</h4>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium text-gray-900">{item.product_name}</h4>
+                          {item.product_deleted && (
+                            <span className="text-[10px] font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Ngừng kinh doanh</span>
+                          )}
+                        </div>
                         <p className="font-medium text-gray-900">{formatPrice(item.total_price)}</p>
                       </div>
                       <p className="text-sm text-gray-500 mb-1">SKU: {item.product_sku}</p>

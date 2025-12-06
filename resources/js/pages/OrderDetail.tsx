@@ -93,6 +93,14 @@ export default function OrderDetail({ order }: OrderDetailProps) {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
 
+  // Debug log for order items
+  console.log('OrderDetail - order items:', order.items.map(item => ({
+    name: item.product_name,
+    product_deleted: item.product_deleted,
+    has_product: !!item.product,
+    product_keys: item.product ? Object.keys(item.product) : []
+  })));
+
   const handleDownloadInvoice = () => {
     if (!canDownloadInvoice) {
       showToast('Chỉ có thể tải hóa đơn cho đơn hàng đã thanh toán', 'error');
