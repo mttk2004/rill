@@ -308,7 +308,7 @@ const OrderList = ({ orders: ordersPagination, filters }: OrderListProps) => {
         {/* Pagination */}
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-gray-700">
-            Hiển thị <span className="font-medium">{ordersPagination.data.length}</span> trong tổng số{' '}
+            Hiển thị <span className="font-medium">{(ordersPagination.current_page - 1) * ordersPagination.per_page + 1}-{Math.min(ordersPagination.current_page * ordersPagination.per_page, ordersPagination.total)}</span> trong tổng số{' '}
             <span className="font-medium">{ordersPagination.total}</span> đơn hàng
           </div>
 

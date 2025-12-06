@@ -70,6 +70,10 @@ class OrderQueryService
             $query->status($filters['status']);
         }
 
+        if (!empty($filters['payment_status'])) {
+            $query->paymentStatus($filters['payment_status']);
+        }
+
         if (!empty($filters['payment_method'])) {
             $query->paymentMethod($filters['payment_method']);
         }
@@ -84,20 +88,28 @@ class OrderQueryService
 
         $perPage = $filters['per_page'] ?? 15;
 
-        // Apply sorting
-        $sortBy = $filters['sort_by'] ?? 'placed_at';
-        $sortDirection = $filters['sort_direction'] ?? 'desc';
+        // Apply sorting - map frontend sort values to backend logic
+        $sort = $filters['sort'] ?? 'newest';
 
-        switch ($sortBy) {
-            case 'total_amount':
-                $query->getQuery()->orderBy('total_amount', $sortDirection);
+        switch ($sort) {
+            case 'oldest':
+                $query->getQuery()->orderBy('placed_at', 'asc');
                 break;
-            case 'status':
-                $query->getQuery()->orderBy('status', $sortDirection);
+            case 'order_number_asc':
+                $query->getQuery()->orderBy('order_number', 'asc');
                 break;
-            case 'placed_at':
+            case 'order_number_desc':
+                $query->getQuery()->orderBy('order_number', 'desc');
+                break;
+            case 'total_asc':
+                $query->getQuery()->orderBy('total_amount', 'asc');
+                break;
+            case 'total_desc':
+                $query->getQuery()->orderBy('total_amount', 'desc');
+                break;
+            case 'newest':
             default:
-                $query->getQuery()->orderBy('placed_at', $sortDirection);
+                $query->getQuery()->orderBy('placed_at', 'desc');
                 break;
         }
 

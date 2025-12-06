@@ -363,7 +363,7 @@ const ProductList = ({ products: productsPagination, filters, genres }: ProductL
         {/* Pagination */}
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-gray-700">
-            Hiển thị <span className="font-medium">{productsPagination.data.length}</span> trong tổng số{' '}
+            Hiển thị <span className="font-medium">{(productsPagination.current_page - 1) * productsPagination.per_page + 1}-{Math.min(productsPagination.current_page * productsPagination.per_page, productsPagination.total)}</span> trong tổng số{' '}
             <span className="font-medium">{productsPagination.total}</span> sản phẩm
           </div>
 
