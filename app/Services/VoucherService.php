@@ -106,6 +106,7 @@ class VoucherService
         try {
             $voucherData = new VoucherData(
                 code: strtoupper(trim($data['code'])),
+                name: trim($data['name']),
                 type: $data['type'],
                 value: (float) $data['value'],
                 validFrom: new \DateTime($data['valid_from']),
@@ -134,6 +135,7 @@ class VoucherService
         try {
             $voucherData = new VoucherData(
                 code: strtoupper(trim($data['code'])),
+                name: trim($data['name']),
                 type: $data['type'],
                 value: (float) $data['value'],
                 validFrom: new \DateTime($data['valid_from']),

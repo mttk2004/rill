@@ -39,7 +39,7 @@ const TopProducts: React.FC<TopProductsProps> = ({ products }) => {
               <tr
                 key={product.id}
                 className="hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent transition-all duration-200 cursor-pointer group hover:shadow-sm"
-                onClick={() => router.visit(`/admin/products/${product.id}`)}
+                onClick={() => router.visit(`/admin/products/${product.id}/edit`)}
               >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">

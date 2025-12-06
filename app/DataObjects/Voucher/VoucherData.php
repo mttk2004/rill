@@ -14,6 +14,7 @@ readonly class VoucherData extends BaseData
 {
     public function __construct(
         public readonly string $code,
+        public readonly string $name,
         public readonly string $type,
         public readonly float $value,
         public readonly \DateTime $validFrom,
@@ -36,6 +37,10 @@ readonly class VoucherData extends BaseData
     {
         if (empty(trim($this->code))) {
             throw new InvalidArgumentException('Voucher code cannot be empty');
+        }
+
+        if (empty(trim($this->name))) {
+            throw new InvalidArgumentException('Voucher name cannot be empty');
         }
 
         if (!in_array($this->type, ['percentage', 'fixed'])) {
@@ -76,6 +81,7 @@ readonly class VoucherData extends BaseData
     {
         return [
             'code' => $this->code,
+            'name' => $this->name,
             'type' => $this->type,
             'value' => $this->value,
             'valid_from' => $this->validFrom,
@@ -99,6 +105,7 @@ readonly class VoucherData extends BaseData
         $data = $request->all();
         return new self(
             code: strtoupper(trim($data['code'])),
+            name: trim($data['name']),
             type: $data['type'],
             value: (float) $data['value'],
             validFrom: new \DateTime($data['valid_from']),
