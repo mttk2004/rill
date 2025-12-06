@@ -58,12 +58,15 @@ class DashboardController extends Controller
         // Get recent orders
         $recentOrders = $this->dashboardService->getRecentOrders(10);
 
+        // Calculate total profit from daily revenue data
+        $totalProfit = collect($dailyRevenue)->sum('profit');
+
         return Inertia::render('admin/Dashboard', [
             'dashboardStats' => [
                 'revenue' => $overview['revenue']['total_revenue'] ?? 0,
-                'newOrders' => $overview['orders']['today'] ?? 0,
+                'newOrders' => $overview['orders']['pending'] ?? 0,
                 'customers' => $overview['users']['total'] ?? 0,
-                'lowStock' => $overview['products']['low_stock'] ?? 0,
+                'totalProfit' => $totalProfit,
             ],
             'topProducts' => $topProducts,
             'topCustomers' => $topCustomers,

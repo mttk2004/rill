@@ -3,7 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from 'recharts';
 import {
-  DollarSign, ShoppingBag, Users, Package,
+  DollarSign, ShoppingBag, Users,
   Plus, Calendar, AlertTriangle, Clock, ChevronRight, Tag, CheckCircle, Trophy, Music, TrendingUp, Settings
 } from 'lucide-react';
 import { Link, router, usePage } from '@inertiajs/react';
@@ -20,7 +20,7 @@ interface DashboardProps extends Record<string, unknown> {
     revenue: number;
     newOrders: number;
     customers: number;
-    lowStock: number;
+    totalProfit: number;
   };
   topProducts: Array<{
     id: string;
@@ -205,34 +205,26 @@ const Dashboard = () => {
           <StatCard
             title="Tổng Doanh Thu"
             value={formatCurrency(dashboardStats.revenue)}
-            trend="12.5%"
-            trendUp={true}
             icon={DollarSign}
             color="bg-emerald-600"
           />
           <StatCard
+            title="Tổng Lợi Nhuận"
+            value={formatCurrency(dashboardStats.totalProfit)}
+            icon={DollarSign}
+            color="bg-green-600"
+          />
+          <StatCard
             title="Đơn Hàng Mới"
             value={dashboardStats.newOrders}
-            trend="8.2%"
-            trendUp={true}
             icon={ShoppingBag}
             color="bg-blue-600"
           />
           <StatCard
             title="Khách Hàng"
             value={dashboardStats.customers}
-            trend="2.1%"
-            trendUp={false}
             icon={Users}
             color="bg-amber-500"
-          />
-          <StatCard
-            title="Sản Phẩm Tồn Kho"
-            value={dashboardStats.lowStock}
-            trend="Cảnh báo"
-            trendUp={false}
-            icon={Package}
-            color="bg-slate-600"
           />
         </div>
 
@@ -250,42 +242,51 @@ const Dashboard = () => {
               </button>
             </div>
             <div className="h-80 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#1B4D3E" stopOpacity={0.1} />
-                      <stop offset="95%" stopColor="#1B4D3E" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 12, fill: '#9ca3af' }}
-                    tickFormatter={(value) => formatCurrency(value).replace(/₫/, '').trim() + 'đ'}
-                  />
-                  <Tooltip
-                    contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                    content={({ active, payload }) => {
-                      if (!active || !payload || payload.length === 0) return null;
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-white/90 backdrop-blur-xl rounded-xl border border-white/50 shadow-lg p-3">
-                          <div className="font-semibold mb-2">{data.fullDate}</div>
-                          <div className="space-y-1">
-                            <div className="font-semibold text-gray-900">Doanh thu: {formatCurrency(data.value)}</div>
-                            <div className="text-green-600 font-medium">Lợi nhuận: {formatCurrency(data.profit || 0)}</div>
-                            <div className="text-sm text-gray-500">Tỷ suất: {data.profitMargin}%</div>
+              {chartData.length === 0 ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center text-gray-400">
+                    <p className="text-lg font-medium mb-1">Ch\u01b0a c\u00f3 d\u1eef li\u1ec7u</p>
+                    <p className="text-sm">Kh\u00f4ng c\u00f3 \u0111\u01a1n h\u00e0ng n\u00e0o trong kho\u1ea3ng th\u1eddi gian n\u00e0y</p>
+                  </div>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#1B4D3E" stopOpacity={0.1} />
+                        <stop offset="95%" stopColor="#1B4D3E" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#9ca3af' }}
+                      tickFormatter={(value) => formatCurrency(value).replace(/₫/, '').trim() + 'đ'}
+                    />
+                    <Tooltip
+                      contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                      content={({ active, payload }) => {
+                        if (!active || !payload || payload.length === 0) return null;
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-white/90 backdrop-blur-xl rounded-xl border border-white/50 shadow-lg p-3">
+                            <div className="font-semibold mb-2">{data.fullDate}</div>
+                            <div className="space-y-1">
+                              <div className="font-semibold text-gray-900">Doanh thu: {formatCurrency(data.value)}</div>
+                              <div className="text-green-600 font-medium">Lợi nhuận: {formatCurrency(data.profit || 0)}</div>
+                              <div className="text-sm text-gray-500">Tỷ suất: {data.profitMargin}%</div>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    }}
-                  />
-                  <CartesianGrid vertical={false} stroke="#f3f4f6" />
-                  <Area type="monotone" dataKey="value" stroke="#1B4D3E" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
-                </AreaChart>
-              </ResponsiveContainer>
+                        );
+                      }}
+                    />
+                    <CartesianGrid vertical={false} stroke="#f3f4f6" />
+                    <Area type="monotone" dataKey="value" stroke="#1B4D3E" strokeWidth={2} fillOpacity={1} fill="url(#colorRevenue)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
@@ -412,38 +413,47 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="flex-1 min-h-[250px] relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={genreData}
-                    cx="45%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={70}
-                    paddingAngle={5}
-                    dataKey={genreMetric === 'revenue' ? 'value' : 'profit'}
-                  >
-                    {genreData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="rgba(255,255,255,0.8)" strokeWidth={2} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
-                    labelFormatter={(label: string) => {
-                      const entry = genreData.find(g => g.name === label);
-                      return entry ? `${label} (${entry.profit_margin}% lợi nhuận)` : label;
-                    }}
-                    contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                  />
-                  <Legend
-                    layout="vertical"
-                    verticalAlign="middle"
-                    align="right"
-                    iconType="circle"
-                    wrapperStyle={{ fontSize: '11px', paddingLeft: '10px', maxWidth: '35%' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              {genreData.length === 0 ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center text-gray-400">
+                    <p className="text-lg font-medium mb-1">Chưa có dữ liệu</p>
+                    <p className="text-sm">Không có doanh thu theo thể loại trong khoảng thời gian này</p>
+                  </div>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={genreData}
+                      cx="45%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={70}
+                      paddingAngle={5}
+                      dataKey={genreMetric === 'revenue' ? 'value' : 'profit'}
+                    >
+                      {genreData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} stroke="rgba(255,255,255,0.8)" strokeWidth={2} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value: number) => formatCurrency(value)}
+                      labelFormatter={(label: string) => {
+                        const entry = genreData.find(g => g.name === label);
+                        return entry ? `${label} (${entry.profit_margin}% lợi nhuận)` : label;
+                      }}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', backgroundColor: 'rgba(255,255,255,0.9)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                    />
+                    <Legend
+                      layout="vertical"
+                      verticalAlign="middle"
+                      align="right"
+                      iconType="circle"
+                      wrapperStyle={{ fontSize: '11px', paddingLeft: '10px', maxWidth: '35%' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>

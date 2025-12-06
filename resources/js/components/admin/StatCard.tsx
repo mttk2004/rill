@@ -4,8 +4,8 @@ import { ArrowUp, ArrowDown } from 'lucide-react';
 interface StatCardProps {
   title: string;
   value: string | number;
-  trend: string;
-  trendUp: boolean;
+  trend?: string;
+  trendUp?: boolean;
   icon: any;
   color: string;
 }
@@ -20,6 +20,7 @@ const StatCard = ({ title, value, trend, trendUp, icon: Icon, color }: StatCardP
     blue: 'from-blue-50 via-white to-white border-blue-100',
     amber: 'from-amber-50 via-white to-white border-amber-100',
     slate: 'from-slate-50 via-white to-white border-slate-100',
+    green: 'from-green-50 via-white to-white border-green-100',
     gray: 'from-gray-50 via-white to-white border-gray-100',
   };
 
@@ -34,10 +35,12 @@ const StatCard = ({ title, value, trend, trendUp, icon: Icon, color }: StatCardP
         <div className={`p-3.5 rounded-xl ${color} text-white shadow-lg shadow-${colorName}-500/20 ring-4 ring-white/50`}>
           <Icon size={22} />
         </div>
-        <span className={`flex items-center text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm border border-white/50 ${trendUp ? 'bg-green-100/80 text-green-700' : 'bg-red-100/80 text-red-700'}`}>
-          {trendUp ? <ArrowUp size={12} className="mr-1" /> : <ArrowDown size={12} className="mr-1" />}
-          {trend}
-        </span>
+        {trend && (
+          <span className={`flex items-center text-xs font-bold px-2.5 py-1 rounded-full backdrop-blur-sm border border-white/50 ${trendUp ? 'bg-green-100/80 text-green-700' : 'bg-red-100/80 text-red-700'}`}>
+            {trendUp ? <ArrowUp size={12} className="mr-1" /> : <ArrowDown size={12} className="mr-1" />}
+            {trend}
+          </span>
+        )}
       </div>
       <div className="relative z-10">
         <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">{title}</h3>

@@ -116,6 +116,7 @@ class AdminDashboardService
 
     /**
      * Get daily revenue breakdown.
+     * Fills missing dates with zero values.
      *
      * @param Carbon|null $startDate
      * @param Carbon|null $endDate
@@ -127,10 +128,32 @@ class AdminDashboardService
         $startDate = $startDate ?? Carbon::now()->subDays(30);
         $endDate = $endDate ?? Carbon::now();
 
-        return $salesBuilder->getDailyRevenue($startDate, $endDate)
+        // Get actual revenue data
+        $revenueData = $salesBuilder->getDailyRevenue($startDate, $endDate)
+            ->keyBy('date')
             ->map(fn($item) => (array) $item)
-            ->values()
             ->toArray();
+
+        // Generate all dates in range
+        $allDates = [];
+        $currentDate = $startDate->copy();
+
+        while ($currentDate->lte($endDate)) {
+            $dateString = $currentDate->format('Y-m-d');
+
+            // Use actual data if exists, otherwise fill with zeros
+            $allDates[] = $revenueData[$dateString] ?? [
+                'date' => $dateString,
+                'order_count' => 0,
+                'revenue' => 0,
+                'avg_order_value' => 0,
+                'profit' => 0,
+            ];
+
+            $currentDate->addDay();
+        }
+
+        return $allDates;
     }
 
     /**
