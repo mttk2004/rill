@@ -90,7 +90,8 @@ const Dashboard = () => {
     revenueData
   } = props;
 
-  const [timeRange, setTimeRange] = useState('week');
+  const urlParams = new URLSearchParams(window.location.search);
+  const [timeRange, setTimeRange] = useState(urlParams.get('time_range') || 'month');
   const [genreMetric, setGenreMetric] = useState<'revenue' | 'profit'>('revenue');
 
   // Transform revenue data for chart
@@ -149,7 +150,15 @@ const Dashboard = () => {
             </div>
             <select
               value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
+              onChange={(e) => {
+                const newTimeRange = e.target.value;
+                setTimeRange(newTimeRange);
+                router.get('/admin/dashboard', { time_range: newTimeRange }, {
+                  preserveState: true,
+                  preserveScroll: true,
+                  only: ['revenueData', 'genreData', 'topProducts', 'trendingArtists', 'dashboardStats']
+                });
+              }}
               className="bg-transparent text-sm font-medium text-gray-700 focus:outline-none cursor-pointer py-1.5 pr-2"
             >
               <option value="today">Hôm nay</option>

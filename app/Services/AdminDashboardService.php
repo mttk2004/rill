@@ -24,9 +24,11 @@ class AdminDashboardService
     /**
      * Get dashboard overview statistics.
      *
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getDashboardOverview(): array
+    public function getDashboardOverview(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
@@ -34,8 +36,8 @@ class AdminDashboardService
             'orders' => $this->getOrderStats(),
             'products' => $this->getProductStats(),
             'users' => $this->getUserStats(),
-            'revenue' => $salesBuilder->getRevenue(),
-            'customer_stats' => $salesBuilder->getCustomerStats(),
+            'revenue' => $salesBuilder->getRevenue($startDate, $endDate),
+            'customer_stats' => $salesBuilder->getCustomerStats($startDate, $endDate),
         ];
     }
 
@@ -115,15 +117,17 @@ class AdminDashboardService
     /**
      * Get daily revenue breakdown.
      *
-     * @param int $days
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getDailyRevenue(int $days = 30): array
+    public function getDailyRevenue(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
-        $startDate = Carbon::now()->subDays($days);
+        $startDate = $startDate ?? Carbon::now()->subDays(30);
+        $endDate = $endDate ?? Carbon::now();
 
-        return $salesBuilder->getDailyRevenue($startDate, now())
+        return $salesBuilder->getDailyRevenue($startDate, $endDate)
             ->map(fn($item) => (array) $item)
             ->values()
             ->toArray();
@@ -147,13 +151,15 @@ class AdminDashboardService
      * Get top selling products.
      *
      * @param int $limit
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getTopProducts(int $limit = 5): array
+    public function getTopProducts(int $limit = 5, ?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getTopProducts($limit)
+        return $salesBuilder->getTopProducts($limit, $startDate, $endDate)
             ->map(function ($item) {
                 $item = (array) $item;
                 return [
@@ -174,13 +180,15 @@ class AdminDashboardService
      * Get trending artists by sales.
      *
      * @param int $limit
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getTrendingArtists(int $limit = 5): array
+    public function getTrendingArtists(int $limit = 5, ?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getTrendingArtists($limit)
+        return $salesBuilder->getTrendingArtists($limit, $startDate, $endDate)
             ->map(function ($item) {
                 $item = (array) $item;
                 return [
@@ -199,13 +207,15 @@ class AdminDashboardService
      * Get top customers by total spend.
      *
      * @param int $limit
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getTopCustomers(int $limit = 5): array
+    public function getTopCustomers(int $limit = 5, ?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getTopCustomers($limit)
+        return $salesBuilder->getTopCustomers($limit, $startDate, $endDate)
             ->map(fn($item) => (array) $item)
             ->values()
             ->toArray();
@@ -214,13 +224,15 @@ class AdminDashboardService
     /**
      * Get revenue breakdown by payment method.
      *
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getRevenueByPaymentMethod(): array
+    public function getRevenueByPaymentMethod(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getRevenueByPaymentMethod()
+        return $salesBuilder->getRevenueByPaymentMethod($startDate, $endDate)
             ->map(fn($item) => (array) $item)
             ->values()
             ->toArray();
@@ -229,13 +241,15 @@ class AdminDashboardService
     /**
      * Get revenue breakdown by product genre.
      *
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getRevenueByGenre(): array
+    public function getRevenueByGenre(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getRevenueByGenre()
+        return $salesBuilder->getRevenueByGenre($startDate, $endDate)
             ->map(function ($item) {
                 $item = (array) $item;
                 $revenue = (float) $item['total_revenue'];
@@ -254,13 +268,15 @@ class AdminDashboardService
     }    /**
      * Get order status distribution.
      *
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
      * @return array
      */
-    public function getOrderStatusDistribution(): array
+    public function getOrderStatusDistribution(?Carbon $startDate = null, ?Carbon $endDate = null): array
     {
         $salesBuilder = new SalesReportQueryBuilder();
 
-        return $salesBuilder->getOrderStatusDistribution()
+        return $salesBuilder->getOrderStatusDistribution($startDate, $endDate)
             ->map(fn($item) => (array) $item)
             ->values()
             ->toArray();

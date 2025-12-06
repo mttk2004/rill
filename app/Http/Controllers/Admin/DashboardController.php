@@ -14,22 +14,39 @@ class DashboardController extends Controller
         protected AdminDashboardService $dashboardService
     ) {}
 
+    /**
+     * Get date range based on time range string.
+     */
+    private function getDateRangeFromTimeRange(string $timeRange): array
+    {
+        $now = Carbon::now();
+
+        return match ($timeRange) {
+            'today' => [$now->copy()->startOfDay(), $now->copy()->endOfDay()],
+            'week' => [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()],
+            'month' => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
+            'year' => [$now->copy()->startOfYear(), $now->copy()->endOfYear()],
+            default => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()],
+        };
+    }
+
     public function index(Request $request)
     {
-        $startDate = Carbon::parse($request->get('start_date', now()->startOfMonth()));
-        $endDate = Carbon::parse($request->get('end_date', now()->endOfMonth()));
+        // Calculate date range based on time_range parameter
+        $timeRange = $request->get('time_range', 'month');
+        [$startDate, $endDate] = $this->getDateRangeFromTimeRange($timeRange);
 
-        // Get comprehensive dashboard overview
-        $overview = $this->dashboardService->getDashboardOverview();
+        // Get comprehensive dashboard overview (filtered by date range)
+        $overview = $this->dashboardService->getDashboardOverview($startDate, $endDate);
 
-        // Get analytics data
-        $topProducts = $this->dashboardService->getTopProducts(5);
-        $topCustomers = $this->dashboardService->getTopCustomers(5);
-        $trendingArtists = $this->dashboardService->getTrendingArtists(5);
-        $dailyRevenue = $this->dashboardService->getDailyRevenue(30);
-        $revenueByPaymentMethod = $this->dashboardService->getRevenueByPaymentMethod();
-        $revenueByGenre = $this->dashboardService->getRevenueByGenre();
-        $orderStatusDistribution = $this->dashboardService->getOrderStatusDistribution();
+        // Get analytics data (filtered by date range)
+        $topProducts = $this->dashboardService->getTopProducts(5, $startDate, $endDate);
+        $topCustomers = $this->dashboardService->getTopCustomers(5, $startDate, $endDate);
+        $trendingArtists = $this->dashboardService->getTrendingArtists(5, $startDate, $endDate);
+        $dailyRevenue = $this->dashboardService->getDailyRevenue($startDate, $endDate);
+        $revenueByPaymentMethod = $this->dashboardService->getRevenueByPaymentMethod($startDate, $endDate);
+        $revenueByGenre = $this->dashboardService->getRevenueByGenre($startDate, $endDate);
+        $orderStatusDistribution = $this->dashboardService->getOrderStatusDistribution($startDate, $endDate);
 
         // Get items needing attention
         $productsNeedingAttention = $this->dashboardService->getProductsNeedingAttention();
