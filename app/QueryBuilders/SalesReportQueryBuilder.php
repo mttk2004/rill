@@ -58,7 +58,7 @@ class SalesReportQueryBuilder
                 DB::raw('COUNT(DISTINCT orders.id) as order_count'),
                 DB::raw('SUM(orders.total_amount) as revenue'),
                 DB::raw('AVG(orders.total_amount) as avg_order_value'),
-                DB::raw('SUM((order_items.price - COALESCE(products.cost_price, 0)) * order_items.quantity) as profit'),
+                DB::raw('SUM((order_items.unit_price - COALESCE(products.cost_price, 0)) * order_items.quantity) as profit'),
             ])
             ->where('orders.status', '!=', 'cancelled')
             ->whereBetween('orders.created_at', [$from, $to])
@@ -214,7 +214,7 @@ class SalesReportQueryBuilder
                 'products.genre',
                 DB::raw('SUM(order_items.quantity) as total_sold'),
                 DB::raw('SUM(order_items.total_price) as total_revenue'),
-                DB::raw('SUM((order_items.price - COALESCE(products.cost_price, 0)) * order_items.quantity) as total_profit'),
+                DB::raw('SUM((order_items.unit_price - COALESCE(products.cost_price, 0)) * order_items.quantity) as total_profit'),
                 DB::raw('COUNT(DISTINCT order_items.order_id) as order_count'),
             ])
             ->where('orders.status', '!=', 'cancelled')
