@@ -67,6 +67,7 @@ interface OrderStatusHistory {
   createdBy?: {
     id: string;
     name: string;
+    is_admin: boolean;
   };
 }
 

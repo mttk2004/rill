@@ -114,10 +114,11 @@ class OrderAdminResource extends JsonResource
                         'status' => is_object($history->status) ? $history->status->value : $history->status,
                         'notes' => $history->notes,
                         'created_at' => $history->created_at,
-                        'created_by' => $this->when($history->relationLoaded('createdBy'), function () use ($history) {
+                        'createdBy' => $this->when($history->relationLoaded('createdBy'), function () use ($history) {
                             return $history->createdBy ? [
                                 'id' => $history->createdBy->id,
                                 'name' => $history->createdBy->name,
+                                'is_admin' => $history->createdBy->is_admin,
                             ] : null;
                         }),
                     ];
