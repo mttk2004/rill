@@ -18,7 +18,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Public routes (accessible to guests and authenticated users)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/products/{product}', [ProductController::class, 'show'])
+    ->name('products.show')
+    ->withTrashed();
 
 // Product reviews (authenticated users only)
 Route::middleware(['auth', 'verified'])->group(function () {

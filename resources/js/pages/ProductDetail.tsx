@@ -143,11 +143,33 @@ function ProductDetailContent({
 
   const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price));
 
+  const isDeleted = !!product.deleted_at;
+
   return (
     <>
       <Head title={`${product.name} - Rill`} />
       <div className="bg-white min-h-screen">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+
+          {/* Product Deleted Warning Banner */}
+          {isDeleted && (
+            <div className="mb-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg animate-fade-in">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-bold text-red-800">Sản phẩm đã ngừng kinh doanh</h3>
+                  <p className="mt-1 text-sm text-red-700">
+                    Rất tiếc, sản phẩm này hiện không còn được bán. Bạn có thể xem các sản phẩm tương tự bên dưới hoặc quay lại{' '}
+                    <Link href="/products" className="font-semibold underline hover:text-red-900">cửa hàng</Link>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Breadcrumb */}
           <nav className="text-sm text-gray-500 mb-8 animate-fade-in">
@@ -267,7 +289,7 @@ function ProductDetailContent({
                   <div className="flex-1 min-w-[140px] h-[48px] flex justify-center">
                     <button
                       onClick={handleAddToCart}
-                      disabled={product.stock_quantity === 0 || btnState !== 'idle'}
+                      disabled={isDeleted || product.stock_quantity === 0 || btnState !== 'idle'}
                       className={`
                         h-[48px] flex items-center justify-center font-bold tracking-wide transition-all duration-300 shadow-lg
                         ${btnState === 'idle'
@@ -282,7 +304,14 @@ function ProductDetailContent({
                       {btnState === 'loading' && <Loader2 size={24} className="animate-spin" />}
                       {btnState === 'success' && <Check size={24} className="animate-in zoom-in duration-200" />}
                       {btnState === 'idle' && (
-                        <span>{product.stock_quantity > 0 ? "Thêm vào giỏ" : "Hết hàng"}</span>
+                        <span>
+                          {isDeleted
+                            ? "Ngừng kinh doanh"
+                            : product.stock_quantity > 0
+                              ? "Thêm vào giỏ"
+                              : "Hết hàng"
+                          }
+                        </span>
                       )}
                     </button>
                   </div>

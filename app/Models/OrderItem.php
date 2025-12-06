@@ -32,6 +32,7 @@ class OrderItem extends Model
     protected $appends = [
         'product_image',
         'product_slug',
+        'product_deleted',
     ];
 
     public function order(): BelongsTo
@@ -58,5 +59,13 @@ class OrderItem extends Model
     public function getProductSlugAttribute(): ?string
     {
         return $this->product?->slug;
+    }
+
+    /**
+     * Check if product is deleted (soft deleted)
+     */
+    public function getProductDeletedAttribute(): bool
+    {
+        return $this->product?->trashed() ?? false;
     }
 }

@@ -38,9 +38,13 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onEdit, onDelete, onRes
 
         {/* Status Dot */}
         <span
-          className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${isDeleted ? 'bg-red-500' : 'bg-green-500'
+          className={`inline-block w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${isDeleted
+              ? 'bg-red-500'
+              : artist.is_active
+                ? 'bg-green-500'
+                : 'bg-amber-500'
             }`}
-          title={isDeleted ? 'Đã xóa' : 'Đang hoạt động'}
+          title={isDeleted ? 'Đã xóa' : artist.is_active ? 'Đang hoạt động' : 'Tạm ngưng'}
         ></span>
       </div>
 

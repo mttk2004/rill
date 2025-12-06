@@ -48,6 +48,9 @@ class OrderController extends Controller
         Gate::authorize('view', $order);
 
         $order->load([
+            'items.product' => function($query) {
+                $query->withTrashed();
+            },
             'items.product.artists',
             'items.product.reviews' => function($query) {
                 $query->where('user_id', Auth::id());

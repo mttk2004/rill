@@ -12,6 +12,7 @@ interface OrderItem {
   product_name: string;
   product_image: string | null;
   product_slug: string | null;
+  product_deleted: boolean;
   quantity: number;
   unit_price: string;
   total_price: string;
@@ -420,16 +421,35 @@ export default function OrderDetail({ order }: OrderDetailProps) {
 
                     return (
                       <div key={idx} className="p-6 flex gap-4 hover:bg-gray-50 transition-colors">
-                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-200">
-                          {item.product_image && <img src={item.product_image} alt={item.product_name} className="h-full w-full object-cover" />}
+                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 border border-gray-200 relative">
+                          {item.product_image ? (
+                            <img src={item.product_image} alt={item.product_name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                          )}
+                          {item.product_deleted && (
+                            <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center">
+                              <span className="text-[10px] font-bold text-white bg-red-500 px-2 py-0.5 rounded">Ngừng KD</span>
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
-                              <h3 className="font-medium text-gray-900">{item.product_name}</h3>
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-medium text-gray-900">{item.product_name}</h3>
+                                {item.product_deleted && (
+                                  <span className="text-[10px] font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">Ngừng kinh doanh</span>
+                                )}
+                              </div>
                               <div className="flex items-center gap-3 mt-1">
-                                {item.product_slug && <Link href={`/products/${item.product_slug}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>}
-                                {canReview && item.product && (
+                                {item.product_slug && !item.product_deleted && (
+                                  <Link href={`/products/${item.product_slug}`} className="text-xs text-primary hover:underline font-medium">Xem sản phẩm</Link>
+                                )}
+                                {item.product_deleted && (
+                                  <span className="text-xs text-gray-400 cursor-not-allowed">Sản phẩm không còn kinh doanh</span>
+                                )}
+                                {canReview && item.product && !item.product_deleted && (
                                   <button
                                     onClick={() => {
                                       setReviewingProduct({ id: item.product!.id, name: item.product_name, slug: item.product!.slug });
@@ -514,10 +534,10 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     <>
                       <p className="mb-2">Phương thức: <span className="font-medium text-gray-900">{typeof order.payment.payment_method === 'string' ? order.payment.payment_method : Object.values(order.payment.payment_method)[0].toUpperCase()}</span></p>
                       <p className={`text-xs font-bold inline-block px-2.5 py-1 rounded border ${(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'completed'
-                          ? 'bg-green-50 text-green-700 border-green-100'
-                          : (typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'failed'
-                            ? 'bg-red-50 text-red-700 border-red-100'
-                            : 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                        ? 'bg-green-50 text-green-700 border-green-100'
+                        : (typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'failed'
+                          ? 'bg-red-50 text-red-700 border-red-100'
+                          : 'bg-yellow-50 text-yellow-700 border-yellow-100'
                         }`}>
                         {(typeof order.payment.payment_status === 'string' ? order.payment.payment_status : Object.values(order.payment.payment_status)[0]) === 'completed'
                           ? 'ĐÃ THANH TOÁN'
