@@ -102,6 +102,11 @@ Sở hữu đĩa than `Abbey Road` là sở hữu một chương cuối hoàn h�
             [
                 'name' => 'Sgt. Pepper\'s Lonely Hearts Club Band',
                 'description' => 'Album phòng thu thứ tám của The Beatles phát hành năm 1967, được coi là album có ảnh hưởng nhất trong lịch sử nhạc rock. Một kiệt tác của nhạc psychedelic rock với "Lucy in the Sky with Diamonds", "A Day in the Life".',
+                'detailed_description' => 'Được phát hành vào "Mùa hè tình yêu" năm 1967, `Sgt. Pepper\'s Lonely Hearts Club Band` không chỉ là một album nhạc rock, mà là một sự kiện văn hóa đã thay đổi vĩnh viễn bộ mặt của âm nhạc đại chúng. The Beatles đã rũ bỏ hình tượng "boyband" để khoác lên mình bộ trang phục sặc sỡ của ban nhạc giả tưởng Sgt. Pepper, cho phép họ tự do thử nghiệm mọi giới hạn của phòng thu mà không bị ràng buộc bởi việc phải biểu diễn live.
+
+Album là sự pha trộn ảo diệu giữa Rock, nhạc cổ điển Ấn Độ, Vaudeville và Avant-garde. Từ ca khúc mở đầu ồn ào như một buổi hòa nhạc, đến thế giới ảo giác của "Lucy in the Sky with Diamonds", và kết thúc bằng hợp âm piano vang vọng kéo dài vô tận trong "A Day in the Life" - ca khúc được coi là đỉnh cao sáng tác của Lennon-McCartney. Kỹ thuật thu âm đa lớp, sử dụng băng ngược và các hiệu ứng âm thanh chưa từng có đã biến album này thành thánh kinh của Art Rock và Psychedelic Rock.
+
+Trên định dạng đĩa than, bìa đĩa được thiết kế công phu với lời bài hát được in ở mặt sau (lần đầu tiên trong lịch sử rock) và các phụ kiện cắt dán đi kèm tạo nên trải nghiệm nghe nhìn trọn vẹn. Đây là album buộc phải có trong mọi bộ sưu tập.',
                 'genre' => 'Psychedelic Rock',
                 'label' => 'Parlophone',
                 'price' => 950000,
@@ -546,7 +551,7 @@ Bìa đĩa với hình ảnh đám đông giơ tay lên trời thể hiện chí
             // Marvin Gaye
             [
                 'name' => 'What\'s Going On',
-                'detailed_description' => '`What\'s Going On` (1971) thường xuyên đứng đầu các danh sách "Album hay nhất mọi thời đại" của các tạp chí uy tín. Đây là bước ngoặt khi Marvin Gaye thoát khỏi khuôn mẫu "hoàng tử tình ca" của Motown để trở thành một nghệ sĩ có lương tri xã hội. Album là một chuỗi ca khúc liền mạch (song cycle) phản ánh góc nhìn của một cựu chiến binh Việt Nam trở về Mỹ, chứng kiến sự bất công, nghèo đói, ma túy và ô nhiễm môi trường.
+                'description' => '`What\'s Going On` (1971) thường xuyên đứng đầu các danh sách "Album hay nhất mọi thời đại" của các tạp chí uy tín. Đây là bước ngoặt khi Marvin Gaye thoát khỏi khuôn mẫu "hoàng tử tình ca" của Motown để trở thành một nghệ sĩ có lương tri xã hội. Album là một chuỗi ca khúc liền mạch (song cycle) phản ánh góc nhìn của một cựu chiến binh Việt Nam trở về Mỹ, chứng kiến sự bất công, nghèo đói, ma túy và ô nhiễm môi trường.
 
 Âm nhạc trong album là sự pha trộn mượt mà giữa Soul, Jazz và Gospel. Giọng hát của Marvin Gaye, lúc thì thì thầm, lúc thì vút cao đau đớn, trôi trên nền nhạc đệm đa lớp tinh tế. Ca khúc chủ đề và "Mercy Mercy Me (The Ecology)" mang thông điệp vượt thời gian.
 

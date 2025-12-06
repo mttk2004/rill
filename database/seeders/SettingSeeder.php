@@ -16,7 +16,7 @@ class SettingSeeder extends Seeder
             // Nhóm Banner
             [
                 'key' => 'banner_enabled',
-                'value' => '0', // Tắt mặc định
+                'value' => '1', // Bật mặc định
                 'type' => 'boolean',
                 'group' => 'banner',
                 'label' => 'Bật/Tắt Banner đầu trang'

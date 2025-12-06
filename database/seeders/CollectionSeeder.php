@@ -48,22 +48,22 @@ class CollectionSeeder extends Seeder
 
         // Create additional collections with sample data
         $collections = [
-            [
-                'name' => 'Giảm giá đặc biệt',
-                'slug' => 'giam-gia-dac-biet',
-                'type' => 'promotion',
-                'description' => 'Các sản phẩm đang được giảm giá',
-                'image' => null,
-                'is_active' => false,
-            ],
-            [
-                'name' => 'Jazz Classics',
-                'slug' => 'jazz-classics',
-                'type' => 'curated',
-                'description' => 'Những album Jazz kinh điển không thể bỏ lỡ',
-                'image' => null,
-                'is_active' => true,
-            ],
+            // [
+            //     'name' => 'Giảm giá đặc biệt',
+            //     'slug' => 'giam-gia-dac-biet',
+            //     'type' => 'promotion',
+            //     'description' => 'Các sản phẩm đang được giảm giá',
+            //     'image' => null,
+            //     'is_active' => false,
+            // ],
+            // [
+            //     'name' => 'Jazz Classics',
+            //     'slug' => 'jazz-classics',
+            //     'type' => 'curated',
+            //     'description' => 'Những album Jazz kinh điển không thể bỏ lỡ',
+            //     'image' => null,
+            //     'is_active' => true,
+            // ],
             [
                 'name' => 'Rock Legends',
                 'slug' => 'rock-legends',

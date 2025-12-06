@@ -16,7 +16,7 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user() || !$request->user()->isAdmin()) {
-            return redirect()->route('products')->with('error', 'Bạn không có quyền truy cập trang này.');
+            return redirect()->route('products.index')->with('error', 'Bạn không có quyền truy cập trang này.');
         }
 
         return $next($request);
