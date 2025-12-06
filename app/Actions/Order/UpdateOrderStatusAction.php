@@ -4,6 +4,7 @@ namespace App\Actions\Order;
 
 use App\Actions\BaseAction;
 use App\Enums\OrderStatus;
+use App\Enums\OrderStatusNote;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Services\NotificationService;
@@ -51,10 +52,13 @@ class UpdateOrderStatusAction extends BaseAction
             // Update order status
             $this->orderRepository->updateStatus($order->id, $newStatus->value);
 
+            // Use automatic note if none provided
+            $finalNotes = $notes ?? OrderStatusNote::forStatus($newStatus);
+
             // Always create status history record
             $order->statusHistories()->create([
                 'status' => $newStatus->value,
-                'notes' => $notes,
+                'notes' => $finalNotes,
                 'created_by' => auth()->id(),
             ]);
 

@@ -4,6 +4,7 @@ namespace App\Actions\Order;
 
 use App\Actions\BaseAction;
 use App\Enums\OrderStatus;
+use App\Enums\OrderStatusNote;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
@@ -71,10 +72,9 @@ class CancelOrderAction extends BaseAction
 
             // Create status history
             $order->statusHistories()->create([
-                'old_status' => $oldStatus->value,
-                'new_status' => OrderStatus::CANCELLED->value,
-                'notes' => $reason ?? 'Order cancelled',
-                'changed_by' => auth()->id(),
+                'status' => OrderStatus::CANCELLED->value,
+                'notes' => $reason ?? OrderStatusNote::CANCELLED->value,
+                'created_by' => auth()->id(),
             ]);
 
             return $this->success(

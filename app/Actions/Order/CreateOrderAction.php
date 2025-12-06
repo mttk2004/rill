@@ -12,6 +12,7 @@ use App\Services\ShippingService;
 use App\Services\VoucherService;
 use App\Support\ServiceResult;
 use App\Enums\OrderStatus;
+use App\Enums\OrderStatusNote;
 use App\Enums\PaymentStatus;
 use Illuminate\Support\Str;
 
@@ -109,6 +110,13 @@ class CreateOrderAction extends BaseAction
                 'payment_method' => $data->paymentMethod ?? 'cod',
                 'payment_status' => PaymentStatus::PENDING,
                 'amount' => $data->totalAmount,
+            ]);
+
+            // Create initial status history
+            $order->statusHistories()->create([
+                'status' => OrderStatus::PENDING->value,
+                'notes' => OrderStatusNote::PENDING->value,
+                'created_by' => $data->userId,
             ]);
 
             // Apply voucher if provided
