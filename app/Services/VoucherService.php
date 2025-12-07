@@ -117,7 +117,15 @@ class VoucherService
                 description: $data['description'] ?? null,
                 isActive: $data['is_active'] ?? true
             );
-            return $this->createVoucherAction->execute($voucherData);
+            $result = $this->createVoucherAction->execute($voucherData);
+
+            // Dispatch event if voucher creation was successful and email notification is requested
+            if ($result->isSuccess() && !empty($data['send_email_notification'])) {
+                $voucher = $result->data['voucher'];
+                event(new \App\Events\VoucherCreated($voucher, true));
+            }
+
+            return $result;
         } catch (\InvalidArgumentException $e) {
             return ServiceResult::error($e->getMessage());
         }

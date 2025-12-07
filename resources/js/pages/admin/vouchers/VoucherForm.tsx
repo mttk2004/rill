@@ -51,6 +51,8 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
     used_count: 0
   });
 
+  const [sendEmailNotification, setSendEmailNotification] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -64,8 +66,14 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prepare data with email notification flag
+    const submitData = {
+      ...formData,
+      send_email_notification: sendEmailNotification ? 1 : 0
+    };
+
     if (isEditMode && voucher) {
-      router.put(`/admin/vouchers/${voucher.id}`, formData, {
+      router.put(`/admin/vouchers/${voucher.id}`, submitData, {
         preserveScroll: true,
         onSuccess: () => {
           showToast(`Đã cập nhật mã giảm giá "${formData.code}"`, 'success');
@@ -76,10 +84,13 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
         },
       });
     } else {
-      router.post('/admin/vouchers', formData, {
+      router.post('/admin/vouchers', submitData, {
         preserveScroll: true,
         onSuccess: () => {
-          showToast(`Đã tạo mã giảm giá mới "${formData.code}"`, 'success');
+          const message = sendEmailNotification
+            ? `Đã tạo mã giảm giá "${formData.code}" và đang gửi email thông báo đến khách hàng...`
+            : `Đã tạo mã giảm giá mới "${formData.code}"`;
+          showToast(message, 'success');
         },
         onError: (errors: Record<string, string>) => {
           const firstError = Object.values(errors)[0];
@@ -323,6 +334,27 @@ const VoucherForm = ({ voucher }: VoucherFormProps) => {
                     <option value={0}>Tạm ngưng (Inactive)</option>
                   </select>
                 </div>
+
+                {!isEditMode && (
+                  <div className="pt-4 border-t border-gray-200">
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={sendEmailNotification}
+                        onChange={(e) => setSendEmailNotification(e.target.checked)}
+                        className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-primary transition-colors">
+                          📧 Gửi email thông báo
+                        </span>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Gửi email cho tất cả khách hàng về voucher mới này. Email sẽ được gửi trong background sau khi tạo voucher thành công.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
           </div>

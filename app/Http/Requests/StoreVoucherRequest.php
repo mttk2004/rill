@@ -41,6 +41,7 @@ class StoreVoucherRequest extends FormRequest
             'valid_from' => 'required|date',
             'valid_to' => 'required|date|after:valid_from',
             'is_active' => 'boolean',
+            'send_email_notification' => 'nullable|boolean',
         ];
     }
 

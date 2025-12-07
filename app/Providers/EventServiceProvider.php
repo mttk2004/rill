@@ -17,7 +17,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         // Listeners are auto-discovered from app/Listeners directory
-        // No need to manually register them here
+        // VoucherCreated event listener is auto-discovered, no manual registration needed
     ];
 
     /**
