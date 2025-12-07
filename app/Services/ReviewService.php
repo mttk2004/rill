@@ -94,10 +94,27 @@ class ReviewService
     public function updateReview(int $reviewId, int $userId, string $productId, array $data): ServiceResult
     {
         try {
+            \Log::info('[REVIEW UPDATE] Starting update', [
+                'review_id' => $reviewId,
+                'user_id' => $userId,
+                'product_id' => $productId,
+                'data' => $data,
+            ]);
+
             // Get existing review to find order_item_id
             $existingReview = $this->reviewRepository->find($reviewId);
 
+            \Log::info('[REVIEW UPDATE] Existing review found', [
+                'review' => $existingReview ? [
+                    'id' => $existingReview->id,
+                    'user_id' => $existingReview->user_id,
+                    'product_id' => $existingReview->product_id,
+                    'order_item_id' => $existingReview->order_item_id,
+                ] : null,
+            ]);
+
             if (!$existingReview) {
+                \Log::error('[REVIEW UPDATE] Review not found');
                 return ServiceResult::error(
                     'Không tìm thấy đánh giá.',
                     ['error_code' => 'REVIEW_NOT_FOUND']
@@ -105,22 +122,47 @@ class ReviewService
             }
 
             // Verify ownership (early check)
-            if ($existingReview->user_id !== $userId) {
+            \Log::info('[REVIEW UPDATE] Checking ownership', [
+                'existing_user_id' => $existingReview->user_id,
+                'existing_user_id_type' => gettype($existingReview->user_id),
+                'current_user_id' => $userId,
+                'current_user_id_type' => gettype($userId),
+                'strict_match' => $existingReview->user_id === $userId,
+                'loose_match' => $existingReview->user_id == $userId,
+            ]);
+
+            // Use loose comparison (==) because DB returns string but Auth::id() might return int
+            if ($existingReview->user_id != $userId) {
+                \Log::error('[REVIEW UPDATE] Ownership check failed');
                 return ServiceResult::error(
                     'Bạn không có quyền chỉnh sửa đánh giá này.',
                     ['error_code' => 'UNAUTHORIZED']
                 );
-            }
-
-            // Use existing order_item_id from review
+            }            // Use existing order_item_id from review
             $reviewData = ReviewData::forUpdate($userId, $productId, $existingReview->order_item_id, $data);
 
             // Extract images
             $uploadedImages = $data['images'] ?? null;
             $existingImages = $data['existing_images'] ?? null;
 
+            \Log::info('[REVIEW UPDATE] Executing action', [
+                'review_data' => [
+                    'user_id' => $reviewData->userId,
+                    'product_id' => $reviewData->productId,
+                    'rating' => $reviewData->rating,
+                    'comment' => $reviewData->comment,
+                ],
+            ]);
+
             // Execute action
-            return $this->updateReviewAction->execute($reviewId, $reviewData, $uploadedImages, $existingImages);
+            $result = $this->updateReviewAction->execute($reviewId, $reviewData, $uploadedImages, $existingImages);
+
+            \Log::info('[REVIEW UPDATE] Action completed', [
+                'success' => $result->isSuccess(),
+                'message' => $result->message,
+            ]);
+
+            return $result;
         } catch (\InvalidArgumentException $e) {
             return ServiceResult::error($e->getMessage());
         }

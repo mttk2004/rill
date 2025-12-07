@@ -414,10 +414,26 @@ function ProductDetailContent({
 
             <form onSubmit={(e) => {
               e.preventDefault();
+
+              console.log('[REVIEW UPDATE] Form submit', {
+                product_slug: product.slug,
+                form_data: {
+                  rating: reviewForm.data.rating,
+                  comment: reviewForm.data.comment,
+                  images_count: reviewForm.data.images?.length || 0,
+                  existing_images_count: reviewForm.data.existing_images?.length || 0,
+                },
+                editing_review_id: editingReview?.id,
+              });
+
               reviewForm.post(`/products/${product.slug}/reviews`, {
                 preserveScroll: true,
                 forceFormData: true,
+                onBefore: () => {
+                  console.log('[REVIEW UPDATE] Request starting...');
+                },
                 onSuccess: () => {
+                  console.log('[REVIEW UPDATE] Success callback');
                   // Backend will send flash message
                   setEditingReview(null);
                   setSelectedImages([]);
@@ -426,6 +442,11 @@ function ProductDetailContent({
                   reviewForm.reset();
                 },
                 onError: (errors) => {
+                  console.error('[REVIEW UPDATE] Error callback', {
+                    errors: errors,
+                    all_keys: Object.keys(errors),
+                  });
+
                   // Only show error toast for validation errors
                   // Authorization errors are handled by backend flash message
                   if (errors.comment) {

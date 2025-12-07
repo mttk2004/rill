@@ -40,6 +40,14 @@ class ReviewController extends Controller
         // Check if it's an update (user already has a review)
         $existingReview = $this->reviewService->getUserReview(Auth::id(), $product->id);
 
+        \Log::info('[REVIEW CONTROLLER] Processing review submission', [
+            'user_id' => Auth::id(),
+            'product_id' => $product->id,
+            'has_existing_review' => $existingReview !== null,
+            'existing_review_id' => $existingReview?->id,
+            'validated_data' => $validated,
+        ]);
+
         if ($existingReview) {
             $result = $this->reviewService->updateReview(
                 $existingReview->id,
