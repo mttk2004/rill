@@ -157,52 +157,27 @@ class CollectionController extends Controller
      */
     public function update(UpdateCollectionRequest $request, string $id)
     {
-        \Log::info('[CollectionController] Update started', [
-            'collection_id' => $id,
-            'user_id' => $request->user()->id,
-            'has_file' => $request->hasFile('image'),
-            'request_all' => $request->except(['image']),
-        ]);
-
         $collection = Collection::findOrFail($id);
         $validated = $request->validated();
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            \Log::info('[CollectionController] Processing image upload', [
-                'file_name' => $request->file('image')->getClientOriginalName(),
-                'file_size' => $request->file('image')->getSize(),
-            ]);
-
             $validated['image'] = $this->collectionService->handleImageUpdate(
                 $collection,
                 $request->file('image')
             );
-
-            \Log::info('[CollectionController] Image uploaded', [
-                'image_path' => $validated['image'],
-            ]);
         }
 
         $collection->update($validated);
 
-        \Log::info('[CollectionController] Collection updated', [
-            'collection_id' => $collection->id,
-        ]);
-
         // Sync products
         if (isset($validated['products'])) {
             $this->collectionService->syncProducts($collection, $validated['products']);
-            \Log::info('[CollectionController] Products synced', [
-                'products_count' => count($validated['products']),
-            ]);
         }
 
         return redirect()->route('admin.collections.index')
             ->with('success', 'Collection đã được cập nhật thành công');
-    }
-
-    /**
+    }    /**
      * Remove the specified collection.
      */
     public function destroy(string $id)

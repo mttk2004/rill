@@ -11,29 +11,12 @@ class UpdateCollectionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Route parameter is 'id', not 'collection'
-        $collectionId = $this->route('id');
-
-        \Log::info('[UpdateCollectionRequest] Authorization check', [
-            'route_id' => $collectionId,
-            'all_route_params' => $this->route()->parameters(),
-            'user_id' => $this->user()?->id,
-            'user_is_admin' => $this->user()?->is_admin,
-            'request_method' => $this->method(),
-            'has_file' => $this->hasFile('image'),
-        ]);
-
         // Check if user is admin (direct check since no Policy exists)
-        $isAdmin = $this->user() && $this->user()->is_admin;
+        // Note: Route parameter is 'id', not 'collection'
+        return $this->user() && $this->user()->is_admin;
+    }
 
-        \Log::info('[UpdateCollectionRequest] Authorization result', [
-            'collection_id' => $collectionId,
-            'is_admin' => $isAdmin,
-            'authorized' => $isAdmin,
-        ]);
-
-        return $isAdmin;
-    }    /**
+    /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array

@@ -293,14 +293,6 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('[CollectionForm] Submit started', {
-      isEditMode,
-      collectionId: collection?.id,
-      hasImageFile: data.image instanceof File,
-      imageType: typeof data.image,
-      productsCount: data.products.length,
-    });
-
     if (isEditMode && collection) {
       // Prepare data for update
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -308,43 +300,18 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
 
       // If image is a string (not a File), remove it from payload to avoid validation error
       if (typeof data.image === 'string') {
-        console.log('[CollectionForm] Removing string image from payload', { image: data.image });
         delete updateData.image;
-      } else if (data.image instanceof File) {
-        console.log('[CollectionForm] Including image file in payload', {
-          fileName: data.image.name,
-          fileSize: data.image.size,
-          fileType: data.image.type,
-        });
       }
-
-      console.log('[CollectionForm] Sending update request', {
-        url: `/admin/collections/${collection.id}`,
-        hasImage: !!updateData.image,
-        dataKeys: Object.keys(updateData),
-      });
 
       router.post(`/admin/collections/${collection.id}`, updateData, {
         preserveScroll: true,
         forceFormData: true,
-        onBefore: () => {
-          console.log('[CollectionForm] Request starting...');
-        },
-        onSuccess: (page) => {
-          console.log('[CollectionForm] Update successful', { page });
+        onSuccess: () => {
           showToast(`Đã cập nhật bộ sưu tập "${data.name}"`, 'success');
         },
         onError: (errors: Record<string, string>) => {
-          console.error('[CollectionForm] Update failed', {
-            errors,
-            errorKeys: Object.keys(errors),
-            errorValues: Object.values(errors),
-          });
           const firstError = Object.values(errors)[0];
           showToast(firstError || 'Có lỗi xảy ra khi cập nhật', 'error');
-        },
-        onFinish: () => {
-          console.log('[CollectionForm] Request finished');
         },
       });
     } else {
