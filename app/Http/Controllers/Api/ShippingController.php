@@ -75,6 +75,16 @@ class ShippingController extends Controller
         // Get dynamic free shipping threshold
         $freeShippingThreshold = $shippingService->getFreeShippingThreshold();
 
+        \Log::info('Shipping fee calculated', [
+            'fee_result_success' => $feeResult->success,
+            'fee_result_data' => $feeResult->data ?? null,
+            'calculated_fee' => $shippingFee,
+            'is_free_shipping' => $isFreeShipping,
+            'cart_total' => $cartTotal,
+            'free_shipping_threshold' => $freeShippingThreshold,
+            'estimated_weight' => $estimatedWeight,
+        ]);
+
         return response()->json([
             'shipping_fee' => $shippingFee,
             'is_free_shipping' => $isFreeShipping,

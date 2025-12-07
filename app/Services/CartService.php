@@ -49,6 +49,12 @@ class CartService
      */
     public function getCartSummary(?int $userId = null, ?string $sessionId = null): array
     {
+        // Auto-detect userId and sessionId if not provided
+        if ($userId === null && $sessionId === null) {
+            $userId = auth()->id();
+            $sessionId = session()->getId();
+        }
+
         return $this->cartRepository->getCartSummary($userId, $sessionId);
     }
 

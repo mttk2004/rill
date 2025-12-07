@@ -111,7 +111,7 @@ class CheckoutController extends Controller
                 'user_id' => $user->id,
                 'url' => route('orders.thank-you', ['orderId' => $order->id])
             ]);
-            return redirect()->route('orders.thank-you', ['orderId' => $order->id])->with('success', 'Order placed successfully!');
+            return redirect()->route('orders.thank-you', ['orderId' => $order->id]);
         } catch (\Exception $e) {
             \Log::error('Checkout: Failed to create order.', ['error' => $e->getMessage()]);
             // Handle stock errors specifically

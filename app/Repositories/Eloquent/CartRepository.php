@@ -31,6 +31,11 @@ class CartRepository extends BaseRepository implements CartRepositoryInterface
      */
     public function getCartItems(?int $userId = null, ?string $sessionId = null): Collection
     {
+        // If neither userId nor sessionId provided, return empty collection
+        if (!$userId && !$sessionId) {
+            return new Collection();
+        }
+
         $query = $this->model->with(['product', 'product.artists']);
 
         if ($userId) {

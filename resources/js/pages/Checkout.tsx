@@ -47,7 +47,8 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const [loadingShipping, setLoadingShipping] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const finalTotal = cartTotal + shippingCost - discountAmount;
+  // Apply voucher to product price only, then add shipping
+  const finalTotal = Math.max(0, cartTotal - discountAmount) + shippingCost;
 
   // Fetch shipping cost when address changes
   useEffect(() => {
@@ -59,15 +60,29 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
 
       setLoadingShipping(true);
       try {
+        console.log('[SHIPPING] Fetching shipping cost', {
+          address_id: selectedAddress,
+          cart_total: cartTotal
+        });
+
         const response = await axios.post('/checkout/shipping-fee', {
           address_id: selectedAddress,
           order_total: cartTotal
         });
 
+        console.log('[SHIPPING] Response received:', {
+          full_response: response.data,
+          shipping_fee: response.data.shipping_fee,
+          is_free_shipping: response.data.is_free_shipping,
+          cart_total: response.data.cart_total,
+          total_amount: response.data.total_amount
+        });
+
         const fee = response.data.shipping_fee ?? 0;
+        console.log('[SHIPPING] Setting shipping cost to:', fee);
         setShippingCost(fee);
       } catch (error) {
-        console.error('Failed to fetch shipping cost:', error);
+        console.error('[SHIPPING] Failed to fetch shipping cost:', error);
         setShippingCost(35000);
       } finally {
         setLoadingShipping(false);
@@ -429,6 +444,8 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                     <span>Phí vận chuyển</span>
                     {loadingShipping ? (
                       <span className="text-gray-400">Đang tính...</span>
+                    ) : !selectedAddress ? (
+                      <span className="text-gray-400">Chọn địa chỉ</span>
                     ) : shippingCost === 0 ? (
                       <span className="font-medium text-green-600">Miễn phí</span>
                     ) : (
@@ -451,9 +468,9 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
                   fullWidth
                   className="mt-8"
                   onClick={handleSubmit}
-                  disabled={processing}
+                  disabled={processing || loadingShipping}
                 >
-                  {processing ? 'Đang xử lý...' : 'Đặt Hàng'}
+                  {processing ? 'Đang xử lý...' : loadingShipping ? 'Đang tính phí ship...' : 'Đặt Hàng'}
                 </Button>
 
                 <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-500">
