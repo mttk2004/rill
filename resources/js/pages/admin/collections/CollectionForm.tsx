@@ -238,7 +238,6 @@ const CollectionForm = ({ collection, allProducts, products }: CollectionFormPro
     if (file) {
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
-      // @ts-expect-error - Inertia handles File objects correctly
       setData('image', file);
     }
   };

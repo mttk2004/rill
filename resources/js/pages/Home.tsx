@@ -218,7 +218,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
-                      M
+                      <img src="/avatar-minh-tuan.jpg" alt="Minh Tuấn" className="w-full h-full rounded-full object-cover" />
                     </div>
                     <div>
                       <p className="font-bold text-gray-900">Minh Tuấn</p>
@@ -242,7 +242,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg">
-                      H
+                      <img src="/avatar-huong-tra.jpg" alt="Hương Trà" className="w-full h-full rounded-full object-cover" />
                     </div>
                     <div>
                       <p className="font-bold text-gray-900">Hương Trà</p>
@@ -266,7 +266,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
                   </p>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
-                      Q
+                      <img src="/avatar-quoc-anh.jpg" alt="Quốc Anh" className="w-full h-full rounded-full object-cover" />
                     </div>
                     <div>
                       <p className="font-bold text-gray-900">Quốc Anh</p>
@@ -277,8 +277,8 @@ export default function Home({ featuredProducts = [], collections = [], artists 
               </Reveal>
             </div>
           </div>
-        </section>
-      </div>
-    </AppLayout>
+        </section >
+      </div >
+    </AppLayout >
   );
 }

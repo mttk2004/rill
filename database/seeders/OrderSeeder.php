@@ -116,7 +116,7 @@ class OrderSeeder extends Seeder
 
         // Discount ngẫu nhiên
         $discountAmount = (rand(0, 10) > 8) ? round($subtotal * 0.05) : 0;
-        $shippingFee = rand(15000, 50000);
+        $shippingFee = [20000, 30000, 40000, 50000, 60000][array_rand([20000, 30000, 40000, 50000, 60000])];
         $totalAmount = $subtotal + $shippingFee - $discountAmount;
 
         // Timeline: Bắt đầu từ placed_at

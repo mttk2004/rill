@@ -11,7 +11,9 @@ class UpdateCollectionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $collection = $this->route('collection');
+        // Route parameter is 'id', not 'collection'
+        $collectionId = $this->route('id');
+        $collection = \App\Models\Collection::findOrFail($collectionId);
         return $this->user()->can('update', $collection);
     }
 
@@ -20,7 +22,7 @@ class UpdateCollectionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $collectionId = $this->route('collection');
+        $collectionId = $this->route('id');
 
         return [
             'name' => 'required|string|max:255',
