@@ -65,7 +65,7 @@ class DashboardController extends Controller
         return Inertia::render('admin/Dashboard', [
             'dashboardStats' => [
                 'revenue' => $allTimeOverview['revenue']['total_revenue'] ?? 0,
-                'newOrders' => $allTimeOverview['orders']['pending'] ?? 0,
+                'newOrders' => $allTimeOverview['orders']['total'] ?? 0,
                 'customers' => $allTimeOverview['users']['total'] ?? 0,
                 'totalProfit' => $allTimeTotalProfit,
             ],
