@@ -94,18 +94,26 @@ class ReviewService
     public function updateReview(int $reviewId, int $userId, string $productId, array $data): ServiceResult
     {
         try {
-            // Get order item (needed for DTO but not validation in update)
-            $orderItem = $this->reviewRepository->getUserOrderItem($userId, $productId);
+            // Get existing review to find order_item_id
+            $existingReview = $this->reviewRepository->find($reviewId);
 
-            if (!$orderItem) {
+            if (!$existingReview) {
                 return ServiceResult::error(
-                    'Bạn chỉ có thể đánh giá sản phẩm sau khi đã nhận hàng.',
-                    ['error_code' => 'ORDER_NOT_DELIVERED']
+                    'Không tìm thấy đánh giá.',
+                    ['error_code' => 'REVIEW_NOT_FOUND']
                 );
             }
 
-            // Create ReviewData DTO
-            $reviewData = ReviewData::forUpdate($userId, $productId, $orderItem->id, $data);
+            // Verify ownership (early check)
+            if ($existingReview->user_id !== $userId) {
+                return ServiceResult::error(
+                    'Bạn không có quyền chỉnh sửa đánh giá này.',
+                    ['error_code' => 'UNAUTHORIZED']
+                );
+            }
+
+            // Use existing order_item_id from review
+            $reviewData = ReviewData::forUpdate($userId, $productId, $existingReview->order_item_id, $data);
 
             // Extract images
             $uploadedImages = $data['images'] ?? null;

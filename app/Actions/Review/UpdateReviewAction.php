@@ -47,13 +47,7 @@ class UpdateReviewAction extends BaseAction
                 );
             }
 
-            // Verify ownership
-            if ($review->user_id !== $data->userId) {
-                return ServiceResult::error(
-                    'Bạn không có quyền chỉnh sửa đánh giá này.',
-                    ['error_code' => 'UNAUTHORIZED']
-                );
-            }
+            // Ownership already verified in ReviewService, skip duplicate check
 
             // Process image paths
             $imagePaths = [];
