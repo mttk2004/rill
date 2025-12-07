@@ -69,7 +69,8 @@ class CartController extends Controller
             return back()->with('error', $result->message);
         }
 
-        return back()->with('success', $result->message);
+        // Don't send flash message - frontend ShopContext handles toast notification
+        return back();
     }
 
     /**
