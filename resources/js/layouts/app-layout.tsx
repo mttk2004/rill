@@ -1,6 +1,7 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MusicPlayer from '@/components/MusicPlayer';
+import AnnouncementBar from '@/components/AnnouncementBar';
 import { type ReactNode, useEffect } from 'react';
 import { ShopProvider } from '@/context/ShopContext';
 import { usePage } from '@inertiajs/react';
@@ -37,6 +38,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <ShopProvider>
       <div className="flex min-h-screen flex-col bg-white font-sans text-gray-900 pb-20 md:pb-0">
+        <AnnouncementBar />
         <Navbar />
         <main className="flex-grow">
           {children}

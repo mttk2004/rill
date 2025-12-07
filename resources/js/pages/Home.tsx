@@ -192,22 +192,93 @@ export default function Home({ featuredProducts = [], collections = [], artists 
           </div>
         </section>
 
-        {/* Newsletter CTA */}
+        {/* Customer Testimonials */}
         <section className="py-20 bg-white">
-          <Reveal width="100%">
-            <div className="mx-auto max-w-4xl px-4 text-center">
-              <h2 className="text-3xl font-serif font-bold text-gray-900 mb-4">Đừng Bỏ Lỡ Giai Điệu Nào</h2>
-              <p className="text-gray-500 mb-8">Đăng ký nhận tin để là người đầu tiên biết về các đĩa than giới hạn và ưu đãi độc quyền.</p>
-              <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
-                <input
-                  type="email"
-                  placeholder="Nhập địa chỉ email của bạn"
-                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-                <Button variant="primary" className="whitespace-nowrap px-6">Đăng Ký</Button>
-              </form>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Reveal>
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Khách Hàng Nói Gì Về Chúng Tôi</h2>
+                <div className="h-1 w-20 bg-accent mx-auto rounded-full"></div>
+                <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
+                  Hàng nghìn khách hàng đã tin tưởng và hài lòng với chất lượng sản phẩm cùng dịch vụ của Rill Store.
+                </p>
+              </div>
+            </Reveal>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <Reveal delay={0.1}>
+                <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex items-center gap-1 text-yellow-400 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 leading-relaxed mb-6 italic">
+                    "Chất lượng đĩa than tuyệt vời, đóng gói cẩn thận. Đặc biệt là bộ sưu tập Jazz của shop rất đa dạng và chính hãng. Sẽ tiếp tục ủng hộ!"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
+                      M
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">Minh Tuấn</p>
+                      <p className="text-sm text-gray-500">Đã mua 12 đĩa</p>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.2}>
+                <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex items-center gap-1 text-yellow-400 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 leading-relaxed mb-6 italic">
+                    "Giao hàng nhanh chóng, nhân viên tư vấn nhiệt tình. Đĩa đến tay trong tình trạng hoàn hảo. Âm thanh analog thật sự khác biệt!"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center text-white font-bold text-lg">
+                      H
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">Hương Trà</p>
+                      <p className="text-sm text-gray-500">Khách hàng thân thiết</p>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+
+              <Reveal delay={0.3}>
+                <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex items-center gap-1 text-yellow-400 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 leading-relaxed mb-6 italic">
+                    "Mình rất hài lòng với các album giới hạn. Giá cả hợp lý, chính sách đổi trả rõ ràng. Rill Store là địa chỉ tin cậy cho người yêu vinyl!"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-lg">
+                      Q
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900">Quốc Anh</p>
+                      <p className="text-sm text-gray-500">Vinyl collector</p>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
             </div>
-          </Reveal>
+          </div>
         </section>
       </div>
     </AppLayout>
