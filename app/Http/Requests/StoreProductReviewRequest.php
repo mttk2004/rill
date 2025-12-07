@@ -11,9 +11,20 @@ class StoreProductReviewRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Use Policy created in Task 2
-        // $this->route('product') gets the product from {product} in URL
-        return $this->user()->can('review', $this->route('product'));
+        $product = $this->route('product');
+
+        // Check if user already has a review for this product (update case)
+        $existingReview = \App\Models\ProductReview::where('user_id', $this->user()->id)
+            ->where('product_id', $product->id)
+            ->first();
+
+        // If updating own review, allow it
+        if ($existingReview) {
+            return true;
+        }
+
+        // For new reviews, check if user can review this product (has delivered order)
+        return $this->user()->can('review', $product);
     }
 
     /**

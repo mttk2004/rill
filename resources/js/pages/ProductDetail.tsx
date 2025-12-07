@@ -418,7 +418,7 @@ function ProductDetailContent({
                 preserveScroll: true,
                 forceFormData: true,
                 onSuccess: () => {
-                  showToast('Đã cập nhật đánh giá', 'success');
+                  // Backend will send flash message
                   setEditingReview(null);
                   setSelectedImages([]);
                   setImagePreviews([]);
@@ -426,10 +426,10 @@ function ProductDetailContent({
                   reviewForm.reset();
                 },
                 onError: (errors) => {
+                  // Only show error toast for validation errors
+                  // Authorization errors are handled by backend flash message
                   if (errors.comment) {
                     showToast(errors.comment, 'error');
-                  } else {
-                    showToast('Cập nhật thất bại', 'error');
                   }
                 },
               });

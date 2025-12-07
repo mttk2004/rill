@@ -47,19 +47,21 @@ class ReviewController extends Controller
                 $product->id,
                 $validated
             );
+            $successMessage = 'Đánh giá của bạn đã được cập nhật.';
         } else {
             $result = $this->reviewService->createReview(
                 Auth::id(),
                 $product->id,
                 $validated
             );
+            $successMessage = 'Đánh giá của bạn đã được gửi.';
         }
 
         if (!$result->isSuccess()) {
-            return back()->with('error', $result->message);
+            return back()->withErrors(['review' => $result->message])->with('error', $result->message);
         }
 
-        return back();
+        return back()->with('success', $successMessage);
     }
 
     /**
