@@ -42,10 +42,10 @@ class HomeController extends Controller
             'featuredProducts' => $featuredProducts,
             'collections' => $collections,
             'artists' => $artists,
-            'settings' => [
-                'returnPolicyDays' => $returnPolicyDays,
-                'returnPolicyCondition' => $returnPolicyCondition,
-            ],
+            // Don't override settings - let middleware handle it via shared data
+            // Just pass the specific values Home needs
+            'returnPolicyDays' => $returnPolicyDays,
+            'returnPolicyCondition' => $returnPolicyCondition,
         ]);
     }
 }

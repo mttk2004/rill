@@ -11,13 +11,11 @@ interface HomeProps {
   featuredProducts: Product[];
   collections: Collection[];
   artists: Artist[];
-  settings: {
-    returnPolicyDays: string;
-    returnPolicyCondition: string;
-  };
+  returnPolicyDays: string;
+  returnPolicyCondition: string;
 }
 
-export default function Home({ featuredProducts = [], collections = [], artists = [], settings }: HomeProps) {
+export default function Home({ featuredProducts = [], collections = [], artists = [], returnPolicyDays, returnPolicyCondition }: HomeProps) {
   // Fallback to empty arrays if data not provided
 
   return (
@@ -184,7 +182,7 @@ export default function Home({ featuredProducts = [], collections = [], artists 
                   </div>
                   <h3 className="text-xl font-bold mb-3">Bảo Hành 1 Đổi 1</h3>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    Chính sách đổi trả trong vòng {settings.returnPolicyDays} ngày nếu có {settings.returnPolicyCondition}. Hỗ trợ kỹ thuật trọn đời.
+                    Chính sách đổi trả trong vòng {returnPolicyDays} ngày nếu có {returnPolicyCondition}. Hỗ trợ kỹ thuật trọn đời.
                   </p>
                 </div>
               </Reveal>
