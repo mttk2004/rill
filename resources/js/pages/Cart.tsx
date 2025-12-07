@@ -1,12 +1,16 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useShop } from '../context/ShopContext';
 import AppLayout from '@/layouts/app-layout';
 import Button from '../components/Button';
 import { Trash2, ArrowLeft } from 'lucide-react';
+import FreeShippingProgress from '../components/FreeShippingProgress';
+import type { SharedData } from '@/types';
 
 function CartContent() {
   const { cart, removeFromCart, updateQuantity, cartTotal } = useShop();
+  const { settings } = usePage<SharedData>().props;
+  const freeShippingThreshold = settings?.shipping?.free_threshold || 1000000;
 
   if (cart.length === 0) {
     return (
@@ -98,6 +102,13 @@ function CartContent() {
               <div className="rounded-xl bg-gray-50 p-6">
                 <h2 className="text-lg font-medium text-gray-900 mb-6">Tổng quan đơn hàng</h2>
                 <div className="space-y-4">
+                  {/* Free Shipping Progress */}
+                  <FreeShippingProgress
+                    currentAmount={cartTotal}
+                    freeShippingThreshold={freeShippingThreshold}
+                    className="-mx-2"
+                  />
+
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600">Tạm tính</p>
                     <p className="text-sm font-medium text-gray-900">
@@ -106,7 +117,13 @@ function CartContent() {
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600">Phí vận chuyển</p>
-                    <p className="text-sm font-medium text-gray-900">Tính tại bước thanh toán</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {cartTotal >= freeShippingThreshold ? (
+                        <span className="text-green-600 font-semibold">Miễn phí</span>
+                      ) : (
+                        'Tính tại bước thanh toán'
+                      )}
+                    </p>
                   </div>
                   <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
                     <p className="text-base font-bold text-gray-900">Tổng cộng</p>

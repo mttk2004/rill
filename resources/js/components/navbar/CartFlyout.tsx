@@ -1,9 +1,11 @@
 
 import React from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ShoppingBag, Trash2 } from 'lucide-react';
 import { useShop } from '../../context/ShopContext';
 import Button from '../Button';
+import FreeShippingProgress from '../FreeShippingProgress';
+import type { SharedData } from '@/types';
 
 interface CartFlyoutProps {
   isOpen: boolean;
@@ -11,6 +13,8 @@ interface CartFlyoutProps {
 
 const CartFlyout: React.FC<CartFlyoutProps> = ({ isOpen }) => {
   const { cart, cartCount, cartTotal, removeFromCart } = useShop();
+  const { settings } = usePage<SharedData>().props;
+  const freeShippingThreshold = settings?.shipping?.free_threshold || 1000000;
 
   if (!isOpen) return null;
 
@@ -50,6 +54,12 @@ const CartFlyout: React.FC<CartFlyoutProps> = ({ isOpen }) => {
             </div>
 
             <div className="border-t border-gray-100 pt-4 space-y-4">
+              {/* Free Shipping Progress */}
+              <FreeShippingProgress
+                currentAmount={cartTotal}
+                freeShippingThreshold={freeShippingThreshold}
+              />
+
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Tạm tính:</span>
                 <span className="font-bold text-primary text-lg">
