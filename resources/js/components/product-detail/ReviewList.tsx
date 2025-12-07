@@ -27,9 +27,32 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCan
     setIsLightboxOpen(true);
   };
 
+  const userHasReviewed = currentUserId ? reviews.some(r => r.user?.id === currentUserId) : false;
+  const canWriteReview = userCanReview && !userHasReviewed;
+
   return (
     <div className="border-t border-gray-100 pt-16 mb-20 animate-fade-in-up">
-      <h2 className="text-2xl font-serif font-bold text-gray-900 mb-8">Đánh giá khách hàng</h2>
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl font-serif font-bold text-gray-900">Đánh giá khách hàng</h2>
+        {reviews.length > 0 && (
+          <div className="relative group">
+            <Button
+              variant={canWriteReview ? "outline" : "outline"}
+              onClick={canWriteReview ? onWriteReview : undefined}
+              disabled={!canWriteReview}
+              className={!canWriteReview ? "cursor-not-allowed opacity-50" : ""}
+            >
+              {userHasReviewed ? "Bạn đã đánh giá" : "Viết đánh giá"}
+            </Button>
+            {!userCanReview && !userHasReviewed && (
+              <div className="absolute right-0 top-full mt-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <p>Bạn cần mua và nhận sản phẩm này trước khi có thể đánh giá</p>
+                <div className="absolute -top-1 right-4 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {reviews.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -113,8 +136,10 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCan
           <p className="text-gray-500 mb-4">Chưa có đánh giá nào cho sản phẩm này.</p>
           {userCanReview ? (
             <Button variant="outline" onClick={onWriteReview}>Viết đánh giá đầu tiên</Button>
+          ) : currentUserId ? (
+            <p className="text-sm text-gray-400">Mua và nhận sản phẩm để có thể đánh giá</p>
           ) : (
-            <p className="text-sm text-gray-400">Mua sản phẩm để đánh giá</p>
+            <p className="text-sm text-gray-400">Đăng nhập và mua sản phẩm để đánh giá</p>
           )}
         </div>
       )}
