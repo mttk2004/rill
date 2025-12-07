@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { toast } from 'react-toastify';
 
 export function useCartOperations() {
   const [isUpdating, setIsUpdating] = useState<number | null>(null);

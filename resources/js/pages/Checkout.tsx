@@ -6,7 +6,7 @@ import Button from '../components/Button';
 import { CheckCircle, CreditCard, MapPin, Ticket } from 'lucide-react';
 import type { UserAddress } from '@/types';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useToast } from '../context/ToastContext';
 
 interface Voucher {
   id: number;
@@ -25,6 +25,7 @@ interface CheckoutProps {
 
 function CheckoutContent({ addresses = [] }: CheckoutProps) {
   const { cart, cartTotal } = useShop();
+  const { showToast } = useToast();
   const defaultAddress = addresses.find(a => a.is_default) || addresses[0];
   const [availableVouchers, setAvailableVouchers] = useState<Voucher[]>([]);
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
@@ -125,7 +126,7 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
 
     // Validate address selected
     if (!data.shipping_address_id) {
-      toast.error('Vui lòng chọn địa chỉ giao hàng');
+      showToast('Vui lòng chọn địa chỉ giao hàng', 'error');
       return;
     }
 
@@ -148,16 +149,16 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
         if (axios.isAxiosError(error) && error.response?.data) {
           const errorData = error.response.data;
           if (errorData.message) {
-            toast.error(errorData.message);
+            showToast(errorData.message, 'error');
           } else if (errorData.errors) {
             // Handle validation errors
             const firstError = Object.values(errorData.errors)[0];
-            toast.error(Array.isArray(firstError) ? firstError[0] : firstError);
+            showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
           } else {
-            toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
+            showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error');
           }
         } else {
-          toast.error('Có lỗi xảy ra. Vui lòng thử lại.');
+          showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error');
         }
       }
       return;
@@ -170,17 +171,17 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
       onSuccess: () => {
         // Backend will redirect to thank-you page
         setIsSuccess(true);
-        toast.success('Đặt hàng thành công!');
+        showToast('Đặt hàng thành công!', 'success');
       },
       onError: (errors: Record<string, string>) => {
         console.error('Checkout error:', errors);
         if (errors.stock) {
-          toast.error(errors.stock);
+          showToast(errors.stock, 'error');
         } else if (errors.order) {
-          toast.error(errors.order);
+          showToast(errors.order, 'error');
         } else {
           const firstError = Object.values(errors)[0];
-          toast.error(Array.isArray(firstError) ? firstError : String(firstError));
+          showToast(Array.isArray(firstError) ? firstError : String(firstError), 'error');
         }
       }
     });
