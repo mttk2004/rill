@@ -15,6 +15,8 @@ const AnnouncementBar = () => {
 
   const { enabled: isEnabled, content, type } = props.settings?.banner || {};
 
+  console.log('[AnnouncementBar] Rendering:', { isEnabled, content, type, url: window.location.pathname });
+
   if (!isEnabled || !content) return null;
 
   const bannerStyles: Record<string, { bg: string; text: string; icon: typeof Info; border: string }> = {

@@ -38,8 +38,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <ShopProvider>
       <div className="flex min-h-screen flex-col bg-white font-sans text-gray-900 pb-20 md:pb-0">
-        <AnnouncementBar />
-        <Navbar />
+        <div className="sticky top-0 z-50">
+          <AnnouncementBar />
+          <Navbar />
+        </div>
         <main className="flex-grow">
           {children}
         </main>
