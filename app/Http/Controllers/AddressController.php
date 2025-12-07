@@ -49,7 +49,7 @@ class AddressController extends Controller
             return back()->with('error', $result->message);
         }
 
-        return back()->with('success', $result->message);
+        return back();
     }
 
     /**
@@ -65,7 +65,7 @@ class AddressController extends Controller
             return back()->with('error', $result->message);
         }
 
-        return back()->with('success', $result->message);
+        return back();
     }
 
     /**
@@ -81,7 +81,7 @@ class AddressController extends Controller
             return back()->with('error', $result->message);
         }
 
-        return back()->with('success', $result->message);
+        return back();
     }
 
     /**
@@ -97,6 +97,6 @@ class AddressController extends Controller
             return back()->with('error', $result->message);
         }
 
-        return back()->with('success', $result->message);
+        return back();
     }
 }
