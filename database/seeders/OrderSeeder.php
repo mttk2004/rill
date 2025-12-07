@@ -36,10 +36,15 @@ class OrderSeeder extends Seeder
 
             $this->command->info("📊 Found {$customers->count()} customers, {$admins->count()} admins, {$products->count()} products");
 
-            // Tạo 10 đơn hàng với các kịch bản khác nhau
+            // Tạo 15 đơn hàng với các kịch bản khác nhau
             $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - quy trình hoàn hảo');
             $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - có đánh giá 5 sao', true);
             $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - giao nhanh trong ngày');
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - khách hàng hài lòng');
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - đóng gói kỹ lưỡng', true);
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - quà tặng kèm theo');
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - giao đúng hẹn');
+            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - khách hàng quay lại mua tiếp');
 
             $this->createOrderWithStatusHistory('shipped', $customers, $admins, $products, 'Đơn hàng đang giao - đã xuất kho');
             $this->createOrderWithStatusHistory('shipped', $customers, $admins, $products, 'Đơn hàng đang giao - giao xa');
