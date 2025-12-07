@@ -23,7 +23,6 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   selectedGenre,
   selectedLabel,
   selectedArtist,
-  availableArtists,
   setSelectedGenre,
   setSelectedArtist,
   setSelectedLabel,
@@ -45,7 +44,7 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
       <span className="text-sm text-gray-500 mr-2">Đang lọc theo:</span>
       {activeCollection && (
         <Link
-          to="/products"
+          href="/products"
           className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-accent/10 text-xs font-medium text-accent hover:bg-accent/20"
         >
           Bộ sưu tập: {activeCollection.name} <X size={12} />
