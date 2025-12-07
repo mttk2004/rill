@@ -42,6 +42,10 @@ interface FilterSidebarProps {
   onArtistChange: (artistId: string) => void;
   openSections: { genre: boolean; artist: boolean; label: boolean; price: boolean };
   toggleSection: (section: 'genre' | 'artist' | 'label' | 'price') => void;
+  priceRange: { min: string; max: string };
+  onPriceRangeChange: (range: { min: string; max: string }) => void;
+  onApplyPriceFilter: () => void;
+  onClearPriceFilter: () => void;
 }
 
 const FilterSidebar: React.FC<FilterSidebarProps> = ({
@@ -55,8 +59,21 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onLabelChange,
   onArtistChange,
   openSections,
-  toggleSection
+  toggleSection,
+  priceRange,
+  onPriceRangeChange,
+  onApplyPriceFilter,
+  onClearPriceFilter
 }) => {
+  const formatPrice = (value: string) => {
+    const number = value.replace(/\D/g, '');
+    return number ? parseInt(number).toLocaleString('vi-VN') : '';
+  };
+
+  const handlePriceInput = (field: 'min' | 'max', value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    onPriceRangeChange({ ...priceRange, [field]: cleaned });
+  };
   return (
     <div className="space-y-1">
       {/* Genre Filter - Visual Chips */}
@@ -71,8 +88,8 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               key={genre}
               onClick={() => onGenreChange(genre)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${selectedGenre === genre
-                  ? 'bg-primary text-white border-primary shadow-sm'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                ? 'bg-primary text-white border-primary shadow-sm'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
             >
               {genre === 'all' ? 'Tất cả' : genre}
@@ -149,23 +166,56 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
       </FilterSection>
 
-      {/* Price Range (Visual only) */}
+      {/* Price Range Filter */}
       <FilterSection
         title="Khoảng giá"
         isOpen={openSections.price}
         onToggle={() => toggleSection('price')}
       >
-        <div className="px-1">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-            <span>0đ</span>
-            <span>5.000.000đ+</span>
+        <div className="px-1 space-y-4">
+          <div className="flex gap-3 items-center">
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 mb-1 block">Từ</label>
+              <input
+                type="text"
+                placeholder="0"
+                value={formatPrice(priceRange.min)}
+                onChange={(e) => handlePriceInput('min', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+              />
+            </div>
+            <span className="text-gray-400 mt-5">—</span>
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 mb-1 block">Đến</label>
+              <input
+                type="text"
+                placeholder="5.000.000"
+                value={formatPrice(priceRange.max)}
+                onChange={(e) => handlePriceInput('max', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+              />
+            </div>
           </div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gray-300 w-full rounded-full"></div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={onApplyPriceFilter}
+              className="flex-1 px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Áp dụng
+            </button>
+            {(priceRange.min || priceRange.max) && (
+              <button
+                onClick={onClearPriceFilter}
+                className="px-4 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Xóa
+              </button>
+            )}
           </div>
-          <div className="flex gap-2 mt-4">
-            <input type="text" placeholder="Thấp nhất" className="w-1/2 p-2 border border-gray-200 rounded text-sm text-center" readOnly />
-            <input type="text" placeholder="Cao nhất" className="w-1/2 p-2 border border-gray-200 rounded text-sm text-center" readOnly />
+
+          <div className="text-xs text-gray-400 text-center">
+            Nhập giá theo đơn vị VNĐ
           </div>
         </div>
       </FilterSection>

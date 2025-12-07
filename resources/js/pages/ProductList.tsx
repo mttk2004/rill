@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import ProductCard from '../components/ProductCard';
 import { Filter, ArrowUpDown, X, Search, Disc } from 'lucide-react';
@@ -23,6 +23,8 @@ interface ProductListProps {
     collection?: string;
     sort?: string;
     page?: string;
+    min_price?: string;
+    max_price?: string;
   };
   pagination: {
     current_page: number;
@@ -63,6 +65,14 @@ export default function ProductList({
   const selectedLabel = filters.label || 'all';
   const selectedArtist = filters.artist || 'all';
   const sortOption = filters.sort || 'default';
+  const minPrice = filters.min_price || '';
+  const maxPrice = filters.max_price || '';
+
+  // Local state for price inputs
+  const [priceRange, setPriceRange] = useState({
+    min: minPrice,
+    max: maxPrice
+  });
 
   // Extract unique filter options from available data
   const genres = useMemo(() => ['all', ...availableGenres], [availableGenres]);
@@ -101,7 +111,34 @@ export default function ProductList({
   const setSelectedArtist = (artist: string) => updateFilters({ artist });
   const setSortOption = (sort: string) => updateFilters({ sort });
 
+  const applyPriceFilter = () => {
+    const newFilters: Partial<typeof filters> = {};
+
+    if (priceRange.min) {
+      const minValue = parseInt(priceRange.min.replace(/\D/g, ''));
+      if (!isNaN(minValue) && minValue >= 0) {
+        newFilters.min_price = minValue.toString();
+      }
+    }
+
+    if (priceRange.max) {
+      const maxValue = parseInt(priceRange.max.replace(/\D/g, ''));
+      if (!isNaN(maxValue) && maxValue >= 0) {
+        newFilters.max_price = maxValue.toString();
+      }
+    }
+
+    updateFilters(newFilters);
+  };
+
+  const clearPriceFilter = () => {
+    setPriceRange({ min: '', max: '' });
+    const clearedFilters: Partial<typeof filters> = { min_price: '', max_price: '' };
+    updateFilters(clearedFilters);
+  };
+
   const clearFilters = () => {
+    setPriceRange({ min: '', max: '' });
     router.visit('/products', {
       preserveState: false,
     });
@@ -185,6 +222,8 @@ export default function ProductList({
               setSelectedArtist={setSelectedArtist}
               setSelectedLabel={setSelectedLabel}
               clearFilters={clearFilters}
+              priceRange={priceRange}
+              clearPriceFilter={clearPriceFilter}
             />
           </div>
 
@@ -207,6 +246,10 @@ export default function ProductList({
                   onArtistChange={setSelectedArtist}
                   openSections={openSections}
                   toggleSection={toggleSection}
+                  priceRange={priceRange}
+                  onPriceRangeChange={setPriceRange}
+                  onApplyPriceFilter={applyPriceFilter}
+                  onClearPriceFilter={clearPriceFilter}
                 />
               </div>
             </aside>
@@ -235,6 +278,10 @@ export default function ProductList({
                       onArtistChange={setSelectedArtist}
                       openSections={openSections}
                       toggleSection={toggleSection}
+                      priceRange={priceRange}
+                      onPriceRangeChange={setPriceRange}
+                      onApplyPriceFilter={applyPriceFilter}
+                      onClearPriceFilter={clearPriceFilter}
                     />
                   </div>
                   <div className="p-4 border-t border-gray-100 bg-gray-50">

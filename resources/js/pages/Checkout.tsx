@@ -221,6 +221,24 @@ function CheckoutContent({ addresses = [] }: CheckoutProps) {
       <Head title="Thanh toán - Rill" />
       <div className="bg-gray-50 py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Back to Cart Link */}
+          <div className="mb-6">
+            <Link
+              href="/cart"
+              className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors group"
+            >
+              <svg
+                className="w-4 h-4 transition-transform group-hover:-translate-x-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Quay lại giỏ hàng
+            </Link>
+          </div>
+
           <h1 className="mb-8 text-center font-serif text-3xl font-bold text-gray-900">Thanh toán</h1>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">

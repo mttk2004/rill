@@ -96,6 +96,17 @@ class GetProductsWithFiltersAction
                     ->where('is_active', true);
             });
         }
+
+        // Price range filter
+        if (!empty($filters['min_price'])) {
+            $minPrice = (float) $filters['min_price'];
+            $query->where('price', '>=', $minPrice);
+        }
+
+        if (!empty($filters['max_price'])) {
+            $maxPrice = (float) $filters['max_price'];
+            $query->where('price', '<=', $maxPrice);
+        }
     }
 
     protected function applySorting(Builder $query, string $sort): void

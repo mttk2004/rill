@@ -14,6 +14,8 @@ interface ActiveFiltersProps {
   setSelectedArtist: (val: string) => void;
   setSelectedLabel: (val: string) => void;
   clearFilters: () => void;
+  priceRange: { min: string; max: string };
+  clearPriceFilter: () => void;
 }
 
 const ActiveFilters: React.FC<ActiveFiltersProps> = ({
@@ -25,11 +27,18 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
   setSelectedGenre,
   setSelectedArtist,
   setSelectedLabel,
-  clearFilters
+  clearFilters,
+  priceRange,
+  clearPriceFilter
 }) => {
-  const hasActiveFilters = selectedGenre !== 'all' || selectedLabel !== 'all' || selectedArtist !== 'all' || activeCollection;
+  const hasPriceFilter = priceRange.min || priceRange.max;
+  const hasActiveFilters = selectedGenre !== 'all' || selectedLabel !== 'all' || selectedArtist !== 'all' || activeCollection || hasPriceFilter;
 
   if (!hasActiveFilters) return null;
+
+  const formatPrice = (value: string) => {
+    return parseInt(value).toLocaleString('vi-VN');
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-2 mt-4 animate-in fade-in slide-in-from-top-1">
@@ -64,6 +73,18 @@ const ActiveFilters: React.FC<ActiveFiltersProps> = ({
           className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-200"
         >
           Hãng: {selectedLabel} <X size={12} />
+        </button>
+      )}
+      {hasPriceFilter && (
+        <button
+          onClick={clearPriceFilter}
+          className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-700 hover:bg-gray-200"
+        >
+          Giá:
+          {priceRange.min && <span>{formatPrice(priceRange.min)}đ</span>}
+          {priceRange.min && priceRange.max && <span className="mx-1">-</span>}
+          {priceRange.max && <span>{formatPrice(priceRange.max)}đ</span>}
+          <X size={12} />
         </button>
       )}
       <button

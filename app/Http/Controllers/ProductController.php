@@ -25,7 +25,7 @@ class ProductController extends Controller
      */
     public function index(Request $request): Response
     {
-        $filters = $request->only(['search', 'genre', 'label', 'artist', 'collection', 'sort', 'page']);
+        $filters = $request->only(['search', 'genre', 'label', 'artist', 'collection', 'sort', 'page', 'min_price', 'max_price']);
 
         $serviceResult = $this->productQueryService->getProducts($filters);
 
@@ -63,6 +63,8 @@ class ProductController extends Controller
                 'artist' => $filters['artist'] ?? null,
                 'collection' => $filters['collection'] ?? null,
                 'sort' => $filters['sort'] ?? null,
+                'min_price' => $filters['min_price'] ?? null,
+                'max_price' => $filters['max_price'] ?? null,
             ],
             'pagination' => $result['pagination'],
         ]);
