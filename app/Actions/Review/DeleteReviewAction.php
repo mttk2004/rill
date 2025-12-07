@@ -38,8 +38,8 @@ class DeleteReviewAction extends BaseAction
                 );
             }
 
-            // Verify ownership
-            if ($review->user_id !== $userId) {
+            // Verify ownership (loose comparison due to string vs int type mismatch)
+            if ($review->user_id != $userId) {
                 return ServiceResult::error(
                     'Bạn không có quyền xóa đánh giá này.',
                     ['error_code' => 'UNAUTHORIZED']

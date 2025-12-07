@@ -77,8 +77,8 @@ class ReviewController extends Controller
      */
     public function destroy(\App\Models\ProductReview $review)
     {
-        // Check if the authenticated user owns this review
-        if ($review->user_id !== Auth::id()) {
+        // Check if the authenticated user owns this review (loose comparison for type safety)
+        if ($review->user_id != Auth::id()) {
             return back()->with('error', 'Bạn không có quyền xóa đánh giá này.');
         }
 
@@ -88,6 +88,6 @@ class ReviewController extends Controller
             return back()->with('error', $result->message);
         }
 
-        return back();
+        return back()->with('success', 'Đánh giá của bạn đã được xóa.');
     }
 }

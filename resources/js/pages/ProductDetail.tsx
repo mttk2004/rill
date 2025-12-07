@@ -629,10 +629,14 @@ function ProductDetailContent({
               preserveScroll: true,
               preserveState: false,
               onSuccess: () => {
-                showToast('Đã xóa đánh giá', 'success');
+                // Backend sends flash message, no need for toast here
                 setDeleteReviewId(null);
               },
-              onError: () => showToast('Không thể xóa đánh giá', 'error'),
+              onError: () => {
+                // Only show error toast for unexpected errors
+                // Authorization errors are handled by backend flash
+                showToast('Không thể xóa đánh giá', 'error');
+              },
             });
           }
         }}
