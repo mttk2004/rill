@@ -215,7 +215,15 @@ const Navbar = () => {
                       onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                       className={`text-gray-500 hover:text-primary transition-colors ${isUserMenuOpen ? 'text-primary' : ''}`}
                     >
-                      <User size={20} />
+                      {user?.avatar_url ? (
+                        <img
+                          src={user.avatar_url}
+                          alt={user.name}
+                          className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 hover:border-primary transition-colors"
+                        />
+                      ) : (
+                        <User size={20} />
+                      )}
                     </button>
 
                     <UserDropdown

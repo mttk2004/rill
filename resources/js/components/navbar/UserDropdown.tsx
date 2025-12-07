@@ -32,9 +32,22 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onLogout, 
 
   return (
     <div ref={menuRef} className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-100 bg-white shadow-xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden z-50">
-      <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
-        <p className="text-sm font-bold text-gray-900">{user?.name || 'Người dùng'}</p>
-        <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
+      <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50 flex items-center gap-3">
+        {user?.avatar_url ? (
+          <img
+            src={user.avatar_url}
+            alt={user.name}
+            className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-semibold">
+            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-gray-900 truncate">{user?.name || 'Người dùng'}</p>
+          <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
+        </div>
       </div>
       <div className="py-1">
         <Link
