@@ -46,7 +46,7 @@ Route::get('/orders/thank-you', [OrderController::class, 'thankYou'])->name('ord
 
 // Customer routes (authenticated only)
 Route::middleware(['auth', 'verified', 'customer'])->group(function () {
-    Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    // Note: /cart/add is public route above, accessible to both guests and authenticated users
     Route::put('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/{cartItem}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');

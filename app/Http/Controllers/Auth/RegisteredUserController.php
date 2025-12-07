@@ -33,6 +33,10 @@ class RegisteredUserController extends Controller
     {
         $validated = $request->validated();
 
+        // Store old session ID before registration for cart merge
+        $oldSessionId = $request->session()->getId();
+        $request->session()->put('_previous_session_id', $oldSessionId);
+
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],

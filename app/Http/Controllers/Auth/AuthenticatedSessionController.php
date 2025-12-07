@@ -29,6 +29,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Store old session ID before regeneration for cart merge
+        $oldSessionId = $request->session()->getId();
+        $request->session()->put('_previous_session_id', $oldSessionId);
+
         $request->authenticate();
 
         $request->session()->regenerate();

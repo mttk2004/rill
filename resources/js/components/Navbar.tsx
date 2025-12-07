@@ -188,30 +188,30 @@ const Navbar = () => {
                   <Search size={20} />
                 </button>
 
+                {/* Cart with Flyout - Show for both guest and logged in users */}
+                <div
+                  className="relative z-50 h-full flex items-center"
+                  onMouseEnter={() => setIsCartHovered(true)}
+                  onMouseLeave={() => setIsCartHovered(false)}
+                >
+                  <Link
+                    href="/cart"
+                    id="cart-icon-desktop"
+                    className={`relative text-gray-500 hover:text-primary transition-colors py-4 ${isBouncing ? 'animate-cart-bounce' : ''}`}
+                  >
+                    <ShoppingBag size={20} />
+                    {cartCount > 0 && (
+                      <span className="absolute -right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Link>
+
+                  <CartFlyout isOpen={isCartHovered} />
+                </div>
+
                 {isLoggedIn ? (
                   <>
-                    {/* Cart with Flyout */}
-                    <div
-                      className="relative z-50 h-full flex items-center"
-                      onMouseEnter={() => setIsCartHovered(true)}
-                      onMouseLeave={() => setIsCartHovered(false)}
-                    >
-                      <Link
-                        href="/cart"
-                        id="cart-icon-desktop"
-                        className={`relative text-gray-500 hover:text-primary transition-colors py-4 ${isBouncing ? 'animate-cart-bounce' : ''}`}
-                      >
-                        <ShoppingBag size={20} />
-                        {cartCount > 0 && (
-                          <span className="absolute -right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-                            {cartCount}
-                          </span>
-                        )}
-                      </Link>
-
-                      <CartFlyout isOpen={isCartHovered} />
-                    </div>
-
                     {/* User Dropdown */}
                     <div className="relative">
                       <button
@@ -250,20 +250,19 @@ const Navbar = () => {
                   <Search size={20} />
                 </button>
 
-                {isLoggedIn && (
-                  <Link
-                    href="/cart"
-                    id="cart-icon-mobile"
-                    className={`relative text-gray-500 hover:text-primary ${isBouncing ? 'animate-cart-bounce' : ''}`}
-                  >
-                    <ShoppingBag size={20} />
-                    {cartCount > 0 && (
-                      <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Link>
-                )}
+                {/* Cart icon - Show for both guest and logged in users */}
+                <Link
+                  href="/cart"
+                  id="cart-icon-mobile"
+                  className={`relative text-gray-500 hover:text-primary ${isBouncing ? 'animate-cart-bounce' : ''}`}
+                >
+                  <ShoppingBag size={20} />
+                  {cartCount > 0 && (
+                    <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
 
                 <button
                   onClick={() => setIsOpen(!isOpen)}
