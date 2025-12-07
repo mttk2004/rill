@@ -204,7 +204,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
       preserveScroll: true,
       forceFormData: true,
       onSuccess: () => {
-        showToast('Đánh giá sản phẩm thành công!', 'success');
+        // Backend sends flash message, no need for duplicate toast
         setReviewingProduct(null);
         setSelectedImages([]);
         setImagePreviews([]);
@@ -490,8 +490,17 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                                           comment: existingReview.comment,
                                           images: [],
                                         });
+                                        // Display existing images
+                                        if (existingReview.images && existingReview.images.length > 0) {
+                                          setImagePreviews(existingReview.images);
+                                        } else {
+                                          setImagePreviews([]);
+                                        }
+                                        setSelectedImages([]);
                                       } else {
                                         reviewForm.setData({ rating: 5, comment: '', images: [] });
+                                        setImagePreviews([]);
+                                        setSelectedImages([]);
                                       }
                                     }}
                                     className="text-xs text-amber-600 hover:text-amber-700 font-medium flex items-center gap-1"

@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { User, Star, Edit2, Trash2 } from 'lucide-react';
+import { User, Edit2, Trash2 } from 'lucide-react';
 import { Review } from '../../types';
 import Button from '../Button';
 import { formatRelativeTime } from '../../utils/date';
 import ImageLightbox from '../ImageLightbox';
+import StarRating from '../StarRating';
 
 interface ReviewListProps {
   reviews: Review[];
@@ -69,15 +70,8 @@ const ReviewList: React.FC<ReviewListProps> = ({ reviews, currentUserId, userCan
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900">{review.user?.name || 'Ẩn danh'}</h4>
-                    <div className="flex text-yellow-400 text-xs mt-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={12}
-                          fill={i < review.rating ? "currentColor" : "none"}
-                          className={i < review.rating ? "text-yellow-400" : "text-gray-300"}
-                        />
-                      ))}
+                    <div className="mt-0.5">
+                      <StarRating rating={review.rating} size={12} showRating={false} />
                     </div>
                   </div>
                 </div>

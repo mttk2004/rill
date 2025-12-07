@@ -17,6 +17,7 @@ import ImageLightbox from '../components/ImageLightbox';
 import QuantitySelector from '../components/product-detail/QuantitySelector';
 import ReviewList from '../components/product-detail/ReviewList';
 import RelatedProducts from '../components/product-detail/RelatedProducts';
+import StarRating from '../components/StarRating';
 
 interface ProductDetailProps {
   product: Product;
@@ -247,16 +248,7 @@ function ProductDetailContent({
 
               {/* Rating Summary */}
               <div className="flex items-center gap-2 mb-6">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={16}
-                      fill={i < Math.round(averageRating) ? "currentColor" : "none"}
-                      className={i < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"}
-                    />
-                  ))}
-                </div>
+                <StarRating rating={averageRating} size={18} showRating={true} />
                 <span className="text-sm text-gray-500">({reviews.length} đánh giá)</span>
               </div>
 
@@ -409,7 +401,7 @@ function ProductDetailContent({
       {editingReview && (
         <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Chỉnh sửa đánh giá</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">{editingReview.id === 0 ? 'Viết đánh giá' : 'Chỉnh sửa đánh giá'}</h3>
             <p className="text-sm text-gray-600 mb-6">{product.name}</p>
 
             <form onSubmit={(e) => {
@@ -611,7 +603,9 @@ function ProductDetailContent({
                   fullWidth
                   disabled={reviewForm.processing || reviewForm.data.comment.length < 10}
                 >
-                  {reviewForm.processing ? 'Đang cập nhật...' : 'Cập nhật đánh giá'}
+                  {reviewForm.processing
+                    ? (editingReview.id === 0 ? 'Đang gửi...' : 'Đang cập nhật...')
+                    : (editingReview.id === 0 ? 'Gửi đánh giá' : 'Cập nhật đánh giá')}
                 </Button>
               </div>
             </form>
