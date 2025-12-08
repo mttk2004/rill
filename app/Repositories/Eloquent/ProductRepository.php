@@ -223,32 +223,74 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     }
 
     /**
-     * Decrease product stock.
+     * Decrease product stock with row locking to prevent race conditions.
      *
      * @param int $productId
      * @param int $quantity
      * @return bool
+     * @throws \Exception
      */
     public function decreaseStock(int $productId, int $quantity): bool
     {
-        return $this->model
-            ->where('id', $productId)
-            ->where('stock_quantity', '>=', $quantity)
-            ->decrement('stock_quantity', $quantity);
+        return \DB::transaction(function () use ($productId, $quantity) {
+            // Lock the product row to prevent concurrent modifications
+            $product = $this->model
+                ->lockForUpdate()
+                ->find($productId);
+
+            if (!$product) {
+                throw new \Exception("Product not found: {$productId}");
+            }
+
+            if ($product->stock_quantity < $quantity) {
+                throw new \Exception(
+                    "Insufficient stock for product '{$product->name}'. " .
+                    "Available: {$product->stock_quantity}, Requested: {$quantity}"
+                );
+            }
+
+            // Safely decrement stock
+            $product->decrement('stock_quantity', $quantity);
+
+            // Update status to out_of_stock if needed
+            if ($product->fresh()->stock_quantity === 0) {
+                $product->update(['status' => 'out_of_stock']);
+            }
+
+            return true;
+        });
     }
 
     /**
-     * Increase product stock.
+     * Increase product stock with validation.
      *
      * @param int $productId
      * @param int $quantity
      * @return bool
+     * @throws \Exception
      */
     public function increaseStock(int $productId, int $quantity): bool
     {
-        return $this->model
-            ->where('id', $productId)
-            ->increment('stock_quantity', $quantity);
+        if ($quantity <= 0) {
+            throw new \InvalidArgumentException('Quantity must be greater than 0');
+        }
+
+        return \DB::transaction(function () use ($productId, $quantity) {
+            $product = $this->model->find($productId);
+
+            if (!$product) {
+                throw new \Exception("Product not found: {$productId}");
+            }
+
+            $product->increment('stock_quantity', $quantity);
+
+            // Update status back to active if it was out of stock
+            if ($product->fresh()->stock_quantity > 0 && $product->status === 'out_of_stock') {
+                $product->update(['status' => 'active']);
+            }
+
+            return true;
+        });
     }
 
     /**

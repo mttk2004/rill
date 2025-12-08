@@ -22,7 +22,7 @@ interface SearchSuggestion {
 }
 
 const SEARCH_HISTORY_KEY = 'rill_search_history';
-const MAX_HISTORY_ITEMS = 5;
+// const MAX_HISTORY_ITEMS = 5;
 
 const SearchOverlay: React.FC<SearchOverlayProps> = ({
   isOpen,

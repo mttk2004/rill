@@ -48,12 +48,21 @@ class CreateOrderAction extends BaseAction
                 return $this->error('Invalid shipping address');
             }
 
-            // Validate and lock stock for all products
+            // CRITICAL: Lock all products first to prevent race conditions
             $productIds = array_column($data->items, 'product_id');
-            $products = $this->productRepository->findBy('id', $productIds);
 
+            // Lock products in a deterministic order (by ID) to prevent deadlocks
+            sort($productIds);
+
+            $products = \DB::table('products')
+                ->lockForUpdate()
+                ->whereIn('id', $productIds)
+                ->get()
+                ->keyBy('id');
+
+            // Validate stock availability with locked data
             foreach ($data->items as $item) {
-                $product = $products->firstWhere('id', $item['product_id']);
+                $product = $products->get($item['product_id']);
 
                 if (!$product) {
                     return $this->error("Product not found: {$item['product_id']}");
@@ -67,12 +76,19 @@ class CreateOrderAction extends BaseAction
                 }
             }
 
-            // Decrease stock for all products
+            // Decrease stock for all products (now safe within transaction with locks)
             foreach ($data->items as $item) {
-                $this->productRepository->decreaseStock(
-                    $item['product_id'],
-                    $item['quantity']
-                );
+                try {
+                    $this->productRepository->decreaseStock(
+                        $item['product_id'],
+                        $item['quantity']
+                    );
+                } catch (\Exception $e) {
+                    return $this->error(
+                        "Failed to decrease stock: {$e->getMessage()}",
+                        ['product_id' => $item['product_id']]
+                    );
+                }
             }
 
             // Create order
