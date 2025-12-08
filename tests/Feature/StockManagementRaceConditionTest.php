@@ -39,6 +39,7 @@ describe('Stock Management Race Conditions', function () {
                 'address' => '123 Test St',
                 'ward' => 'Test Ward',
                 'district' => 'Test District',
+                'city' => 'Test City',
                 'province' => 'Test Province',
             ],
             subtotal: 100000,
@@ -52,32 +53,27 @@ describe('Stock Management Race Conditions', function () {
 
         // Simulate concurrent execution
         $results = [];
-        $exceptions = [];
 
         // Try to create two orders sequentially (simulating race condition scenario)
-        try {
-            $result1 = $createOrderAction->execute($orderData1);
-            $results[] = $result1;
-        } catch (\Exception $e) {
-            $exceptions[] = $e->getMessage();
-        }
+        $result1 = $createOrderAction->execute($orderData1);
+        $results[] = $result1;
 
-        try {
-            $result2 = $createOrderAction->execute($orderData2);
-            $results[] = $result2;
-        } catch (\Exception $e) {
-            $exceptions[] = $e->getMessage();
-        }
+        $result2 = $createOrderAction->execute($orderData2);
+        $results[] = $result2;
 
         // Assertions
         $successCount = collect($results)->filter(fn($r) => $r->isSuccess())->count();
+        $errorCount = collect($results)->filter(fn($r) => !$r->isSuccess())->count();
 
         // Only ONE order should succeed
-        expect($successCount)->toBeLessThanOrEqual(1);
+        expect($successCount)->toBe(1);
 
-        // At least one should fail with insufficient stock
-        expect($exceptions)->not->toBeEmpty();
-        expect(implode(' ', $exceptions))->toContain('Insufficient stock');
+        // One should fail
+        expect($errorCount)->toBe(1);
+
+        // The failed one should have insufficient stock error
+        $failedResult = collect($results)->first(fn($r) => !$r->isSuccess());
+        expect($failedResult->message)->toContain('Insufficient stock');
 
         // Stock should be 0 or 1 (not negative!)
         $product->refresh();
@@ -181,6 +177,7 @@ describe('Order Cancellation Stock Restoration', function () {
                 'address' => '123 Test St',
                 'ward' => 'Test Ward',
                 'district' => 'Test District',
+                'city' => 'Test City',
                 'province' => 'Test Province',
             ],
             subtotal: 300000,
