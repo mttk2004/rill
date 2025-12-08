@@ -31,8 +31,8 @@ class AddToCartAction extends BaseAction
     public function execute(CartItemData $data): ServiceResult
     {
         return DB::transaction(function () use ($data) {
-            // Get product
-            $product = $this->productRepository->find($data->productId);
+            // Lock product to get accurate stock count
+            $product = Product::lockForUpdate()->find($data->productId);
 
             if (!$product) {
                 return ServiceResult::error('Product not found');
@@ -46,7 +46,7 @@ class AddToCartAction extends BaseAction
                 );
             }
 
-            // Check stock quantity
+            // Check stock quantity (now with locked data)
             if ($data->quantity > $product->stock_quantity) {
                 return ServiceResult::error(
                     "Chỉ còn {$product->stock_quantity} sản phẩm trong kho",

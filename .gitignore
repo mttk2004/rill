@@ -32,3 +32,4 @@ yarn.lock
 /jules-scratch
 *.log
 /public/images
+temp/

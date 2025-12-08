@@ -276,7 +276,8 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         }
 
         return \DB::transaction(function () use ($productId, $quantity) {
-            $product = $this->model->find($productId);
+            // Lock product for consistency (though race condition impact is low here)
+            $product = $this->model->lockForUpdate()->find($productId);
 
             if (!$product) {
                 throw new \Exception("Product not found: {$productId}");
