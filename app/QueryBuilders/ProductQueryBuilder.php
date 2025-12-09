@@ -204,14 +204,13 @@ class ProductQueryBuilder
     }
 
     /**
-     * Filter low stock products.
+     * Filter low stock products (including out of stock).
      *
      * @return self
      */
     public function lowStock(): self
     {
-        $this->query->whereColumn('stock_quantity', '<=', 'min_stock_level')
-            ->where('stock_quantity', '>', 0);
+        $this->query->whereColumn('stock_quantity', '<=', 'min_stock_level');
 
         return $this;
     }
