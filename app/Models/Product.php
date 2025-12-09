@@ -288,15 +288,15 @@ class Product extends Model
 
     public function getTotalSoldAttribute(): int
     {
-        // Check if already loaded via withSum
-        if ($this->relationLoaded('orderItems') && isset($this->attributes['order_items_sum_quantity'])) {
+        // Check if already loaded via withSum or addSelect
+        if (isset($this->attributes['order_items_sum_quantity'])) {
             return (int) $this->attributes['order_items_sum_quantity'];
         }
 
-        // Fallback to query
+        // Fallback to query (only count confirmed/shipped/delivered orders)
         return (int) $this->orderItems()
             ->whereHas('order', function ($query) {
-                $query->whereIn('status', ['confirmed', 'processing', 'shipped', 'delivered']);
+                $query->whereIn('status', ['confirmed', 'shipped', 'delivered']);
             })
             ->sum('quantity');
     }

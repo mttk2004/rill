@@ -69,7 +69,14 @@ class ProductController extends Controller
 
         // Eager load relationships (include soft deleted products)
         $query = $queryBuilder->getQuery();
-        $products = $query->with([
+
+        // DEBUG: Log SQL query when sort is sold_desc
+        if ($sort === 'sold_desc') {
+            \Log::info('=== SQL QUERY DEBUG ===');
+            \Log::info('SQL: ' . $query->toSql());
+            \Log::info('Bindings: ' . json_encode($query->getBindings()));
+        }
+        $query->with([
             'artists' => function ($q) {
                 $q->orderByPivot('sort_order');
             },
@@ -78,13 +85,21 @@ class ProductController extends Controller
                     ->orderBy('name')
                     ->limit(1);
             }
-        ])
-        ->withCount('orderItems')
-        ->paginate($perPage)
-        ->withQueryString();
+        ]);
+
+        // Only add withCount if not using bestSellers (which already includes it)
+        if ($sort !== 'sold_desc') {
+            $query->withCount('orderItems');
+        }
+
+        $products = $query->paginate($perPage)
+            ->withQueryString();
 
         // Add sales data efficiently (no N+1 queries)
-        $this->productQueryService->enrichProductsWithSalesData($products->getCollection());
+        // Skip enriching when sort is sold_desc because bestSellers() already calculated it
+        if ($sort !== 'sold_desc') {
+            $this->productQueryService->enrichProductsWithSalesData($products->getCollection());
+        }
 
         // Get stats and form options
         $stats = $this->productQueryService->getProductStats();

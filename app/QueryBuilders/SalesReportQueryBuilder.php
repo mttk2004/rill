@@ -112,7 +112,7 @@ class SalesReportQueryBuilder
                 DB::raw('SUM(order_items.total_price) as total_revenue'),
                 DB::raw('AVG(order_items.unit_price) as avg_price'),
             ])
-            ->where('orders.status', '!=', 'cancelled');
+            ->whereIn('orders.status', ['confirmed', 'shipped', 'delivered']);
 
         if ($from) {
             $query->where('orders.created_at', '>=', $from);

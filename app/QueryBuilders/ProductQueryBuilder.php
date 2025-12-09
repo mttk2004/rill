@@ -300,14 +300,21 @@ class ProductQueryBuilder
 
     /**
      * Sort by best sellers (total sold).
+     * Only counts confirmed, processing, shipped, and delivered orders.
      *
      * @return self
      */
     public function bestSellers(): self
     {
-        $this->query->withCount(['orderItems as total_sold' => function ($q) {
-            $q->selectRaw('SUM(quantity)');
-        }])->orderByDesc('total_sold')->orderBy('id', 'asc');
+        // Use 'order_items_sum_quantity' to match accessor check in Product model
+        // This prevents the accessor from overriding with filtered query
+        $this->query->addSelect([
+            'order_items_sum_quantity' => \DB::table('order_items')
+                ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->whereIn('orders.status', ['confirmed', 'shipped', 'delivered'])
+                ->whereColumn('order_items.product_id', 'products.id')
+                ->selectRaw('COALESCE(SUM(order_items.quantity), 0)')
+        ])->orderByDesc('order_items_sum_quantity')->orderBy('id', 'asc');
 
         return $this;
     }
