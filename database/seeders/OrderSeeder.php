@@ -16,13 +16,13 @@ use Illuminate\Support\Facades\DB;
 class OrderSeeder extends Seeder
 {
     /**
-     * Tạo 10 đơn hàng chất lượng với status histories chi tiết
-     * Tất cả đơn hàng sử dụng COD (thanh toán khi nhận hàng)
+     * Tạo 50+ đơn hàng với dữ liệu phong phú để demo dashboard
+     * 40 đơn delivered (trong 6 tháng), 5 shipped, 3 confirmed, 2 pending, 2 cancelled
      */
     public function run(): void
     {
         DB::transaction(function () {
-            $this->command->info('🚀 Starting quality-focused order seeding...');
+            $this->command->info('🚀 Starting comprehensive order seeding...');
 
             // Lấy dữ liệu cần thiết
             $customers = User::where('role', 'customer')->get();
@@ -35,29 +35,76 @@ class OrderSeeder extends Seeder
             }
 
             $this->command->info("📊 Found {$customers->count()} customers, {$admins->count()} admins, {$products->count()} products");
+            $this->command->info("📦 Creating 52 orders with varied timelines...\n");
 
-            // Tạo 15 đơn hàng với các kịch bản khác nhau
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - quy trình hoàn hảo');
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - có đánh giá 5 sao', true);
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - giao nhanh trong ngày');
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - khách hàng hài lòng');
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - đóng gói kỹ lưỡng', true);
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - quà tặng kèm theo');
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - giao đúng hẹn');
-            $this->createOrderWithStatusHistory('delivered', $customers, $admins, $products, 'Đơn hàng giao thành công - khách hàng quay lại mua tiếp');
+            // Tạo 40 đơn hàng đã giao (delivered) - phân bố trong 6 tháng
+            $this->command->info("Creating 40 delivered orders (last 6 months)...");
+            for ($i = 1; $i <= 40; $i++) {
+                $shouldReview = ($i % 5 === 0); // Mỗi 5 đơn có 1 review
+                $this->createOrderWithStatusHistory(
+                    'delivered',
+                    $customers,
+                    $admins,
+                    $products,
+                    "Đơn hàng giao thành công #{$i}",
+                    $shouldReview
+                );
+            }
 
-            $this->createOrderWithStatusHistory('shipped', $customers, $admins, $products, 'Đơn hàng đang giao - đã xuất kho');
-            $this->createOrderWithStatusHistory('shipped', $customers, $admins, $products, 'Đơn hàng đang giao - giao xa');
+            // Tạo 5 đơn đang giao (shipped)
+            $this->command->info("\nCreating 5 shipped orders...");
+            for ($i = 1; $i <= 5; $i++) {
+                $this->createOrderWithStatusHistory(
+                    'shipped',
+                    $customers,
+                    $admins,
+                    $products,
+                    "Đơn hàng đang giao #{$i}"
+                );
+            }
 
-            $this->createOrderWithStatusHistory('confirmed', $customers, $admins, $products, 'Đơn hàng đã xác nhận - đang chuẩn bị');
-            $this->createOrderWithStatusHistory('confirmed', $customers, $admins, $products, 'Đơn hàng đã xác nhận - chờ đóng gói');
+            // Tạo 3 đơn đã xác nhận (confirmed)
+            $this->command->info("\nCreating 3 confirmed orders...");
+            for ($i = 1; $i <= 3; $i++) {
+                $this->createOrderWithStatusHistory(
+                    'confirmed',
+                    $customers,
+                    $admins,
+                    $products,
+                    "Đơn hàng đã xác nhận #{$i}"
+                );
+            }
 
-            $this->createOrderWithStatusHistory('pending', $customers, $admins, $products, 'Đơn hàng mới - chờ xử lý');
-            $this->createOrderWithStatusHistory('pending', $customers, $admins, $products, 'Đơn hàng mới - khách hàng vừa đặt');
+            // Tạo 2 đơn chờ xử lý (pending)
+            $this->command->info("\nCreating 2 pending orders...");
+            for ($i = 1; $i <= 2; $i++) {
+                $this->createOrderWithStatusHistory(
+                    'pending',
+                    $customers,
+                    $admins,
+                    $products,
+                    "Đơn hàng mới #{$i}"
+                );
+            }
 
-            $this->createOrderWithStatusHistory('cancelled', $customers, $admins, $products, 'Đơn hàng đã hủy - khách hàng đổi ý');
+            // Tạo 2 đơn đã hủy (cancelled)
+            $this->command->info("\nCreating 2 cancelled orders...");
+            for ($i = 1; $i <= 2; $i++) {
+                $this->createOrderWithStatusHistory(
+                    'cancelled',
+                    $customers,
+                    $admins,
+                    $products,
+                    "Đơn hàng đã hủy #{$i}"
+                );
+            }
 
-            $this->command->info("\n✅ Successfully created 10 quality orders with detailed status histories!");
+            $this->command->info("\n✅ Successfully created 52 orders with detailed histories!");
+            $this->command->info("   • 40 delivered (last 6 months)");
+            $this->command->info("   • 5 shipped");
+            $this->command->info("   • 3 confirmed");
+            $this->command->info("   • 2 pending");
+            $this->command->info("   • 2 cancelled");
         });
     }
 
@@ -124,13 +171,13 @@ class OrderSeeder extends Seeder
         $shippingFee = [20000, 30000, 40000, 50000, 60000][array_rand([20000, 30000, 40000, 50000, 60000])];
         $totalAmount = $subtotal + $shippingFee - $discountAmount;
 
-        // Timeline: Bắt đầu từ placed_at
+        // Timeline: Bắt đầu từ placed_at với phạm vi rộng hơn
         $placedAt = match($finalStatus) {
-            'delivered' => now()->subDays(rand(7, 30)),
+            'delivered' => now()->subDays(rand(10, 180)), // 10 ngày đến 6 tháng
             'shipped' => now()->subDays(rand(2, 5)),
             'confirmed' => now()->subDays(rand(1, 3)),
-            'pending' => now()->subHours(rand(1, 24)),
-            'cancelled' => now()->subDays(rand(1, 7)),
+            'pending' => now()->subHours(rand(1, 48)),
+            'cancelled' => now()->subDays(rand(1, 14)),
         };
 
         // Tạo order với status pending ban đầu (sẽ tự động tạo history đầu tiên)
@@ -144,6 +191,8 @@ class OrderSeeder extends Seeder
             'shipping_address' => $shippingAddressData,
             'notes' => null,
             'placed_at' => $placedAt,
+            'created_at' => $placedAt,
+            'updated_at' => $placedAt,
         ]);
 
         // Tạo order items
