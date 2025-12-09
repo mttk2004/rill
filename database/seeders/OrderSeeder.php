@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\DB;
 class OrderSeeder extends Seeder
 {
     /**
-     * Tạo 50+ đơn hàng với dữ liệu phong phú để demo dashboard
-     * 40 đơn delivered (trong 6 tháng), 5 shipped, 3 confirmed, 2 pending, 2 cancelled
+     * Tạo 70+ đơn hàng với dữ liệu phong phú để demo dashboard
+     * 70 đơn delivered (trong 6 tháng), 5 shipped, 3 confirmed, 2 pending, 2 cancelled
      */
     public function run(): void
     {
@@ -35,11 +35,11 @@ class OrderSeeder extends Seeder
             }
 
             $this->command->info("📊 Found {$customers->count()} customers, {$admins->count()} admins, {$products->count()} products");
-            $this->command->info("📦 Creating 52 orders with varied timelines...\n");
+            $this->command->info("📦 Creating 72 orders with varied timelines...\n");
 
-            // Tạo 40 đơn hàng đã giao (delivered) - phân bố trong 6 tháng
-            $this->command->info("Creating 40 delivered orders (last 6 months)...");
-            for ($i = 1; $i <= 40; $i++) {
+            // Tạo 70 đơn hàng đã giao (delivered) - phân bố trong 6 tháng
+            $this->command->info("Creating 70 delivered orders (last 6 months)...");
+            for ($i = 1; $i <= 70; $i++) {
                 $shouldReview = ($i % 5 === 0); // Mỗi 5 đơn có 1 review
                 $this->createOrderWithStatusHistory(
                     'delivered',

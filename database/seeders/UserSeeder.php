@@ -28,6 +28,7 @@ class UserSeeder extends Seeder
                 'email' => 'nguyenvananh@gmail.com',
                 'phone' => '0987654321',
                 'gender' => 'male',
+                'avatar' => 'avatars/ymS8QLywYTAXDaU0AGjgRqNJedS4MXlrRw2EqxH8.jpg',
                 'date_of_birth' => '1992-03-15',
             ],
             [

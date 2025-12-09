@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronUp, ChevronDown, Check } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Artist } from '../../types';
 
 interface FilterSectionProps {
@@ -76,23 +76,26 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   };
   return (
     <div className="space-y-1">
-      {/* Genre Filter - Visual Chips */}
+      {/* Genre Filter - Radio Buttons */}
       <FilterSection
         title="Thể loại"
         isOpen={openSections.genre}
         onToggle={() => toggleSection('genre')}
       >
-        <div className="flex flex-wrap gap-2">
+        <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 pr-2">
           {genres.map(genre => (
             <button
               key={genre}
               onClick={() => onGenreChange(genre)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${selectedGenre === genre
-                ? 'bg-primary text-white border-primary shadow-sm'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedGenre === genre
+                ? 'bg-primary/5 text-primary font-medium'
+                : 'text-gray-600 hover:bg-gray-50'
                 }`}
             >
-              {genre === 'all' ? 'Tất cả' : genre}
+              <div className={`h-4 w-4 rounded-full border flex items-center justify-center flex-shrink-0 ${selectedGenre === genre ? 'border-primary' : 'border-gray-300'}`}>
+                {selectedGenre === genre && <div className="h-2 w-2 rounded-full bg-primary" />}
+              </div>
+              <span className="truncate">{genre === 'all' ? 'Tất cả' : genre}</span>
             </button>
           ))}
         </div>
@@ -131,20 +134,22 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
       </FilterSection>
 
-      {/* Label Filter - Custom List */}
+      {/* Label Filter - Radio Buttons */}
       <FilterSection
         title="Hãng đĩa"
         isOpen={openSections.label}
         onToggle={() => toggleSection('label')}
       >
-        <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 pr-2">
+        <div className="space-y-2 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 pr-2">
           <button
             onClick={() => onLabelChange('all')}
-            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedLabel === 'all' ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+            className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedLabel === 'all'
+              ? 'bg-primary/5 text-primary font-medium'
+              : 'text-gray-600 hover:bg-gray-50'
               }`}
           >
-            <div className={`flex h-4 w-4 items-center justify-center rounded border ${selectedLabel === 'all' ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
-              {selectedLabel === 'all' && <Check size={10} />}
+            <div className={`h-4 w-4 rounded-full border flex items-center justify-center flex-shrink-0 ${selectedLabel === 'all' ? 'border-primary' : 'border-gray-300'}`}>
+              {selectedLabel === 'all' && <div className="h-2 w-2 rounded-full bg-primary" />}
             </div>
             Tất cả hãng đĩa
           </button>
@@ -153,11 +158,13 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
               <button
                 key={label}
                 onClick={() => onLabelChange(label)}
-                className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedLabel === label ? 'bg-primary/5 text-primary font-medium' : 'text-gray-600 hover:bg-gray-50'
+                className={`flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition-colors ${selectedLabel === label
+                  ? 'bg-primary/5 text-primary font-medium'
+                  : 'text-gray-600 hover:bg-gray-50'
                   }`}
               >
-                <div className={`flex h-4 w-4 items-center justify-center rounded border ${selectedLabel === label ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
-                  {selectedLabel === label && <Check size={10} />}
+                <div className={`h-4 w-4 rounded-full border flex items-center justify-center flex-shrink-0 ${selectedLabel === label ? 'border-primary' : 'border-gray-300'}`}>
+                  {selectedLabel === label && <div className="h-2 w-2 rounded-full bg-primary" />}
                 </div>
                 <span className="truncate">{label}</span>
               </button>

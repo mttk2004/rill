@@ -21,7 +21,7 @@ class CollectionSeeder extends Seeder
                 'name' => 'Sản phẩm nổi bật',
                 'type' => 'featured',
                 'description' => 'Các sản phẩm nổi bật được chọn lọc',
-                'image' => null, // Admin can upload later
+                'image' => 'collections/DFcszKPkNGbFbKikwu7Ue6TOJO0lftHOKWjXlPjs.webp',
                 'is_active' => true,
             ]
         );
@@ -69,7 +69,7 @@ class CollectionSeeder extends Seeder
                 'slug' => 'rock-legends',
                 'type' => 'curated',
                 'description' => 'Huyền thoại nhạc Rock qua các thời kỳ',
-                'image' => null,
+                'image' => 'collections/uu5Vvs0ZXzdPugmUowO2qPgW21fewXvh64nq7iby.webp',
                 'is_active' => true,
             ],
         ];

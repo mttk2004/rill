@@ -19,6 +19,7 @@ class ProductSeeder extends Seeder
             // Nhạc vàng Việt Nam
             [
                 'name' => 'Diễm Xưa',
+                'image' => 'products/iEfLvIFjGm7OXUL7HL5rFCvd0y4j3ravH6uSSSHN.webp',
                 'description' => 'Album tuyển tập những ca khúc bất hủ của nhạc sĩ Trịnh Công Sơn do Khánh Ly thể hiện. Bao gồm các tác phẩm như "Diễm Xưa", "Biển Nhớ", "Nối Vòng Tay Lớn" - những sáng tác đi vào lòng người Việt.',
                 'detailed_description' => '**Diễm Xưa** là một trong những tuyển tập tiêu biểu nhất của dòng nhạc Trịnh Công Sơn qua giọng hát Khánh Ly. Album không chỉ là tập hợp các ca khúc mà còn là một cuốn nhật ký bằng âm nhạc, ghi lại những rung động tinh tế, nỗi buồn man mác và triết lý nhân sinh sâu sắc của người nhạc sĩ tài hoa.
 
@@ -34,6 +35,7 @@ Bản thu âm trong tuyển tập này giữ được chất mộc mạc, chân 
             ],
             [
                 'name' => 'Tôi Sẽ Quay Về',
+                'image' => 'products/hhvK4qqY7gCRy58TMqWgm1CUZqnWjrBsgx221Z7K.webp',
                 'description' => 'Tuyển tập các ca khúc của Lam Trường với phong cách ballad đầy cảm xúc, đánh dấu thời kỳ hoàng kim của nhạc trẻ Việt Nam cuối thập niên 1990. Album bao gồm "Tình Thôi Xót Xa", "Tình Ca Không Quên".',
                 'detailed_description' => 'Album `Tôi Sẽ Quay Về` là cột mốc quan trọng đánh dấu thời kỳ hoàng kim của Làn Sóng Xanh và sự nghiệp rực rỡ của "Anh Hai" Lam Trường. Ra đời trong giai đoạn nhạc trẻ Việt Nam bắt đầu chuyển mình mạnh mẽ vào cuối những năm 90, album mang đậm hơi thở của Cantopop (nhạc Pop Hồng Kông) nhưng được Việt hóa đầy tinh tế, phù hợp với tâm tư của khán giả trẻ thời bấy giờ.
 
@@ -47,6 +49,7 @@ Sản phẩm này không chỉ là một đĩa nhạc giải trí mà còn là m
             ],
             [
                 'name' => 'Đàm Vĩnh Hưng & Những Tình Khúc Bất Hủ',
+                'image' => 'products/jnzSafQkj5xc6fC9sWaCM9voGReM6aqKs4Elrkwz.webp',
                 'description' => 'Album tuyển chọn những ca khúc kinh điển được Đàm Vĩnh Hưng thể hiện lại với phong cách độc đáo. Bao gồm "Biển Tình", "Xin Lỗi Tình Yêu", mang đến cảm xúc sâu lắng cho người nghe.',
                 'detailed_description' => 'Trong album này, Đàm Vĩnh Hưng - "Ông hoàng nhạc Việt" - đã thực hiện một cuộc dạo chơi đầy táo bạo khi khoác lên những tình khúc Bolero và nhạc xưa một lớp áo mới. Không đi theo lối hát nức nở truyền thống, Mr. Đàm mang vào đó chất giọng khàn, gằn đầy nội lực và sự khắc khoải của một người đàn ông từng trải, tạo nên thương hiệu "nhạc xưa kiểu Đàm Vĩnh Hưng".
 
@@ -60,6 +63,7 @@ Tuyển tập bao gồm những nhạc phẩm vàng son như "Biển Tình", "Xi
             ],
             [
                 'name' => 'Tình Ca Phạm Duy',
+                'image' => 'products/W7654Wa2Pjtc3hBwsau76x1ft6FVwmC4AAmpWC58.webp',
                 'description' => 'Tuyển tập những tình ca bất hủ của nhạc sĩ Phạm Duy, ghi dấu một thời kỳ vàng son của âm nhạc Việt Nam. Các ca khúc như "Tình Ca", "Cỏ Úa" được trình bày với đầy cảm xúc.',
                 'detailed_description' => '`Tình Ca Phạm Duy` là một công trình nghệ thuật đồ sộ, tôn vinh di sản âm nhạc của nhạc sĩ Phạm Duy - người được mệnh danh là "phù thủy âm nhạc" của Việt Nam. Album này tuyển chọn những sáng tác tiêu biểu nhất trải dài qua nhiều giai đoạn sáng tác của ông, từ những bản dân ca mới, tình ca quê hương cho đến những bản tình ca đôi lứa đầy triết lý và lãng mạn.
 
@@ -73,6 +77,7 @@ Với chất lượng thu âm đạt chuẩn audiophile, album tái hiện khôn
             ],
             [
                 'name' => 'Nửa Vầng Trăng',
+                'image' => 'products/cjz6l6B4KmCezA7kEXGzUrtrT3je119n7Q3KO2jI.webp',
                 'description' => 'Album tổng hợp các ca khúc trữ tình với giọng ca của nhiều nghệ sĩ nổi tiếng thập niên 1990s, bao gồm "Nửa Vầng Trăng", "Mưa Rơi Lặng Thầm", mang đến không khí hoài niệm.',
                 'detailed_description' => 'Album `Nửa Vầng Trăng` là một tuyển tập đặc sắc quy tụ những giọng ca vàng của dòng nhạc trữ tình hải ngoại và trong nước thập niên 90 và đầu 2000. Tựa đề album lấy cảm hứng từ ca khúc cùng tên rất nổi tiếng, gợi mở một không gian âm nhạc lãng mạn, man mác buồn và đậm chất thơ, đặc trưng của các sản phẩm do trung tâm Thúy Nga phát hành.
 
@@ -88,6 +93,7 @@ Sự đa dạng trong album thể hiện qua việc lựa chọn bài hát, từ
             // The Beatles
             [
                 'name' => 'Abbey Road',
+                'image' => 'products/qImOIj1eFn4fmmsJhALbDPmIjNPq5l53Is1cR2tE.webp',
                 'description' => 'Album phòng thu thứ mười một và cũng là album cuối cùng được thu âm của The Beatles, phát hành năm 1969. Được đánh giá là một trong những album vĩ đại nhất mọi thời đại với "Come Together", "Something", "Here Comes the Sun".',
                 'detailed_description' => '`Abbey Road` là album phòng thu thứ mười một và cũng là lần cuối cùng bộ tứ huyền thoại The Beatles cùng nhau bước vào phòng thu. Mặc dù được phát hành trước *Let It Be*, nhưng đây thực sự là lời chia tay nghệ thuật đầy viên mãn của ban nhạc. Bìa album với hình ảnh bốn thành viên đi qua vạch kẻ đường bên ngoài studio đã trở thành một trong những hình ảnh mang tính biểu tượng nhất lịch sử văn hóa đại chúng.
 
@@ -101,6 +107,7 @@ Sở hữu đĩa than `Abbey Road` là sở hữu một chương cuối hoàn h�
             ],
             [
                 'name' => 'Sgt. Pepper\'s Lonely Hearts Club Band',
+                'image' => 'products/y7KcyrYo2hk3PxXwyNzdbjQnpiK3pzWt3GN4HvKG.webp',
                 'description' => 'Album phòng thu thứ tám của The Beatles phát hành năm 1967, được coi là album có ảnh hưởng nhất trong lịch sử nhạc rock. Một kiệt tác của nhạc psychedelic rock với "Lucy in the Sky with Diamonds", "A Day in the Life".',
                 'detailed_description' => 'Được phát hành vào "Mùa hè tình yêu" năm 1967, `Sgt. Pepper\'s Lonely Hearts Club Band` không chỉ là một album nhạc rock, mà là một sự kiện văn hóa đã thay đổi vĩnh viễn bộ mặt của âm nhạc đại chúng. The Beatles đã rũ bỏ hình tượng "boyband" để khoác lên mình bộ trang phục sặc sỡ của ban nhạc giả tưởng Sgt. Pepper, cho phép họ tự do thử nghiệm mọi giới hạn của phòng thu mà không bị ràng buộc bởi việc phải biểu diễn live.
 
@@ -114,6 +121,7 @@ Trên định dạng đĩa than, bìa đĩa được thiết kế công phu vớ
             ],
             [
                 'name' => 'Revolver',
+                'image' => 'products/03PxasQzVa4Zm7MZWukNdR7yQFqvKrpDPKd7C6tY.webp',
                 'description' => 'Album phòng thu thứ bảy của The Beatles phát hành năm 1966, đánh dấu sự chuyển mình trong âm nhạc của ban nhạc. Bao gồm các ca khúc nổi tiếng như "Eleanor Rigby", "Yellow Submarine", "Tomorrow Never Knows".',
                 'detailed_description' => 'Nếu *Sgt. Pepper* là bông hoa nở rộ rực rỡ, thì `Revolver` (1966) chính là hạt giống đầy đột phá. Đây là thời điểm The Beatles bắt đầu từ bỏ các chuyến lưu diễn để tập trung hoàn toàn vào phòng thu. Album đánh dấu sự trưởng thành vượt bậc trong tư duy sáng tác và sự tò mò vô tận với các âm thanh mới lạ, là cầu nối quan trọng chuyển giao từ Pop Rock sang Psychedelic.
 
@@ -127,6 +135,7 @@ Trên định dạng đĩa than, bìa đĩa được thiết kế công phu vớ
             ],
             [
                 'name' => 'The Beatles (White Album)',
+                'image' => 'products/BWiJgxvbUaBThXmCQJmLyH3OBal6lBDDkMPM22A3.webp',
                 'description' => 'Album kép thứ chín của The Beatles phát hành năm 1968, nổi tiếng với bìa album trắng tinh khiết. Một tác phẩm đa dạng với 30 ca khúc thuộc nhiều thể loại khác nhau, từ rock đến folk.',
                 'detailed_description' => 'Thường được gọi là "Album Trắng" do thiết kế bìa tối giản hoàn toàn, album kép phát hành năm 1968 này là bức chân dung chân thực nhất về bốn cá tính âm nhạc riêng biệt đang dần tách rời nhau. Không còn sự đồng nhất chặt chẽ như các album trước, `The White Album` là một bộ sưu tập hỗn loạn nhưng thiên tài, bao gồm 30 ca khúc trải dài trên hầu hết các thể loại âm nhạc tồn tại lúc bấy giờ.
 
@@ -142,6 +151,7 @@ Người nghe sẽ đi từ sự ồn ào, gào thét của Proto-metal trong "H
             // Pink Floyd
             [
                 'name' => 'The Dark Side of the Moon',
+                'image' => 'products/Opg2zhu4hV1VzgnOt4tldYeR7MPTqv1a57g1Dzps.webp',
                 'description' => 'Album phòng thu thứ tám của Pink Floyd phát hành năm 1973, một trong những album bán chạy nhất mọi thời đại. Khám phá các chủ đề về xung đột, tham lam, thời gian và bệnh tâm thần qua âm nhạc progressive rock tuyệt vời.',
                 'detailed_description' => 'Không chỉ là một album, `The Dark Side of the Moon` (1973) là một cột mốc văn hóa và là định nghĩa hoàn hảo cho khái niệm "Album Concept". Pink Floyd đã dệt nên một tấm thảm âm thanh liền mạch, khám phá những áp lực của cuộc sống hiện đại: thời gian ("Time"), tiền bạc ("Money"), chiến tranh ("Us and Them") và cái chết/sự điên loạn ("Brain Damage/Eclipse").
 
@@ -155,6 +165,7 @@ Với bìa đĩa lăng kính tam giác tán sắc ánh sáng mang tính biểu t
             ],
             [
                 'name' => 'The Wall',
+                'image' => 'products/y5tMXFgMY49q0nWRpMrMphIt0Ta1AFFyr29OmhHx.webp',
                 'description' => 'Album kép phòng thu thứ mười một của Pink Floyd phát hành năm 1979, một rock opera kể về nhân vật Pink. Bao gồm các hit như "Another Brick in the Wall Part 2", "Comfortably Numb", một kiệt tác về sự cô lập.',
                 'detailed_description' => '`The Wall` (1979) là một vở Rock Opera đầy tham vọng và kịch tính, kể về cuộc đời của nhân vật Pink - một ngôi sao nhạc rock bị dằn vặt bởi sự mất mát, cô lập và dần xây dựng một bức tường tinh thần ngăn cách bản thân với thế giới bên ngoài. Được dẫn dắt bởi Roger Waters, album mang màu sắc u tối, dằn vặt nhưng cũng đầy mãnh liệt.
 
@@ -168,6 +179,7 @@ Album kép này đòi hỏi người nghe phải thưởng thức trọn vẹn �
             ],
             [
                 'name' => 'Wish You Were Here',
+                'image' => 'products/JOxPl7wltRLkR4GWLvbMyScwgGF6F8hw35jsjqas.webp',
                 'description' => 'Album phòng thu thứ chín của Pink Floyd phát hành năm 1975, là lời tri ân cho thành viên sáng lập Syd Barrett. Album gồm các tác phẩm nổi tiếng như "Shine On You Crazy Diamond", "Wish You Were Here".',
                 'detailed_description' => 'Được phát hành sau thành công khổng lồ của *Dark Side of the Moon*, `Wish You Were Here` (1975) là lời tự sự đầy cảm xúc và cũng là lời tri ân đau đớn dành cho Syd Barrett - thành viên sáng lập thiên tài nhưng bất hạnh của nhóm đã rời bỏ thực tại vì vấn đề tâm lý. Chủ đề xuyên suốt của album là sự "vắng mặt" (absence) và sự hoài nghi đối với ngành công nghiệp âm nhạc.
 
@@ -183,6 +195,7 @@ Tác phẩm được bao bọc bởi hai phần của thiên trường ca "Shine
             // Led Zeppelin
             [
                 'name' => 'Led Zeppelin IV',
+                'image' => 'products/yrQ92Akf6nxVWYTWJSuW9i9o2EqHilIBmbRaXGIo.webp',
                 'description' => 'Album phòng thu thứ tư của Led Zeppelin phát hành năm 1971, bao gồm ca khúc huyền thoại "Stairway to Heaven". Được coi là một trong những album rock vĩ đại nhất với sự kết hợp hoàn hảo giữa hard rock, folk và blues.',
                 'detailed_description' => 'Thường được gọi là `Led Zeppelin IV` hoặc *Zoso*, album phát hành năm 1971 này là đỉnh cao chói lọi của dòng nhạc Hard Rock thập niên 70. Không có tên ban nhạc hay tiêu đề trên bìa đĩa, Led Zeppelin để âm nhạc tự cất tiếng nói, và đó là một tiếng nói đầy uy lực, pha trộn hoàn hảo giữa sự dữ dội của Rock, sự bí ẩn của Folk và chất đời của Blues.
 
@@ -196,6 +209,7 @@ Sở hữu đĩa than `Led Zeppelin IV` là sở hữu một giáo trình mẫu 
             ],
             [
                 'name' => 'Physical Graffiti',
+                'image' => 'products/fE1QuQNNAdXtE6AnREE1n0fnCaDwHykhc1eKyDD0.webp',
                 'description' => 'Album kép thứ sáu của Led Zeppelin phát hành năm 1975, cho thấy sự đa dạng trong phong cách âm nhạc của ban nhạc. Bao gồm "Kashmir", "Trampled Under Foot", một tác phẩm đồ sộ của hard rock.',
                 'detailed_description' => 'Là album kép đầu tiên của nhóm, `Physical Graffiti` (1975) cho thấy một Led Zeppelin ở đỉnh cao phong độ và sự tự tin tuyệt đối. Album là một bữa tiệc âm nhạc thịnh soạn, mở rộng biên độ sáng tạo của ban nhạc ra khỏi khuôn khổ Blues-Rock thông thường để chạm tới Funk, Progressive Rock và âm hưởng phương Đông.
 
@@ -209,6 +223,7 @@ Bìa đĩa được thiết kế độc đáo với các cửa sổ cắt rỗng
             ],
             [
                 'name' => 'Led Zeppelin II',
+                'image' => 'products/0WVtxO1O6XF0szMvPm9Bkh2M8tVwJCKlqG5NN57F.webp',
                 'description' => 'Album phòng thu thứ hai của Led Zeppelin phát hành năm 1969, củng cố vị thế của họ trong làng nhạc rock. Với các bản hit như "Whole Lotta Love", "Ramble On", album này định hình hard rock và heavy metal.',
                 'detailed_description' => 'Được thu âm vội vã giữa các chuyến lưu diễn năm 1969, `Led Zeppelin II` mang năng lượng thô ráp, trực diện và đầy dục vọng. Đây được coi là bản thiết kế chi tiết cho dòng nhạc Heavy Metal sau này. Album tập trung vào các đoạn riff guitar nặng nề, tiếng bass dồn dập và giọng hát cao vút đầy khiêu khích của Robert Plant.
 
@@ -224,6 +239,7 @@ Trên đĩa than, `Led Zeppelin II` (đặc biệt là các bản in đầu tiê
             // Queen
             [
                 'name' => 'A Night at the Opera',
+                'image' => 'products/hKMSoauPx88JghMc6bMF0nSNVASAMSFi12OLN4fa.webp',
                 'description' => 'Album phòng thu thứ tư của Queen phát hành năm 1975, bao gồm ca khúc huyền thoại "Bohemian Rhapsody". Một kiệt tác của rock opera với sự kết hợp độc đáo giữa rock, opera và progressive.',
                 'detailed_description' => 'Được mệnh danh là "Sgt. Pepper của Queen", `A Night at the Opera` (1975) là album đắt đỏ nhất từng được thực hiện vào thời điểm đó. Nó phá vỡ mọi quy tắc về thể loại, kết hợp Hard Rock với Opera, Music Hall, Folk và Pop. Queen đã sử dụng phòng thu như một nhạc cụ, chồng hàng trăm lớp giọng hát và guitar để tạo ra bức tường âm thanh đặc trưng mà không cần dùng đến synthesizer.
 
@@ -237,6 +253,7 @@ Bản Vinyl của album này tái hiện không gian sân khấu rộng lớn v�
             ],
             [
                 'name' => 'News of the World',
+                'image' => 'products/jKUYy0rio32VSG4vEw0NFzRiXgNEBIXy3NSnUNJf.webp',
                 'description' => 'Album phòng thu thứ sáu của Queen phát hành năm 1977, bao gồm hai anthem rock vĩ đại "We Will Rock You" và "We Are the Champions". Album này đã trở thành biểu tượng của văn hóa thể thao toàn cầu.',
                 'detailed_description' => 'Sau sự phức tạp và bóng bẩy của các album trước, `News of the World` (1977) là sự trở lại với chất Rock mộc mạc, gai góc và trực diện hơn, phản ứng lại sự trỗi dậy của phong trào Punk Rock lúc bấy giờ. Album được thiết kế để phục vụ cho các sân vận động, nơi khán giả có thể hòa mình vào âm nhạc.
 
@@ -250,6 +267,7 @@ Bìa đĩa với hình ảnh robot khổng lồ cầm trên tay các thành viê
             ],
             [
                 'name' => 'The Game',
+                'image' => 'products/eynr7nZZfIOKFSKPS1RcNRdrojjcQMQ3CNqvm2ws.webp',
                 'description' => 'Album phòng thu thứ tám của Queen phát hành năm 1980, đánh dấu sự chuyển hướng sang funk và disco. Bao gồm các hit "Another One Bites the Dust", "Crazy Little Thing Called Love".',
                 'detailed_description' => 'Bước vào thập niên 80, Queen đã thực hiện một cú chuyển mình ngoạn mục với `The Game`. Đây là album đầu tiên nhóm sử dụng Synthesizer, đánh dấu sự thay đổi lớn trong tư duy sản xuất. Album mang âm hưởng gọn gàng, hiện đại và chịu ảnh hưởng của dòng nhạc Funk/Disco đang thịnh hành.
 
@@ -265,6 +283,7 @@ Bìa đĩa với hình ảnh robot khổng lồ cầm trên tay các thành viê
             // Miles Davis - Jazz
             [
                 'name' => 'Kind of Blue',
+                'image' => 'products/APff5grSQ3O3Tb5D6dKG5sjiHoGuE5EtYfLce8bb.webp',
                 'description' => 'Album jazz kinh điển của Miles Davis phát hành năm 1959, được coi là album jazz vĩ đại nhất mọi thời đại. Với sự tham gia của John Coltrane, Bill Evans, album này định nghĩa modal jazz và đã bán được hàng triệu bản.',
                 'detailed_description' => '`Kind of Blue` (1959) không chỉ là album Jazz bán chạy nhất mọi thời đại, mà còn được coi là album nhạc Jazz vĩ đại nhất. Miles Davis, cùng với đội hình trong mơ gồm John Coltrane, Bill Evans, Cannonball Adderley, Paul Chambers và Jimmy Cobb, đã tạo ra một ngôn ngữ âm nhạc hoàn toàn mới dựa trên các thang âm (modal jazz) thay vì các vòng hòa thanh phức tạp truyền thống.
 
@@ -278,6 +297,7 @@ Nghe `Kind of Blue` trên đĩa than là cách tốt nhất để cảm nhận "
             ],
             [
                 'name' => 'Sketches of Spain',
+                'image' => 'products/7RZNYOAufLv5EdFUL2LbjNSikdTOfXr0y7guMncr.webp',
                 'description' => 'Album của Miles Davis phát hành năm 1960, kết hợp jazz với âm nhạc cổ điển Tây Ban Nha. Được phối khí bởi Gil Evans, đây là một trong những album jazz orchestral đẹp nhất từng được thu âm.',
                 'detailed_description' => 'Trong `Sketches of Spain` (1960), Miles Davis và nhà phối khí Gil Evans đã đưa Jazz thoát khỏi khuôn khổ của các câu lạc bộ đêm để bước vào thánh đường của âm nhạc giao hưởng thính phòng. Album là sự kết hợp đầy mê hoặc giữa ngôn ngữ Jazz Mỹ và âm hưởng dân gian, cổ điển Tây Ban Nha.
 
@@ -291,6 +311,7 @@ Tác phẩm trung tâm "Concierto de Aranjuez" dài 16 phút là một hành tr�
             ],
             [
                 'name' => 'Bitches Brew',
+                'image' => 'products/3z33RAbE4U2m7kVTBF1jlVQfhlhSEvmROMxBumHL.webp',
                 'description' => 'Album đột phá của Miles Davis phát hành năm 1970, khởi đầu kỷ nguyên jazz fusion. Kết hợp jazz với rock, funk và electronic, album này đã mở ra hướng đi mới cho jazz hiện đại.',
                 'detailed_description' => 'Nếu *Kind of Blue* là sự tĩnh lặng, thì `Bitches Brew` (1970) là cơn bão hỗn mang đầy mê hoặc. Miles Davis đã phá bỏ mọi rào cản, kết hợp Jazz với Rock, Funk và Psychedelic, sử dụng nhạc cụ điện tử, hiệu ứng âm thanh và cấu trúc bài hát lỏng lẻo dựa trên sự ngẫu hứng tập thể.
 
@@ -306,6 +327,7 @@ Bìa đĩa siêu thực (Surrealism) rực rỡ là sự phản chiếu hoàn h�
             // John Coltrane
             [
                 'name' => 'A Love Supreme',
+                'image' => 'products/xukBu7L2BiCbbIt0Q14EqODIvGaN5B5CR5uMtdhB.webp',
                 'description' => 'Album jazz tâm linh của John Coltrane phát hành năm 1965, được coi là kiệt tác của ông. Một tác phẩm bốn phần thể hiện hành trình tâm linh, đây là một trong những album jazz quan trọng và có ảnh hưởng nhất.',
                 'detailed_description' => '`A Love Supreme` (1965) là đỉnh cao nghệ thuật và tâm linh của nghệ sĩ saxophone John Coltrane. Đây là một bản thánh ca không lời, một lời tạ ơn dâng lên Thượng Đế sau khi ông vượt qua được cơn nghiện ngập và tìm thấy sự giác ngộ. Album được chia thành 4 phần: "Acknowledgement", "Resolution", "Pursuance", và "Psalm".
 
@@ -319,6 +341,7 @@ Tiếng kèn tenor của Coltrane trong album này đạt đến độ chín mu�
             ],
             [
                 'name' => 'Blue Train',
+                'image' => 'products/hAg02l1AqAiiHmxInMnBPbmkGAHeoYyX6jsAGCQW.webp',
                 'description' => 'Album phòng thu của John Coltrane phát hành năm 1957, đánh dấu debut của ông với Blue Note Records. Một album hard bop kinh điển với ca khúc chủ đề "Blue Train" và sự tham gia của Lee Morgan.',
                 'detailed_description' => 'Trước khi đi sâu vào những thử nghiệm tâm linh phức tạp, John Coltrane đã tạo ra `Blue Train` (1957) - album Hard Bop hoàn hảo nhất của ông cho hãng đĩa Blue Note. Album nổi bật với sự tham gia của dàn kèn hùng hậu gồm Lee Morgan (trumpet) và Curtis Fuller (trombone), tạo nên âm thanh dày dặn và sôi nổi.
 
@@ -334,6 +357,7 @@ Bìa đĩa với tông màu xanh dương và hình ảnh Coltrane đang trầm t
             // Ella Fitzgerald
             [
                 'name' => 'Ella Fitzgerald Sings the Cole Porter Song Book',
+                'image' => 'products/RuFZRlFIXFCIg94EU9zHuoVuOc9xSwE7RS29MZ32.webp',
                 'description' => 'Album của Ella Fitzgerald phát hành năm 1956, là phần đầu tiên trong series Song Books. Bà thể hiện các tác phẩm của Cole Porter với giọng hát trong trẻo và kỹ thuật hoàn hảo.',
                 'detailed_description' => 'Đây là viên gạch đầu tiên đặt nền móng cho di sản đồ sộ "The Song Books" của Ella Fitzgerald. Phát hành năm 1956, album này đã nâng tầm nhạc Pop truyền thống lên hàng nghệ thuật. Ella không chỉ hát, bà tôn vinh từng ca từ, từng nốt nhạc của nhạc sĩ Cole Porter bằng giọng hát trong trẻo, kỹ thuật phrasing (ngắt câu) hoàn hảo và sự sang trọng tự nhiên.
 
@@ -347,6 +371,7 @@ Sở hữu bộ đĩa than này giống như sở hữu một cuốn sách giáo
             ],
             [
                 'name' => 'Ella and Louis',
+                'image' => 'products/4goE6HWw7xTv2aL76jxQ3eox559podbivVdIyrrr.webp',
                 'description' => 'Album hợp tác giữa Ella Fitzgerald và Louis Armstrong phát hành năm 1956. Sự kết hợp giữa giọng soprano tinh khiết của Ella và giọng gravelly của Louis tạo nên một album jazz vocal bất hủ.',
                 'detailed_description' => 'Một sự kết hợp "lạ lùng" nhưng hoàn hảo đến ngỡ ngàng. Giọng hát của Ella Fitzgerald - trong trẻo, bay bổng như pha lê - đặt cạnh giọng hát của Louis Armstrong - khàn đục, thô ráp như sỏi đá - đã tạo nên một sự tương phản đầy thú vị và duyên dáng. `Ella and Louis` (1956) là đỉnh cao của sự thư giãn và niềm vui trong âm nhạc.
 
@@ -362,6 +387,7 @@ Sở hữu bộ đĩa than này giống như sở hữu một cuốn sách giáo
             // Louis Armstrong
             [
                 'name' => 'Hello, Dolly!',
+                'image' => 'products/MUKZuRicekhh6UYTkk5HBJX9Wgg3TKRTZ8MRlCIj.webp',
                 'description' => 'Album của Louis Armstrong phát hành năm 1964, với ca khúc chủ đề cùng tên đã đánh bại Beatles trên bảng xếp hạng Billboard. Một album showcase giọng hát ấm áp và trumpet tuyệt vời của Satchmo.',
                 'detailed_description' => 'Năm 1964, giữa tâm bão Beatlemania (cơn sốt The Beatles), một nghệ sĩ Jazz 63 tuổi đã đánh bật bộ tứ Liverpool khỏi vị trí số 1 bảng xếp hạng Billboard. Đó chính là Louis Armstrong với album `Hello, Dolly!`. Album này là minh chứng cho sức hút vượt thời gian và sự duyên dáng bất tận của "Satchmo" ở giai đoạn sau của sự nghiệp.
 
@@ -377,6 +403,7 @@ Dù không mang nặng tính học thuật hay thử nghiệm như các album Ja
             // Nirvana
             [
                 'name' => 'Nevermind',
+                'image' => 'products/RnoHGWQfmu7X7EI7kTuniMuWdtnd5a6a2ApYT2wi.webp',
                 'description' => 'Album phòng thu thứ hai của Nirvana phát hành năm 1991, đã thay đổi bộ mặt nhạc rock và đưa grunge vào mainstream. Với "Smells Like Teen Spirit", album này trở thành biểu tượng của thế hệ Generation X.',
                 'detailed_description' => '`Nevermind` (1991) không chỉ là một album, nó là phát súng hiệu lệnh cho một cuộc cách mạng văn hóa. Nirvana đã đưa dòng nhạc Grunge từ những gara ẩm thấp ở Seattle ra ánh sáng, kết liễu kỷ nguyên Hair Metal hào nhoáng và trở thành tiếng nói của thế hệ X đầy bất mãn và âu lo.
 
@@ -390,6 +417,7 @@ Bìa đĩa hình em bé bơi theo tờ đô-la là một trong những hình ả
             ],
             [
                 'name' => 'In Utero',
+                'image' => 'products/LF17R54yj6xN2tpLKBcBOxD85WWAp9ku8bMtgqga.webp',
                 'description' => 'Album phòng thu thứ ba và cuối cùng của Nirvana phát hành năm 1993, thô ráp và trực diện hơn Nevermind. Album thể hiện sự giằng xé nội tâm của Kurt Cobain với các ca khúc như "Heart-Shaped Box".',
                 'detailed_description' => 'Sau thành công choáng ngợp của *Nevermind*, Nirvana phản ứng lại sự nổi tiếng bằng `In Utero` (1993) - một album thô ráp, gai góc và khó tiếp cận hơn, được thu âm bởi "kỹ sư âm thanh purist" Steve Albini. Đây là bức chân dung chân thực và đau đớn về nội tâm giằng xé của Kurt Cobain trước khi anh qua đời.
 
@@ -405,6 +433,7 @@ Bìa đĩa hình em bé bơi theo tờ đô-la là một trong những hình ả
             // Radiohead
             [
                 'name' => 'OK Computer',
+                'image' => 'products/0FWmixn6RBkJsHclDCUagMQsSxZjYCYptkxMd1PZ.webp',
                 'description' => 'Album phòng thu thứ ba của Radiohead phát hành năm 1997, một kiệt tác của alternative rock. Album khám phá alienation trong thời đại hiện đại với các ca khúc như "Paranoid Android", "Karma Police", "No Surprises".',
                 'detailed_description' => '`OK Computer` (1997) thường được ví như *Dark Side of the Moon* của thế hệ Alternative Rock. Radiohead đã tạo ra một kiệt tác về nỗi lo âu trước sự bùng nổ của công nghệ, sự tha hóa của chủ nghĩa tiêu dùng và sự cô đơn trong xã hội hiện đại, ngay trước thềm thiên niên kỷ mới.
 
@@ -418,6 +447,7 @@ Album là sự mở rộng vĩ đại của cấu trúc nhạc Rock: những b�
             ],
             [
                 'name' => 'Kid A',
+                'image' => 'products/gHIQBVxu0lLEACjl8p6F2JsZKaME8y8o5CqCSp3O.webp',
                 'description' => 'Album phòng thu thứ tư của Radiohead phát hành năm 2000, đánh dấu sự chuyển hướng radical sang electronic và experimental. Một album đầy thách thức và đổi mới, định hình rock thập kỷ 2000.',
                 'detailed_description' => 'Khi cả thế giới đang chờ đợi một *OK Computer* phần 2, Radiohead đã ném đi tất cả guitar để tạo ra `Kid A` (2000). Album này là cú sốc lớn nhất đầu thế kỷ 21, một cuộc cách mạng triệt để khi ban nhạc rock nổi tiếng nhất thế giới chuyển sang chơi nhạc điện tử, Ambient và Jazz thể nghiệm.
 
@@ -431,6 +461,7 @@ Album là sự mở rộng vĩ đại của cấu trúc nhạc Rock: những b�
             ],
             [
                 'name' => 'In Rainbows',
+                'image' => 'products/rV8GSJLf9P8FkRN0XXAiAtoTmvcfX0knsyUz3FhU.webp',
                 'description' => 'Album phòng thu thứ bảy của Radiohead phát hành năm 2007, nổi tiếng với mô hình phát hành "pay what you want". Album kết hợp electronic với rock truyền thống, được đánh giá là một trong những album hay nhất của họ.',
                 'detailed_description' => '`In Rainbows` (2007) là sự hòa giải tuyệt vời giữa những thử nghiệm điện tử lạnh lùng và sự ấm áp, nhân văn của nhạc cụ truyền thống. Sau nhiều năm, Radiohead trở nên "gần gũi" hơn, lãng mạn hơn và quyến rũ hơn. Album cũng nổi tiếng với mô hình phát hành "trả bao nhiêu tùy thích" gây chấn động ngành công nghiệp âm nhạc.
 
@@ -446,6 +477,7 @@ Album là sự mở rộng vĩ đại của cấu trúc nhạc Rock: những b�
             // Kraftwerk
             [
                 'name' => 'Trans-Europe Express',
+                'image' => 'products/wBCGEhPHPxXNNzokt4J2OXBJUg38wvBwpKnClZMf.webp',
                 'description' => 'Album thứ sáu của Kraftwerk phát hành năm 1977, một tác phẩm tiên phong của electronic music. Album lấy cảm hứng từ hành trình tàu hỏa xuyên châu Âu, đã ảnh hưởng sâu rộng đến hip hop và techno.',
                 'detailed_description' => 'Nếu Kraftwerk là những người cha đỡ đầu của nhạc điện tử, thì `Trans-Europe Express` (1977) chính là bản tuyên ngôn quan trọng nhất. Album lấy cảm hứng từ mạng lưới tàu hỏa cao tốc Châu Âu, tôn vinh sự lãng mạn của công nghệ và sự kết nối lục địa già.
 
@@ -459,6 +491,7 @@ Nghe `Trans-Europe Express` trên Vinyl là quay ngược thời gian về tươ
             ],
             [
                 'name' => 'The Man-Machine',
+                'image' => 'products/Yf8EHrE1kqF54Hcwr7COvhuHcuZ9qMsygQGJAt6Y.webp',
                 'description' => 'Album thứ bảy của Kraftwerk phát hành năm 1978, khám phá mối quan hệ giữa con người và công nghệ. Với các ca khúc như "The Robots", "The Model", album này định hình synthpop và new wave.',
                 'detailed_description' => 'Với `The Man-Machine` (1978), Kraftwerk hoàn thiện hình tượng "người máy" của mình với áo sơ mi đỏ, cà vạt đen đồng phục. Album tiếp tục khai thác mối quan hệ giữa nhân loại và máy móc, nhưng với giai điệu pop hóa hơn, dễ tiếp cận hơn và cấu trúc chặt chẽ hơn.
 
@@ -472,6 +505,7 @@ Bìa đĩa lấy cảm hứng từ nghệ thuật Constructivism (Kiến tạo) 
             ],
             [
                 'name' => 'Autobahn',
+                'image' => 'products/D49Gz0ArCYDeXGL8pkhCdY5EOsSpRAgMYU4WqgMR.webp',
                 'description' => 'Album thứ tư của Kraftwerk phát hành năm 1974, đánh dấu sự chuyển mình sang electronic music hoàn toàn. Ca khúc chủ đề dài 22 phút mô phỏng hành trình trên đường cao tốc, một đột phá trong âm nhạc electronic.',
                 'detailed_description' => '`Autobahn` (1974) là bước ngoặt lịch sử khi Kraftwerk chuyển mình từ một ban nhạc Krautrock thể nghiệm sang những người tiên phong của nhạc Pop điện tử. Ca khúc chủ đề dài 22 phút chiếm trọn mặt A của đĩa than là một bài thơ âm thanh mô tả cảm giác lái xe trên đường cao tốc Đức: tiếng khởi động xe, tiếng còi, tiếng gió lướt qua và nhịp điệu đều đặn của bánh xe trên mặt đường nhựa.
 
@@ -487,6 +521,7 @@ Cầm trên tay chiếc đĩa than `Autobahn`, với bìa đĩa vẽ biểu tư�
             // Daft Punk
             [
                 'name' => 'Discovery',
+                'image' => 'products/wGfb6S0AOVSYtU0f3kkcBEeVyAI2WjpNlO5JmqI6.webp',
                 'description' => 'Album phòng thu thứ hai của Daft Punk phát hành năm 2001, kết hợp house, disco, rock và synthpop. Với các hit như "One More Time", "Harder Better Faster Stronger", album này định nghĩa French house.',
                 'detailed_description' => '`Discovery` (2001) là album đã biến Daft Punk từ những ngôi sao nhạc House hầm ngố thành những biểu tượng Pop toàn cầu trong trang phục Robot. Bộ đôi người Pháp đã khéo léo hồi sinh âm nhạc Disco, Glam Rock và R&B thập niên 70/80, lọc chúng qua lăng kính của nhạc điện tử hiện đại để tạo ra thứ âm thanh vừa hoài cổ vừa tương lai.
 
@@ -500,6 +535,7 @@ Trên định dạng Vinyl, `Discovery` mang lại năng lượng bùng nổ. Â
             ],
             [
                 'name' => 'Random Access Memories',
+                'image' => 'products/S7F5fHVRawuK0Di2CvKykYQQ5BVRL7IgQnsL6eYR.webp',
                 'description' => 'Album phòng thu thứ tư của Daft Punk phát hành năm 2013, tribute đến disco và soft rock thập niên 1970s-80s. Với "Get Lucky" featuring Pharrell Williams, album này giành Album of the Year tại Grammy.',
                 'detailed_description' => 'Khi cả thế giới đang chạy theo EDM ồn ào mà Daft Punk từng góp phần tạo ra, họ lại quay ngược 180 độ với `Random Access Memories` (2013). Album là lời tri ân xa xỉ dành cho kỷ nguyên vàng của âm nhạc Analog (thập niên 70, đầu 80). Họ hạn chế sampling, thay vào đó mời những huyền thoại sống như Nile Rodgers, Giorgio Moroder và các nhạc công hàng đầu vào phòng thu để chơi nhạc cụ thật.
 
@@ -513,6 +549,7 @@ Kết quả là một kiệt tác âm thanh sang trọng, ấm áp và đầy t�
             ],
             [
                 'name' => 'Homework',
+                'image' => 'products/W8oUhFBZvF7BIg1q0O1TMeMtgQSZY593v9BIOrqv.webp',
                 'description' => 'Album debut của Daft Punk phát hành năm 1997, giới thiệu French house đến thế giới. Với các ca khúc như "Around the World", "Da Funk", album này đặt nền móng cho career huyền thoại của bộ đôi.',
                 'detailed_description' => '`Homework` (1997) là tiếng nổ lớn đưa French Touch (House kiểu Pháp) lên bản đồ thế giới. Được thu âm ngay tại phòng ngủ (đúng như tên gọi), album mang năng lượng thô ráp, lặp lại (repetitive) đầy thôi miên và chất lofi quyến rũ của nhạc House và Techno underground.
 
@@ -528,6 +565,7 @@ Sở hữu `Homework` trên đĩa than là sở hữu nguồn gốc của huyề
             // The Chemical Brothers
             [
                 'name' => 'Dig Your Own Hole',
+                'image' => 'products/hFLnleCXsHU5lq4AeAtfmJbK9pL22Z0iqAAzEfUD.webp',
                 'description' => 'Album phòng thu thứ hai của The Chemical Brothers phát hành năm 1997, đỉnh cao của big beat. Với "Block Rockin\' Beats", "Setting Sun", album này định hình electronic dance music thập niên 1990s.',
                 'genre' => 'Big Beat',
                 'label' => 'Freestyle Dust',
@@ -536,6 +574,7 @@ Sở hữu `Homework` trên đĩa than là sở hữu nguồn gốc của huyề
             ],
             [
                 'name' => 'Surrender',
+                'image' => 'products/HumxAR05h6Lyoq0rZKczQsxRzQFSzzqh7ocdPIh2.webp',
                 'description' => 'Album phòng thu thứ ba của The Chemical Brothers phát hành năm 1999, tiếp tục khai thác big beat với sự tinh tế hơn. Bao gồm "Hey Boy Hey Girl", "Let Forever Be" với sự góp giọng của Noel Gallagher.',
                 'detailed_description' => 'Sau sự bùng nổ của Big Beat, `Surrender` (1999) cho thấy sự trưởng thành và hướng đi sâu sắc hơn của The Chemical Brothers. Album mở rộng bảng màu âm thanh sang House, Psychedelic và Pop, mang lại cảm giác bay bổng, mộng mơ hơn (euphoric) so với sự hung hăng của các album trước.
 
@@ -551,6 +590,7 @@ Bìa đĩa với hình ảnh đám đông giơ tay lên trời thể hiện chí
             // Marvin Gaye
             [
                 'name' => 'What\'s Going On',
+                'image' => 'products/AwEKY8405LdMkqDRb9owDWNf4h507T8dlOF9MEAG.webp',
                 'description' => '`What\'s Going On` (1971) thường xuyên đứng đầu các danh sách "Album hay nhất mọi thời đại" của các tạp chí uy tín. Đây là bước ngoặt khi Marvin Gaye thoát khỏi khuôn mẫu "hoàng tử tình ca" của Motown để trở thành một nghệ sĩ có lương tri xã hội. Album là một chuỗi ca khúc liền mạch (song cycle) phản ánh góc nhìn của một cựu chiến binh Việt Nam trở về Mỹ, chứng kiến sự bất công, nghèo đói, ma túy và ô nhiễm môi trường.
 
 Âm nhạc trong album là sự pha trộn mượt mà giữa Soul, Jazz và Gospel. Giọng hát của Marvin Gaye, lúc thì thì thầm, lúc thì vút cao đau đớn, trôi trên nền nhạc đệm đa lớp tinh tế. Ca khúc chủ đề và "Mercy Mercy Me (The Ecology)" mang thông điệp vượt thời gian.
@@ -563,6 +603,7 @@ Nghe `What\'s Going On` trên đĩa than là một trải nghiệm tâm linh. S�
             ],
             [
                 'name' => 'Let\'s Get It On',
+                'image' => 'products/VhqvJa3mEO8JRvVG7TTVxpzYazOhRT1libSGrBoA.webp',
                 'description' => 'Album phòng thu thứ mười ba của Marvin Gaye phát hành năm 1973, một album sensual về tình yêu và sexuality. Ca khúc chủ đề trở thành một trong những love song mang tính biểu tượng nhất.',
                 'detailed_description' => 'Nếu *What\'s Going On* là tiếng nói của tâm hồn và trí tuệ, thì `Let\'s Get It On` (1973) là tiếng nói của thể xác và dục vọng. Marvin Gaye đã biến tình dục thành một trải nghiệm tôn giáo thiêng liêng. Album này là chuẩn mực của dòng nhạc Soul/R&B lãng mạn, quyến rũ (Quiet Storm).
 
@@ -578,6 +619,7 @@ Chất âm của đĩa than cực kỳ phù hợp với không khí của album 
             // Stevie Wonder
             [
                 'name' => 'Songs in the Key of Life',
+                'image' => 'products/8ier1Pltjugq7I14x2zU2sUJwZ9l9Xc1oHKLztR4.webp',
                 'description' => 'Album kép của Stevie Wonder phát hành năm 1976, được coi là kiệt tác của ông. Một tác phẩm đồ sộ với 21 ca khúc khám phá tình yêu, tâm linh và công bằng xã hội, giành Album of the Year tại Grammy.',
                 'detailed_description' => '`Songs in the Key of Life` là album phòng thu thứ 18 của huyền thoại âm nhạc Mỹ Stevie Wonder. Được phát hành vào ngày 28 tháng 9 năm 1976 dưới dạng album kép bởi Tamla Records (một nhánh của Motown), đây được coi là đỉnh cao chói lọi nhất trong "thời kỳ cổ điển" (classic period) của ông, bắt đầu từ năm 1972.
 
@@ -591,6 +633,7 @@ Album ra mắt ở vị trí số 1 trên Billboard 200 và trụ vững ở đ�
             ],
             [
                 'name' => 'Innervisions',
+                'image' => 'products/35WaL5TWcQnCsbyMtrS8hfOppyg2Jb1U47aDONwy.webp',
                 'description' => 'Album phòng thu thứ mười sáu của Stevie Wonder phát hành năm 1973, khám phá các vấn đề xã hội và tâm linh. Với "Living for the City", "Higher Ground", album này giành Grammy Album of the Year.',
                 'detailed_description' => '`Innervisions` (1973) là album tập trung, gai góc và mang tính chính trị nhất của Stevie Wonder. Nếu các album khác hướng ngoại, thì album này là cái nhìn sâu sắc vào nội tâm và thực trạng xã hội Mỹ thời bấy giờ: ma túy, phân biệt chủng tộc và áp lực đô thị.
 
@@ -604,6 +647,7 @@ Album đã giành giải Grammy Album của năm. Trên định dạng Vinyl, s�
             ],
             [
                 'name' => 'Talking Book',
+                'image' => 'products/a4FUCsDmb0kZXIGV8lguZyaAiZydiP01HDuDRDAV.webp',
                 'description' => 'Album phòng thu thứ mười lăm của Stevie Wonder phát hành năm 1972, bao gồm hai hit lớn "Superstition" và "You Are the Sunshine of My Life". Album đánh dấu thời kỳ hoàng kim của ông.',
                 'detailed_description' => '`Talking Book` (1972) là album đánh dấu sự tự do nghệ thuật hoàn toàn của Stevie Wonder, nơi ông rũ bỏ hình ảnh "Little Stevie" để trở thành một nghệ sĩ trưởng thành đầy quyến rũ và sâu sắc. Album cân bằng hoàn hảo giữa những bản Funk hầm hố và những bản Ballad tình yêu mềm mại.
 
@@ -618,12 +662,13 @@ Bìa album với hình ảnh Stevie không đeo kính đen, nhìn xa xăm, thể
         ];
 
         foreach ($albums as $albumData) {
-            // Calculate cost_price: 50,000 to 300,000 VND lower than selling price
-            $priceReduction = rand(5, 30) * 10000;
+            // Calculate cost_price: 100,000 to 500,000 VND lower than selling price
+            $priceReduction = rand(10, 50) * 10000;
             $costPrice = max(50000, $albumData['price'] - $priceReduction); // Ensure cost price is at least 50,000 VND
 
             Product::create([
                 'name' => $albumData['name'],
+                'image' => $albumData['image'],
                 'slug' => Str::slug($albumData['name']),
                 'description' => $albumData['description'],
                 'detailed_description' => $albumData['detailed_description'] ?? null,
