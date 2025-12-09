@@ -35,7 +35,7 @@ class ProductController extends Controller
             'genre' => $request->get('genre'),
             'featured' => $request->get('featured'),
             'stock' => $request->get('stock'),
-            'sort' => $request->get('sort', 'newest'),
+            'sort' => $request->get('sort', 'name_asc'),
         ];
 
         // Build query using ProductQueryBuilder

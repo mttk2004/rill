@@ -465,8 +465,8 @@ const ProductList = ({ products: productsPagination, filters, genres }: ProductL
           onClose={() => setDeleteId(null)}
           onConfirm={handleDeleteConfirm}
           title="Xóa sản phẩm?"
-          description="Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác và có thể ảnh hưởng đến dữ liệu đơn hàng."
-          confirmText="Xóa vĩnh viễn"
+          description="Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này có thể hoàn tác và không ảnh hưởng đến dữ liệu đơn hàng."
+          confirmText="Xóa sản phẩm"
         />
       </div>
     </AdminLayout>
